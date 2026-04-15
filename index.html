@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="ember">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,17 +15,90 @@
       padding: 0;
     }
 
-    :root {
+    :root, [data-theme="ember"] {
       --black: #0a0906;
-      --off-black: #100f0c;
       --dark: #181510;
-      --amber: #e8782a;
-      --amber-dim: #a04f18;
-      --amber-glow: rgba(232, 120, 42, 0.12);
+      --accent: #e8782a;
+      --accent-dim: #a04f18;
+      --glow: rgba(232, 120, 42, 0.07);
       --white: #f5ede2;
       --muted: #6b6057;
       --border: rgba(232, 120, 42, 0.18);
     }
+
+    [data-theme="neon-noir"] {
+      --black: #07050f;
+      --dark: #0e0a1a;
+      --accent: #f72585;
+      --accent-dim: #7b1fa2;
+      --glow: rgba(183, 0, 255, 0.08);
+      --white: #ede8f5;
+      --muted: #5c5470;
+      --border: rgba(247, 37, 133, 0.2);
+    }
+
+    [data-theme="ice"] {
+      --black: #050810;
+      --dark: #0a0f1e;
+      --accent: #4fc3f7;
+      --accent-dim: #1a6a8a;
+      --glow: rgba(79, 195, 247, 0.07);
+      --white: #e8f4f8;
+      --muted: #4a6070;
+      --border: rgba(79, 195, 247, 0.18);
+    }
+
+    [data-theme="acid"] {
+      --black: #040a04;
+      --dark: #081208;
+      --accent: #39ff14;
+      --accent-dim: #1a7a08;
+      --glow: rgba(57, 255, 20, 0.06);
+      --white: #e8f5e8;
+      --muted: #4a6b4a;
+      --border: rgba(57, 255, 20, 0.18);
+    }
+
+    /* ── THEME SWITCHER ── */
+    .theme-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .theme-dots {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-dot:hover { transform: scale(1.3); }
+
+    .theme-dot.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 7px 2px var(--dot-color);
+    }
+
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
 
     html, body {
       height: 100%;
@@ -34,6 +107,7 @@
       font-family: 'Barlow', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
     /* Radial atmospheric glow */
@@ -45,12 +119,12 @@
       transform: translate(-50%, -50%);
       width: 700px;
       height: 500px;
-      background: radial-gradient(ellipse, rgba(232, 120, 42, 0.07) 0%, transparent 70%);
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Grain overlay — heavier */
+    /* Grain overlay */
     body::before {
       content: '';
       position: fixed;
@@ -89,9 +163,7 @@
       text-decoration: none;
     }
 
-    .wordmark span {
-      color: var(--amber);
-    }
+    .wordmark span { color: var(--accent); }
 
     .contact-link {
       font-size: 0.7rem;
@@ -101,10 +173,7 @@
       text-decoration: none;
       transition: color 0.3s;
     }
-
-    .contact-link:hover {
-      color: var(--amber);
-    }
+    .contact-link:hover { color: var(--accent); }
 
     /* ── HERO ── */
     .hero {
@@ -124,7 +193,7 @@
       font-size: 0.7rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--amber);
+      color: var(--accent);
       animation: fadeUp 0.8s 0.2s ease both;
     }
 
@@ -142,11 +211,11 @@
     .headline em {
       font-style: italic;
       font-weight: 400;
-      color: var(--amber);
+      color: var(--accent);
     }
 
     .subhead {
-      font-size: 1rem;
+      font-size: 0.875rem;
       line-height: 1.8;
       color: var(--muted);
       max-width: 440px;
@@ -186,7 +255,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
       z-index: 2;
     }
 
@@ -194,7 +263,7 @@
     .divider {
       width: 48px;
       height: 1px;
-      background: var(--amber-dim);
+      background: var(--accent-dim);
       margin: 0 auto;
       animation: fadeUp 0.8s 0.8s ease both;
     }
@@ -253,9 +322,7 @@
       transition: color 0.3s;
     }
 
-    .footer-email:hover {
-      color: var(--amber);
-    }
+    .footer-email:hover { color: var(--accent); }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeDown {
@@ -282,8 +349,8 @@
 
     <header>
       <a class="wordmark" href="#">
-  <img src="HR-logo-horiz-white.png" alt="Higher Roads" height="32" />
-</a>
+        <img src="HR-logo-horiz-white.png" alt="Higher Roads" height="32" />
+      </a>
       <a class="contact-link" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
     </header>
 
@@ -297,7 +364,7 @@
       </h1>
 
       <p class="subhead">
-        Full site coming soon. In the meantime — take a look at the work.
+        We're building something. In the meantime, take a look at the work.
       </p>
 
       <!-- DEMO REEL — swap the Vimeo/YouTube src below -->
@@ -306,10 +373,10 @@
           <!--
             Replace this src with your actual reel URL.
             Vimeo example:  https://player.vimeo.com/video/YOUR_VIDEO_ID?autoplay=0&title=0&byline=0&portrait=0
-            YouTube example: https://www.youtube.com/embed/2DUOFQyAzbo https://youtu.be/2DUOFQyAzbo
+            YouTube example: https://www.youtube.com/embed/YOUR_VIDEO_ID
           -->
           <iframe
-            src="https://www.youtube.com/embed/2DUOFQyAzbo"
+            src="https://player.vimeo.com/video/76979871?title=0&byline=0&portrait=0"
             allow="autoplay; fullscreen; picture-in-picture"
             allowfullscreen
             title="Higher Roads Demo Reel"
@@ -330,9 +397,31 @@
 
     <footer>
       <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
+          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
+          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
+          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
+        </div>
+      </div>
       <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
     </footer>
 
   </div>
+
+  <script>
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
