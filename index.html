@@ -6,7 +6,7 @@
   <title>Higher Roads — Coming Soon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
 
   <style>
     *, *::before, *::after {
@@ -16,14 +16,15 @@
     }
 
     :root {
-      --black: #0a0a0a;
-      --off-black: #111111;
-      --dark: #161616;
-      --gold: #c9a84c;
-      --gold-dim: #8a6e32;
-      --white: #f2ede8;
-      --muted: #6b6560;
-      --border: rgba(201, 168, 76, 0.15);
+      --black: #0a0906;
+      --off-black: #100f0c;
+      --dark: #181510;
+      --amber: #e8782a;
+      --amber-dim: #a04f18;
+      --amber-glow: rgba(232, 120, 42, 0.12);
+      --white: #f5ede2;
+      --muted: #6b6057;
+      --border: rgba(232, 120, 42, 0.18);
     }
 
     html, body {
@@ -35,15 +36,29 @@
       overflow-x: hidden;
     }
 
-    /* Subtle grain overlay */
+    /* Radial atmospheric glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(232, 120, 42, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grain overlay — heavier */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
-      opacity: 0.5;
+      opacity: 0.8;
     }
 
     .page {
@@ -65,17 +80,17 @@
     }
 
     .wordmark {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 1.25rem;
-      letter-spacing: 0.3em;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
       text-transform: uppercase;
       color: var(--white);
       text-decoration: none;
     }
 
     .wordmark span {
-      color: var(--gold);
+      color: var(--amber);
     }
 
     .contact-link {
@@ -88,7 +103,7 @@
     }
 
     .contact-link:hover {
-      color: var(--gold);
+      color: var(--amber);
     }
 
     /* ── HERO ── */
@@ -104,16 +119,18 @@
     }
 
     .eyebrow {
-      font-size: 0.65rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      font-size: 0.7rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--amber);
       animation: fadeUp 0.8s 0.2s ease both;
     }
 
     .headline {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
       font-size: clamp(2.8rem, 7vw, 5.5rem);
       line-height: 1.05;
       letter-spacing: -0.01em;
@@ -124,7 +141,8 @@
 
     .headline em {
       font-style: italic;
-      color: var(--gold);
+      font-weight: 400;
+      color: var(--amber);
     }
 
     .subhead {
@@ -160,7 +178,7 @@
       border: none;
     }
 
-    /* Gold line accent */
+    /* Amber line accent */
     .reel-frame::before {
       content: '';
       position: absolute;
@@ -168,7 +186,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
       z-index: 2;
     }
 
@@ -176,7 +194,7 @@
     .divider {
       width: 48px;
       height: 1px;
-      background: var(--gold-dim);
+      background: var(--amber-dim);
       margin: 0 auto;
       animation: fadeUp 0.8s 0.8s ease both;
     }
@@ -236,7 +254,7 @@
     }
 
     .footer-email:hover {
-      color: var(--gold);
+      color: var(--amber);
     }
 
     /* ── ANIMATIONS ── */
@@ -269,14 +287,15 @@
 
     <main class="hero">
 
-      <p class="eyebrow">Motion Design · Functional CPG</p>
+      <p class="eyebrow">Motion Design · 3D Animation · Immersive Environments</p>
 
       <h1 class="headline">
-        Make every impression<br><em>actually make</em> an impression.
+        <span style="display:block">Make every impression</span>
+        <span style="display:block"><em>actually make</em> one.</span>
       </h1>
 
       <p class="subhead">
-        We're building something. In the meantime, take a look at the work.
+        We're still building the world's most amazing site. In the meantime, take a look at the work.
       </p>
 
       <!-- DEMO REEL — swap the Vimeo/YouTube src below -->
