@@ -3,14 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="Higher Roads" />
-  <meta property="og:description" content="Motion Design · 3D Animation · Immersive Environments" />
-  <meta property="og:image" content="https://higher-roads.com/images/og-image1.png" />
-  <meta property="og:url" content="https://higher-roads.com" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <title>Higher Roads</title>
-  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <title>Higher Roads — Coming Soon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
@@ -175,7 +168,7 @@
     .header-logo {
       display: block;
       width: auto;
-      height: 32px;
+      height: 48px;
       max-width: none;
 
     }
@@ -189,7 +182,75 @@
     }
     .contact-link:hover { color: var(--accent); }
 
-    /* ── HERO ── */
+    /* ── NAV ── */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--white);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      background: var(--black);
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .mobile-nav a:hover { color: var(--white); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+    }
     .hero {
       flex: 1;
       display: flex;
@@ -204,7 +265,7 @@
     .eyebrow {
       font-family: 'Rajdhani', sans-serif;
       font-weight: 500;
-      font-size: 0.7rem;
+      font-size: 0.85rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--accent);
@@ -213,10 +274,10 @@
 
     .headline {
       font-family: 'Playfair Display', serif;
-      font-weight: 500;
+      font-weight: 700;
       font-size: clamp(2.8rem, 7vw, 5.5rem);
       line-height: 1.05;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
       color: var(--white);
       max-width: 760px;
       animation: fadeUp 0.8s 0.35s ease both;
@@ -257,9 +318,37 @@
       z-index: 0;
     }
 
+    .room-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(to bottom, transparent, var(--black));
+      z-index: 1;
+      pointer-events: none;
+    }
+
     .room-section .reel-wrapper {
       position: relative;
+      z-index: 2;
+      padding: 2rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* Fade to dark at bottom of triptych */
+    .triptych-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(to bottom, transparent, var(--black));
       z-index: 1;
+      pointer-events: none;
     }
     .reel-wrapper {
       width: 100%;
@@ -297,7 +386,185 @@
       display: block;
     }
 
-    /* ── DIVIDER ── */
+    /* ── PORTFOLIO SECTIONS ── */
+    .portfolio-section {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    .portfolio-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .portfolio-bg video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Dark gradient overlay — heavier at bottom for text legibility */
+    .portfolio-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.1) 0%,
+        rgba(0,0,0,0.15) 40%,
+        rgba(0,0,0,0.75) 100%
+      );
+      z-index: 1;
+    }
+
+    .portfolio-content {
+      position: relative;
+      z-index: 2;
+      padding: 2rem 2.5rem;
+      margin: 3rem 4rem;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+      background: rgba(0,0,0,0.45);
+      border-left: 2px solid var(--accent);
+    }
+
+    .portfolio-section.animate .portfolio-content {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .portfolio-section.animate.in-view .portfolio-content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .portfolio-category {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .portfolio-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: var(--white);
+      max-width: 600px;
+    }
+
+    /* Scroll cue */
+    .scroll-cue {
+      position: absolute;
+      bottom: 2rem;
+      right: 3rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.4;
+    }
+
+    .scroll-cue span {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .scroll-cue-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--white), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.1); }
+    }
+
+    @media (max-width: 640px) {
+      .portfolio-content { padding: 2rem 1.5rem; }
+      .scroll-cue { right: 1.5rem; }
+    }
+    /* ── TRIPTYCH SECTION ── */
+    .triptych-section {
+      display: flex;
+      align-items: stretch;
+      min-height: 100vh;
+      background: var(--dark);
+    }
+
+    .triptych-copy {
+      flex: 0 0 35%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .triptych-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--white);
+    }
+
+    .triptych-videos {
+      flex: 1;
+      display: flex;
+    }
+
+    .triptych-video {
+      flex: 1;
+      overflow: hidden;
+      border-left: 1px solid var(--border);
+    }
+
+    .triptych-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .triptych-section {
+        flex-direction: column;
+        min-height: auto;
+      }
+      .triptych-copy {
+        flex: none;
+        padding: 3rem 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .triptych-videos {
+        flex-direction: column;
+      }
+      .triptych-video {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        height: 75vw;
+      }
+    }
+
     .divider {
       width: 48px;
       height: 1px;
@@ -471,7 +738,25 @@
       <a class="wordmark" href="#">
         <img src="images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
       </a>
+      <nav class="nav-links">
+        <a href="#work">Motion Design</a>
+        <a href="#3d-animation">3D Animation</a>
+        <a href="#immersive">Immersive</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </header>
+
+    <nav class="mobile-nav">
+      <a href="#work">Motion Design</a>
+      <a href="#3d-animation">3D Animation</a>
+      <a href="#immersive">Immersive</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
     <main>
 
@@ -499,6 +784,65 @@
               Your browser does not support the video tag.
             </video>
           </div>
+        </div>
+      </section>
+
+      <!-- ── PORTFOLIO ── -->
+      <section class="portfolio-section" id="work">
+        <div class="portfolio-bg">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Champagne.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-category">Motion Design</span>
+          <h2 class="portfolio-title">Any setting.<br>Any mood.<br>Any world.</h2>
+        </div>
+        <div class="scroll-cue">
+          <div class="scroll-cue-line"></div>
+          <span>Scroll</span>
+        </div>
+      </section>
+
+      <!-- ── 3D ANIMATION TRIPTYCH ── -->
+      <section class="triptych-section" id="3d-animation">
+        <div class="triptych-copy">
+          <span class="portfolio-category">3D Animation</span>
+          <h2 class="triptych-title">Every surface.<br>Every detail.<br>Every angle.</h2>
+        </div>
+        <div class="triptych-videos">
+          <div class="triptych-video">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Bottle-grow.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="triptych-video">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/makeup.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="triptych-video">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/lab.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── IMMERSIVE EXPERIENCES ── -->
+      <section class="portfolio-section" id="immersive">
+        <div class="portfolio-bg">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive1.jpg" alt="Immersive Environments" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-category">Immersive Environments</span>
+          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that amaze.</h2>
+        </div>
+        <div class="scroll-cue">
+          <div class="scroll-cue-line"></div>
+          <span>Scroll</span>
         </div>
       </section>
 
@@ -540,11 +884,30 @@
           <div class="theme-dot"        data-t="acid"      title="Acid"></div>
         </div>
       </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
     </footer>
 
   </div>
 
   <script>
+    // Hamburger toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+
+    // Close mobile nav on link click
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    // Theme switcher
     const dots = document.querySelectorAll('.theme-dot');
     const root = document.documentElement;
 
@@ -555,6 +918,25 @@
         dot.classList.add('active');
       });
     });
+
+    // Portfolio scroll-trigger
+    const portfolioSections = document.querySelectorAll('.portfolio-section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          // Autoplay video when in view
+          const video = entry.target.querySelector('video');
+          if (video) video.play();
+        } else {
+          // Pause when out of view to save resources
+          const video = entry.target.querySelector('video');
+          if (video) video.pause();
+        }
+      });
+    }, { threshold: 0.1 });
+
+    portfolioSections.forEach(section => observer.observe(section));
 
     if (window.innerWidth <= 640) {
       const video = document.querySelector('.reel-frame video');
