@@ -752,17 +752,5 @@
       });
     }, { threshold: 0.08 });
     
-    // Force first frame on mobile
-if (window.innerWidth <= 640) {
-  document.querySelectorAll('.work-item video').forEach(video => {
-    video.load();
-    video.addEventListener('loadedmetadata', () => {
-      video.currentTime = 0.1;
-    });
-  });
-}
-
-    reveals.forEach(el => revealObserver.observe(el));
-  </script>
 </body>
 </html>
