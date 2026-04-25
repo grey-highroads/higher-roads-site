@@ -387,49 +387,26 @@
 
     /* ── APPROACH SECTION ── */
     .approach {
-      padding: 6rem 3rem;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 4rem;
-      align-items: start;
-      border-top: 1px solid var(--border);
-      margin-top: 5rem;
-    }
+  padding: 4rem 3rem;
+  max-width: 680px;
+  margin: 0 auto;
+  border-top: 1px solid var(--border);
+}
 
-    .approach-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      padding-top: 0.25rem;
-    }
+.approach p {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
 
-    .approach-body {
-      font-size: 1rem;
-      line-height: 1.9;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-    }
+.approach p + p {
+  margin-top: 1.25rem;
+}
 
-    .approach-body p + p {
-      margin-top: 1.25rem;
-    }
-
-    .approach-body strong {
-      color: var(--white);
-      font-weight: 400;
-    }
-
-    @media (max-width: 640px) {
-      .approach {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 4rem 1.5rem;
-      }
-      .page-intro { padding: 3rem 1.5rem 2rem; }
-      .accent-rule { margin: 0 1.5rem 3rem; }
-    }
+@media (max-width: 640px) {
+  .approach { padding: 3rem 1.5rem; }
+}
 
     /* ── CTA CLOSER ── */
     .cta-closer {
@@ -681,19 +658,9 @@
 
       <!-- ── APPROACH ── -->
       <div class="approach reveal">
-        <div class="approach-label">How we work</div>
-        <div class="approach-body">
-          <p>
-            Motion design at Higher Roads <strong>starts with understanding what the work needs to do, not just how it should look</strong>. Whether it's a 15-second loop for paid social or a cinematic launch piece, every frame has a job.
-          </p>
-          <p>
-            We work in generative and procedural pipelines that let us iterate fast without sacrificing craft. The result is motion that feels <strong>considered and purposeful</strong> — not templated or trend-chasing.
-          </p>
-          <p>
-            Most clients come to us with a brand and a brief. Some come with just an idea. Either way, we'll tell you what the work needs before we start making it.
-          </p>
-        </div>
-      </div>
+  <p>Motion design at Higher Roads starts with one question: what does this need to do? Whether it's a 15-second social loop or a cinematic launch piece, every frame has a job.</p>
+  <p>Most clients come with a brand and a brief. Some come with just an idea. Either way, we'll tell you what the work needs before we start making it.</p>
+</div>
 
       <!-- ── CTA CLOSER ── -->
       <div class="cta-closer reveal">
