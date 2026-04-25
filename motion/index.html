@@ -386,26 +386,31 @@
     }
 
     /* ── APPROACH SECTION ── */
-    .approach {
-  padding: 4rem 3rem;
-  max-width: 680px;
-  margin: 0 auto;
+   .approach {
+  padding: 3rem 3rem 4rem;
+  max-width: 640px;
   border-top: 1px solid var(--border);
+  margin-top: 3rem;
 }
 
-.approach p {
-  font-size: 0.95rem;
-  line-height: 1.9;
-  color: var(--muted);
-  letter-spacing: 0.02em;
+.approach .page-eyebrow {
+  margin-bottom: 1rem;
 }
 
-.approach p + p {
-  margin-top: 1.25rem;
+.approach-body {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--white);
+  opacity: 0.7;
+  letter-spacing: 0.01em;
+}
+
+.approach-body + .approach-body {
+  margin-top: 1.1rem;
 }
 
 @media (max-width: 640px) {
-  .approach { padding: 3rem 1.5rem; }
+  .approach { padding: 2.5rem 1.5rem; }
 }
 
     /* ── CTA CLOSER ── */
@@ -658,8 +663,9 @@
 
       <!-- ── APPROACH ── -->
       <div class="approach reveal">
-  <p>Motion design at Higher Roads starts with one question: what does this need to do? Whether it's a 15-second social loop or a cinematic launch piece, every frame has a job.</p>
-  <p>Most clients come with a brand and a brief. Some come with just an idea. Either way, we'll tell you what the work needs before we start making it.</p>
+  <span class="page-eyebrow">How we work</span>
+  <p class="approach-body">Motion design at Higher Roads starts with one question: what does this need to do? Whether it's a 15-second social loop or a cinematic launch piece, every frame has a job.</p>
+  <p class="approach-body">Most clients come with a brand and a brief. Some come with just an idea. Either way, we'll tell you what the work needs before we start making it.</p>
 </div>
 
       <!-- ── CTA CLOSER ── -->
