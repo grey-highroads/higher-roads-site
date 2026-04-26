@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:title" content="3D Animation — Higher Roads" />
-  <meta property="og:description" content="Object-level detail. Photorealistic rendering. Products and worlds built from scratch." />
+  <meta property="og:description" content="Product visualization and brand assets for work that lives in the real world and online." />
   <meta property="og:url" content="https://higher-roads.com/3d" />
   <meta property="og:type" content="website" />
   <title>3D Animation — Higher Roads</title>
@@ -264,14 +264,14 @@
       flex: 1;
     }
 
-    /* 16:9 row — each item takes half the row */
-    .grid-row.row-wide .work-item .work-media {
-      padding-top: 56.25%;
+    /* Row 1: 3 square (1:1) items */
+    .grid-row.row-square .work-item .work-media {
+      padding-top: 100%;
     }
 
-    /* Vertical row — each item is 3:4 portrait */
-    .grid-row.row-vert .work-item .work-media {
-      padding-top: 133%;
+    /* Row 2: 3 tall (3:4) portrait items */
+    .grid-row.row-tall .work-item .work-media {
+      padding-top: 133.33%;
     }
 
     .work-media {
@@ -342,17 +342,18 @@
       line-height: 1.2;
     }
 
+    /* ── MOBILE ── */
     @media (max-width: 640px) {
       .work-grid-wrap { padding: 0; align-items: stretch; }
       .grid-row { width: 100%; flex-wrap: wrap; }
-      .grid-row.row-wide .work-item { flex: 0 0 100%; }
-      .grid-row.row-wide .work-item .work-media { padding-top: 56.25%; }
-      .grid-row.row-vert .work-item { flex: 0 0 50%; }
-      .grid-row.row-vert .work-item:last-child { flex: 0 0 100%; }
-      .grid-row.row-vert .work-item .work-media { padding-top: 133%; }
+      .grid-row.row-square .work-item { flex: 0 0 100%; }
+      .grid-row.row-square .work-item .work-media { padding-top: 100%; }
+      .grid-row.row-tall .work-item { flex: 0 0 100%; }
+      .grid-row.row-tall .work-item .work-media { padding-top: 133.33%; }
       .capabilities { width: 100%; margin: 0; }
       .page-intro { padding: 2rem 1.5rem 1.5rem; }
       .accent-rule { margin: 0 1.5rem 2rem; }
+      .capability-item { padding: 1rem 1.25rem; }
     }
 
     /* ── CAPABILITIES STRIP ── */
@@ -380,55 +381,32 @@
     .capability-item:last-child { border-right: none; }
     .capability-item:hover { color: var(--white); }
 
-    @media (max-width: 640px) {
-      .capabilities { margin: 0 1.5rem; }
-      .capability-item { padding: 1rem 1.25rem; }
-    }
-
     /* ── APPROACH SECTION ── */
     .approach {
-      padding: 6rem 3rem;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 4rem;
-      align-items: start;
+      padding: 3rem 3rem 4rem;
+      max-width: 640px;
       border-top: 1px solid var(--border);
-      margin-top: 5rem;
+      margin-top: 3rem;
     }
 
-    .approach-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      padding-top: 0.25rem;
+    .approach .page-eyebrow {
+      margin-bottom: 1rem;
     }
 
     .approach-body {
       font-size: 1rem;
-      line-height: 1.9;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-    }
-
-    .approach-body p + p {
-      margin-top: 1.25rem;
-    }
-
-    .approach-body strong {
+      line-height: 1.85;
       color: var(--white);
-      font-weight: 400;
+      opacity: 0.7;
+      letter-spacing: 0.01em;
+    }
+
+    .approach-body + .approach-body {
+      margin-top: 1.1rem;
     }
 
     @media (max-width: 640px) {
-      .approach {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 4rem 1.5rem;
-      }
-      .page-intro { padding: 3rem 1.5rem 2rem; }
-      .accent-rule { margin: 0 1.5rem 3rem; }
+      .approach { padding: 2.5rem 1.5rem; }
     }
 
     /* ── CTA CLOSER ── */
@@ -605,7 +583,7 @@
         </a>
         <span class="page-eyebrow">3D Animation</span>
         <p class="page-descriptor">
-          Products, packaging, and environments built from scratch. If it needs to look real, feel tactile, or exist before it <i>really</i> exists, this is how it's done.
+          Product visualization and brand assets for work that lives in the real world and online.
         </p>
       </div>
 
@@ -614,61 +592,82 @@
       <!-- ── WORK GRID ── -->
       <div class="work-grid-wrap reveal">
 
-        <!-- Row A: two 16:9 wide items -->
-        <div class="grid-row row-wide">
+        <!-- Row 1: three square (1:1) items -->
+        <div class="grid-row row-square">
           <div class="work-item">
             <div class="work-media">
-              <video muted loop playsinline preload="metadata">
-                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Bottle-grow.mp4" type="video/mp4" />
+              <video muted loop playsinline preload="metadata"
+                poster="PLACEHOLDER_POSTER_1.png">
+                <source src="PLACEHOLDER_VIDEO_1.mp4" type="video/mp4" />
               </video>
             </div>
             <div class="work-overlay">
               <span class="work-tag">Product Visualization</span>
-              <span class="work-title">Botanical Tincture — Bottle Reveal</span>
+              <span class="work-title">Title Here</span>
             </div>
           </div>
           <div class="work-item">
             <div class="work-media">
-              <video muted loop playsinline preload="metadata">
-                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Makeup1.mp4" type="video/mp4" />
+              <video muted loop playsinline preload="metadata"
+                poster="PLACEHOLDER_POSTER_2.png">
+                <source src="PLACEHOLDER_VIDEO_2.mp4" type="video/mp4" />
               </video>
             </div>
             <div class="work-overlay">
               <span class="work-tag">Product Visualization</span>
-              <span class="work-title">Glam Goddess — Cosmetics Line</span>
+              <span class="work-title">Title Here</span>
+            </div>
+          </div>
+          <div class="work-item">
+            <div class="work-media">
+              <video muted loop playsinline preload="metadata"
+                poster="PLACEHOLDER_POSTER_3.png">
+                <source src="PLACEHOLDER_VIDEO_3.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div class="work-overlay">
+              <span class="work-tag">Product Visualization</span>
+              <span class="work-title">Title Here</span>
             </div>
           </div>
         </div>
 
-        <!-- Row B: three portrait/vertical items -->
-        <div class="grid-row row-vert">
+        <!-- Row 2: three tall (3:4) items -->
+        <div class="grid-row row-tall">
           <div class="work-item">
             <div class="work-media">
-              <video muted loop playsinline preload="metadata">
-                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/lab.mp4" type="video/mp4" />
+              <video muted loop playsinline preload="metadata"
+                poster="PLACEHOLDER_POSTER_4.png">
+                <source src="PLACEHOLDER_VIDEO_4.mp4" type="video/mp4" />
               </video>
             </div>
             <div class="work-overlay">
-              <span class="work-tag">Environment</span>
-              <span class="work-title">Lab — Atmospheric Render</span>
+              <span class="work-tag">Product Visualization</span>
+              <span class="work-title">Title Here</span>
             </div>
           </div>
           <div class="work-item">
             <div class="work-media">
-              <div class="placeholder-media">Coming soon</div>
+              <video muted loop playsinline preload="metadata"
+                poster="PLACEHOLDER_POSTER_5.png">
+                <source src="PLACEHOLDER_VIDEO_5.mp4" type="video/mp4" />
+              </video>
             </div>
             <div class="work-overlay">
-              <span class="work-tag">Brand Asset</span>
-              <span class="work-title">Packaging Visualization</span>
+              <span class="work-tag">Product Visualization</span>
+              <span class="work-title">Title Here</span>
             </div>
           </div>
           <div class="work-item">
             <div class="work-media">
-              <div class="placeholder-media">Coming soon</div>
+              <video muted loop playsinline preload="metadata"
+                poster="PLACEHOLDER_POSTER_6.png">
+                <source src="PLACEHOLDER_VIDEO_6.mp4" type="video/mp4" />
+              </video>
             </div>
             <div class="work-overlay">
-              <span class="work-tag">Product Animation</span>
-              <span class="work-title">Material Study</span>
+              <span class="work-tag">Product Visualization</span>
+              <span class="work-title">Title Here</span>
             </div>
           </div>
         </div>
@@ -677,18 +676,9 @@
 
       <!-- ── APPROACH ── -->
       <div class="approach reveal">
-        <div class="approach-label">How we work</div>
-        <div class="approach-body">
-          <p>
-            3D at Higher Roads is about <strong>making things feel real</strong> — the right material, the right light, the right moment. Whether it's a hero product shot or a full environment build, we work at the level of detail that separates good from convincing.
-          </p>
-          <p>
-            We model, light, and render in-house. No stock assets, no shortcuts. If it's in the frame, <strong>we built it</strong> — which means we can change it, iterate it, and own it with you.
-          </p>
-          <p>
-            Most clients come to us with a product and a reference. Some come with just a brief. Either way, we'll show you what's possible before we start building it.
-          </p>
-        </div>
+        <span class="page-eyebrow">How we work</span>
+        <p class="approach-body">3D at Higher Roads is about making things feel real — the right material, the right light, the right moment. Whether it's a hero product shot or a full environment build, we work at the level of detail that separates good from convincing.</p>
+        <p class="approach-body">Most clients come to us with a product and a reference. Some come with just a brief. Either way, we'll show you what's possible before we start building it.</p>
       </div>
 
       <!-- ── CTA CLOSER ── -->
