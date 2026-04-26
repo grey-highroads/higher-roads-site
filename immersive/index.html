@@ -237,7 +237,7 @@
       padding: 0 3rem;
       display: flex;
       flex-direction: column;
-      gap: 1px;
+      gap: 0;
       align-items: center;
     }
 
@@ -250,7 +250,7 @@
       width: 75%;
     }
 
-    .grid-row:last-child {
+    .grid-row.row-wide {
       border-bottom: 1px solid var(--border);
     }
 
@@ -377,10 +377,103 @@
     .capability-item:last-child { border-right: none; }
     .capability-item:hover { color: var(--white); }
 
+    /* ── PROCESS SECTION ── */
+    .process-header {
+      width: 75%;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 1.75rem 2rem 1.5rem;
+    }
+
+    .grid-row.row-process {
+      width: 75%;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .process-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .process-item:last-child {
+      border-right: none;
+    }
+
+    .process-media {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      overflow: hidden;
+    }
+
+    .process-media img,
+    .process-media .placeholder-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--dark);
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .process-caption {
+      padding: 1.25rem 1.5rem 1.75rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .process-step {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .process-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.6;
+      letter-spacing: 0.01em;
+    }
+
+    @media (max-width: 640px) {
+      .process-header { width: 100%; }
+      .grid-row.row-process { width: 100%; flex-wrap: wrap; }
+      .process-item { flex: 0 0 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .process-item:last-child { border-bottom: none; }
+    }
+
     /* ── APPROACH SECTION ── */
     .approach {
       padding: 3rem 3rem 4rem;
-      max-width: 640px;
+      max-width: 860px;
       border-top: 1px solid var(--border);
       margin-top: 3rem;
     }
@@ -612,33 +705,41 @@
           </div>
         </div>
 
-        <!-- Row B: three portrait/vertical items -->
-        <div class="grid-row row-vert">
-          <div class="work-item">
-            <div class="work-media">
-              <div class="placeholder-media">Coming soon</div>
+        <!-- Process separator + headline -->
+        <div class="process-header">
+          <span class="page-eyebrow">From Space to Screen</span>
+        </div>
+
+        <!-- Row B: three-step process grid -->
+        <div class="grid-row row-process">
+          <div class="process-item">
+            <div class="process-media">
+              <div class="placeholder-media">Image</div>
             </div>
-            <div class="work-overlay">
-              <span class="work-tag">Hotel Install</span>
-              <span class="work-title">Bar Wall Projection</span>
-            </div>
-          </div>
-          <div class="work-item">
-            <div class="work-media">
-              <div class="placeholder-media">Coming soon</div>
-            </div>
-            <div class="work-overlay">
-              <span class="work-tag">Brand Experience</span>
-              <span class="work-title">Pop-Up Environment</span>
+            <div class="process-caption">
+              <span class="process-step">01</span>
+              <span class="process-title">Capture the Space</span>
+              <p class="process-body">We photograph and measure every surface, angle, and architectural detail. From that, we build a precise 3D model of the environment. The foundation everything else is built on.</p>
             </div>
           </div>
-          <div class="work-item">
-            <div class="work-media">
-              <div class="placeholder-media">Coming soon</div>
+          <div class="process-item">
+            <div class="process-media">
+              <div class="placeholder-media">Image</div>
             </div>
-            <div class="work-overlay">
-              <span class="work-tag">Process</span>
-              <span class="work-title">Content Mapping Study</span>
+            <div class="process-caption">
+              <span class="process-step">02</span>
+              <span class="process-title">Map the Surfaces</span>
+              <p class="process-body">Using the 3D model, we define every projection surface down to the inch. Throw distances, overlap zones, geometry corrections. All resolved before a single frame of content is made.</p>
+            </div>
+          </div>
+          <div class="process-item">
+            <div class="process-media">
+              <div class="placeholder-media">Image</div>
+            </div>
+            <div class="process-caption">
+              <span class="process-step">03</span>
+              <span class="process-title">Make it Move</span>
+              <p class="process-body">With the space fully understood, we design and produce content that fits it exactly. Video, animation, generative loops, or layered stills. Whatever the moment calls for, built to land where it's supposed to.</p>
             </div>
           </div>
         </div>
