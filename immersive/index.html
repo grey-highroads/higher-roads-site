@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Immersive Environments — Higher Roads" />
+  <meta property="og:description" content="Projection mapping, permanent installs, and event environments." />
+  <meta property="og:url" content="https://higher-roads.com/immersive" />
+  <meta property="og:type" content="website" />
+  <title>Immersive Environments — Higher Roads</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root, [data-theme="ember"] {
+      --black: #0a0906;
+      --dark: #181510;
+      --accent: #e8782a;
+      --accent-dim: #a04f18;
+      --glow: rgba(232, 120, 42, 0.07);
+      --white: #f5ede2;
+      --muted: #6b6057;
+      --border: rgba(232, 120, 42, 0.18);
+    }
+
+    [data-theme="neon-noir"] {
+      --black: #07050f; --dark: #0e0a1a; --accent: #f72585;
+      --accent-dim: #7b1fa2; --glow: rgba(183,0,255,0.08);
+      --white: #ede8f5; --muted: #5c5470; --border: rgba(247,37,133,0.2);
+    }
+    [data-theme="ice"] {
+      --black: #050810; --dark: #0a0f1e; --accent: #4fc3f7;
+      --accent-dim: #1a6a8a; --glow: rgba(79,195,247,0.07);
+      --white: #e8f4f8; --muted: #4a6070; --border: rgba(79,195,247,0.18);
+    }
+    [data-theme="acid"] {
+      --black: #040a04; --dark: #081208; --accent: #39ff14;
+      --accent-dim: #1a7a08; --glow: rgba(57,255,20,0.06);
+      --white: #e8f5e8; --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .header-logo {
+      display: block;
+      height: 32px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a.active { color: var(--accent); }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--white);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      border-top: 1px solid var(--border);
+      background: var(--black);
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .mobile-nav a:hover { color: var(--white); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      header { padding: 1.5rem; }
+    }
+
+    /* ── PAGE INTRO ── */
+    .page-intro {
+      padding: 2.5rem 3rem 2rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .page-intro .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 1.25rem;
+      transition: color 0.3s;
+    }
+
+    .page-intro .back-link:hover { color: var(--accent); }
+
+    .page-intro .back-link .arrow {
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .page-intro .back-link:hover .arrow {
+      transform: translateX(-3px);
+    }
+
+    .page-eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.65rem;
+      display: block;
+    }
+
+    .page-descriptor {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--white);
+      max-width: 560px;
+      letter-spacing: 0.01em;
+      opacity: 0.7;
+    }
+
+    /* ── ACCENT DIVIDER ── */
+    .accent-rule {
+      width: 48px;
+      height: 1px;
+      background: var(--accent-dim);
+      margin: 0 3rem 2.5rem;
+    }
+
+    /* ── WORK GRID WRAPPER ── */
+    .work-grid-wrap {
+      padding: 0 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-items: center;
+    }
+
+    .grid-row {
+      display: flex;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      width: 75%;
+    }
+
+    .grid-row.row-wide {
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── WORK ITEMS ── */
+    .work-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--dark);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .grid-row.row-wide .work-item .work-media {
+      padding-top: 56.25%;
+    }
+
+    .work-media {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .work-media video,
+    .work-media .placeholder-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .work-media .placeholder-media {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--dark);
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .work-item:hover .work-media video {
+      transform: scale(1.03);
+    }
+
+    .work-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .work-item:hover .work-overlay {
+      opacity: 1;
+    }
+
+    .work-tag {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .work-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    @media (max-width: 640px) {
+      .work-grid-wrap { padding: 0; align-items: stretch; }
+      .grid-row { width: 100%; flex-wrap: wrap; }
+      .grid-row.row-wide .work-item { flex: 0 0 100%; }
+      .grid-row.row-wide .work-item .work-media { padding-top: 56.25%; }
+      .capabilities { width: 100%; margin: 0; }
+      .page-intro { padding: 2rem 1.5rem 1.5rem; }
+      .accent-rule { margin: 0 1.5rem 2rem; }
+      .capability-item { padding: 1rem 1.25rem; }
+    }
+
+    /* ── CAPABILITIES STRIP ── */
+    .capabilities {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      border-bottom: none;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .capability-item {
+      flex: 1;
+      min-width: 160px;
+      padding: 1.25rem 2rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-right: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .capability-item:last-child { border-right: none; }
+    .capability-item:hover { color: var(--white); }
+
+    /* ── PROCESS SECTION ── */
+    .process-header {
+      width: 75%;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 1.75rem 2rem 1.5rem;
+    }
+
+    .grid-row.row-process {
+      width: 75%;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .process-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .process-item:last-child {
+      border-right: none;
+    }
+
+    .process-media {
+      position: relative;
+      width: 100%;
+      padding-top: 66.67%;
+      overflow: hidden;
+    }
+
+    .process-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .process-caption {
+      padding: 1.25rem 1.5rem 1.75rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .process-step {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .process-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.6;
+      letter-spacing: 0.01em;
+    }
+
+    @media (max-width: 640px) {
+      .process-header { width: 100%; }
+      .grid-row.row-process { width: 100%; flex-wrap: wrap; }
+      .process-item { flex: 0 0 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .process-item:last-child { border-bottom: none; }
+    }
+
+    /* ── APPROACH SECTION ── */
+    .approach {
+      padding: 3rem 3rem 4rem;
+      max-width: 860px;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    .approach .page-eyebrow {
+      margin-bottom: 1rem;
+    }
+
+    .approach-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--white);
+      opacity: 0.7;
+      letter-spacing: 0.01em;
+    }
+
+    .approach-body + .approach-body {
+      margin-top: 1.1rem;
+    }
+
+    @media (max-width: 640px) {
+      .approach { padding: 2.5rem 1.5rem; }
+    }
+
+    /* ── CTA CLOSER ── */
+    .cta-closer {
+      margin: 0 3rem 6rem;
+      padding: 3rem;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .cta-closer-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .cta-closer-text em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--accent);
+      border: none;
+      padding: 1rem 1.75rem;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-cta:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .cta-closer {
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 0 1.5rem 4rem;
+        padding: 2rem;
+      }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-note {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-email {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-email:hover { color: var(--accent); }
+
+    .theme-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    @media (max-width: 640px) {
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <a href="../">
+        <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="../motion/">Motion Design</a>
+        <a href="../3d/">3D Animation</a>
+        <a href="../immersive/" class="active">Immersive</a>
+        <a href="../#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="../motion/">Motion Design</a>
+      <a href="../3d/">3D Animation</a>
+      <a href="../immersive/">Immersive</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- ── PAGE INTRO ── -->
+      <div class="page-intro">
+        <a class="back-link" href="../">
+          <span class="arrow">←</span> Back to Higher Roads
+        </a>
+        <span class="page-eyebrow">Immersive Environments</span>
+        <p class="page-descriptor">
+          Projection mapping, permanent installs, and live event environments. We design and produce work where the room itself is the medium.
+        </p>
+      </div>
+
+      <div class="accent-rule"></div>
+
+      <!-- ── WORK GRID ── -->
+      <div class="work-grid-wrap reveal">
+
+        <!-- Row A: two 16:9 wide items -->
+        <div class="grid-row row-wide">
+          <div class="work-item">
+            <div class="work-media">
+              <video muted loop playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/immersive-poster.png">
+                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div class="work-overlay">
+              <span class="work-tag">Live Event</span>
+              <span class="work-title">Projection Install — Event Environment</span>
+            </div>
+          </div>
+          <div class="work-item">
+            <div class="work-media">
+              <div class="placeholder-media">Coming soon</div>
+            </div>
+            <div class="work-overlay">
+              <span class="work-tag">Permanent Install</span>
+              <span class="work-title">Venue Environment</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Process separator + headline -->
+        <div class="process-header">
+          <span class="page-eyebrow">From Space to Screen</span>
+        </div>
+
+        <!-- Row B: three-step process grid -->
+        <div class="grid-row row-process">
+          <div class="process-item">
+            <div class="process-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-place.png" alt="Capture the Space" />
+            </div>
+            <div class="process-caption">
+              <span class="process-step">01</span>
+              <span class="process-title">Capture the Space</span>
+              <p class="process-body">We photograph and measure every surface, angle, and architectural detail. From that, we build a precise 3D model of the environment. The foundation everything else is built on.</p>
+            </div>
+          </div>
+          <div class="process-item">
+            <div class="process-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Map the Surfaces" />
+            </div>
+            <div class="process-caption">
+              <span class="process-step">02</span>
+              <span class="process-title">Map the Surfaces</span>
+              <p class="process-body">Using the 3D model, we define every projection surface down to the inch. Throw distances, overlap zones, geometry corrections. All resolved before a single frame of content is made.</p>
+            </div>
+          </div>
+          <div class="process-item">
+            <div class="process-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="Make it Move" />
+            </div>
+            <div class="process-caption">
+              <span class="process-step">03</span>
+              <span class="process-title">Make it Move</span>
+              <p class="process-body">With the space fully understood, we design and produce content that fits it exactly. Video, animation, generative loops, or layered stills. Whatever the moment calls for, built to land where it's supposed to.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── APPROACH ── -->
+      <div class="approach reveal">
+        <span class="page-eyebrow">How we work</span>
+        <p class="approach-body">Immersive work starts with understanding the space, the architecture, the audience, and the moment you're designing for. A hotel bar is not a music venue. A brand activation is not a museum install.</p>
+        <p class="approach-body">We handle the full chain: content design, projection geometry, hardware specification, and on-site calibration. You don't need to know how any of it works. You need to know what you want people to feel.</p>
+        <p class="approach-body">Most installs start with a site visit or a detailed brief. Permanent builds typically run 8 to 16 weeks from concept to calibration. Event installs can move faster. Either way, we'll tell you what's realistic before we scope anything.</p>
+      </div>
+
+      <!-- ── CTA CLOSER ── -->
+      <div class="cta-closer reveal">
+        <div class="cta-closer-text">
+          Have a space that should<br><em>feel</em> like something?
+        </div>
+        <a class="btn-cta" href="../#contact">Start a conversation →</a>
+      </div>
+
+      <!-- ── CAPABILITIES ── -->
+      <div class="capabilities reveal">
+        <span class="capability-item">Projection Mapping</span>
+        <span class="capability-item">Permanent Installs</span>
+        <span class="capability-item">Event Environments</span>
+        <span class="capability-item">Hotel & Venue</span>
+        <span class="capability-item">Brand Activations</span>
+      </div>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
+          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
+          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
+          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Hamburger
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    // Theme switcher
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Hover-to-play on grid videos
+    document.querySelectorAll('.work-item').forEach(item => {
+      const video = item.querySelector('video');
+      if (!video) return;
+      item.addEventListener('mouseenter', () => video.play());
+      item.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    reveals.forEach(el => revealObserver.observe(el));
+  </script>
+</body>
+</html>
