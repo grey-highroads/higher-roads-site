@@ -739,6 +739,40 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     .footer-email:hover { color: var(--accent); }
 
+    /* ── DRILL DOWN BUTTONS ── */
+
+    .btn-see-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #f5f0eb;
+  border: 1px solid rgba(245,240,235,0.25);
+  padding: 0.65rem 1.25rem;
+  margin-top: 1.25rem;
+  background: transparent;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-see-more:hover {
+  border-color: #e8782a;
+  color: #e8782a;
+}
+
+.btn-see-more .arrow {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.btn-see-more:hover .arrow {
+  transform: translateX(4px);
+}
+
     /* ── ANIMATIONS ── */
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-12px); }
@@ -839,6 +873,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="portfolio-category">Motion Design</span>
           <h2 class="portfolio-title">Any setting.<br>Any mood.<br>Any world.</h2>
           <p class="section-clarifier">Brand campaigns, product launches, and social content built to move.</p>
+          <a href="/motion" class="btn-see-more">See more <span class="arrow">→</span></a>
         </div>
         <div class="scroll-cue">
           <div class="scroll-cue-line"></div>
