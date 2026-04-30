@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="ember">
 <head>
+   <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+   <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Higher Roads — About</title>
@@ -69,16 +76,6 @@
       backdrop-filter: blur(8px);
     }
 
-    .logo {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--white);
-      text-decoration: none;
-    }
-
     nav {
       display: flex;
       gap: 32px;
@@ -97,6 +94,60 @@
 
     nav a:hover,
     nav a.active {
+      color: var(--accent);
+    }
+
+    /* Hamburger */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--white);
+      transition: opacity 0.2s;
+    }
+
+    /* Mobile nav */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      background: rgba(10, 9, 6, 0.97);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column;
+      padding: 16px 0;
+    }
+
+    .mobile-nav.open {
+      display: flex;
+    }
+
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245, 240, 234, 0.55);
+      text-decoration: none;
+      padding: 12px 48px;
+      transition: color 0.2s;
+    }
+
+    .mobile-nav a:hover,
+    .mobile-nav a.active {
       color: var(--accent);
     }
 
@@ -282,22 +333,55 @@
     [data-theme="neon"] { --accent: #f72585; --black: #07050f; --glow: rgba(247,37,133,0.08); }
     [data-theme="ice"]  { --accent: #4fc3f7; --black: #050810; --glow: rgba(79,195,247,0.08); }
     [data-theme="acid"] { --accent: #39ff14; --black: #040a04; --glow: rgba(57,255,20,0.08); }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      header { padding: 0 24px; }
+      nav { display: none; }
+      .nav-toggle { display: flex; }
+      .about { padding: 64px 24px 80px; }
+      .about-inner { width: 100%; }
+      .footer-copy { display: none; }
+      footer { padding: 20px 24px; }
+    }
   </style>
+   <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-39KG7JZMW5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-39KG7JZMW5');
+</script>
 </head>
 <body>
 
   <header>
     <a href="../">
-        <img src="../images/HR-logo-horiz-white.png" height="32" alt="Higher Roads" class="header-logo" />
-      </a>
+      <img src="../images/HR-logo-horiz-white.png" height="32" alt="Higher Roads" class="header-logo" />
+    </a>
     <nav>
-      <a href="#">Motion Design</a>
-      <a href="#">3D Animation</a>
-      <a href="#">Immersive</a>
-      <a href="#" class="active">About</a>
-      <a href="#">Contact</a>
+      <a href="../motion/">Motion Design</a>
+      <a href="../3d/">3D Animation</a>
+      <a href="../immersive/">Immersive</a>
+      <a href="../about/" class="active">About</a>
+      <a href="../#contact">Contact</a>
     </nav>
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="../motion/">Motion Design</a>
+    <a href="../3d/">3D Animation</a>
+    <a href="../immersive/">Immersive</a>
+    <a href="../about/" class="active">About</a>
+    <a href="../#contact">Contact</a>
+  </div>
 
   <section class="about">
     <div class="about-inner">
@@ -307,7 +391,7 @@
         <p class="about-intro">Higher Roads is built around people who have done this work at a high level, across real events, real campaigns, and real spaces. Our network brings together motion designers, 3D artists, environment builders, envelope-pushers, and producers who know what great looks like because they've made it before.</p>
       </div>
 
-       <div class="profile">
+      <div class="profile">
         <div class="avatar">JR</div>
         <div class="profile-body">
           <p class="profile-name">Jonathan Richter</p>
@@ -315,7 +399,7 @@
           <p class="profile-bio">Daytime Emmy-nominated director with 30+ years across live action, CGI, animation, and fabrication. Clients include Coca-Cola, TikTok, Paramount/Viacom, Levi's, and Nissan. Brings a multi-disciplinary background and a deep instinct for using the right tool, not the trending one.</p>
         </div>
       </div>
-      
+
       <div class="profile">
         <div class="avatar">GG</div>
         <div class="profile-body">
@@ -339,7 +423,7 @@
         <div class="avatar">LS</div>
         <div class="profile-body">
           <p class="profile-name">Lauren Spina</p>
-          <p class="profile-role">Yeah, she knows that guy</p>
+          <p class="profile-role">Yeah, She Knows That Guy</p>
           <p class="profile-bio">Placeholder for incoming team member blurb. Background, notable clients or work, and one line about how they think.</p>
           <span class="pending">Pending</span>
         </div>
@@ -360,12 +444,23 @@
   </footer>
 
   <script>
+    // Theme switcher
     document.querySelectorAll('.theme-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
         dot.classList.add('active');
         document.documentElement.setAttribute('data-theme', dot.dataset.t);
       });
+    });
+
+    // Hamburger toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.getElementById('mobileNav');
+    navToggle.addEventListener('click', () => {
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => mobileNav.classList.remove('open'));
     });
   </script>
 
