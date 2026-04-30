@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Higher Roads — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Rajdhani:wght@500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0906;
+      --dark: #110f0c;
+      --accent: #e8782a;
+      --accent-dim: rgba(232, 120, 42, 0.18);
+      --glow: rgba(232, 120, 42, 0.08);
+      --white: #f5f0ea;
+      --muted: #7a7060;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    html, body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(ellipse at 50% 0%, var(--glow) 0%, transparent 65%);
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 9, 6, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .logo {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    nav {
+      display: flex;
+      gap: 32px;
+    }
+
+    nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245, 240, 234, 0.55);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--accent);
+    }
+
+    /* About section */
+    .about {
+      position: relative;
+      z-index: 1;
+      padding: 96px 48px 120px;
+    }
+
+    .about-inner {
+      width: 75%;
+      margin: 0 auto;
+    }
+
+    .about-header {
+      border-left: 2px solid var(--accent);
+      padding-left: 24px;
+      margin-bottom: 64px;
+    }
+
+    .eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .about-intro {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: rgba(245, 240, 234, 0.75);
+      max-width: 640px;
+    }
+
+    /* Cards */
+    .profile {
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .profile:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .profile:hover {
+      border-top-color: rgba(232, 120, 42, 0.25);
+    }
+
+    .avatar {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      border-radius: 4px;
+      background: rgba(232, 120, 42, 0.1);
+      border: 1px solid rgba(232, 120, 42, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .profile:hover .avatar {
+      background: rgba(232, 120, 42, 0.16);
+      border-color: rgba(232, 120, 42, 0.45);
+    }
+
+    .profile-body {
+      flex: 1;
+      padding-top: 4px;
+    }
+
+    .profile-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 5px;
+    }
+
+    .profile-role {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.8;
+      margin-bottom: 16px;
+    }
+
+    .profile-bio {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: rgba(245, 240, 234, 0.6);
+    }
+
+    .pending {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(232, 120, 42, 0.35);
+      margin-top: 12px;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-copy {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .footer-email {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-email:hover {
+      color: var(--accent);
+    }
+
+    /* Theme dots */
+    .theme-switcher {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { border-color: var(--white); }
+    .theme-dot[data-t="ember"] { background: #e8782a; }
+    .theme-dot[data-t="neon"] { background: #f72585; }
+    .theme-dot[data-t="ice"] { background: #4fc3f7; }
+    .theme-dot[data-t="acid"] { background: #39ff14; }
+
+    /* Theme overrides */
+    [data-theme="neon"] { --accent: #f72585; --black: #07050f; --glow: rgba(247,37,133,0.08); }
+    [data-theme="ice"]  { --accent: #4fc3f7; --black: #050810; --glow: rgba(79,195,247,0.08); }
+    [data-theme="acid"] { --accent: #39ff14; --black: #040a04; --glow: rgba(57,255,20,0.08); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="#">Higher Roads</a>
+    <nav>
+      <a href="#">Motion Design</a>
+      <a href="#">3D Animation</a>
+      <a href="#">Immersive</a>
+      <a href="#" class="active">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <section class="about">
+    <div class="about-inner">
+
+      <div class="about-header">
+        <p class="eyebrow">The People</p>
+        <p class="about-intro">Higher Roads is built around people who have done this work at a high level, across real events, real campaigns, and real spaces. Our network brings together motion designers, 3D artists, environment builders, and producers who know what great looks like because they've made it before.</p>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">GR</div>
+        <div class="profile-body">
+          <p class="profile-name">Grey</p>
+          <p class="profile-role">Co-Founder / Creative Strategy & Business Development</p>
+          <p class="profile-bio">10+ years as a recording artist, producer, and engineer. 10+ years leading and advising high-growth tech companies through 2520 Consulting. Brings a rare combination of technical creative instinct and executive-level business strategy to finding the projects and collaborations that move people.</p>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">JR</div>
+        <div class="profile-body">
+          <p class="profile-name">Jonathan Richter</p>
+          <p class="profile-role">Animation Director</p>
+          <p class="profile-bio">Daytime Emmy-nominated director with 30+ years across live action, CGI, animation, and fabrication. Clients include Coca-Cola, TikTok, Paramount/Viacom, Levi's, and Nissan. Brings a multi-disciplinary background and a deep instinct for using the right tool, not the trending one.</p>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">??</div>
+        <div class="profile-body">
+          <p class="profile-name">Team Member</p>
+          <p class="profile-role">Role / Discipline</p>
+          <p class="profile-bio">Placeholder for incoming team member blurb. Background, notable clients or work, and one line about how they think.</p>
+          <span class="pending">Pending</span>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">??</div>
+        <div class="profile-body">
+          <p class="profile-name">Team Member</p>
+          <p class="profile-role">Role / Discipline</p>
+          <p class="profile-bio">Placeholder for incoming team member blurb. Background, notable clients or work, and one line about how they think.</p>
+          <span class="pending">Pending</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-copy">© 2026 Higher Roads</p>
+    <div class="theme-switcher">
+      <div class="theme-dot active" data-t="ember"></div>
+      <div class="theme-dot" data-t="neon"></div>
+      <div class="theme-dot" data-t="ice"></div>
+      <div class="theme-dot" data-t="acid"></div>
+    </div>
+    <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        document.documentElement.setAttribute('data-theme', dot.dataset.t);
+      });
+    });
+  </script>
+
+</body>
+</html>
