@@ -861,30 +861,46 @@
       item.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
     });
 
-    // Promo video: click-to-play with audio
-    const promoVideo = document.getElementById('promo-video');
-    const playBtn = document.getElementById('play-btn');
-    if (promoVideo && playBtn) {
-      playBtn.addEventListener('click', () => {
-        const playPromise = promoVideo.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              playBtn.classList.add('hidden');
-            })
-            .catch(() => {
-              // Fallback: play muted, then unmute once started
-              promoVideo.muted = true;
-              promoVideo.play().then(() => {
-                promoVideo.muted = false;
-                playBtn.classList.add('hidden');
-              });
-            });
-        }
-      });
-      promoVideo.addEventListener('pause', () => playBtn.classList.remove('hidden'));
-      promoVideo.addEventListener('ended', () => playBtn.classList.remove('hidden'));
+   // Promo video: click-to-play with audio
+const promoVideo = document.getElementById('promo-video');
+const playBtn = document.getElementById('play-btn');
+if (promoVideo && playBtn) {
+  playBtn.addEventListener('click', () => {
+    const playPromise = promoVideo.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          playBtn.classList.add('hidden');
+        })
+        .catch(() => {
+          promoVideo.muted = true;
+          promoVideo.play().then(() => {
+            promoVideo.muted = false;
+            playBtn.classList.add('hidden');
+          });
+        });
     }
+  });
+
+  promoVideo.addEventListener('pause', () => {
+    promoVideo.removeAttribute('controls');
+    playBtn.classList.remove('hidden');
+  });
+
+  promoVideo.addEventListener('ended', () => {
+    promoVideo.removeAttribute('controls');
+    playBtn.classList.remove('hidden');
+  });
+
+  // Show/hide controls on hover while playing
+  promoVideo.addEventListener('mouseenter', () => {
+    if (!promoVideo.paused) promoVideo.setAttribute('controls', '');
+  });
+
+  promoVideo.addEventListener('mouseleave', () => {
+    promoVideo.removeAttribute('controls');
+  });
+}
 
     // Scroll reveal
     const reveals = document.querySelectorAll('.reveal');
