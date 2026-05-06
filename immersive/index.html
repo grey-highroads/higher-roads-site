@@ -333,7 +333,24 @@
       color: var(--white);
       line-height: 1.2;
     }
+/* ── PROMO ITEM (click-to-play with audio) ── */
+.promo-item .play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 3;
+  transition: opacity 0.25s;
+}
 
+.promo-item .play-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
     @media (max-width: 640px) {
       .work-grid-wrap { padding: 0; align-items: stretch; }
       .grid-row { width: 100%; flex-wrap: wrap; }
@@ -676,12 +693,18 @@
 
         <!-- Row A: two 16:9 wide items -->
         <div class="grid-row row-wide">
-          <div class="work-item">
-            <div class="work-media">
-              <video muted loop playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster.png">
-                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
-              </video>
-            </div>
+         <div class="work-item promo-item">
+  <div class="work-media">
+    <video loop playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster.png" id="promo-video">
+      <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+    </video>
+    <button class="play-btn" id="play-btn" aria-label="Play video">
+      <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+        <polygon points="23,17 47,30 23,43" fill="white"/>
+      </svg>
+    </button>
+  </div>
             <div class="work-overlay">
               <span class="work-tag">Live Event</span>
               <span class="work-title">Projection Install — Event Environment</span>
@@ -830,5 +853,24 @@
 
     reveals.forEach(el => revealObserver.observe(el));
   </script>
+  // Hover-to-play on grid videos (excludes promo item)
+document.querySelectorAll('.work-item:not(.promo-item)').forEach(item => {
+  const video = item.querySelector('video');
+  if (!video) return;
+  item.addEventListener('mouseenter', () => video.play());
+  item.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
+});
+
+// Promo video: click-to-play with audio
+const promoVideo = document.getElementById('promo-video');
+const playBtn = document.getElementById('play-btn');
+if (promoVideo && playBtn) {
+  playBtn.addEventListener('click', () => {
+    promoVideo.play();
+    playBtn.classList.add('hidden');
+  });
+  promoVideo.addEventListener('pause', () => playBtn.classList.remove('hidden'));
+  promoVideo.addEventListener('ended', () => playBtn.classList.remove('hidden'));
+}
 </body>
 </html>
