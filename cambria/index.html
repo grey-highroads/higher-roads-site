@@ -32,6 +32,25 @@
     overflow-x: hidden;
   }
 
+ .wordmark {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .wordmark span { color: var(--accent); }
+
+    .header-logo {
+      display: block;
+      width: auto;
+      height: 32px;
+      max-width: none;
+    }
+ 
   /* NAV */
   nav {
     position: fixed;
@@ -690,7 +709,9 @@
 <body>
 
 <nav>
-  <span class="nav-logo">Higher Roads</span>
+  <a class="wordmark" href="#">
+        <img src="images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
   <span class="nav-title">The Rux — Concept Presentation</span>
   <div class="slide-dots" id="dots"></div>
 </nav>
