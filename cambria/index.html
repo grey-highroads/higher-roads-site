@@ -39,7 +39,6 @@
     max-width: none;
   }
 
-  /* NAV */
   nav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -78,7 +77,6 @@
 
   .dot.active { background: var(--amber); border-color: var(--amber); }
 
-  /* SLIDES */
   .slide {
     min-height: 100vh;
     display: flex;
@@ -350,55 +348,6 @@
     overflow: hidden;
   }
 
-  .swatch-organic {
-    background: radial-gradient(ellipse at 30% 70%, #1a2e1a 0%, #0d1a10 50%, #080f08 100%);
-  }
-  .swatch-organic::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 20% 80%, rgba(74,130,50,0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(50,100,40,0.2) 0%, transparent 40%),
-      radial-gradient(circle at 60% 60%, rgba(30,80,30,0.15) 0%, transparent 30%);
-  }
-
-  .swatch-electric {
-    background: radial-gradient(ellipse at 60% 40%, #0f0f2e 0%, #05050f 100%);
-  }
-  .swatch-electric::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 70% 30%, rgba(80,50,200,0.4) 0%, transparent 45%),
-      radial-gradient(circle at 30% 70%, rgba(180,80,255,0.2) 0%, transparent 40%),
-      radial-gradient(circle at 50% 50%, rgba(100,100,255,0.1) 0%, transparent 35%);
-  }
-
-  .swatch-ember {
-    background: radial-gradient(ellipse at 50% 80%, #1f0d05 0%, #0f0602 100%);
-  }
-  .swatch-ember::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 50% 90%, rgba(200,80,20,0.5) 0%, transparent 50%),
-      radial-gradient(circle at 30% 60%, rgba(220,120,30,0.3) 0%, transparent 40%),
-      radial-gradient(circle at 70% 40%, rgba(180,60,10,0.2) 0%, transparent 35%);
-  }
-
-  .swatch-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-style: italic;
-    color: rgba(255,255,255,0.8);
-    position: relative;
-    z-index: 1;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.8);
-  }
-
   .style-info {
     padding: 1.25rem;
     border-top: 1px solid var(--border);
@@ -421,19 +370,8 @@
     max-width: none;
   }
 
-  .style-palette {
-    display: flex;
-    gap: 4px;
-    margin-top: 0.75rem;
-  }
-
-  .palette-chip {
-    width: 16px; height: 16px;
-    border-radius: 2px;
-  }
-
-  /* SLIDE 5 */
-  .brand-grid {
+  /* SLIDE 5 — COMBINED BENEFITS */
+  .benefits-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
@@ -441,62 +379,29 @@
     align-items: start;
   }
 
-  .brand-examples {
+  .benefits-proof {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
   }
 
-  .brand-copy { padding-left: 0.5rem; }
-  .brand-copy p { margin-bottom: 1rem; }
+  .benefits-proof-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
 
-  .integration-modes {
-    margin-top: 1.5rem;
+  .deliverables-stack {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
-  .mode-item {
-    display: grid;
-    grid-template-columns: 80px 1fr;
-    gap: 1rem;
-    align-items: start;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mode-item:last-child { border-bottom: none; }
-
-  .mode-tag {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.55rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--amber);
-    padding: 0.3rem 0.5rem;
-    border: 1px solid rgba(212,137,58,0.3);
-    text-align: center;
-    margin-top: 0.1rem;
-  }
-
-  .mode-text {
-    font-size: 0.82rem;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  /* SLIDE 6 */
-  .deliverables-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-top: 2.5rem;
-  }
-
   .deliverable-card {
     border: 1px solid var(--border);
-    padding: 1.75rem 1.5rem;
+    padding: 1.25rem 1.5rem;
     background: var(--off-black);
     position: relative;
   }
@@ -504,8 +409,8 @@
   .deliverable-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
+    top: 0; left: 0; bottom: 0;
+    width: 2px;
     background: var(--amber);
     opacity: 0;
     transition: opacity 0.3s;
@@ -513,21 +418,12 @@
 
   .deliverable-card:hover::before { opacity: 1; }
 
-  .d-number {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    font-weight: 500;
-    color: rgba(212,137,58,0.2);
-    line-height: 1;
-    margin-bottom: 1rem;
-  }
-
   .d-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--white);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
   }
 
   .d-body {
@@ -536,53 +432,59 @@
     line-height: 1.65;
   }
 
-  /* SLIDE 7 */
-  .timeline {
-    margin-top: 3rem;
-    position: relative;
-  }
-
-  .timeline::before {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    left: 120px;
-    width: 1px;
-    background: var(--border);
-  }
-
-  .timeline-item {
+  /* SLIDE 6 — NEXT STEP */
+  .nextstep-grid {
     display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 2rem;
-    padding-bottom: 2.5rem;
-    position: relative;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 2.5rem;
+    align-items: start;
   }
 
-  .timeline-item:last-child { padding-bottom: 0; }
+  .nextstep-copy p { margin-bottom: 1rem; max-width: 420px; }
 
-  .timeline-phase {
+  .differentiators {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .diff-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    background: var(--off-black);
+  }
+
+  .diff-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: rgba(212,137,58,0.25);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 28px;
+  }
+
+  .diff-text {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    padding-top: 0.15rem;
+  }
+
+  .diff-text strong {
+    display: block;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.25em;
+    font-weight: 600;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--amber);
-    text-align: right;
-    padding-top: 0.1rem;
+    color: var(--white);
+    margin-bottom: 0.25rem;
   }
-
-  .timeline-dot {
-    position: absolute;
-    left: 116px;
-    top: 0.35rem;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: var(--amber);
-    border: 2px solid var(--black);
-  }
-
-  .timeline-content h3 { margin-bottom: 0.4rem; }
-  .timeline-content p { font-size: 0.85rem; max-width: 500px; }
 
   /* FOOTER */
   .slide-footer {
@@ -618,23 +520,20 @@
     nav { padding: 1rem 1.5rem; }
     .slide { padding: 6rem 1.5rem 3rem; }
     .before-grid,
-    .brand-grid,
+    .benefits-layout,
+    .nextstep-grid,
     .transform-grid { grid-template-columns: 1fr; }
     .transform-img-wide { aspect-ratio: 16/9; }
     .styles-grid { grid-template-columns: 1fr; }
-    .deliverables-grid { grid-template-columns: 1fr; }
-    .timeline::before { left: 80px; }
-    .timeline-item { grid-template-columns: 80px 1fr; gap: 1.25rem; }
-    .timeline-dot { left: 76px; }
   }
 </style>
 </head>
 <body>
 
 <nav>
- <a href="../">
-      <img src="../images/HR-logo-horiz-white.png" height="32" alt="Higher Roads" class="header-logo" />
-    </a>
+  <a href="../">
+    <img src="../images/HR-logo-horiz-white.png" height="32" alt="Higher Roads" class="header-logo" />
+  </a>
   <span class="nav-title">The Rux — Concept Presentation</span>
   <div class="slide-dots" id="dots"></div>
 </nav>
@@ -646,11 +545,11 @@
     <span class="eyebrow">A concept for The Rux</span>
     <h1>What if your space was the experience?</h1>
     <p style="max-width:480px; margin: 0 auto;">A projection mapping concept designed specifically for The Rux at the Cambria Hotel Nashville.</p>
-   <p class="cover-sub mt-lg" style="text-align:center; width:100%; display:block;">Higher Roads &nbsp;·&nbsp; Immersive Environments &nbsp;·&nbsp; Nashville</p>
+    <p class="cover-sub mt-lg" style="text-align:center; width:100%; display:block;">Higher Roads &nbsp;·&nbsp; Immersive Environments &nbsp;·&nbsp; Nashville</p>
   </div>
 </section>
 
-<!-- SLIDE 2: THE OPPORTUNITY -->
+<!-- SLIDE 2: THE SPACE -->
 <section class="slide" data-slide="2">
   <div class="slide-inner">
     <div class="slide-num">01</div>
@@ -659,7 +558,7 @@
     <div class="before-grid">
       <div>
         <div class="space-placeholder">
-  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-today.jpg" alt="The Rux — existing state" style="width:100%; height:100%; object-fit:cover; display:block;">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-today.jpg" alt="The Rux — existing state" style="width:100%; height:100%; object-fit:cover; display:block;">
         </div>
       </div>
       <div class="before-copy">
@@ -688,19 +587,19 @@
       </div>
       <div class="transform-img">
         <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:var(--dark);">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-2.jpg" alt="The Rux concept render — projection mapping covering wall and floor">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-2.jpg" alt="The Rux concept render — angle 2" style="width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="img-caption">Concept render — angle 2</div>
       </div>
       <div class="transform-img">
         <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:var(--dark);">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-3.jpg" alt="The Rux concept render — projection mapping covering wall and floor">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-3.jpg" alt="The Rux concept render — angle 3" style="width:100%;height:100%;object-fit:cover;">
         </div>
         <div class="img-caption">Concept render — angle 3</div>
       </div>
     </div>
     <div class="concept-note mt-md">
-      <p>Wall coverage and floor coverage together. Guests aren't looking at it from across the room. They're standing inside it.</p>
+      <p>This is the baseline. Wall and floor coverage running as the Rux evergreen loop. From here, the content system does more.</p>
     </div>
   </div>
 </section>
@@ -709,9 +608,9 @@
 <section class="slide" data-slide="4">
   <div class="slide-inner">
     <div class="slide-num">03</div>
-    <span class="eyebrow">What it's for</span>
-    <h2>Three occasions. One space.</h2>
-    <p>The content system is built around how the space gets used. Each mode has its own visual language, running as a seamless loop.</p>
+    <span class="eyebrow">Now put it to work</span>
+    <h2>Three ways the space earns its keep.</h2>
+    <p>The same projection infrastructure supports three distinct modes. Each has its own content, its own purpose, and its own commercial logic.</p>
     <div class="styles-grid">
       <div class="style-card">
         <div class="style-swatch" style="padding:0; overflow:hidden;">
@@ -744,111 +643,82 @@
   </div>
 </section>
 
-<!-- SLIDE 5: BRAND INTEGRATION -->
+<!-- SLIDE 5: BENEFITS + PROOF -->
 <section class="slide" data-slide="5">
   <div class="slide-inner">
     <div class="slide-num">04</div>
-    <span class="eyebrow">Brand integration</span>
-    <h2>Brands don't interrupt the experience. They become it.</h2>
-    <div class="brand-grid">
-      <div class="brand-examples">
+    <span class="eyebrow">What you walk away with</span>
+    <h2>One event. Three lasting assets.</h2>
+    <div class="benefits-layout">
+      <div class="benefits-proof">
         <video
           src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4"
-          autoplay
-          loop
-          muted
-          playsinline
+          autoplay loop muted playsinline
           style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block; border:1px solid var(--border);"
         ></video>
-        <p style="font-size: 0.75rem; color: var(--dim); margin-top: 0.5rem; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.1em; text-transform: uppercase;">Mycopop — live brand integration</p>
+        <p class="benefits-proof-label">Mycopop — live brand integration</p>
+        <p style="font-size:0.82rem; max-width:none;">A real event, fully branded. This is what a brand takeover night looks like in practice. The content is built around the brand, not placed on top of it.</p>
       </div>
-      <div class="brand-copy">
-        <p>Every surface becomes part of a brand's story. Not a banner, not a logo placement. A room built around what they make and who they're trying to reach.</p>
-        <div class="integration-modes">
-          <div class="mode-item">
-            <span class="mode-tag">Visual Identity</span>
-            <span class="mode-text">Brand colors, shapes, and language woven into the projection content. The room carries their identity without it feeling like advertising.</span>
-          </div>
-          <div class="mode-item">
-            <span class="mode-tag">Product Moments</span>
-            <span class="mode-text">The product lives inside the content. A bottle emerging from the environment, product details as texture, motion that reflects what's in the glass.</span>
-          </div>
-          <div class="mode-item">
-            <span class="mode-tag">Playlist Logic</span>
-            <span class="mode-text">Brand content and venue content run as a playlist. The experience shifts between Rux identity and the featured brand without a hard cut. Always coherent, never jarring.</span>
-          </div>
+      <div class="deliverables-stack">
+        <div class="deliverable-card">
+          <div class="d-title">A night that gets remembered</div>
+          <p class="d-body">A fully produced projection event. Wall and floor coverage. Brand partner integration. Content guests photograph, share, and talk about afterward.</p>
+        </div>
+        <div class="deliverable-card">
+          <div class="d-title">A media loop for your screens</div>
+          <p class="d-body">Rux-branded ambient content formatted for your existing LED screens. Runs the night of the event and keeps working every night after, with no additional hardware required.</p>
+        </div>
+        <div class="deliverable-card">
+          <div class="d-title">A product you can sell</div>
+          <p class="d-body">The event footage becomes your pitch asset. Corporate buyers and brand partners can see exactly what a brand takeover night at The Rux looks like before they book it.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 6: WHAT HE GETS -->
+<!-- SLIDE 6: THE NEXT STEP -->
 <section class="slide" data-slide="6">
   <div class="slide-inner">
     <div class="slide-num">05</div>
-    <span class="eyebrow">The offer</span>
-    <h2>What the Cambria walks away with.</h2>
-    <div class="deliverables-grid">
-      <div class="deliverable-card">
-        <div class="d-number">01</div>
-        <div class="d-title">A night that gets remembered</div>
-        <p class="d-body">A fully produced projection event. Wall and floor coverage. Brand partner integration. Content guests photograph, share, and talk about afterward.</p>
-      </div>
-      <div class="deliverable-card">
-        <div class="d-number">02</div>
-        <div class="d-title">A media loop for your screens</div>
-        <p class="d-body">Rux-branded ambient content formatted for your existing LED screens. Runs the night of the event and keeps working every night after, with no additional hardware required.</p>
-      </div>
-      <div class="deliverable-card">
-        <div class="d-number">03</div>
-        <div class="d-title">A product you can sell</div>
-        <p class="d-body">The event footage becomes your pitch asset. Corporate buyers, brand partners, and private event clients get to see exactly what a brand takeover night at The Rux looks like before they book it.</p>
-      </div>
-    </div>
-    <div class="concept-note mt-lg">
-      <p>One event proves the concept, produces the footage that sells the next booking, and gives The Rux something to show corporate buyers that no other rooftop bar in Nashville can match.</p>
-    </div>
-  </div>
-</section>
-
-<!-- SLIDE 7: THE BIGGER PICTURE -->
-<section class="slide" data-slide="7">
-  <div class="slide-inner">
-    <div class="slide-num">06</div>
-    <span class="eyebrow">Where this goes</span>
-    <h2>One night becomes an ongoing differentiator.</h2>
-    <div class="timeline">
-      <div class="timeline-item">
-        <span class="timeline-phase">The Pilot</span>
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <h3>The event</h3>
-          <p>Higher Roads produces and installs the full experience. You host. A brand partner is featured. The Rux becomes something guests have never seen before in a hotel bar in Nashville.</p>
+    <span class="eyebrow">How we start</span>
+    <h2>One pilot event changes everything.</h2>
+    <div class="nextstep-grid">
+      <div class="nextstep-copy">
+        <p>Higher Roads produces and installs the full experience. You host. A brand partner is featured. The Rux becomes something guests in Nashville have never seen before in a hotel bar.</p>
+        <p>After that night, you have footage, a media loop on your screens, and a new product to sell to corporate event buyers. The event pays for itself in the first brand takeover booking.</p>
+        <div class="concept-note mt-md">
+          <p>We've already mapped the space and built the concept. The next step is agreeing on a date.</p>
         </div>
       </div>
-      <div class="timeline-item">
-        <span class="timeline-phase">The Asset</span>
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <h3>Ambient media on your screens</h3>
-          <p>Rux-branded content runs on your existing LED screens from the night of the event forward. The space has a visual identity without requiring any additional hardware or ongoing effort.</p>
+      <div class="differentiators">
+        <div class="diff-item">
+          <div class="diff-num">1</div>
+          <div class="diff-text">
+            <strong>You host, we execute</strong>
+            Higher Roads owns the concept, the content, and the install. You provide the space and your existing brand relationships.
+          </div>
         </div>
-      </div>
-      <div class="timeline-item">
-        <span class="timeline-phase">The Product</span>
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <h3>Brand takeover nights</h3>
-          <p>The pilot footage lets you sell private brand takeover events. A brand books the rooftop, Higher Roads builds their content, The Rux becomes their room for the night. A premium product nobody else in Nashville offers.</p>
+        <div class="diff-item">
+          <div class="diff-num">2</div>
+          <div class="diff-text">
+            <strong>Wall and floor coverage</strong>
+            Not a screen on a wall. The entire room is the canvas. Guests stand inside it.
+          </div>
         </div>
-      </div>
-      <div class="timeline-item">
-        <span class="timeline-phase">The Refresh</span>
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <h3>Seasonal content updates</h3>
-          <p>Quarterly content refreshes keep the space feeling current. New direction, new mood, new reason for regulars to notice something has changed. The room stays alive between events.</p>
+        <div class="diff-item">
+          <div class="diff-num">3</div>
+          <div class="diff-text">
+            <strong>Nobody else in Nashville offers this</strong>
+            A branded projection takeover in a rooftop hospitality venue is a product your corporate event buyers have nowhere else to find.
+          </div>
+        </div>
+        <div class="diff-item">
+          <div class="diff-num">4</div>
+          <div class="diff-text">
+            <strong>The content keeps working after the event</strong>
+            The evergreen loop runs on your existing screens from the night of the event forward, at no additional cost.
+          </div>
         </div>
       </div>
     </div>
@@ -856,12 +726,12 @@
 </section>
 
 <!-- FOOTER -->
-<section class="slide slide-footer" data-slide="8">
+<section class="slide slide-footer" data-slide="7">
   <div class="slide-inner">
     <span class="eyebrow">Higher Roads</span>
     <h2 style="font-size: clamp(1.5rem, 3vw, 2.5rem);">Ready when you are.</h2>
     <div class="footer-rule"></div>
-    <p style="margin: 0 auto; max-width: 420px;">We've already mapped the space. We know what it can become. The next step is a conversation about when.</p>
+    <p style="margin: 0 auto; max-width: 420px;">The concept is built. The space is mapped. Let's pick a date.</p>
     <p class="footer-contact mt-lg">higher-roads.com &nbsp;·&nbsp; Nashville, TN</p>
   </div>
 </section>
