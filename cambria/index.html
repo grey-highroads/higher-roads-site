@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rux Nashville — Immersive Experience Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --off-black: #111111;
+    --dark: #1a1a1a;
+    --mid: #2a2a2a;
+    --border: rgba(255,255,255,0.1);
+    --amber: #d4893a;
+    --amber-light: #e8a85a;
+    --white: #f5f2ee;
+    --muted: rgba(245,242,238,0.5);
+    --dim: rgba(245,242,238,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+
+  .nav-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .slide-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .dot.active { background: var(--amber); border-color: var(--amber); }
+
+  /* SLIDES */
+  .slide {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 7rem 3rem 4rem;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .slide-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* SLIDE NUMBERS */
+  .slide-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .slide-num::after {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: var(--amber);
+    opacity: 0.5;
+  }
+
+  /* TYPOGRAPHY */
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  p {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.75;
+    max-width: 600px;
+  }
+
+  em { font-style: italic; color: var(--white); }
+
+  /* SLIDE 1 — COVER */
+  .slide-cover {
+    background: var(--black);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide-cover .slide-inner { text-align: center; max-width: 700px; }
+
+  .cover-rule {
+    width: 48px;
+    height: 1px;
+    background: var(--amber);
+    margin: 0 auto 2.5rem;
+  }
+
+  .cover-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2rem;
+  }
+
+  /* SLIDE 2 — BEFORE */
+  .before-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    align-items: center;
+  }
+
+  .space-placeholder {
+    aspect-ratio: 16/9;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .space-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(255,255,255,0.015) 20px,
+      rgba(255,255,255,0.015) 21px
+    );
+  }
+
+  .placeholder-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--dim);
+    position: relative;
+    z-index: 1;
+  }
+
+  .placeholder-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .placeholder-icon svg { opacity: 0.3; }
+
+  .before-copy { padding-left: 1rem; }
+
+  .before-copy p { max-width: 400px; margin-bottom: 1rem; }
+
+  .gap-list {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .gap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .gap-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--amber);
+    margin-top: 0.55rem;
+    flex-shrink: 0;
+  }
+
+  /* SLIDE 3 — TRANSFORMATION */
+  .transform-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .transform-img {
+    aspect-ratio: 16/9;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .transform-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .transform-img-wide {
+    grid-column: 1 / -1;
+    aspect-ratio: 21/9;
+  }
+
+  .img-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .concept-note {
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    border-left: 2px solid var(--amber);
+    background: rgba(212,137,58,0.05);
+  }
+
+  .concept-note p { font-size: 0.9rem; max-width: none; }
+
+  /* SLIDE 4 — STYLE DIRECTIONS */
+  .styles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .style-card {
+    border: 1px solid var(--border);
+    background: var(--off-black);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .style-card:hover { border-color: var(--amber); }
+
+  .style-swatch {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .swatch-organic {
+    background: radial-gradient(ellipse at 30% 70%, #1a2e1a 0%, #0d1a10 50%, #080f08 100%);
+  }
+
+  .swatch-organic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(74,130,50,0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(50,100,40,0.2) 0%, transparent 40%),
+      radial-gradient(circle at 60% 60%, rgba(30,80,30,0.15) 0%, transparent 30%);
+  }
+
+  .swatch-electric {
+    background: radial-gradient(ellipse at 60% 40%, #0f0f2e 0%, #05050f 100%);
+  }
+
+  .swatch-electric::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 70% 30%, rgba(80,50,200,0.4) 0%, transparent 45%),
+      radial-gradient(circle at 30% 70%, rgba(180,80,255,0.2) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(100,100,255,0.1) 0%, transparent 35%);
+  }
+
+  .swatch-ember {
+    background: radial-gradient(ellipse at 50% 80%, #1f0d05 0%, #0f0602 100%);
+  }
+
+  .swatch-ember::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 90%, rgba(200,80,20,0.5) 0%, transparent 50%),
+      radial-gradient(circle at 30% 60%, rgba(220,120,30,0.3) 0%, transparent 40%),
+      radial-gradient(circle at 70% 40%, rgba(180,60,10,0.2) 0%, transparent 35%);
+  }
+
+  .swatch-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: rgba(255,255,255,0.8);
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+  }
+
+  .style-info {
+    padding: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .style-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+  }
+
+  .style-desc {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: none;
+  }
+
+  .style-palette {
+    display: flex;
+    gap: 4px;
+    margin-top: 0.75rem;
+  }
+
+  .palette-chip {
+    width: 16px; height: 16px;
+    border-radius: 2px;
+  }
+
+  /* SLIDE 5 — BRAND INTEGRATION */
+  .brand-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    align-items: start;
+  }
+
+  .brand-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .brand-example {
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+    background: var(--off-black);
+    position: relative;
+  }
+
+  .brand-example-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+  }
+
+  .brand-example p { font-size: 0.82rem; max-width: none; }
+
+  .mycopop-box {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mycopop-inner {
+    text-align: center;
+    z-index: 1;
+    position: relative;
+  }
+
+  .mycopop-inner .eyebrow { margin-bottom: 0.5rem; }
+
+  .mycopop-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 60%, rgba(180,60,200,0.25) 0%, transparent 50%),
+      radial-gradient(circle at 70% 30%, rgba(60,120,200,0.2) 0%, transparent 45%),
+      radial-gradient(circle at 50% 80%, rgba(100,200,150,0.15) 0%, transparent 40%);
+  }
+
+  .brand-copy { padding-left: 0.5rem; }
+
+  .brand-copy p { margin-bottom: 1rem; }
+
+  .integration-modes {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .mode-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mode-item:last-child { border-bottom: none; }
+
+  .mode-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    padding: 0.3rem 0.5rem;
+    border: 1px solid rgba(212,137,58,0.3);
+    text-align: center;
+    margin-top: 0.1rem;
+  }
+
+  .mode-text {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* SLIDE 6 — WHAT HE GETS */
+  .deliverables-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .deliverable-card {
+    border: 1px solid var(--border);
+    padding: 1.75rem 1.5rem;
+    background: var(--off-black);
+    position: relative;
+  }
+
+  .deliverable-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--amber);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .deliverable-card:hover::before { opacity: 1; }
+
+  .d-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: rgba(212,137,58,0.2);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .d-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .d-body {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* SLIDE 7 — THE BIGGER PICTURE */
+  .timeline {
+    margin-top: 3rem;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 120px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 2rem;
+    padding-bottom: 2.5rem;
+    position: relative;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-phase {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber);
+    text-align: right;
+    padding-top: 0.1rem;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 116px;
+    top: 0.35rem;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 2px solid var(--black);
+  }
+
+  .timeline-content h3 { margin-bottom: 0.4rem; }
+
+  .timeline-content p { font-size: 0.85rem; max-width: 500px; }
+
+  /* FOOTER SLIDE */
+  .slide-footer {
+    min-height: 40vh;
+    background: var(--off-black);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-bottom: none;
+  }
+
+  .slide-footer .slide-inner { text-align: center; max-width: 600px; }
+
+  .footer-rule {
+    width: 48px; height: 1px;
+    background: var(--amber);
+    margin: 2rem auto;
+  }
+
+  .footer-contact {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* UTILITIES */
+  .mt-sm { margin-top: 1rem; }
+  .mt-md { margin-top: 1.5rem; }
+  .mt-lg { margin-top: 2.5rem; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .slide { padding: 6rem 1.5rem 3rem; }
+    .before-grid,
+    .brand-grid,
+    .transform-grid { grid-template-columns: 1fr; }
+    .transform-img-wide { aspect-ratio: 16/9; }
+    .styles-grid { grid-template-columns: 1fr; }
+    .deliverables-grid { grid-template-columns: 1fr; }
+    .timeline::before { left: 80px; }
+    .timeline-item { grid-template-columns: 80px 1fr; gap: 1.25rem; }
+    .timeline-dot { left: 76px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">Higher Roads</span>
+  <span class="nav-title">The Rux — Concept Presentation</span>
+  <div class="slide-dots" id="dots"></div>
+</nav>
+
+<!-- SLIDE 1: COVER -->
+<section class="slide slide-cover" data-slide="1">
+  <div class="slide-inner">
+    <div class="cover-rule"></div>
+    <span class="eyebrow">A concept for The Rux</span>
+    <h1>What if your space was the experience?</h1>
+    <p style="max-width:480px; margin: 0 auto;">A projection mapping concept designed specifically for The Rux at the Cambria Hotel Nashville.</p>
+    <p class="cover-sub mt-lg">Higher Roads &nbsp;·&nbsp; Immersive Environments &nbsp;·&nbsp; Nashville</p>
+  </div>
+</section>
+
+<!-- SLIDE 2: THE SPACE AS IT IS -->
+<section class="slide" data-slide="2">
+  <div class="slide-inner">
+    <div class="slide-num">01</div>
+    <span class="eyebrow">The opportunity</span>
+    <h2>The Rux as it stands</h2>
+    <div class="before-grid">
+      <div>
+        <div class="space-placeholder">
+          <div class="placeholder-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+            </svg>
+          </div>
+          <span class="placeholder-label">Your photo here</span>
+        </div>
+        <p style="font-size:0.7rem; color: var(--dim); margin-top: 0.5rem; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.1em; text-transform: uppercase;">Insert rooftop photo — existing state</p>
+      </div>
+      <div class="before-copy">
+        <p>A rooftop bar with real architectural bones. Great furniture, a strong view, and surfaces that haven't been put to work yet.</p>
+        <div class="gap-list">
+          <div class="gap-item"><div class="gap-dot"></div><span>Walls and floors that could anchor a visual identity</span></div>
+          <div class="gap-item"><div class="gap-dot"></div><span>A space guests would photograph if there was something to photograph</span></div>
+          <div class="gap-item"><div class="gap-dot"></div><span>An event canvas ready for a brand to own for a night</span></div>
+          <div class="gap-item"><div class="gap-dot"></div><span>Infrastructure that could keep the room feeling fresh season to season</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: THE TRANSFORMATION -->
+<section class="slide" data-slide="3">
+  <div class="slide-inner">
+    <div class="slide-num">02</div>
+    <span class="eyebrow">The transformation</span>
+    <h2>The same room. A completely different world.</h2>
+    <div class="transform-grid">
+      <div class="transform-img transform-img-wide">
+        <img src="/mnt/user-data/uploads/Screenshot_2026-05-11_at_9_12_22_AM.png" alt="Rux Nashville concept render — enchanted forest projection covering wall and floor" onerror="this.parentElement.innerHTML='<span class=\'placeholder-label\'>Insert primary concept render</span>'">
+        <div class="img-caption">Concept render — The Rux · Cambria Hotel Nashville</div>
+      </div>
+      <div class="transform-img">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:var(--dark);">
+          <span class="placeholder-label">Second angle</span>
+        </div>
+        <div class="img-caption">Concept render — angle 2</div>
+      </div>
+      <div class="transform-img">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:var(--dark);">
+          <span class="placeholder-label">Third angle</span>
+        </div>
+        <div class="img-caption">Concept render — angle 3</div>
+      </div>
+    </div>
+    <div class="concept-note mt-md">
+      <p>Wall coverage and floor coverage together. Guests aren't looking at it from across the room. They're standing inside it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: STYLE DIRECTIONS -->
+<section class="slide" data-slide="4">
+  <div class="slide-inner">
+    <div class="slide-num">03</div>
+    <span class="eyebrow">Visual directions</span>
+    <h2>Three directions. One space.</h2>
+    <p>Content is designed seasonally or thematically. These are three starting points — each can be adapted, evolved, or combined with a brand partner's identity.</p>
+    <div class="styles-grid">
+      <div class="style-card">
+        <div class="style-swatch swatch-organic">
+          <span class="swatch-label">Organic</span>
+        </div>
+        <div class="style-info">
+          <div class="style-name">Natural / Botanical</div>
+          <p class="style-desc">Living textures, slow-moving flora, deep forest atmospheres. Warm and grounded. Works well for wellness brands, spring programming, or intimate evening events.</p>
+          <div class="style-palette">
+            <div class="palette-chip" style="background:#1a3a14;"></div>
+            <div class="palette-chip" style="background:#2d5a25;"></div>
+            <div class="palette-chip" style="background:#4a7a3a;"></div>
+            <div class="palette-chip" style="background:#8ab87a;"></div>
+            <div class="palette-chip" style="background:#c8e8b0;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-swatch swatch-electric">
+          <span class="swatch-label">Electric</span>
+        </div>
+        <div class="style-info">
+          <div class="style-name">Electric / Contemporary</div>
+          <p class="style-desc">High contrast, graphic, kinetic. Deep indigo and violet fields with sharp light trails. Fits brand activations, product launches, and events with a younger, design-forward audience.</p>
+          <div class="style-palette">
+            <div class="palette-chip" style="background:#0a0520;"></div>
+            <div class="palette-chip" style="background:#1a0f50;"></div>
+            <div class="palette-chip" style="background:#3a20a0;"></div>
+            <div class="palette-chip" style="background:#7a50e0;"></div>
+            <div class="palette-chip" style="background:#c090ff;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-swatch swatch-ember">
+          <span class="swatch-label">Ember</span>
+        </div>
+        <div class="style-info">
+          <div class="style-name">Ember / Warm Dark</div>
+          <p class="style-desc">Deep amber, burnt orange, and slow fire movement. Cinematic and indulgent. Made for whiskey and spirit brands, late-night programming, and CMA-adjacent events in Nashville.</p>
+          <div class="style-palette">
+            <div class="palette-chip" style="background:#1a0800;"></div>
+            <div class="palette-chip" style="background:#3a1500;"></div>
+            <div class="palette-chip" style="background:#7a3500;"></div>
+            <div class="palette-chip" style="background:#c06020;"></div>
+            <div class="palette-chip" style="background:#e8a060;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: BRAND INTEGRATION -->
+<section class="slide" data-slide="5">
+  <div class="slide-inner">
+    <div class="slide-num">04</div>
+    <span class="eyebrow">Brand integration</span>
+    <h2>Brands don't interrupt the experience. They become it.</h2>
+    <div class="brand-grid">
+      <div class="brand-examples">
+        <div class="mycopop-box">
+          <div class="mycopop-inner">
+            <span class="eyebrow">Mycopop Functional Beverages</span>
+            <p style="max-width:220px; margin: 0 auto; font-size: 0.8rem; color: rgba(255,255,255,0.6);">Full brand integration — live event install</p>
+          </div>
+        </div>
+        <p style="font-size: 0.75rem; color: var(--dim); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.1em; text-transform: uppercase;">
+          Insert Mycopop event photos here — replace this box with 1-2 actual event images
+        </p>
+      </div>
+      <div class="brand-copy">
+        <p>Every surface becomes part of a brand's story. Not a banner, not a logo placement. A room built around what they make and who they're trying to reach.</p>
+        <div class="integration-modes">
+          <div class="mode-item">
+            <span class="mode-tag">Visual Identity</span>
+            <span class="mode-text">Brand colors, shapes, and language woven into the projection content. The room carries their identity without it feeling like advertising.</span>
+          </div>
+          <div class="mode-item">
+            <span class="mode-tag">Product Moments</span>
+            <span class="mode-text">The product lives inside the content — a bottle emerging from the environment, product details as texture, motion that reflects what's in the glass.</span>
+          </div>
+          <div class="mode-item">
+            <span class="mode-tag">Playlist Logic</span>
+            <span class="mode-text">Brand content and venue content run as a playlist — the experience shifts between Rux identity and the featured brand without a hard cut. Always on brand. Never jarring.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: WHAT HE GETS -->
+<section class="slide" data-slide="6">
+  <div class="slide-inner">
+    <div class="slide-num">05</div>
+    <span class="eyebrow">The offer</span>
+    <h2>What the Cambria walks away with.</h2>
+    <div class="deliverables-grid">
+      <div class="deliverable-card">
+        <div class="d-number">01</div>
+        <div class="d-title">A night that gets remembered</div>
+        <p class="d-body">A fully produced projection event. Wall and floor coverage. Brand partner integration. Content guests photograph, share, and talk about afterward.</p>
+      </div>
+      <div class="deliverable-card">
+        <div class="d-number">02</div>
+        <div class="d-title">A media loop for your screens</div>
+        <p class="d-body">Rux-branded ambient content formatted for your existing LED screens. Runs the night of the event and keeps working every night after, with no additional hardware required.</p>
+      </div>
+      <div class="deliverable-card">
+        <div class="d-number">03</div>
+        <div class="d-title">A product you can sell</div>
+        <p class="d-body">The event footage becomes your pitch asset. Corporate buyers, brand partners, and private event clients get to see exactly what a brand takeover night at The Rux looks like before they book it.</p>
+      </div>
+    </div>
+    <div class="concept-note mt-lg">
+      <p>One event proves the concept, produces the footage that sells the next booking, and gives The Rux something to show corporate buyers that no other rooftop bar in Nashville can match.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: THE BIGGER PICTURE -->
+<section class="slide" data-slide="7">
+  <div class="slide-inner">
+    <div class="slide-num">06</div>
+    <span class="eyebrow">Where this goes</span>
+    <h2>One night becomes an ongoing differentiator.</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-phase">The Pilot</span>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h3>The event</h3>
+          <p>Higher Roads produces and installs the full experience. You host. A brand partner is featured. The Rux becomes something guests have never seen before in a hotel bar in Nashville.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-phase">The Asset</span>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h3>Ambient media on your screens</h3>
+          <p>Rux-branded content runs on your existing LED screens from the night of the event forward. The space has a visual identity without requiring any additional hardware or ongoing effort.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-phase">The Product</span>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h3>Brand takeover nights</h3>
+          <p>The pilot footage lets you sell private brand takeover events. A brand books the rooftop, Higher Roads builds their content, The Rux becomes their room for the night. A premium product nobody else in Nashville offers.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-phase">The Refresh</span>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h3>Seasonal content updates</h3>
+          <p>Quarterly content refreshes keep the space feeling current. New direction, new mood, new reason for regulars to notice something has changed. The room stays alive between events.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<section class="slide slide-footer" data-slide="8">
+  <div class="slide-inner">
+    <span class="eyebrow">Higher Roads</span>
+    <h2 style="font-size: clamp(1.5rem, 3vw, 2.5rem);">Ready when you are.</h2>
+    <div class="footer-rule"></div>
+    <p style="margin: 0 auto; max-width: 420px;">We've already mapped the space. We know what it can become. The next step is a conversation about when.</p>
+    <p class="footer-contact mt-lg">higher-roads.com &nbsp;·&nbsp; Nashville, TN</p>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll('[data-slide]');
+  const dotsContainer = document.getElementById('dots');
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.addEventListener('click', () => {
+      slides[i].scrollIntoView({ behavior: 'smooth' });
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  const dots = document.querySelectorAll('.dot');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = Array.from(slides).indexOf(entry.target);
+        dots.forEach(d => d.classList.remove('active'));
+        if (dots[idx]) dots[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
+
+  slides.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
