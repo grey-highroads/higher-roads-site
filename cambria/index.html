@@ -159,7 +159,6 @@
 
   em { font-style: italic; color: var(--white); }
 
-  /* COVER */
   .slide-cover {
     background: var(--black);
     justify-content: center;
@@ -188,7 +187,6 @@
     display: block;
   }
 
-  /* SLIDE 2 */
   .before-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -247,7 +245,6 @@
     flex-shrink: 0;
   }
 
-  /* SLIDES 3 + 4 SHARED GRID */
   .transform-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -303,7 +300,37 @@
 
   .concept-note p { font-size: 0.9rem; max-width: none; }
 
-  /* SLIDE 5 */
+  .explainer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    width: 100%;
+  }
+
+  .explainer-item {
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    background: var(--off-black);
+  }
+
+  .explainer-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+  }
+
+  .explainer-item p {
+    font-size: 0.8rem;
+    max-width: none;
+  }
+
   .benefits-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -365,7 +392,6 @@
     line-height: 1.65;
   }
 
-  /* SLIDE 6 */
   .nextstep-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -419,7 +445,6 @@
     margin-bottom: 0.25rem;
   }
 
-  /* FOOTER */
   .slide-footer {
     min-height: 40vh;
     background: var(--off-black);
@@ -455,7 +480,8 @@
     .before-grid,
     .benefits-layout,
     .nextstep-grid,
-    .transform-grid { grid-template-columns: 1fr; }
+    .transform-grid,
+    .explainer-grid { grid-template-columns: 1fr; }
     .transform-img-wide { aspect-ratio: 16/9; }
     .transform-img-portrait { aspect-ratio: 16/9; }
   }
@@ -538,9 +564,11 @@
     <div class="slide-num">03</div>
     <span class="eyebrow">The activation</span>
     <h2>Now imagine a brand built into every surface.</h2>
+
+    <!-- IMAGE GRID -->
     <div class="transform-grid">
 
-      <!-- HERO IMAGE — full width -->
+      <!-- HERO — full width -->
       <div class="transform-img transform-img-wide">
         <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/5A06BBC1-B5A8-4781-87CD-CF9E86AB06AA.PNG" alt="Brand activation concept — hero">
         <div class="img-caption">Brand activation concept — The Rux</div>
@@ -555,33 +583,34 @@
         <div class="img-caption">Brand surfaces — concept renders</div>
       </div>
 
-      <!-- RIGHT — static portrait image -->
+      <!-- RIGHT — static portrait -->
       <div class="transform-img transform-img-portrait">
         <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/CDF327A9-3208-4DAE-988D-45F17C2C93C8.PNG" alt="Brand activation concept — angle 3">
         <div class="img-caption">Brand activation concept — angle 3</div>
       </div>
 
-     <!-- EXPLAINER BLOCK -->
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem;">
-  <div style="padding:1.25rem; border:1px solid var(--border); background:var(--off-black);">
-    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">The environment is built around the brand</div>
-    <p style="font-size:0.8rem; max-width:none;">Color, texture, motion, and atmosphere are derived from the brand's visual identity. The room feels like the product without the product being on a banner.</p>
-  </div>
-  <div style="padding:1.25rem; border:1px solid var(--border); background:var(--off-black);">
-    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">Content runs as a playlist</div>
-    <p style="font-size:0.8rem; max-width:none;">Brand content and venue content run in rotation throughout the night. The experience shifts between the two without a hard cut. Coherent, never jarring.</p>
-  </div>
-  <div style="padding:1.25rem; border:1px solid var(--border); background:var(--off-black);">
-    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">Guests are inside the brand world</div>
-    <p style="font-size:0.8rem; max-width:none;">Wall and floor coverage means the brand surrounds guests rather than competing for their attention. They're not looking at it. They're in it. That's what they photograph and share.</p>
-  </div>
-  <div style="padding:1.25rem; border:1px solid var(--border); background:var(--off-black);">
-    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">One featured brand per event</div>
-    <p style="font-size:0.8rem; max-width:none;">One brand. One cohesive visual world. No co-branding, no competing logos. The aesthetic clarity is what makes it premium and what makes the footage usable afterward.</p>
-  </div>
-</div>
-</div>
-    </div>
+    </div><!-- END transform-grid -->
+
+    <!-- EXPLAINER — outside the image grid, full width -->
+    <div class="explainer-grid">
+      <div class="explainer-item">
+        <div class="explainer-label">The environment is built around the brand</div>
+        <p>Color, texture, motion, and atmosphere are derived from the brand's visual identity. The room feels like the product without the product being on a banner.</p>
+      </div>
+      <div class="explainer-item">
+        <div class="explainer-label">Content runs as a playlist</div>
+        <p>Brand content and venue content run in rotation throughout the night. The experience shifts between the two without a hard cut. Coherent, never jarring.</p>
+      </div>
+      <div class="explainer-item">
+        <div class="explainer-label">Guests are inside the brand world</div>
+        <p>Wall and floor coverage means the brand surrounds guests rather than competing for their attention. They're not looking at it. They're in it. That's what they photograph and share.</p>
+      </div>
+      <div class="explainer-item">
+        <div class="explainer-label">One featured brand per event</div>
+        <p>One brand. One cohesive visual world. No co-branding, no competing logos. The aesthetic clarity is what makes it premium and what makes the footage usable afterward.</p>
+      </div>
+    </div><!-- END explainer-grid -->
+
   </div>
 </section>
 
@@ -679,7 +708,6 @@
 </section>
 
 <script>
-  // Dot navigation
   const slides = document.querySelectorAll('[data-slide]');
   const dotsContainer = document.getElementById('dots');
 
@@ -706,7 +734,6 @@
 
   slides.forEach(s => observer.observe(s));
 
-  // Slide 4 crossfade slideshow
   const brandSlides = document.querySelectorAll('.brand-slide');
   let brandCurrent = 0;
   setInterval(() => {
