@@ -183,6 +183,9 @@
     text-transform: uppercase;
     color: var(--muted);
     margin-top: 2rem;
+    text-align: center;
+    width: 100%;
+    display: block;
   }
 
   /* SLIDE 2 */
@@ -207,19 +210,6 @@
     overflow: hidden;
   }
 
-  .space-placeholder::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 20px,
-      rgba(255,255,255,0.015) 20px,
-      rgba(255,255,255,0.015) 21px
-    );
-  }
-
   .placeholder-label {
     font-family: 'Rajdhani', sans-serif;
     font-size: 0.6rem;
@@ -229,19 +219,6 @@
     position: relative;
     z-index: 1;
   }
-
-  .placeholder-icon {
-    width: 32px; height: 32px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .placeholder-icon svg { opacity: 0.3; }
 
   .before-copy { padding-left: 1rem; }
   .before-copy p { max-width: 400px; margin-bottom: 1rem; }
@@ -270,7 +247,7 @@
     flex-shrink: 0;
   }
 
-  /* SLIDE 3 */
+  /* SLIDES 3 + 4 SHARED GRID */
   .transform-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -301,6 +278,10 @@
     aspect-ratio: 21/9;
   }
 
+  .transform-img-portrait {
+    aspect-ratio: 9/16;
+  }
+
   .img-caption {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -322,55 +303,7 @@
 
   .concept-note p { font-size: 0.9rem; max-width: none; }
 
-  /* SLIDE 4 */
-  .styles-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-top: 2.5rem;
-  }
-
-  .style-card {
-    border: 1px solid var(--border);
-    background: var(--off-black);
-    overflow: hidden;
-    transition: border-color 0.3s;
-  }
-
-  .style-card:hover { border-color: var(--amber); }
-
-  .style-swatch {
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .style-info {
-    padding: 1.25rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .style-name {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 600;
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin-bottom: 0.5rem;
-  }
-
-  .style-desc {
-    font-size: 0.8rem;
-    line-height: 1.6;
-    color: var(--muted);
-    max-width: none;
-  }
-
-  /* SLIDE 5 — COMBINED BENEFITS */
+  /* SLIDE 5 */
   .benefits-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -432,7 +365,7 @@
     line-height: 1.65;
   }
 
-  /* SLIDE 6 — NEXT STEP */
+  /* SLIDE 6 */
   .nextstep-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -524,7 +457,7 @@
     .nextstep-grid,
     .transform-grid { grid-template-columns: 1fr; }
     .transform-img-wide { aspect-ratio: 16/9; }
-    .styles-grid { grid-template-columns: 1fr; }
+    .transform-img-portrait { aspect-ratio: 16/9; }
   }
 </style>
 </head>
@@ -544,8 +477,8 @@
     <div class="cover-rule"></div>
     <span class="eyebrow">A concept for The Rux</span>
     <h1>What if your space was the experience?</h1>
-    <p style="max-width:480px; margin: 0 auto;">A projection mapping concept designed specifically for The Rux at the Cambria Hotel Nashville.</p>
-  
+    <p style="max-width:480px; margin: 0 auto;">A brand activation concept designed specifically for The Rux at the Cambria Hotel Nashville.</p>
+    <p class="cover-sub mt-lg">Higher Roads &nbsp;·&nbsp; Immersive Environments &nbsp;·&nbsp; Nashville</p>
   </div>
 </section>
 
@@ -567,7 +500,6 @@
           <div class="gap-item"><div class="gap-dot"></div><span>Walls and floors that could anchor a visual identity</span></div>
           <div class="gap-item"><div class="gap-dot"></div><span>A space guests would photograph if there was something to inspire them</span></div>
           <div class="gap-item"><div class="gap-dot"></div><span>An event canvas ready for a brand to own for a night</span></div>
-          <div class="gap-item"><div class="gap-dot"></div><span>Infrastructure that could keep the room feeling fresh season to season</span></div>
         </div>
       </div>
     </div>
@@ -583,67 +515,74 @@
     <div class="transform-grid">
       <div class="transform-img transform-img-wide">
         <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-2.jpg" alt="The Rux concept render — projection mapping covering wall and floor">
-        <div class="img-caption">Concept render — The Rux · Cambria Hotel Midtown</div>
+        <div class="img-caption">Concept render — The Rux · Cambria Hotel Nashville</div>
       </div>
       <div class="transform-img">
-        <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:var(--dark);">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-4.jpg" alt="The Rux concept render — angle 2" style="width:100%;height:100%;object-fit:cover;">
-        </div>
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-4.jpg" alt="The Rux concept render — angle 2" style="width:100%;height:100%;object-fit:cover;">
         <div class="img-caption">Concept render — angle 2</div>
       </div>
       <div class="transform-img">
-        <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:var(--dark);">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-3.jpg" alt="The Rux concept render — angle 3" style="width:100%;height:100%;object-fit:cover;">
-        </div>
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-3.jpg" alt="The Rux concept render — angle 3" style="width:100%;height:100%;object-fit:cover;">
         <div class="img-caption">Concept render — angle 3</div>
       </div>
     </div>
     <div class="concept-note mt-md">
-      <p>This is the baseline. Wall and floor coverage running as the Rux evergreen loop. From here, the content system does more.</p>
+      <p>Wall and floor coverage together. Guests aren't looking at it from across the room. They're standing inside it.</p>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 4: USE CASES -->
+<!-- SLIDE 4: BRAND ACTIVATION -->
 <section class="slide" data-slide="4">
   <div class="slide-inner">
     <div class="slide-num">03</div>
-    <span class="eyebrow">Now put it to work</span>
-    <h2>Three ways the space earns its keep.</h2>
-    <p>The same projection infrastructure supports three distinct modes. Each has its own content, its own purpose, and its own commercial logic.</p>
-    <div class="styles-grid">
-      <div class="style-card">
-        <div class="style-swatch" style="padding:0; overflow:hidden;">
-          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX%20loop-evergreen.mp4" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; display:block;"></video>
-        </div>
-        <div class="style-info">
-          <div class="style-name">Evergreen</div>
-          <p class="style-desc">The Rux brand loop. Runs any night the bar is open. Gives the space a visual identity guests notice without it demanding their attention.</p>
-        </div>
+    <span class="eyebrow">The activation</span>
+    <h2>Now imagine a brand built into every surface.</h2>
+    <div class="transform-grid">
+
+      <!-- HERO IMAGE — full width -->
+      <div class="transform-img transform-img-wide">
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/5A06BBC1-B5A8-4781-87CD-CF9E86AB06AA.PNG" alt="Brand activation concept — hero">
+        <div class="img-caption">Brand activation concept — The Rux</div>
       </div>
-      <div class="style-card">
-        <div class="style-swatch" style="padding:0; overflow:hidden;">
-          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX%20loop-event.mp4" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; display:block;"></video>
-        </div>
-        <div class="style-info">
-          <div class="style-name">Event Nights</div>
-          <p class="style-desc">Tastings, trivia, live music, seasonal programming. The visuals shift to match the occasion and give guests a reason to feel like they're somewhere special.</p>
-        </div>
+
+      <!-- LEFT — crossfade slideshow, portrait -->
+      <div class="transform-img transform-img-portrait" style="position:relative; overflow:hidden;">
+        <img class="brand-slide" src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/BFE9C723-1F76-4BAC-B311-723D5F3D451B.PNG" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity 1.2s ease-in-out;">
+        <img class="brand-slide" src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/3E6242A9-C3EE-4B8C-B278-C24AD1D1367D.PNG" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease-in-out;">
+        <img class="brand-slide" src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/4F173473-4481-4336-95CA-2E0BECDF6AC9.PNG" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease-in-out;">
+        <img class="brand-slide" src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/7AB7E54A-BC16-4DA3-9892-087BFD8D9DC4.PNG" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease-in-out;">
+        <div class="img-caption">Brand surfaces — concept renders</div>
       </div>
-      <div class="style-card">
-        <div class="style-swatch" style="padding:0; overflow:hidden;">
-          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX%20loop-brand.mp4" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; display:block;"></video>
-        </div>
-        <div class="style-info">
-          <div class="style-name">Brand Takeover</div>
-          <p class="style-desc">A corporate client or brand partner books the rooftop. The room becomes theirs for the night. Full visual ownership, built around their identity and what they're there to sell.</p>
-        </div>
+
+      <!-- RIGHT — static portrait image -->
+      <div class="transform-img transform-img-portrait">
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/CDF327A9-3208-4DAE-988D-45F17C2C93C8.PNG" alt="Brand activation concept — angle 3">
+        <div class="img-caption">Brand activation concept — angle 3</div>
       </div>
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem;">
+  <div>
+    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">The environment is built around the brand</div>
+    <p style="font-size:0.8rem; max-width:none;">Color, texture, motion, and atmosphere are derived from the brand's visual identity. The room feels like the product without the product being on a banner.</p>
+  </div>
+  <div>
+    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">Content runs as a playlist</div>
+    <p style="font-size:0.8rem; max-width:none;">Brand content and venue content run in rotation throughout the night. The experience shifts between the two without a hard cut. Coherent, never jarring.</p>
+  </div>
+  <div>
+    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">Guests are inside the brand world</div>
+    <p style="font-size:0.8rem; max-width:none;">Wall and floor coverage means the brand surrounds guests rather than competing for their attention. They're not looking at it. They're in it. That's what they photograph and share.</p>
+  </div>
+  <div>
+    <div style="font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem;">One featured brand per event</div>
+    <p style="font-size:0.8rem; max-width:none;">One brand. One cohesive visual world. No co-branding, no competing logos. The aesthetic clarity is what makes it premium and what makes the footage usable afterward.</p>
+  </div>
+</div>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 5: BENEFITS + PROOF -->
+<!-- SLIDE 5: PROOF -->
 <section class="slide" data-slide="5">
   <div class="slide-inner">
     <div class="slide-num">04</div>
@@ -657,7 +596,7 @@
           style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block; border:1px solid var(--border);"
         ></video>
         <p class="benefits-proof-label">Mycopop — live brand integration</p>
-        <p style="font-size:0.82rem; max-width:none;">A real event, fully branded. This is what a brand takeover night looks like in practice. The content is built around the brand, not placed on top of it.</p>
+        <p style="font-size:0.82rem; max-width:none;">A real event, fully produced and installed by Higher Roads. The brand's identity was built into every surface. Guests were standing inside the brand world, not standing next to signage.</p>
       </div>
       <div class="deliverables-stack">
         <div class="deliverable-card">
@@ -677,7 +616,7 @@
   </div>
 </section>
 
-<!-- SLIDE 6: THE NEXT STEP -->
+<!-- SLIDE 6: THE ASK -->
 <section class="slide" data-slide="6">
   <div class="slide-inner">
     <div class="slide-num">05</div>
@@ -717,7 +656,7 @@
           <div class="diff-num">4</div>
           <div class="diff-text">
             <strong>The content keeps working after the event</strong>
-            The evergreen loop runs on your existing screens from the night of the event forward, at no additional cost.
+            The media loop runs on your existing screens from the night of the event forward, at no additional cost.
           </div>
         </div>
       </div>
@@ -737,6 +676,7 @@
 </section>
 
 <script>
+  // Dot navigation
   const slides = document.querySelectorAll('[data-slide]');
   const dotsContainer = document.getElementById('dots');
 
@@ -762,6 +702,15 @@
   }, { threshold: 0.5 });
 
   slides.forEach(s => observer.observe(s));
+
+  // Slide 4 crossfade slideshow
+  const brandSlides = document.querySelectorAll('.brand-slide');
+  let brandCurrent = 0;
+  setInterval(() => {
+    brandSlides[brandCurrent].style.opacity = '0';
+    brandCurrent = (brandCurrent + 1) % brandSlides.length;
+    brandSlides[brandCurrent].style.opacity = '1';
+  }, 3500);
 </script>
 </body>
 </html>
