@@ -565,23 +565,22 @@
     <h2>Now imagine a brand built into every surface.</h2>
 
 <!-- IMAGE GRID -->
-<div style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows: auto auto auto; gap:1rem; margin-top:2rem;">
+<div style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows: repeat(3, 1fr); gap:1rem; margin-top:2rem;">
 
-  <div class="transform-img">
-    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-1.jpg" style="width:100%;height:100%;object-fit:cover;">
+  <div style="overflow:hidden; border:1px solid var(--border);">
+    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-1.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
   </div>
 
-  <!-- Right image spans all 3 rows -->
-  <div class="transform-img" style="grid-row: 1 / 4; aspect-ratio: unset;">
-    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-6.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;">
+  <div style="grid-column:2; grid-row:1/4; overflow:hidden; border:1px solid var(--border);">
+    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-6.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
   </div>
 
-  <div class="transform-img">
-    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-2.jpg" style="width:100%;height:100%;object-fit:cover;">
+  <div style="overflow:hidden; border:1px solid var(--border);">
+    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-2.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
   </div>
 
-  <div class="transform-img">
-    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-4.jpg" style="width:100%;height:100%;object-fit:cover;">
+  <div style="overflow:hidden; border:1px solid var(--border);">
+    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-4.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
   </div>
 
 </div><!-- END image grid -->
