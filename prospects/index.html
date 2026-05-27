@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prospects — Higher Roads</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="../images/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #e8782a;
+    --accent-dim: #c9621e;
+    --bg: #0a0906;
+    --surface: #161412;
+    --surface2: #1e1b18;
+    --border: #2a2620;
+    --text: #e8e2d9;
+    --muted: #6b6258;
+    --success: #4caf7d;
+    --error: #e05252;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── LOCK SCREEN ── */
+  #lock-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  #lock-screen .lock-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  #lock-screen .lock-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 40px 48px;
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  #lock-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--text);
+    text-align: center;
+  }
+
+  #lock-screen .lock-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    align-self: flex-start;
+  }
+
+  #lock-screen input[type="password"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.1em;
+  }
+
+  #lock-screen input[type="password"]:focus {
+    border-color: var(--accent);
+  }
+
+  #lock-error {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--error);
+    min-height: 16px;
+    text-align: center;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 60px;
+    background: rgba(10,9,6,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .nav-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nav-lock-btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .nav-lock-btn:hover { color: var(--text); }
+
+  /* ── MAIN ── */
+  #app {
+    display: none;
+    padding-top: 80px;
+    padding-bottom: 60px;
+    max-width: 860px;
+    margin: 0 auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-heading {
+    margin-bottom: 32px;
+  }
+
+  .page-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 30px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  /* ── TOKEN BAR ── */
+  .token-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .token-pill {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--muted);
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .token-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Barlow', monospace;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .token-bar input::placeholder { color: var(--muted); }
+
+  .token-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .token-dot.live { background: var(--success); }
+
+  /* ── FORM ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+
+  .form-section-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .form-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.span-2 { grid-column: 1 / -1; }
+
+  label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  select,
+  textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6258' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  select option { background: var(--surface2); }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.65;
+  }
+
+  textarea.tall { min-height: 130px; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  /* ── ACTIONS ── */
+  .actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn-push {
+    flex: 1;
+    background: var(--accent);
+    border: none;
+    border-radius: 5px;
+    padding: 14px 24px;
+    color: #0a0906;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-push:hover { background: var(--accent-dim); }
+  .btn-push:active { transform: scale(0.98); }
+  .btn-push:disabled {
+    background: var(--border);
+    color: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-clear {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 14px 22px;
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-clear:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(10,9,6,0.25);
+    border-top-color: #0a0906;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 22px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    z-index: 200;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--error); color: var(--error); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    #app { padding-left: 20px; padding-right: 20px; }
+    nav { padding: 0 20px; }
+    .form-card { padding: 20px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .field.span-2 { grid-column: auto; }
+  }
+
+  /* Shared btn styles for lock screen */
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: 5px;
+    padding: 13px 20px;
+    color: #0a0906;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--accent-dim); }
+</style>
+</head>
+<body>
+
+<!-- ── LOCK SCREEN ── -->
+<div id="lock-screen">
+  <span class="lock-logo">Higher Roads</span>
+  <div class="lock-box">
+    <h2>Team Access</h2>
+    <div style="width:100%;display:flex;flex-direction:column;gap:8px;">
+      <span class="lock-label">Password</span>
+      <input type="password" id="lock-input" placeholder="Enter password" autocomplete="current-password" />
+    </div>
+    <div id="lock-error"></div>
+    <button class="btn-primary" onclick="unlock()">Enter</button>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-logo" href="../">Higher Roads</a>
+  <span class="nav-label">Prospect Intelligence</span>
+  <div class="nav-right">
+    <button class="nav-lock-btn" onclick="lock()">Lock</button>
+  </div>
+</nav>
+
+<!-- ── APP ── -->
+<div id="app">
+
+  <div class="page-heading">
+    <div class="page-eyebrow">Business Development</div>
+    <h1 class="page-title">Add Prospect to Notion</h1>
+  </div>
+
+  <!-- Token bar -->
+  <div class="token-bar">
+    <span class="token-pill">Notion</span>
+    <input type="password" id="tokenInput" placeholder="secret_... (saved in this browser)" autocomplete="off" />
+    <div class="token-dot" id="tokenDot"></div>
+  </div>
+
+  <!-- Company + Contact -->
+  <div class="form-card">
+    <div class="form-section-label">Company</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Company Name *</label>
+        <input type="text" id="company" placeholder="Spirited Hive" />
+      </div>
+      <div class="field">
+        <label>Website</label>
+        <input type="text" id="website" placeholder="spiritedhive.com" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="form-section-label">Primary Contact</div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="contactName" placeholder="Jack Smith" />
+      </div>
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="contactTitle" placeholder="Founder &amp; CEO" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="jack@spiritedhive.com" />
+      </div>
+      <div class="field">
+        <label>LinkedIn</label>
+        <input type="text" id="linkedin" placeholder="linkedin.com/in/..." />
+      </div>
+    </div>
+  </div>
+
+  <!-- Classification -->
+  <div class="form-card">
+    <div class="form-section-label">Classification</div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Pipeline Stage</label>
+        <select id="stage">
+          <option value="Identified">Identified</option>
+          <option value="Outreach Drafted">Outreach Drafted</option>
+          <option value="Outreach Sent">Outreach Sent</option>
+          <option value="Responded">Responded</option>
+          <option value="Meeting Set">Meeting Set</option>
+          <option value="Active">Active</option>
+          <option value="Closed / Not a Fit">Closed / Not a Fit</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Source</label>
+        <select id="source">
+          <option value="KK Network">KK Network</option>
+          <option value="Warm Intro">Warm Intro</option>
+          <option value="Cold Outreach">Cold Outreach</option>
+          <option value="Referral">Referral</option>
+          <option value="Inbound">Inbound</option>
+          <option value="Research">Research</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Priority</label>
+        <select id="priority">
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Owner</label>
+        <input type="text" id="owner" placeholder="Grey" />
+      </div>
+      <div class="field">
+        <label>Vertical</label>
+        <select id="vertical">
+          <option value="">Select...</option>
+          <option value="Beverage / CPG">Beverage / CPG</option>
+          <option value="Hospitality / Venue">Hospitality / Venue</option>
+          <option value="Music / Entertainment">Music / Entertainment</option>
+          <option value="Event Production">Event Production</option>
+          <option value="Brand / Agency">Brand / Agency</option>
+          <option value="Fabrication">Fabrication</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intelligence -->
+  <div class="form-card">
+    <div class="form-section-label">Account Intelligence</div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="field">
+        <label>Why This Target</label>
+        <textarea id="whyTarget" placeholder="Why this account, why now. Be specific — this is what the team reads first."></textarea>
+      </div>
+      <div class="field">
+        <label>Strategic Context</label>
+        <textarea id="strategicContext" placeholder="Relationship history, KK connection, timing factors, competitive considerations, how they buy..."></textarea>
+      </div>
+      <div class="field">
+        <label>Next Step</label>
+        <input type="text" id="nextStep" placeholder="e.g. Text KK to set intro before CMA Fest window closes" />
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea class="tall" id="notes" placeholder="Anything else the team should know. No length limit."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn-clear" onclick="clearForm()">Clear</button>
+    <button class="btn-push" id="pushBtn" onclick="pushToNotion()">
+      <span id="btnText">Push to Notion</span>
+      <span class="spinner" id="spinner"></span>
+    </button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── CONFIG ──
+  const PASS = 'givememoney!';
+  const DATABASE_ID = '36dd6b444a2580aa9f01f81a9dd83650';
+  const SESSION_KEY = 'hr_prospects_auth';
+  const TOKEN_KEY   = 'hr_notion_token';
+
+  // ── LOCK ──
+  function checkSession() {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      showApp();
+    }
+  }
+
+  function unlock() {
+    const input = document.getElementById('lock-input');
+    const err   = document.getElementById('lock-error');
+    if (input.value === PASS) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      err.textContent = '';
+      showApp();
+    } else {
+      err.textContent = 'Incorrect password.';
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  function lock() {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('lock-input').value = '';
+  }
+
+  function showApp() {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadToken();
+  }
+
+  // Enter key on lock screen
+  document.getElementById('lock-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') unlock();
+  });
+
+  // ── TOKEN ──
+  function loadToken() {
+    const saved = localStorage.getItem(TOKEN_KEY);
+    if (saved) {
+      document.getElementById('tokenInput').value = saved;
+      updateTokenDot(saved);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    checkSession();
+    const ti = document.getElementById('tokenInput');
+    ti.addEventListener('input', () => {
+      const v = ti.value.trim();
+      updateTokenDot(v);
+      if (v.startsWith('secret_') && v.length > 20) {
+        localStorage.setItem(TOKEN_KEY, v);
+      }
+    });
+  });
+
+  function updateTokenDot(v) {
+    const dot = document.getElementById('tokenDot');
+    if (v.startsWith('secret_') && v.length > 20) {
+      dot.classList.add('live');
+    } else {
+      dot.classList.remove('live');
+    }
+  }
+
+  // ── HELPERS ──
+  function v(id) { return document.getElementById(id).value.trim(); }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 4500);
+  }
+
+  function setLoading(on) {
+    const btn  = document.getElementById('pushBtn');
+    const txt  = document.getElementById('btnText');
+    const spin = document.getElementById('spinner');
+    btn.disabled        = on;
+    txt.style.display   = on ? 'none'         : 'inline';
+    spin.style.display  = on ? 'inline-block' : 'none';
+  }
+
+  function clearForm() {
+    ['company','website','contactName','contactTitle','email','linkedin',
+     'whyTarget','strategicContext','nextStep','notes','owner'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('stage').value    = 'Identified';
+    document.getElementById('source').value   = 'KK Network';
+    document.getElementById('priority').value = 'High';
+    document.getElementById('vertical').value = '';
+  }
+
+  // ── PUSH ──
+  async function pushToNotion() {
+    const token   = v('tokenInput') || localStorage.getItem(TOKEN_KEY) || '';
+    const company = v('company');
+
+    if (!token.startsWith('secret_')) {
+      showToast('Add your Notion token first', 'error');
+      return;
+    }
+    if (!company) {
+      showToast('Company name is required', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    // Build page body blocks
+    const children = [];
+
+    const addHeading = text => children.push({
+      object: 'block', type: 'heading_3',
+      heading_3: { rich_text: [{ type: 'text', text: { content: text } }] }
+    });
+
+    const addParagraph = text => {
+      if (!text) return;
+      children.push({
+        object: 'block', type: 'paragraph',
+        paragraph: { rich_text: [{ type: 'text', text: { content: text } }] }
+      });
+    };
+
+    const addTodo = text => {
+      if (!text) return;
+      children.push({
+        object: 'block', type: 'to_do',
+        to_do: {
+          rich_text: [{ type: 'text', text: { content: text } }],
+          checked: false
+        }
+      });
+    };
+
+    // Contact block
+    const contactLines = [];
+    if (v('contactName')) contactLines.push(`${v('contactName')}${v('contactTitle') ? ' — ' + v('contactTitle') : ''}`);
+    if (v('email'))       contactLines.push(`Email: ${v('email')}`);
+    if (v('linkedin'))    contactLines.push(`LinkedIn: ${v('linkedin')}`);
+    if (v('website'))     contactLines.push(`Website: ${v('website')}`);
+
+    if (contactLines.length) {
+      addHeading('Contact Information');
+      addParagraph(contactLines.join('\n'));
+    }
+
+    if (v('whyTarget')) {
+      addHeading('Why This Target');
+      addParagraph(v('whyTarget'));
+    }
+
+    if (v('strategicContext')) {
+      addHeading('Strategic Context');
+      addParagraph(v('strategicContext'));
+    }
+
+    if (v('nextStep')) {
+      addHeading('Next Step');
+      addTodo(v('nextStep'));
+    }
+
+    if (v('notes')) {
+      addHeading('Notes');
+      addParagraph(v('notes'));
+    }
+
+    // Properties
+    const properties = {
+      'Name':     { title: [{ text: { content: company } }] },
+      'Stage':    { select: { name: v('stage') } },
+      'Source':   { select: { name: v('source') } },
+      'Priority': { select: { name: v('priority') } }
+    };
+
+    if (v('owner'))    properties['Owner']           = { rich_text: [{ text: { content: v('owner') } }] };
+    if (v('vertical')) properties['Vertical']        = { select: { name: v('vertical') } };
+    if (v('contactName')) properties['Primary Contact'] = { rich_text: [{ text: { content: v('contactName') } }] };
+    if (v('email'))    properties['Email']            = { email: v('email') };
+
+    const websiteVal = v('website');
+    if (websiteVal) {
+      properties['Website'] = {
+        url: websiteVal.startsWith('http') ? websiteVal : 'https://' + websiteVal
+      };
+    }
+
+    try {
+      const res = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify({
+          parent: { database_id: DATABASE_ID },
+          properties,
+          children
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast(`"${company}" added to Notion`, 'success');
+        clearForm();
+      } else {
+        const msg = data.message || 'Push failed';
+        showToast(msg.length > 65 ? msg.slice(0, 65) + '...' : msg, 'error');
+        console.error(data);
+      }
+    } catch (err) {
+      showToast('Network error — check connection', 'error');
+      console.error(err);
+    }
+
+    setLoading(false);
+  }
+</script>
+</body>
+</html>
