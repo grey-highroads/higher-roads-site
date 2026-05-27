@@ -738,15 +738,19 @@
     ti.addEventListener('input', () => {
       const v = ti.value.trim();
       updateTokenDot(v);
-      if (v.startsWith('secret_') && v.length > 20) {
+      if (isValidToken(v)) {
         localStorage.setItem(TOKEN_KEY, v);
       }
     });
   });
 
+  function isValidToken(v) {
+    return (v.startsWith('secret_') || v.startsWith('ntn_')) && v.length > 20;
+  }
+
   function updateTokenDot(v) {
     const dot = document.getElementById('tokenDot');
-    if (v.startsWith('secret_') && v.length > 20) {
+    if (isValidToken(v)) {
       dot.classList.add('live');
     } else {
       dot.classList.remove('live');
@@ -788,7 +792,7 @@
     const token   = v('tokenInput') || localStorage.getItem(TOKEN_KEY) || '';
     const company = v('company');
 
-    if (!token.startsWith('secret_')) {
+    if (!isValidToken(token)) {
       showToast('Add your Notion token first', 'error');
       return;
     }
