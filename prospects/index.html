@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="ember">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,10 +23,7 @@
     --muted: #6b6258;
     --success: #4caf7d;
     --error: #e05252;
-  }
-
-  html, body {
-    height: 100%;
+    --info: #5b9bd5;
   }
 
   body {
@@ -38,7 +35,6 @@
     position: relative;
   }
 
-  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
@@ -49,7 +45,7 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* ── LOCK SCREEN ── */
+  /* LOCK */
   #lock-screen {
     position: fixed;
     inset: 0;
@@ -62,7 +58,7 @@
     gap: 32px;
   }
 
-  #lock-screen .lock-logo {
+  .lock-logo {
     font-family: 'Rajdhani', sans-serif;
     font-weight: 700;
     font-size: 20px;
@@ -71,7 +67,7 @@
     color: var(--accent);
   }
 
-  #lock-screen .lock-box {
+  .lock-box {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -84,15 +80,13 @@
     align-items: center;
   }
 
-  #lock-screen h2 {
+  .lock-box h2 {
     font-family: 'Playfair Display', serif;
     font-weight: 400;
     font-size: 22px;
-    color: var(--text);
-    text-align: center;
   }
 
-  #lock-screen .lock-label {
+  .lock-label {
     font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
     font-weight: 600;
@@ -102,25 +96,6 @@
     align-self: flex-start;
   }
 
-  #lock-screen input[type="password"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 12px 14px;
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 15px;
-    font-weight: 300;
-    outline: none;
-    transition: border-color 0.2s;
-    letter-spacing: 0.1em;
-  }
-
-  #lock-screen input[type="password"]:focus {
-    border-color: var(--accent);
-  }
-
   #lock-error {
     font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
@@ -128,15 +103,12 @@
     letter-spacing: 0.12em;
     color: var(--error);
     min-height: 16px;
-    text-align: center;
   }
 
-  /* ── NAV ── */
+  /* NAV */
   nav {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     z-index: 50;
     display: flex;
     align-items: center;
@@ -167,12 +139,6 @@
     color: var(--muted);
   }
 
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
   .nav-lock-btn {
     font-family: 'Rajdhani', sans-serif;
     font-size: 11px;
@@ -188,7 +154,7 @@
 
   .nav-lock-btn:hover { color: var(--text); }
 
-  /* ── MAIN ── */
+  /* MAIN */
   #app {
     display: none;
     padding-top: 80px;
@@ -199,10 +165,6 @@
     padding-right: 32px;
     position: relative;
     z-index: 1;
-  }
-
-  .page-heading {
-    margin-bottom: 32px;
   }
 
   .page-eyebrow {
@@ -219,17 +181,16 @@
     font-family: 'Playfair Display', serif;
     font-weight: 400;
     font-size: 30px;
-    color: var(--text);
-    line-height: 1.2;
+    margin-bottom: 28px;
   }
 
-  /* ── TOKEN BAR ── */
+  /* TOKEN BAR */
   .token-bar {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 14px 18px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -246,7 +207,6 @@
     padding: 3px 8px;
     border-radius: 3px;
     white-space: nowrap;
-    flex-shrink: 0;
   }
 
   .token-bar input {
@@ -255,16 +215,14 @@
     border: none;
     outline: none;
     color: var(--text);
-    font-family: 'Barlow', monospace;
+    font-family: monospace;
     font-size: 12px;
-    font-weight: 400;
   }
 
   .token-bar input::placeholder { color: var(--muted); }
 
   .token-dot {
-    width: 8px;
-    height: 8px;
+    width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--muted);
     flex-shrink: 0;
@@ -273,13 +231,168 @@
 
   .token-dot.live { background: var(--success); }
 
-  /* ── FORM ── */
+  /* AI RESEARCH BAR */
+  .research-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .research-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .research-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .research-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .research-input:focus { border-color: var(--accent); }
+  .research-input::placeholder { color: var(--muted); }
+
+  .btn-research {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    padding: 11px 20px;
+    color: var(--accent);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .btn-research:hover { background: var(--accent); color: var(--bg); }
+  .btn-research:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* AI PROMPT PANEL */
+  .ai-prompt-panel {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-top: 14px;
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .ai-prompt-panel.visible { display: flex; }
+
+  .ai-prompt-q {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .ai-prompt-q strong {
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .ai-prompt-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+    min-height: 60px;
+    line-height: 1.5;
+    width: 100%;
+  }
+
+  .ai-prompt-input:focus { border-color: var(--accent); }
+  .ai-prompt-input::placeholder { color: var(--muted); }
+
+  .btn-fill {
+    align-self: flex-end;
+    background: var(--accent);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: var(--bg);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-fill:hover { background: var(--accent-dim); }
+  .btn-fill:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* STATUS LINE */
+  .ai-status {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-top: 10px;
+    min-height: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-status.active { color: var(--info); }
+  .ai-status.done { color: var(--success); }
+  .ai-status.err { color: var(--error); }
+
+  /* FORM */
   .form-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 32px;
-    margin-bottom: 20px;
+    padding: 28px;
+    margin-bottom: 16px;
   }
 
   .form-section-label {
@@ -292,7 +405,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .form-section-label::after {
@@ -302,27 +415,10 @@
     background: var(--border);
   }
 
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 
-  .grid-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .field.span-2 { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
 
   label {
     font-family: 'Rajdhani', sans-serif;
@@ -333,11 +429,7 @@
     color: var(--muted);
   }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="url"],
-  select,
-  textarea {
+  input[type="text"], input[type="email"], select, textarea {
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 5px;
@@ -351,10 +443,7 @@
     width: 100%;
   }
 
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--accent);
-  }
-
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
   input::placeholder, textarea::placeholder { color: var(--muted); }
 
   select {
@@ -367,27 +456,12 @@
   }
 
   select option { background: var(--surface2); }
+  textarea { resize: vertical; min-height: 85px; line-height: 1.65; }
+  textarea.tall { min-height: 120px; }
+  .divider { height: 1px; background: var(--border); margin: 18px 0; }
 
-  textarea {
-    resize: vertical;
-    min-height: 90px;
-    line-height: 1.65;
-  }
-
-  textarea.tall { min-height: 130px; }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 20px 0;
-  }
-
-  /* ── ACTIONS ── */
-  .actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
+  /* ACTIONS */
+  .actions { display: flex; gap: 12px; align-items: center; }
 
   .btn-push {
     flex: 1;
@@ -411,12 +485,7 @@
 
   .btn-push:hover { background: var(--accent-dim); }
   .btn-push:active { transform: scale(0.98); }
-  .btn-push:disabled {
-    background: var(--border);
-    color: var(--muted);
-    cursor: not-allowed;
-    transform: none;
-  }
+  .btn-push:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
 
   .btn-clear {
     background: transparent;
@@ -435,58 +504,7 @@
 
   .btn-clear:hover { border-color: var(--text); color: var(--text); }
 
-  /* ── SPINNER ── */
-  .spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(10,9,6,0.25);
-    border-top-color: #0a0906;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    display: none;
-    flex-shrink: 0;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 12px 22px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
-    z-index: 200;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .toast.success { border-color: var(--success); color: var(--success); }
-  .toast.error { border-color: var(--error); color: var(--error); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 640px) {
-    #app { padding-left: 20px; padding-right: 20px; }
-    nav { padding: 0 20px; }
-    .form-card { padding: 20px; }
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .field.span-2 { grid-column: auto; }
-  }
-
-  /* Shared btn styles for lock screen */
+  /* SHARED BUTTON */
   .btn-primary {
     width: 100%;
     background: var(--accent);
@@ -504,46 +522,132 @@
   }
 
   .btn-primary:hover { background: var(--accent-dim); }
+
+  /* SPINNER */
+  .spinner {
+    width: 13px; height: 13px;
+    border: 2px solid rgba(10,9,6,0.25);
+    border-top-color: #0a0906;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+
+  .spinner.light {
+    border-color: rgba(232,120,42,0.25);
+    border-top-color: var(--accent);
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 22px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    z-index: 200;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--error); color: var(--error); }
+
+  @media (max-width: 640px) {
+    #app { padding-left: 16px; padding-right: 16px; }
+    nav { padding: 0 16px; }
+    .form-card { padding: 18px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .lock-box { padding: 28px 24px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ── LOCK SCREEN ── -->
+<!-- LOCK -->
 <div id="lock-screen">
   <span class="lock-logo">Higher Roads</span>
   <div class="lock-box">
     <h2>Team Access</h2>
     <div style="width:100%;display:flex;flex-direction:column;gap:8px;">
       <span class="lock-label">Password</span>
-      <input type="password" id="lock-input" placeholder="Enter password" autocomplete="current-password" />
+      <input type="password" id="lock-input" placeholder="Enter password" autocomplete="current-password"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;font-weight:300;outline:none;width:100%;" />
     </div>
     <div id="lock-error"></div>
     <button class="btn-primary" onclick="unlock()">Enter</button>
   </div>
 </div>
 
-<!-- ── NAV ── -->
+<!-- NAV -->
 <nav>
   <a class="nav-logo" href="../">Higher Roads</a>
   <span class="nav-label">Prospect Intelligence</span>
-  <div class="nav-right">
-    <button class="nav-lock-btn" onclick="lock()">Lock</button>
-  </div>
+  <button class="nav-lock-btn" onclick="lock()">Lock</button>
 </nav>
 
-<!-- ── APP ── -->
+<!-- APP -->
 <div id="app">
 
-  <div class="page-heading">
-    <div class="page-eyebrow">Business Development</div>
-    <h1 class="page-title">Add Prospect to Notion</h1>
-  </div>
+  <div class="page-eyebrow">Business Development</div>
+  <h1 class="page-title">Add Prospect to Notion</h1>
 
-  <!-- Token bar -->
+  <!-- Token bars -->
   <div class="token-bar">
     <span class="token-pill">Notion</span>
-    <input type="password" id="tokenInput" placeholder="secret_... (saved in this browser)" autocomplete="off" />
+    <input type="password" id="tokenInput" placeholder="secret_ or ntn_ token (saved in browser)" autocomplete="off" />
     <div class="token-dot" id="tokenDot"></div>
+  </div>
+
+  <div class="token-bar">
+    <span class="token-pill" style="background:var(--info);">Claude</span>
+    <input type="password" id="claudeToken" placeholder="Anthropic API key (saved in browser)" autocomplete="off" />
+    <div class="token-dot" id="claudeDot"></div>
+  </div>
+
+  <!-- AI Research -->
+  <div class="research-bar">
+    <div class="research-label">AI Research</div>
+    <div class="research-row">
+      <input class="research-input" id="researchInput" type="text" placeholder="Company name, e.g. Big Machine Records" />
+      <button class="btn-research" id="researchBtn" onclick="runResearch()">
+        <span id="researchBtnText">Research</span>
+        <span class="spinner light" id="researchSpinner"></span>
+      </button>
+    </div>
+
+    <!-- Two questions Claude can't answer -->
+    <div class="ai-prompt-panel" id="promptPanel">
+      <div class="ai-prompt-q">
+        <strong>Two quick questions before I fill the form:</strong>
+      </div>
+      <div class="field">
+        <label>Why are they a Higher Roads target right now?</label>
+        <textarea class="ai-prompt-input" id="promptWhy" placeholder="e.g. KK intro, CMA Fest timing, they run events and need projection..."></textarea>
+      </div>
+      <div class="field">
+        <label>What is the next step?</label>
+        <textarea class="ai-prompt-input" id="promptNext" placeholder="e.g. Text KK to set intro this week before the CMA window closes" style="min-height:44px;"></textarea>
+      </div>
+      <button class="btn-fill" id="fillBtn" onclick="fillForm()">
+        <span id="fillBtnText">Fill Form</span>
+        <span class="spinner" id="fillSpinner"></span>
+      </button>
+    </div>
+
+    <div class="ai-status" id="aiStatus"></div>
   </div>
 
   <!-- Company + Contact -->
@@ -559,10 +663,8 @@
         <input type="text" id="website" placeholder="spiritedhive.com" />
       </div>
     </div>
-
     <div class="divider"></div>
     <div class="form-section-label">Primary Contact</div>
-
     <div class="grid-2">
       <div class="field">
         <label>Name</label>
@@ -643,14 +745,14 @@
   <!-- Intelligence -->
   <div class="form-card">
     <div class="form-section-label">Account Intelligence</div>
-    <div style="display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
       <div class="field">
         <label>Why This Target</label>
-        <textarea id="whyTarget" placeholder="Why this account, why now. Be specific — this is what the team reads first."></textarea>
+        <textarea id="whyTarget" placeholder="Why this account, why now."></textarea>
       </div>
       <div class="field">
         <label>Strategic Context</label>
-        <textarea id="strategicContext" placeholder="Relationship history, KK connection, timing factors, competitive considerations, how they buy..."></textarea>
+        <textarea id="strategicContext" placeholder="Relationship history, timing, how they buy..."></textarea>
       </div>
       <div class="field">
         <label>Next Step</label>
@@ -658,7 +760,7 @@
       </div>
       <div class="field">
         <label>Notes</label>
-        <textarea class="tall" id="notes" placeholder="Anything else the team should know. No length limit."></textarea>
+        <textarea class="tall" id="notes" placeholder="Anything else the team should know."></textarea>
       </div>
     </div>
   </div>
@@ -668,38 +770,39 @@
     <button class="btn-clear" onclick="clearForm()">Clear</button>
     <button class="btn-push" id="pushBtn" onclick="pushToNotion()">
       <span id="btnText">Push to Notion</span>
-      <span class="spinner" id="spinner"></span>
+      <span class="spinner" id="pushSpinner"></span>
     </button>
   </div>
 
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── CONFIG ──
-  const PASS = 'givememoney!';
-  const DATABASE_ID = '36dd6b444a2580aa9f01f81a9dd83650';
-  const SESSION_KEY = 'hr_prospects_auth';
-  const TOKEN_KEY   = 'hr_notion_token';
+  // CONFIG
+  const PASS         = 'givememoney!';
+  const DATABASE_ID  = '36dd6b444a2580aa9f01f81a9dd83650';
+  const WORKER_URL   = 'https://higher-roads-notion.grey-4fe.workers.dev/';
+  const SESSION_KEY  = 'hr_prospects_auth';
+  const NOTION_KEY   = 'hr_notion_token';
+  const CLAUDE_KEY   = 'hr_claude_key';
 
-  // ── LOCK ──
+  // Stash for research result before form fill
+  let researchData = null;
+
+  // LOCK
   function checkSession() {
-    if (sessionStorage.getItem(SESSION_KEY) === '1') {
-      showApp();
-    }
+    if (sessionStorage.getItem(SESSION_KEY) === '1') showApp();
   }
 
   function unlock() {
     const input = document.getElementById('lock-input');
-    const err   = document.getElementById('lock-error');
     if (input.value === PASS) {
       sessionStorage.setItem(SESSION_KEY, '1');
-      err.textContent = '';
+      document.getElementById('lock-error').textContent = '';
       showApp();
     } else {
-      err.textContent = 'Incorrect password.';
+      document.getElementById('lock-error').textContent = 'Incorrect password.';
       input.value = '';
       input.focus();
     }
@@ -715,50 +818,66 @@
   function showApp() {
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    loadToken();
+    loadTokens();
   }
 
-  // Enter key on lock screen
   document.getElementById('lock-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') unlock();
   });
 
-  // ── TOKEN ──
-  function loadToken() {
-    const saved = localStorage.getItem(TOKEN_KEY);
-    if (saved) {
-      document.getElementById('tokenInput').value = saved;
-      updateTokenDot(saved);
-    }
+  document.getElementById('researchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runResearch();
+  });
+
+  // TOKENS
+  function isValidNotion(v) {
+    return (v.startsWith('secret_') || v.startsWith('ntn_')) && v.length > 20;
+  }
+
+  function isValidClaude(v) {
+    return v.startsWith('sk-ant-') && v.length > 20;
+  }
+
+  function loadTokens() {
+    const n = localStorage.getItem(NOTION_KEY);
+    const c = localStorage.getItem(CLAUDE_KEY);
+    if (n) { document.getElementById('tokenInput').value = n; updateDot('tokenDot', isValidNotion(n)); }
+    if (c) { document.getElementById('claudeToken').value = c; updateDot('claudeDot', isValidClaude(c)); }
+  }
+
+  function updateDot(id, valid) {
+    document.getElementById(id).classList.toggle('live', valid);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     checkSession();
-    const ti = document.getElementById('tokenInput');
-    ti.addEventListener('input', () => {
-      const v = ti.value.trim();
-      updateTokenDot(v);
-      if (isValidToken(v)) {
-        localStorage.setItem(TOKEN_KEY, v);
-      }
+
+    document.getElementById('tokenInput').addEventListener('input', e => {
+      const v = e.target.value.trim();
+      updateDot('tokenDot', isValidNotion(v));
+      if (isValidNotion(v)) localStorage.setItem(NOTION_KEY, v);
+    });
+
+    document.getElementById('claudeToken').addEventListener('input', e => {
+      const v = e.target.value.trim();
+      updateDot('claudeDot', isValidClaude(v));
+      if (isValidClaude(v)) localStorage.setItem(CLAUDE_KEY, v);
     });
   });
 
-  function isValidToken(v) {
-    return (v.startsWith('secret_') || v.startsWith('ntn_')) && v.length > 20;
+  // HELPERS
+  function fv(id) { return document.getElementById(id).value.trim(); }
+
+  function setField(id, val) {
+    if (val) document.getElementById(id).value = val;
   }
 
-  function updateTokenDot(v) {
-    const dot = document.getElementById('tokenDot');
-    if (isValidToken(v)) {
-      dot.classList.add('live');
-    } else {
-      dot.classList.remove('live');
+  function setSelect(id, val) {
+    const el = document.getElementById(id);
+    for (let opt of el.options) {
+      if (opt.value === val) { el.value = val; break; }
     }
   }
-
-  // ── HELPERS ──
-  function v(id) { return document.getElementById(id).value.trim(); }
 
   function showToast(msg, type) {
     const t = document.getElementById('toast');
@@ -767,13 +886,10 @@
     setTimeout(() => t.classList.remove('show'), 4500);
   }
 
-  function setLoading(on) {
-    const btn  = document.getElementById('pushBtn');
-    const txt  = document.getElementById('btnText');
-    const spin = document.getElementById('spinner');
-    btn.disabled        = on;
-    txt.style.display   = on ? 'none'         : 'inline';
-    spin.style.display  = on ? 'inline-block' : 'none';
+  function setStatus(msg, cls) {
+    const s = document.getElementById('aiStatus');
+    s.textContent = msg;
+    s.className = `ai-status${cls ? ' ' + cls : ''}`;
   }
 
   function clearForm() {
@@ -785,14 +901,182 @@
     document.getElementById('source').value   = 'KK Network';
     document.getElementById('priority').value = 'High';
     document.getElementById('vertical').value = '';
+    document.getElementById('promptPanel').classList.remove('visible');
+    document.getElementById('promptWhy').value  = '';
+    document.getElementById('promptNext').value = '';
+    document.getElementById('researchInput').value = '';
+    setStatus('');
+    researchData = null;
   }
 
-  // ── PUSH ──
-  async function pushToNotion() {
-    const token   = v('tokenInput') || localStorage.getItem(TOKEN_KEY) || '';
-    const company = v('company');
+  // AI RESEARCH
+  async function runResearch() {
+    const company = fv('researchInput');
+    if (!company) return;
 
-    if (!isValidToken(token)) {
+    const claudeKey = fv('claudeToken') || localStorage.getItem(CLAUDE_KEY) || '';
+    if (!isValidClaude(claudeKey)) {
+      setStatus('Add your Anthropic API key to use AI research', 'err');
+      return;
+    }
+
+    setResearchLoading(true);
+    setStatus('Researching ' + company + '...', 'active');
+    document.getElementById('promptPanel').classList.remove('visible');
+    researchData = null;
+
+    const systemPrompt = `You are a business development researcher for Higher Roads, a Nashville motion design, 3D animation, and immersive environments studio. Higher Roads does projection mapping, brand activations, event environments, and spatial media for hospitality, beverage brands, music industry clients, venues, and event producers.
+
+Your job is to research a prospect company and return a structured JSON object. Research what you know about this company and return only valid JSON with no markdown, no explanation, no preamble.
+
+Return this exact structure:
+{
+  "company": "Official company name",
+  "website": "domain.com",
+  "contactName": "Primary decision maker name or empty string",
+  "contactTitle": "Their title or empty string",
+  "email": "Email if publicly known or empty string",
+  "linkedin": "LinkedIn URL if known or empty string",
+  "stage": "Identified",
+  "source": "Research",
+  "priority": "High or Medium or Low",
+  "vertical": "one of: Beverage / CPG, Hospitality / Venue, Music / Entertainment, Event Production, Brand / Agency, Fabrication, Other",
+  "owner": "Grey",
+  "strategicContext": "2-3 sentences on what this company does, their scale, how they operate, and why they are the type of company Higher Roads works with. Flag anything as assumed if not verified.",
+  "notes": "Any other relevant intel — recent news, events, known projects, relevant contacts. Keep it factual. Flag assumptions."
+}
+
+Rules:
+- Never invent contact emails. Leave empty if not publicly known.
+- Flag inferences explicitly in the text fields with (assumed) notation.
+- Keep strategicContext factual and grounded. No puffery.
+- priority should reflect how well they fit Higher Roads based on what you know.
+- vertical must be one of the exact options listed.`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': claudeKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: `Research this company for Higher Roads prospect tracking: ${company}` }]
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStatus('API error: ' + (data.error?.message || 'unknown'), 'err');
+        setResearchLoading(false);
+        return;
+      }
+
+      const raw = data.content?.[0]?.text || '';
+      const cleaned = raw.replace(/```json|```/g, '').trim();
+      researchData = JSON.parse(cleaned);
+
+      setStatus('Research complete. Answer two questions below.', 'done');
+      document.getElementById('promptPanel').classList.add('visible');
+
+    } catch (err) {
+      setStatus('Research failed: ' + err.message, 'err');
+      console.error(err);
+    }
+
+    setResearchLoading(false);
+  }
+
+  function setResearchLoading(on) {
+    document.getElementById('researchBtn').disabled = on;
+    document.getElementById('researchBtnText').style.display = on ? 'none' : 'inline';
+    document.getElementById('researchSpinner').style.display = on ? 'inline-block' : 'none';
+  }
+
+  // FILL FORM
+  async function fillForm() {
+    if (!researchData) return;
+
+    const claudeKey = fv('claudeToken') || localStorage.getItem(CLAUDE_KEY) || '';
+    const why  = fv('promptWhy');
+    const next = fv('promptNext');
+
+    setFillLoading(true);
+
+    // If they answered the two questions, ask Claude to write the whyTarget field
+    let whyTarget = why;
+    if (why && isValidClaude(claudeKey)) {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': claudeKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 300,
+            messages: [{
+              role: 'user',
+              content: `Write a 2-3 sentence "Why This Target" field for a CRM record for ${researchData.company}. 
+
+Context from researcher: ${why}
+Company context: ${researchData.strategicContext}
+
+Write it in plain, direct language. No em dashes. No buzzwords. No puffery. Written as an internal note for the Higher Roads team explaining why this account is worth pursuing and why now. Do not use bullet points. Just prose.`
+            }]
+          })
+        });
+        const d = await res.json();
+        whyTarget = d.content?.[0]?.text?.trim() || why;
+      } catch(e) {
+        whyTarget = why;
+      }
+    }
+
+    // Fill all form fields
+    setField('company',         researchData.company);
+    setField('website',         researchData.website);
+    setField('contactName',     researchData.contactName);
+    setField('contactTitle',    researchData.contactTitle);
+    setField('email',           researchData.email);
+    setField('linkedin',        researchData.linkedin);
+    setField('owner',           researchData.owner);
+    setField('whyTarget',       whyTarget);
+    setField('strategicContext',researchData.strategicContext);
+    setField('nextStep',        next || '');
+    setField('notes',           researchData.notes);
+    setSelect('stage',          researchData.stage);
+    setSelect('source',         researchData.source);
+    setSelect('priority',       researchData.priority);
+    setSelect('vertical',       researchData.vertical);
+
+    setStatus('Form filled. Review, edit, then push.', 'done');
+    document.getElementById('promptPanel').classList.remove('visible');
+    setFillLoading(false);
+
+    // Scroll to form
+    document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function setFillLoading(on) {
+    document.getElementById('fillBtn').disabled = on;
+    document.getElementById('fillBtnText').style.display = on ? 'none' : 'inline';
+    document.getElementById('fillSpinner').style.display = on ? 'inline-block' : 'none';
+  }
+
+  // PUSH TO NOTION
+  async function pushToNotion() {
+    const token   = fv('tokenInput') || localStorage.getItem(NOTION_KEY) || '';
+    const company = fv('company');
+
+    if (!isValidNotion(token)) {
       showToast('Add your Notion token first', 'error');
       return;
     }
@@ -801,9 +1085,8 @@
       return;
     }
 
-    setLoading(true);
+    setPushLoading(true);
 
-    // Build page body blocks
     const children = [];
 
     const addHeading = text => children.push({
@@ -823,78 +1106,46 @@
       if (!text) return;
       children.push({
         object: 'block', type: 'to_do',
-        to_do: {
-          rich_text: [{ type: 'text', text: { content: text } }],
-          checked: false
-        }
+        to_do: { rich_text: [{ type: 'text', text: { content: text } }], checked: false }
       });
     };
 
-    // Contact block
     const contactLines = [];
-    if (v('contactName')) contactLines.push(`${v('contactName')}${v('contactTitle') ? ' — ' + v('contactTitle') : ''}`);
-    if (v('email'))       contactLines.push(`Email: ${v('email')}`);
-    if (v('linkedin'))    contactLines.push(`LinkedIn: ${v('linkedin')}`);
-    if (v('website'))     contactLines.push(`Website: ${v('website')}`);
+    if (fv('contactName')) contactLines.push(`${fv('contactName')}${fv('contactTitle') ? ' — ' + fv('contactTitle') : ''}`);
+    if (fv('email'))       contactLines.push(`Email: ${fv('email')}`);
+    if (fv('linkedin'))    contactLines.push(`LinkedIn: ${fv('linkedin')}`);
+    if (fv('website'))     contactLines.push(`Website: ${fv('website')}`);
 
-    if (contactLines.length) {
-      addHeading('Contact Information');
-      addParagraph(contactLines.join('\n'));
-    }
+    if (contactLines.length) { addHeading('Contact Information'); addParagraph(contactLines.join('\n')); }
+    if (fv('whyTarget'))       { addHeading('Why This Target');   addParagraph(fv('whyTarget')); }
+    if (fv('strategicContext')){ addHeading('Strategic Context'); addParagraph(fv('strategicContext')); }
+    if (fv('nextStep'))        { addHeading('Next Step');         addTodo(fv('nextStep')); }
+    if (fv('notes'))           { addHeading('Notes');             addParagraph(fv('notes')); }
 
-    if (v('whyTarget')) {
-      addHeading('Why This Target');
-      addParagraph(v('whyTarget'));
-    }
-
-    if (v('strategicContext')) {
-      addHeading('Strategic Context');
-      addParagraph(v('strategicContext'));
-    }
-
-    if (v('nextStep')) {
-      addHeading('Next Step');
-      addTodo(v('nextStep'));
-    }
-
-    if (v('notes')) {
-      addHeading('Notes');
-      addParagraph(v('notes'));
-    }
-
-    // Properties
     const properties = {
       'Name':     { title: [{ text: { content: company } }] },
-      'Stage':    { select: { name: v('stage') } },
-      'Source':   { select: { name: v('source') } },
-      'Priority': { select: { name: v('priority') } }
+      'Stage':    { select: { name: fv('stage') } },
+      'Source':   { select: { name: fv('source') } },
+      'Priority': { select: { name: fv('priority') } }
     };
 
-    if (v('owner'))    properties['Owner']           = { rich_text: [{ text: { content: v('owner') } }] };
-    if (v('vertical')) properties['Vertical']        = { select: { name: v('vertical') } };
-    if (v('contactName')) properties['Primary Contact'] = { rich_text: [{ text: { content: v('contactName') } }] };
-    if (v('email'))    properties['Email']            = { email: v('email') };
+    if (fv('owner'))       properties['Owner']           = { rich_text: [{ text: { content: fv('owner') } }] };
+    if (fv('vertical'))    properties['Vertical']        = { select: { name: fv('vertical') } };
+    if (fv('contactName')) properties['Primary Contact'] = { rich_text: [{ text: { content: fv('contactName') } }] };
+    if (fv('email'))       properties['Email']           = { email: fv('email') };
 
-    const websiteVal = v('website');
-    if (websiteVal) {
-      properties['Website'] = {
-        url: websiteVal.startsWith('http') ? websiteVal : 'https://' + websiteVal
-      };
-    }
+    const w = fv('website');
+    if (w) properties['Website'] = { url: w.startsWith('http') ? w : 'https://' + w };
 
     try {
-      const res = await fetch('https://higher-roads-notion.grey-4fe.workers.dev/', {
+      const res = await fetch(WORKER_URL, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
           'Notion-Version': '2022-06-28'
         },
-        body: JSON.stringify({
-          parent: { database_id: DATABASE_ID },
-          properties,
-          children
-        })
+        body: JSON.stringify({ parent: { database_id: DATABASE_ID }, properties, children })
       });
 
       const data = await res.json();
@@ -912,7 +1163,13 @@
       console.error(err);
     }
 
-    setLoading(false);
+    setPushLoading(false);
+  }
+
+  function setPushLoading(on) {
+    document.getElementById('pushBtn').disabled = on;
+    document.getElementById('btnText').style.display    = on ? 'none' : 'inline';
+    document.getElementById('pushSpinner').style.display = on ? 'inline-block' : 'none';
   }
 </script>
 </body>
