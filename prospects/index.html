@@ -947,10 +947,13 @@ Return this exact structure:
 }
 
 Rules:
-- Never invent contact emails. Leave empty if not publicly known.
-- Flag inferences explicitly in the text fields with (assumed) notation.
-- Keep strategicContext factual and grounded. No puffery.
-- priority should reflect how well they fit Higher Roads based on what you know.
+- You MUST use web search before responding. Do not rely on training data alone.
+- If you cannot find verified information about this company via search, return all fields as empty strings except company name, and set notes to "No verified information found via web search. Research manually."
+- Never invent contact names, titles, or emails. If not found in search results, leave empty.
+- Never construct a founder or leadership narrative from inference. Only include names found in search results.
+- Flag anything that is inferred rather than directly sourced with (inferred) in the text.
+- Keep strategicContext factual and grounded in what search results actually say. No puffery.
+- priority should reflect how well they fit Higher Roads based on verified information.
 - vertical must be one of the exact options listed.`;
 
     try {
@@ -965,7 +968,8 @@ Rules:
           model: 'claude-sonnet-4-5',
           max_tokens: 1000,
           system: systemPrompt,
-          messages: [{ role: 'user', content: `Research this company for Higher Roads prospect tracking: ${company}` }]
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+          messages: [{ role: 'user', content: `Search the web for information about this company and return a completed JSON record: ${company}. Search for their website, leadership, what they do, and any recent news or events. Only include information you can verify from search results.` }]
         })
       });
 
@@ -977,9 +981,14 @@ Rules:
         return;
       }
 
-      const raw = data.content?.[0]?.text || '';
+      // Web search returns multiple blocks; find the text block containing JSON
+      const textBlock = data.content?.find(b => b.type === 'text' && b.text?.includes('{'));
+      const raw = textBlock?.text || '';
       const cleaned = raw.replace(/```json|```/g, '').trim();
-      researchData = JSON.parse(cleaned);
+      // Extract just the JSON object in case there's surrounding text
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in response');
+      researchData = JSON.parse(jsonMatch[0]);
 
       setStatus('Research complete. Answer two questions below.', 'done');
       document.getElementById('promptPanel').classList.add('visible');
