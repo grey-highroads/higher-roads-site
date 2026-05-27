@@ -954,7 +954,7 @@ Rules:
 - vertical must be one of the exact options listed.`;
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://higher-roads-claude.grey-4fe.workers.dev/', {
         method: 'POST',
         headers: {
           'x-api-key': claudeKey,
@@ -1012,7 +1012,7 @@ Rules:
     let whyTarget = why;
     if (why && isValidClaude(claudeKey)) {
       try {
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
+        const res = await fetch('https://higher-roads-claude.grey-4fe.workers.dev/', {
           method: 'POST',
           headers: {
             'x-api-key': claudeKey,
