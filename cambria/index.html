@@ -445,6 +445,84 @@
     margin-bottom: 0.25rem;
   }
 
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    font-weight: 400;
+    color: var(--muted);
+    transition: color 0.2s ease;
+  }
+
+  .faq-q:hover,
+  .faq-q[aria-expanded="true"] {
+    color: var(--white);
+  }
+
+  .faq-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .faq-icon::before,
+  .faq-icon::after {
+    content: '';
+    position: absolute;
+    background: var(--amber);
+    border-radius: 1px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .faq-icon::before {
+    width: 12px; height: 1px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .faq-icon::after {
+    width: 1px; height: 12px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .faq-q[aria-expanded="true"] .faq-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+    opacity: 0;
+  }
+
+  .faq-a {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .faq-a p {
+    padding-bottom: 1.5rem;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.75;
+  }
+
+  /* FOOTER */
   .slide-footer {
     min-height: 40vh;
     background: var(--off-black);
@@ -539,11 +617,11 @@
     <h2>The same room. A completely different world.</h2>
     <div class="transform-grid">
       <div class="transform-img transform-img-wide">
-  <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
-    <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/hf_20260520_222952_b74eb7eb-e4f1-4020-b7e7-b86342fed3db.mp4" type="video/mp4" />
-  </video>
-  <div class="img-caption">Concept render — The Rux · Cambria Hotel Nashville</div>
-</div>
+        <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+          <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/hf_20260520_222952_b74eb7eb-e4f1-4020-b7e7-b86342fed3db.mp4" type="video/mp4" />
+        </video>
+        <div class="img-caption">Concept render — The Rux · Cambria Hotel Nashville</div>
+      </div>
       <div class="transform-img">
         <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-4.jpg" alt="The Rux concept render — angle 2" style="width:100%;height:100%;object-fit:cover;">
         <div class="img-caption">Concept render — angle 2</div>
@@ -566,34 +644,27 @@
     <span class="eyebrow">The activation</span>
     <h2>Now imagine a brand built into every surface.</h2>
 
-<!-- IMAGE GRID -->
-<div style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows: repeat(3, 1fr); gap:1rem; margin-top:2rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows: repeat(3, 1fr); gap:1rem; margin-top:2rem;">
+      <div style="overflow:hidden; border:1px solid var(--border);">
+        <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+          <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/hf_20260520_014217_b9836ee1-510d-492c-9a52-21ef9908b551.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div style="grid-column:2; grid-row:1/4; overflow:hidden; border:1px solid var(--border);">
+        <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+          <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/hf_20260520_191345_6c4d4fa3-eacb-4138-bc9d-1fc9ef4c192b.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div style="overflow:hidden; border:1px solid var(--border);">
+        <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+          <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/main-room-animated.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div style="overflow:hidden; border:1px solid var(--border);">
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-4.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+      </div>
+    </div>
 
-  <div style="overflow:hidden; border:1px solid var(--border);">
-  <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
-    <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/hf_20260520_014217_b9836ee1-510d-492c-9a52-21ef9908b551.mp4" type="video/mp4" />
-  </video>
-</div>
-
- <div style="grid-column:2; grid-row:1/4; overflow:hidden; border:1px solid var(--border);">
-  <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
-    <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/hf_20260520_191345_6c4d4fa3-eacb-4138-bc9d-1fc9ef4c192b.mp4" type="video/mp4" />
-  </video>
-</div>
-
- <div style="overflow:hidden; border:1px solid var(--border);">
-  <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
-    <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/main-room-animated.mp4" type="video/mp4" />
-  </video>
-</div>
-
-  <div style="overflow:hidden; border:1px solid var(--border);">
-    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/senorita-4.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
-  </div>
-
-</div><!-- END image grid -->
-
-    <!-- EXPLAINER — outside the image grid, full width -->
     <div class="explainer-grid">
       <div class="explainer-item">
         <div class="explainer-label">The environment is built around the brand</div>
@@ -611,8 +682,7 @@
         <div class="explainer-label">One featured brand per event</div>
         <p>One brand. One cohesive visual world. No co-branding, no competing logos. The aesthetic clarity is what makes it premium and what makes the footage usable afterward.</p>
       </div>
-    </div><!-- END explainer-grid -->
-
+    </div>
   </div>
 </section>
 
@@ -690,8 +760,101 @@
   </div>
 </section>
 
+<!-- SLIDE 7: WHAT THIS REQUIRES -->
+<section class="slide" data-slide="7" style="background: var(--off-black);">
+  <div class="slide-inner">
+    <div class="slide-num">06</div>
+    <span class="eyebrow">Before you decide</span>
+    <h2>What This Requires</h2>
+
+    <div style="margin-top: 2.5rem; border-top: 1px solid var(--border);">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>Who sources the brand partner?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>Higher Roads handles brand partner coordination. The Rux provides the space, access, and venue coordination.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>What does The Rux team need to do?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>Host the event the way you would host any private or partner activation. Higher Roads handles the concept, content, install, playback, and event support.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>Does this require permanent construction?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>No. The pilot is designed as a temporary activation using projection, content, and controlled production equipment.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>Will this disrupt normal hotel operations?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>The pilot is planned around a defined setup, event, and teardown window. We coordinate access, power, and timing in advance so the activation does not become a burden on hotel staff.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>What happens after the pilot?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>The Rux receives footage, creative assets, and a media loop built from the event. Those assets help turn the pilot into a premium event product for future corporate buyers and brand partners.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>How does this make money?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>The pilot creates a repeatable rooftop takeover package. Once the format is proven, The Rux has a differentiated private event offering for beverage brands, corporate groups, hospitality partners, and launch events.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>What makes this different from screens or signage?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>This is not a screen package. The room becomes the canvas, with wall and floor coverage designed around the actual space.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+          <span>What is the next step?</span>
+          <div class="faq-icon" aria-hidden="true"></div>
+        </button>
+        <div class="faq-a">
+          <p>Agree on a pilot date, confirm access requirements, and lock the first brand partner.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
-<section class="slide slide-footer" data-slide="7">
+<section class="slide slide-footer" data-slide="8">
   <div class="slide-inner">
     <span class="eyebrow">Higher Roads</span>
     <h2 style="font-size: clamp(1.5rem, 3vw, 2.5rem);">Ready when you are.</h2>
@@ -728,13 +891,17 @@
 
   slides.forEach(s => observer.observe(s));
 
-  const brandSlides = document.querySelectorAll('.brand-slide');
-  let brandCurrent = 0;
-  setInterval(() => {
-    brandSlides[brandCurrent].style.opacity = '0';
-    brandCurrent = (brandCurrent + 1) % brandSlides.length;
-    brandSlides[brandCurrent].style.opacity = '1';
-  }, 3500);
+  function toggleFaq(btn) {
+    var isOpen = btn.getAttribute('aria-expanded') === 'true';
+    document.querySelectorAll('.faq-q[aria-expanded="true"]').forEach(function(b) {
+      b.setAttribute('aria-expanded', 'false');
+      b.nextElementSibling.style.maxHeight = '0';
+    });
+    if (!isOpen) {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.nextElementSibling.style.maxHeight = btn.nextElementSibling.scrollHeight + 'px';
+    }
+  }
 </script>
 </body>
 </html>
