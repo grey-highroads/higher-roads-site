@@ -221,7 +221,89 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       opacity: 0.6;
       letter-spacing: 0.01em;
     }
+/* ── CLIENT FIT ── */
+.client-fit {
+  padding: 3rem 3rem 4rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
 
+.fit-col-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.fit-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fit-list li {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.65;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.fit-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 4px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+.fit-not {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.5;
+}
+
+.fit-divider {
+  width: 36px;
+  height: 1px;
+  background: var(--accent-dim);
+  margin: 1.25rem 0;
+}
+
+.fit-closing {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.65;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .client-fit {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.5rem 1.5rem;
+  }
+}
     /* ── MOBILE ── */
     @media (max-width: 640px) {
       .work-grid-wrap { padding: 0; align-items: stretch; }
@@ -357,13 +439,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
 
       </div>
-
+<!-- ── CLIENT FIT ── -->
+<div class="client-fit reveal">
+  <div>
+    <span class="fit-col-label">A fit for</span>
+    <ul class="fit-list">
+      <li>Hotels and rooftop bars</li>
+      <li>Music venues and event spaces</li>
+      <li>Beverage and CPG brands</li>
+      <li>Experiential marketing agencies</li>
+      <li>Event producers and hospitality groups</li>
+      <li>Creative teams that need an immersive production partner</li>
+    </ul>
+  </div>
+  <div>
+    <span class="fit-col-label">Not a fit for</span>
+    <p class="fit-not">Generic AV rental, basic event lighting, field marketing, sampling logistics, or low-cost screen installs.</p>
+    <div class="fit-divider"></div>
+    <p class="fit-closing">Our work starts where the space, the brand, and the visual experience need to feel connected.</p>
+  </div>
+</div>
       <!-- ── APPROACH ── -->
       <div class="approach reveal">
         <span class="page-eyebrow">How we work</span>
         <p class="approach-body">Immersive work starts with understanding the space, the architecture, the audience, and the moment you're designing for. A hotel bar is not a music venue. A brand activation is not a museum install.</p>
         <p class="approach-body">We handle the full chain: content design, projection geometry, hardware specification, and on-site calibration. You don't need to know how any of it works. You need to know what you want people to feel.</p>
-        <p class="approach-body">We're based in Nashville and work with venues and brands across the country.</p>
+        <p class="approach-body">Immersive work and experiential marketing often overlap, but they're not the same thing. We don't lead staffing, permits, sampling, or tour logistics. We create the visual experience layer: the part people see, feel, remember, and post.</p>   
       </div>
 
       <!-- ── CTA CLOSER ── -->
