@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="ember">
 <head>
-   <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NM73WT97');</script>
-   <!-- End Google Tag Manager -->
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Higher Roads — About</title>
@@ -75,12 +75,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       background: rgba(10, 9, 6, 0.92);
       backdrop-filter: blur(8px);
     }
-.header-logo {
-  display: block;
-  width: auto;
-  height: 32px;
-  max-width: none;
-}
+
+    .header-logo {
+      display: block;
+      width: auto;
+      height: 32px;
+      max-width: none;
+    }
+
     nav {
       display: flex;
       gap: 32px;
@@ -193,7 +195,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       max-width: 640px;
     }
 
-    /* Cards */
+    /* Profile cards */
     .profile {
       display: flex;
       align-items: flex-start;
@@ -212,6 +214,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
 
     .avatar {
+      position: relative;
       width: 76px;
       height: 76px;
       flex-shrink: 0;
@@ -278,6 +281,118 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       margin-top: 12px;
     }
 
+    /* Info button */
+    .info-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(232, 120, 42, 0.15);
+      border: 1px solid rgba(232, 120, 42, 0.35);
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 0.65rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .profile:hover .info-btn {
+      opacity: 1;
+    }
+
+    .info-btn:hover {
+      background: rgba(232, 120, 42, 0.3);
+    }
+
+    /* Bio overlay */
+    .bio-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 999;
+    }
+
+    .bio-overlay.active {
+      display: block;
+    }
+
+    /* Bio card */
+    .bio-card {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(400px, 90vw);
+      background: #161412;
+      border: 1px solid rgba(232, 120, 42, 0.25);
+      border-radius: 6px;
+      padding: 32px;
+      z-index: 1000;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7);
+    }
+
+    .bio-card.active {
+      display: block;
+    }
+
+    .bio-card-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .bio-card-role {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .bio-card-body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: rgba(245, 240, 234, 0.75);
+    }
+
+    .bio-card-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: rgba(245, 240, 234, 0.4);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .bio-card-close:hover {
+      color: var(--accent);
+    }
+
     /* Footer */
     footer {
       position: relative;
@@ -330,9 +445,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .theme-dot:hover { transform: scale(1.3); }
     .theme-dot.active { border-color: var(--white); }
     .theme-dot[data-t="ember"] { background: #e8782a; }
-    .theme-dot[data-t="neon"] { background: #f72585; }
-    .theme-dot[data-t="ice"] { background: #4fc3f7; }
-    .theme-dot[data-t="acid"] { background: #39ff14; }
+    .theme-dot[data-t="neon"]  { background: #f72585; }
+    .theme-dot[data-t="ice"]   { background: #4fc3f7; }
+    .theme-dot[data-t="acid"]  { background: #39ff14; }
 
     /* Theme overrides */
     [data-theme="neon"] { --accent: #f72585; --black: #07050f; --glow: rgba(247,37,133,0.08); }
@@ -348,14 +463,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       .about-inner { width: 100%; }
       .footer-copy { display: none; }
       footer { padding: 20px 24px; }
+      /* Keep info-btn always visible on touch devices */
+      .info-btn { opacity: 1; }
     }
   </style>
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
   <header>
     <a href="../">
       <img src="../images/HR-logo-horiz-white.png" height="32" alt="Higher Roads" class="header-logo" />
@@ -389,17 +507,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p class="eyebrow">The People</p>
         <p class="about-intro">Higher Roads is built around people who have done this work at a high level, across real events, real campaigns, and real spaces. Our network brings together motion designers, 3D artists, environment builders, envelope-pushers, and producers who know what great looks like because they've made it before.</p>
       </div>
- <div class="profile">
-        <div class="avatar">JL</div>
+
+      <div class="profile">
+        <div class="avatar">
+          JL
+          <button class="info-btn" data-bio="bio-jl" aria-label="More about Jim">i</button>
+        </div>
         <div class="profile-body">
           <p class="profile-name">Jim Lockhart</p>
           <p class="profile-role">Professor of Creative Geekery</p>
           <p class="profile-bio">Creative technologist and digital media pioneer with 30+ years building immersive experiences, visual effects, and interactive work for some of the world's most recognizable brands. Projects span Ford, the New York Stock Exchange, CMT, and Metallica's S&M production. As founder of emagination-media, he brings production-hardened instincts to emerging technology and a genuine appetite for understanding how things actually work.</p>
-          <span class="pending">Pending</span>
         </div>
       </div>
+
       <div class="profile">
-        <div class="avatar">JR</div>
+        <div class="avatar">
+          JR
+          <button class="info-btn" data-bio="bio-jr" aria-label="More about Jonathan">i</button>
+        </div>
         <div class="profile-body">
           <p class="profile-name">Jonathan Richter</p>
           <p class="profile-role">Artful Mastermind</p>
@@ -408,7 +533,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="profile">
-        <div class="avatar">GG</div>
+        <div class="avatar">
+          GG
+          <button class="info-btn" data-bio="bio-gg" aria-label="More about Grey">i</button>
+        </div>
         <div class="profile-body">
           <p class="profile-name">Grey Garner</p>
           <p class="profile-role">Speaker of Creative Languages</p>
@@ -417,12 +545,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="profile">
-        <div class="avatar">LS</div>
+        <div class="avatar">
+          LS
+          <button class="info-btn" data-bio="bio-ls" aria-label="More about Lauren">i</button>
+        </div>
         <div class="profile-body">
           <p class="profile-name">Lauren Spina</p>
           <p class="profile-role">Yeah, She Knows That Guy</p>
-          <p class="profile-bio">Creative strategist and professional dot-connector with a passion for building brands, experiences, and meaningful collaborations. With a background spanning hospitality, operations, and culture-forward business strategy, Lauren helps founders transform ambitious ideas into tangible momentum.
-Known for connecting people, opportunities, and big-picture vision, she brings both instinct and hands-on execution to every project she touches. Lauren believes the strongest brands don’t just sell products — they create culture, conversation, and memorable experiences.</p>
+          <p class="profile-bio">Creative strategist and professional dot-connector with a background spanning hospitality, operations, and culture-forward business strategy. Lauren helps founders turn ambitious ideas into tangible momentum and has a genuine talent for putting the right people in the same room.</p>
           <span class="pending">Pending</span>
         </div>
       </div>
@@ -440,6 +570,38 @@ Known for connecting people, opportunities, and big-picture vision, she brings b
     </div>
     <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
   </footer>
+
+  <!-- Bio overlay -->
+  <div class="bio-overlay" id="bioOverlay"></div>
+
+  <!-- Bio cards -->
+  <div class="bio-card" id="bio-jl">
+    <button class="bio-card-close" aria-label="Close">&times;</button>
+    <p class="bio-card-name">Jim Lockhart</p>
+    <p class="bio-card-role">Professor of Creative Geekery</p>
+    <p class="bio-card-body">Creative technologist and digital media pioneer with 30+ years building immersive experiences, visual effects, and interactive work for some of the world's most recognizable brands. Projects span Ford, the New York Stock Exchange, CMT, and Metallica's S&M production. As founder of emagination-media, he brings production-hardened instincts to emerging technology and a genuine appetite for understanding how things actually work.</p>
+  </div>
+
+  <div class="bio-card" id="bio-jr">
+    <button class="bio-card-close" aria-label="Close">&times;</button>
+    <p class="bio-card-name">Jonathan Richter</p>
+    <p class="bio-card-role">Artful Mastermind</p>
+    <p class="bio-card-body">Daytime Emmy-nominated director with 30+ years across live action, CGI, animation, and fabrication. Clients include Coca-Cola, TikTok, Paramount/Viacom, Levi's, and Nissan. Brings a multi-disciplinary background and a deep instinct for using the right tool, not the trending one.</p>
+  </div>
+
+  <div class="bio-card" id="bio-gg">
+    <button class="bio-card-close" aria-label="Close">&times;</button>
+    <p class="bio-card-name">Grey Garner</p>
+    <p class="bio-card-role">Speaker of Creative Languages</p>
+    <p class="bio-card-body">Recording artist, producer, engineer, and growth strategist with 10+ years working across creative production and high-growth tech. Grey connects the artistic, technical, and business sides of the work, helping shape the right projects, partnerships, and client opportunities for Higher Roads.</p>
+  </div>
+
+  <div class="bio-card" id="bio-ls">
+    <button class="bio-card-close" aria-label="Close">&times;</button>
+    <p class="bio-card-name">Lauren Spina</p>
+    <p class="bio-card-role">Yeah, She Knows That Guy</p>
+    <p class="bio-card-body">Creative strategist and professional dot-connector with a background spanning hospitality, operations, and culture-forward business strategy. Lauren helps founders turn ambitious ideas into tangible momentum and has a genuine talent for putting the right people in the same room.</p>
+  </div>
 
   <script>
     // Theme switcher
@@ -460,6 +622,34 @@ Known for connecting people, opportunities, and big-picture vision, she brings b
     mobileNav.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => mobileNav.classList.remove('open'));
     });
+
+    // Bio cards
+    const overlay = document.getElementById('bioOverlay');
+
+    document.querySelectorAll('.info-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const card = document.getElementById(btn.dataset.bio);
+        document.querySelectorAll('.bio-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        overlay.classList.add('active');
+      });
+    });
+
+    overlay.addEventListener('click', closeAll);
+
+    document.querySelectorAll('.bio-card-close').forEach(btn => {
+      btn.addEventListener('click', closeAll);
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeAll();
+    });
+
+    function closeAll() {
+      document.querySelectorAll('.bio-card').forEach(c => c.classList.remove('active'));
+      overlay.classList.remove('active');
+    }
   </script>
 
 </body>
