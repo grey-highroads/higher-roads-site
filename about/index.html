@@ -319,78 +319,38 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.75);
       z-index: 999;
+      cursor: pointer;
     }
 
     .bio-overlay.active {
       display: block;
     }
 
-    /* Bio card */
+    /* Bio card — image only, no chrome */
     .bio-card {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: min(400px, 90vw);
-      background: #161412;
-      border: 1px solid rgba(232, 120, 42, 0.25);
-      border-radius: 6px;
-      padding: 32px;
       z-index: 1000;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7);
+      line-height: 0;
+      cursor: pointer;
     }
 
     .bio-card.active {
       display: block;
     }
 
-    .bio-card-name {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--white);
-      margin-bottom: 4px;
-    }
-
-    .bio-card-role {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 20px;
-    }
-
-    .bio-card-body {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: rgba(245, 240, 234, 0.75);
-    }
-
-    .bio-card-close {
-      position: absolute;
-      top: 14px;
-      right: 16px;
-      background: none;
-      border: none;
-      color: rgba(245, 240, 234, 0.4);
-      font-size: 1.2rem;
-      cursor: pointer;
-      line-height: 1;
-      padding: 4px;
-      transition: color 0.2s;
-    }
-
-    .bio-card-close:hover {
-      color: var(--accent);
+    .bio-card img {
+      display: block;
+      max-width: min(810px, 90vw);
+      max-height: 88vh;
+      width: auto;
+      height: auto;
+      border-radius: 4px;
     }
 
     /* Footer */
@@ -463,7 +423,6 @@
       .about-inner { width: 100%; }
       .footer-copy { display: none; }
       footer { padding: 20px 24px; }
-      /* Keep info-btn always visible on touch devices */
       .info-btn { opacity: 1; }
     }
   </style>
@@ -511,7 +470,7 @@
       <div class="profile">
         <div class="avatar">
           JL
-          <button class="info-btn" data-bio="bio-jl" aria-label="More about Jim">i</button>
+          <!-- add info-btn + bio-jl card below when Jim's photo is ready -->
         </div>
         <div class="profile-body">
           <p class="profile-name">Jim Lockhart</p>
@@ -523,7 +482,7 @@
       <div class="profile">
         <div class="avatar">
           JR
-          <button class="info-btn" data-bio="bio-jr" aria-label="More about Jonathan">i</button>
+          <!-- add info-btn + bio-jr card below when Jonathan's photo is ready -->
         </div>
         <div class="profile-body">
           <p class="profile-name">Jonathan Richter</p>
@@ -535,7 +494,7 @@
       <div class="profile">
         <div class="avatar">
           GG
-          <button class="info-btn" data-bio="bio-gg" aria-label="More about Grey">i</button>
+          <button class="info-btn" data-bio="bio-gg" aria-label="Photo of Grey">i</button>
         </div>
         <div class="profile-body">
           <p class="profile-name">Grey Garner</p>
@@ -547,7 +506,7 @@
       <div class="profile">
         <div class="avatar">
           LS
-          <button class="info-btn" data-bio="bio-ls" aria-label="More about Lauren">i</button>
+          <!-- add info-btn + bio-ls card below when Lauren's photo is ready -->
         </div>
         <div class="profile-body">
           <p class="profile-name">Lauren Spina</p>
@@ -574,34 +533,17 @@
   <!-- Bio overlay -->
   <div class="bio-overlay" id="bioOverlay"></div>
 
-  <!-- Bio cards -->
-  <div class="bio-card" id="bio-jl">
-    <button class="bio-card-close" aria-label="Close">&times;</button>
-    <p class="bio-card-name">Jim Lockhart</p>
-    <p class="bio-card-role">Professor of Creative Geekery</p>
-    <p class="bio-card-body">Creative technologist and digital media pioneer with 30+ years building immersive experiences, visual effects, and interactive work for some of the world's most recognizable brands. Projects span Ford, the New York Stock Exchange, CMT, and Metallica's S&M production. As founder of emagination-media, he brings production-hardened instincts to emerging technology and a genuine appetite for understanding how things actually work.</p>
-  </div>
-
-  <div class="bio-card" id="bio-jr">
-    <button class="bio-card-close" aria-label="Close">&times;</button>
-    <p class="bio-card-name">Jonathan Richter</p>
-    <p class="bio-card-role">Artful Mastermind</p>
-    <p class="bio-card-body">Daytime Emmy-nominated director with 30+ years across live action, CGI, animation, and fabrication. Clients include Coca-Cola, TikTok, Paramount/Viacom, Levi's, and Nissan. Brings a multi-disciplinary background and a deep instinct for using the right tool, not the trending one.</p>
-  </div>
+  <!-- Bio cards — image only, click anywhere to close -->
 
   <div class="bio-card" id="bio-gg">
-    <button class="bio-card-close" aria-label="Close">&times;</button>
-    <p class="bio-card-name">Grey Garner</p>
-    <p class="bio-card-role">Speaker of Creative Languages</p>
-    <p class="bio-card-body">Recording artist, producer, engineer, and growth strategist with 10+ years working across creative production and high-growth tech. Grey connects the artistic, technical, and business sides of the work, helping shape the right projects, partnerships, and client opportunities for Higher Roads.</p>
+    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/76C1153B-09B8-46C3-85BB-512E4CA6FACF.PNG" alt="Grey Garner" />
   </div>
 
-  <div class="bio-card" id="bio-ls">
-    <button class="bio-card-close" aria-label="Close">&times;</button>
-    <p class="bio-card-name">Lauren Spina</p>
-    <p class="bio-card-role">Yeah, She Knows That Guy</p>
-    <p class="bio-card-body">Creative strategist and professional dot-connector with a background spanning hospitality, operations, and culture-forward business strategy. Lauren helps founders turn ambitious ideas into tangible momentum and has a genuine talent for putting the right people in the same room.</p>
+  <!-- Add bio-jl, bio-jr, bio-ls here as photos come in:
+  <div class="bio-card" id="bio-jl">
+    <img src="R2_URL_HERE" alt="Jim Lockhart" />
   </div>
+  -->
 
   <script>
     // Theme switcher
@@ -623,7 +565,7 @@
       link.addEventListener('click', () => mobileNav.classList.remove('open'));
     });
 
-    // Bio cards
+    // Bio cards — click anywhere (overlay or image) to close
     const overlay = document.getElementById('bioOverlay');
 
     document.querySelectorAll('.info-btn').forEach(btn => {
@@ -638,8 +580,8 @@
 
     overlay.addEventListener('click', closeAll);
 
-    document.querySelectorAll('.bio-card-close').forEach(btn => {
-      btn.addEventListener('click', closeAll);
+    document.querySelectorAll('.bio-card').forEach(card => {
+      card.addEventListener('click', closeAll);
     });
 
     document.addEventListener('keydown', e => {
