@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Visual Product World | Higher Roads" />
+  <meta property="og:description" content="We take your brand identity and build the three-dimensional world where your product actually lives. Motion, 3D, owned by you." />
+  <meta property="og:url" content="https://higher-roads.com/for-brands/" />
+  <meta property="og:type" content="website" />
+  <title>Visual Product World | Higher Roads</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root, [data-theme="ember"] {
+      --black:      #0a0906;
+      --dark:       #181510;
+      --dark-card:  #111009;
+      --accent:     #e8782a;
+      --accent-dim: #a04f18;
+      --glow:       rgba(232, 120, 42, 0.07);
+      --white:      #f5ede2;
+      --muted:      #6b6057;
+      --border:     rgba(232, 120, 42, 0.18);
+      --border-sub: rgba(232, 120, 42, 0.09);
+    }
+    [data-theme="neon-noir"] {
+      --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
+      --accent: #f72585; --accent-dim: #7b1fa2;
+      --glow: rgba(183,0,255,0.08); --white: #ede8f5;
+      --muted: #5c5470; --border: rgba(247,37,133,0.2);
+      --border-sub: rgba(247,37,133,0.09);
+    }
+    [data-theme="ice"] {
+      --black: #050810; --dark: #0a0f1e; --dark-card: #060a14;
+      --accent: #4fc3f7; --accent-dim: #1a6a8a;
+      --glow: rgba(79,195,247,0.07); --white: #e8f4f8;
+      --muted: #4a6070; --border: rgba(79,195,247,0.18);
+      --border-sub: rgba(79,195,247,0.09);
+    }
+    [data-theme="acid"] {
+      --black: #040a04; --dark: #081208; --dark-card: #050d05;
+      --accent: #39ff14; --accent-dim: #1a7a08;
+      --glow: rgba(57,255,20,0.06); --white: #e8f5e8;
+      --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
+      --border-sub: rgba(57,255,20,0.09);
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.8;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: rgba(10,9,6,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .header-logo { height: 28px; width: auto; display: block; }
+
+    nav.nav-links {
+      display: flex; gap: 2.2rem; align-items: center;
+    }
+
+    nav.nav-links a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    nav.nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--white); transition: all 0.3s; transform-origin: center;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none; flex-direction: column;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem; gap: 1.25rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+    }
+    .mobile-nav a:hover { color: var(--white); }
+
+    /* ── SHARED ── */
+    main { flex: 1; display: flex; flex-direction: column; }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    .eyebrow {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+
+    .accent-rule {
+      width: 48px; height: 2px;
+      background: var(--accent-dim);
+      margin: 0 3rem 3.5rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem 3rem 4rem;
+      max-width: 860px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 1.8rem;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-body {
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--white); opacity: 0.7;
+      max-width: 560px; margin-bottom: 2.6rem;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent); color: var(--black); }
+
+    /* ── POSITIONING BAND ── */
+    .positioning {
+      padding: 3.5rem 3rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--dark-card);
+    }
+
+    .positioning-inner {
+      max-width: 760px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      gap: 0;
+      align-items: start;
+    }
+
+    .positioning-col {
+      padding: 0 2.5rem;
+    }
+    .positioning-col:first-child { padding-left: 0; }
+    .positioning-col:last-child { padding-right: 0; }
+
+    .positioning-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    .positioning-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.6rem; display: block;
+    }
+
+    .positioning-col p {
+      font-size: 0.88rem; line-height: 1.7;
+      color: var(--white); opacity: 0.65;
+    }
+
+    /* ── PROOF ── */
+    .proof {
+      padding: 4.5rem 3rem 5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .proof .eyebrow { margin-bottom: 2rem; }
+
+    .proof-grid-3 {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: var(--border); margin-bottom: 1px;
+    }
+
+    .proof-grid-2 {
+      display: grid; grid-template-columns: repeat(2,1fr);
+      gap: 1px; background: var(--border);
+    }
+
+    .proof-item {
+      position: relative; background: var(--black);
+      overflow: hidden; cursor: pointer;
+    }
+
+    .proof-item video {
+      width: 100%; display: block;
+      aspect-ratio: 1/1; object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .proof-grid-2 .proof-item video { aspect-ratio: 16/9; }
+    .proof-item:hover video { transform: scale(1.04); }
+
+    .proof-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 0.7rem 0.9rem;
+      background: linear-gradient(transparent, rgba(10,9,6,0.88));
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); opacity: 0; transition: opacity 0.3s;
+    }
+    .proof-item:hover .proof-label { opacity: 1; }
+
+    .proof-section-label {
+      display: flex; align-items: center; gap: 1.2rem;
+      margin: 2.2rem 0 1.4rem;
+    }
+    .proof-section-label span {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); white-space: nowrap;
+    }
+    .proof-section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── OFFER ── */
+    .offer {
+      padding: 4.5rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .offer > .eyebrow { margin-bottom: 0.5rem; }
+
+    .offer-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500; line-height: 1.1;
+      color: var(--white); margin-bottom: 0.6rem;
+    }
+
+    .offer-tag {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.82rem;
+      letter-spacing: 0.08em; color: var(--muted);
+      margin-bottom: 2.8rem; display: block;
+    }
+
+    .offer-body {
+      font-size: 1rem; line-height: 1.85;
+      color: var(--white); opacity: 0.7;
+      max-width: 620px; margin-bottom: 3.5rem;
+    }
+
+    /* Three-column flow */
+    .offer-flow {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: var(--border);
+      margin-bottom: 3rem;
+    }
+
+    .offer-flow-col {
+      background: var(--dark-card);
+      padding: 2rem 1.8rem;
+    }
+
+    .flow-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem; display: block;
+    }
+
+    .flow-items {
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+
+    .flow-item {
+      font-size: 0.88rem; line-height: 1.6;
+      color: var(--white); opacity: 0.68;
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border-sub);
+    }
+
+    /* What happens next */
+    .offer-next {
+      border: 1px solid var(--border);
+      background: var(--dark-card);
+      padding: 2rem 2rem;
+      margin-bottom: 3rem;
+      max-width: 760px;
+    }
+
+    .offer-next-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.9rem; display: block;
+    }
+
+    .offer-next p {
+      font-size: 0.92rem; line-height: 1.75;
+      color: var(--white); opacity: 0.65;
+    }
+
+    /* Pricing */
+    .offer-pricing {
+      border-top: 1px solid var(--border);
+      padding-top: 2.5rem;
+      max-width: 760px;
+    }
+
+    .price-range {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; color: var(--white);
+      display: block; margin-bottom: 0.5rem;
+    }
+
+    .price-note {
+      font-size: 0.82rem; line-height: 1.65;
+      color: var(--muted); max-width: 480px;
+    }
+
+    .price-fit {
+      margin-top: 1.4rem;
+      padding: 1rem 1.2rem;
+      border: 1px solid var(--border);
+      background: rgba(232,120,42,0.04);
+    }
+
+    .price-fit-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.4rem;
+    }
+
+    .price-fit p {
+      font-size: 0.85rem; line-height: 1.65;
+      color: var(--white); opacity: 0.65;
+    }
+
+    /* ── AUDIT ── */
+    .audit {
+      padding: 3.5rem 3rem;
+      border-top: 1px solid var(--border);
+      max-width: 600px;
+    }
+
+    .audit h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 500;
+      color: var(--white); margin-bottom: 1rem; line-height: 1.3;
+    }
+
+    .audit p {
+      font-size: 0.9rem; line-height: 1.8;
+      color: var(--white); opacity: 0.6; margin-bottom: 0.9rem;
+    }
+
+    .audit-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; color: var(--accent);
+    }
+
+    /* ── CTA CLOSE ── */
+    .cta-close {
+      padding: 5rem 3rem 6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-close-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-weight: 500; line-height: 1.15;
+      color: var(--white); margin-bottom: 2.2rem;
+      max-width: 640px;
+    }
+
+    .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    .btn-cta {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-cta:hover { background: var(--accent); color: var(--black); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted);
+    }
+
+    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+
+    .footer-email {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-email:hover { color: var(--accent); }
+
+    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
+    .theme-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    }
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+    .theme-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      header { padding: 1.5rem; }
+      nav.nav-links { display: none; }
+      .nav-toggle { display: flex; }
+
+      .hero { padding: 4rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.1rem; }
+
+      .accent-rule { margin: 0 1.5rem 2.5rem; }
+
+      .positioning { padding: 2.5rem 1.5rem; }
+      .positioning-inner {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .positioning-col { padding: 1.2rem 0; border-bottom: 1px solid var(--border-sub); }
+      .positioning-col:last-child { border-bottom: none; }
+      .positioning-divider { display: none; }
+
+      .proof { padding: 3rem 1.5rem 4rem; }
+      .proof-grid-3 { grid-template-columns: 1fr; }
+      .proof-grid-2 { grid-template-columns: 1fr; }
+      .proof-item video { aspect-ratio: 4/3; }
+      .proof-grid-2 .proof-item video { aspect-ratio: 4/3; }
+
+      .offer { padding: 3.5rem 1.5rem; }
+      .offer-flow { grid-template-columns: 1fr; }
+
+      .audit { padding: 3rem 1.5rem; }
+      .cta-close { padding: 4rem 1.5rem 5rem; }
+
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <div class="page">
+
+    <header>
+      <a href="../">
+        <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="../motion/">Motion Design</a>
+        <a href="../3d/">3D Animation</a>
+        <a href="../immersive/">Immersive</a>
+        <a href="mailto:connect@higher-roads.com">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="../motion/">Motion Design</a>
+      <a href="../3d/">3D Animation</a>
+      <a href="../immersive/">Immersive</a>
+      <a href="mailto:connect@higher-roads.com">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- ── HERO ── -->
+      <section class="hero reveal">
+        <span class="eyebrow">For Brands</span>
+        <h1>Your brand has an identity.<br><em>Your product needs a world.</em></h1>
+        <p class="hero-body">
+          Your branding agency defined who you are. Your marketing team runs campaigns. The space between those two is where we work: the visual, three-dimensional world where your product actually lives, in motion.
+        </p>
+        <a href="mailto:connect@higher-roads.com" class="btn-primary">Start a conversation →</a>
+      </section>
+
+      <div class="accent-rule"></div>
+
+      <!-- ── POSITIONING BAND ── -->
+      <div class="positioning reveal">
+        <div class="positioning-inner">
+          <div class="positioning-col">
+            <span class="positioning-label">What your agency built</span>
+            <p>Your brand identity. The guidelines, values, visual direction, and positioning that define who you are. That work is done.</p>
+          </div>
+          <div class="positioning-divider"></div>
+          <div class="positioning-col">
+            <span class="positioning-label">What we build</span>
+            <p>The Visual Product World: a three-dimensional, moving environment your product inhabits, built from your existing identity rather than in place of it.</p>
+          </div>
+          <div class="positioning-divider"></div>
+          <div class="positioning-col">
+            <span class="positioning-label">What your team runs</span>
+            <p>Campaign content drawn from a world you own. Motion loops, stills, and channel assets all come from the same source.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROOF ── -->
+      <section class="proof reveal">
+        <span class="eyebrow">Worlds we've built</span>
+
+        <div class="proof-grid-3">
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/KO-1.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/KO-poster.png"></video>
+            <div class="proof-label">Product World · Kind Oasis</div>
+          </div>
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/nail-bottle.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/polish-poster.png"></video>
+            <div class="proof-label">Product World · Beauty</div>
+          </div>
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Bubbles.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/bubbles-poster.png"></video>
+            <div class="proof-label">Product World · Beverage</div>
+          </div>
+        </div>
+
+        <div class="proof-section-label">
+          <span>The world in motion</span>
+        </div>
+
+        <div class="proof-grid-2">
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Samsung0001-0100.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/samsung-poster.png"></video>
+            <div class="proof-label">Motion · Product in World</div>
+          </div>
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/perfume-sq.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/perfume-poster.png"></video>
+            <div class="proof-label">Motion · Product Launch</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── OFFER ── -->
+      <section class="offer reveal">
+        <span class="eyebrow">The offer</span>
+        <p class="offer-name">Visual Product World</p>
+        <span class="offer-tag">A three-dimensional world built from your brand identity, designed for motion, owned by you.</span>
+
+        <p class="offer-body">
+          We work from your brand's existing identity: the guidelines, values, and visual direction already established. From that, we build the environment where your product actually lives. The world is built for motion first. Stills, campaign loops, and channel assets all come from it. You own the master files.
+        </p>
+
+        <!-- Three-column flow -->
+        <div class="offer-flow">
+          <div class="offer-flow-col">
+            <span class="flow-label">You bring</span>
+            <div class="flow-items">
+              <span class="flow-item">Brand guidelines and visual identity</span>
+              <span class="flow-item">Positioning and values</span>
+              <span class="flow-item">Product specifications and packaging files</span>
+              <span class="flow-item">The visual direction your brand already has</span>
+            </div>
+          </div>
+          <div class="offer-flow-col">
+            <span class="flow-label">We build</span>
+            <div class="flow-items">
+              <span class="flow-item">A complete 3D product environment</span>
+              <span class="flow-item">Materials, lighting, and atmosphere true to your brand</span>
+              <span class="flow-item">Camera systems and motion logic built in from the start</span>
+              <span class="flow-item">A world your product actually inhabits</span>
+            </div>
+          </div>
+          <div class="offer-flow-col">
+            <span class="flow-label">You get</span>
+            <div class="flow-items">
+              <span class="flow-item">The world asset: master files, owned by you</span>
+              <span class="flow-item">2–4 motion loops for paid, social, and PDP</span>
+              <span class="flow-item">A stills set for ecommerce, retail, and Amazon</span>
+              <span class="flow-item">A production source for everything that follows</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- What happens next -->
+        <div class="offer-next">
+          <span class="offer-next-label">After the first build</span>
+          <p>A new SKU drops into the existing world. Same environment, same light, consistent with everything that came before. A seasonal campaign renders from the same system. A different aspect ratio for a new platform takes an afternoon, not a project. The world is built once. Every campaign after that draws from it.</p>
+        </div>
+
+        <!-- Pricing -->
+        <div class="offer-pricing">
+          <span class="price-range"><!-- PRICING PLACEHOLDER: confirm with Grey before publishing --></span>
+          <p class="price-note">Scoped to your product family, environment complexity, and the number of initial deliverables. Most first builds deliver a complete world plus a full campaign launch set.</p>
+          <div class="price-fit">
+            <span class="price-fit-label">Right fit when</span>
+            <p>Your brand has an established identity and your product needs a visual world to match it. You're launching a new line, ramping up paid media, pitching retail, or simply overdue for content that actually looks like the brand you built.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── AUDIT ── -->
+      <section class="audit reveal">
+        <h2>Not sure where to start?</h2>
+        <p>For brands with real complexity or genuine uncertainty about scope, we offer a focused content audit. We review your current visual situation and tell you exactly what a first build should cover and what it costs.</p>
+        <span class="audit-price">$1,500 – $3,000</span>
+      </section>
+
+      <!-- ── CTA CLOSE ── -->
+      <section class="cta-close reveal">
+        <p class="cta-close-text">
+          Ready to give your product<br><em>a world worth living in?</em>
+        </p>
+        <a href="mailto:connect@higher-roads.com" class="btn-cta">connect@higher-roads.com</a>
+      </section>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"></div>
+          <div class="theme-dot"        data-t="neon-noir"></div>
+          <div class="theme-dot"        data-t="ice"></div>
+          <div class="theme-dot"        data-t="acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Hamburger
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    // Theme switcher
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Hover-to-play
+    document.querySelectorAll('.proof-item').forEach(item => {
+      const video = item.querySelector('video');
+      if (!video) return;
+      item.addEventListener('mouseenter', () => video.play());
+      item.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
+    });
+
+    // Scroll reveal
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
