@@ -194,31 +194,26 @@
 
     /* ── POSITIONING BAND ── */
     .positioning {
-      padding: 3.5rem 3rem;
+      padding: 2.2rem 3rem;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
       background: var(--dark-card);
     }
 
     .positioning-inner {
-      max-width: 760px;
+      width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 0;
       align-items: start;
     }
 
     .positioning-col {
-      padding: 0 2.5rem;
+      padding: 0 2.2rem;
+      border-right: 1px solid var(--border);
     }
     .positioning-col:first-child { padding-left: 0; }
-    .positioning-col:last-child { padding-right: 0; }
-
-    .positioning-divider {
-      width: 1px;
-      background: var(--border);
-      align-self: stretch;
-    }
+    .positioning-col:last-child { padding-right: 0; border-right: none; }
 
     .positioning-label {
       font-family: 'Rajdhani', sans-serif; font-weight: 600;
@@ -342,60 +337,75 @@
       border-left: 1px solid var(--border-sub);
     }
 
-    /* What happens next */
-    .offer-next {
-      border: 1px solid var(--border);
-      background: var(--dark-card);
-      padding: 2rem 2rem;
-      margin-bottom: 3rem;
-      max-width: 760px;
+    /* ── OFFER BOTTOM SECTION ── */
+    .offer-reuse {
+      padding-top: 2.5rem;
+      margin-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      max-width: 680px;
     }
 
-    .offer-next-label {
+    .offer-reuse-label {
       font-family: 'Rajdhani', sans-serif; font-weight: 600;
       font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 0.9rem; display: block;
+      color: var(--muted); margin-bottom: 0.8rem; display: block;
     }
 
-    .offer-next p {
-      font-size: 0.92rem; line-height: 1.75;
+    .offer-reuse p {
+      font-size: 0.92rem; line-height: 1.8;
       color: var(--white); opacity: 0.65;
     }
 
-    /* Pricing */
-    .offer-pricing {
+    .offer-scope {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
       border-top: 1px solid var(--border);
-      padding-top: 2.5rem;
-      max-width: 760px;
     }
 
-    .price-range {
+    .offer-scope-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.5rem; display: block;
+    }
+
+    .offer-scope .price-range {
       font-family: 'Playfair Display', serif;
-      font-size: 2rem; color: var(--white);
-      display: block; margin-bottom: 0.5rem;
+      font-size: 1.8rem; color: var(--white);
+      display: block; margin-bottom: 0.4rem;
     }
 
-    .price-note {
+    .offer-scope .scope-note {
       font-size: 0.82rem; line-height: 1.65;
-      color: var(--muted); max-width: 480px;
+      color: var(--muted); max-width: 520px;
     }
 
-    .price-fit {
-      margin-top: 1.4rem;
-      padding: 1rem 1.2rem;
+    .fit-pair {
+      margin-top: 1.6rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       border: 1px solid var(--border);
-      background: rgba(232,120,42,0.04);
     }
 
-    .price-fit-label {
+    .fit-cell {
+      padding: 1.4rem 1.6rem;
+    }
+
+    .fit-cell:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .fit-label {
       font-family: 'Rajdhani', sans-serif; font-weight: 600;
       font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--accent); display: block; margin-bottom: 0.4rem;
+      display: block; margin-bottom: 0.55rem;
     }
 
-    .price-fit p {
-      font-size: 0.85rem; line-height: 1.65;
-      color: var(--white); opacity: 0.65;
+    .fit-cell:first-child .fit-label { color: var(--accent); }
+    .fit-cell.negative .fit-label { color: var(--muted); }
+
+    .fit-cell p {
+      font-size: 0.87rem; line-height: 1.65;
+      color: var(--white); opacity: 0.6;
     }
 
     /* ── AUDIT ── */
@@ -482,6 +492,86 @@
     .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
     .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
 
+    /* ── HERO SUPPORT LINE ── */
+    .hero-body { margin-bottom: 0.9rem; }
+
+    .hero-support {
+      font-size: 0.9rem; line-height: 1.7;
+      color: var(--white); opacity: 0.42;
+      max-width: 500px; margin-bottom: 2.6rem;
+      letter-spacing: 0.015em;
+    }
+
+    /* ── TRIGGER CALLOUT ── */
+    .trigger {
+      padding: 3.5rem 3rem 0;
+      max-width: 780px;
+    }
+
+    .trigger p {
+      font-size: 1rem; line-height: 1.8;
+      color: var(--white); opacity: 0.75;
+      border-left: 2px solid var(--accent-dim);
+      padding-left: 1.5rem;
+    }
+
+    /* ── USE CASES ── */
+    .use-cases {
+      padding: 2.5rem 3rem 0;
+    }
+
+    .use-cases-eyebrow {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1rem;
+    }
+
+    .use-cases-grid {
+      border: 1px solid var(--border);
+    }
+
+    .use-case-row {
+      display: grid; grid-template-columns: 180px 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .use-case-row:last-child { border-bottom: none; }
+
+    .use-case-label {
+      background: var(--dark-card);
+      padding: 0.85rem 1.1rem;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent);
+      display: flex; align-items: center;
+      border-right: 1px solid var(--border);
+    }
+
+    .use-case-outcome {
+      padding: 0.85rem 1.2rem;
+      font-size: 0.87rem; line-height: 1.65;
+      color: var(--white); opacity: 0.62;
+      display: flex; align-items: center;
+    }
+
+    /* ── OFFER CTA ── */
+    .offer-cta {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-offer {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--black); text-decoration: none;
+      background: var(--accent);
+      padding: 0.75rem 1.8rem;
+      transition: opacity 0.2s;
+    }
+    .btn-offer:hover { opacity: 0.85; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       header { padding: 1.5rem; }
@@ -493,14 +583,14 @@
 
       .accent-rule { margin: 0 1.5rem 2.5rem; }
 
-      .positioning { padding: 2.5rem 1.5rem; }
-      .positioning-inner {
-        grid-template-columns: 1fr;
-        gap: 0;
+      .positioning { padding: 2rem 1.5rem; }
+      .positioning-inner { grid-template-columns: 1fr; }
+      .positioning-col {
+        padding: 1.1rem 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
       }
-      .positioning-col { padding: 1.2rem 0; border-bottom: 1px solid var(--border-sub); }
       .positioning-col:last-child { border-bottom: none; }
-      .positioning-divider { display: none; }
 
       .proof { padding: 3rem 1.5rem 4rem; }
       .proof-grid-3 { grid-template-columns: 1fr; }
@@ -508,6 +598,13 @@
       .proof-item video { aspect-ratio: 4/3; }
       .proof-grid-2 .proof-item video { aspect-ratio: 4/3; }
 
+      .trigger { padding: 2.5rem 1.5rem 0; }
+      .use-cases { padding: 2rem 1.5rem 0; }
+      .use-case-row { grid-template-columns: 130px 1fr; }
+      .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
+      .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
+      .fit-pair { grid-template-columns: 1fr; }
+      .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
       .offer { padding: 3.5rem 1.5rem; }
       .offer-flow { grid-template-columns: 1fr; }
 
@@ -550,10 +647,13 @@
 
       <!-- ── HERO ── -->
       <section class="hero reveal">
-        <span class="eyebrow">For Brands</span>
+        <span class="eyebrow">For Product Brands</span>
         <h1>Your brand has an identity.<br><em>Your product needs a world.</em></h1>
         <p class="hero-body">
-          Your branding agency helped define who you are. Your marketing team runs campaigns. The space between those two is where we work. We create the visual, three-dimensional world where your product actually lives, and we put it in motion.
+          We build visual product worlds for brands that need reusable content across ecommerce, paid media, social, retail selling, and future SKU updates.
+        </p>
+        <p class="hero-support">
+          Built from your existing identity, designed for motion, and owned by you.
         </p>
         <a href="mailto:connect@higher-roads.com" class="btn-primary">Start a conversation →</a>
       </section>
@@ -564,22 +664,98 @@
       <div class="positioning reveal">
         <div class="positioning-inner">
           <div class="positioning-col">
-            <span class="positioning-label">What your agency built</span>
-            <p>Your brand identity. The guidelines, values, visual direction, and positioning that define who you are. That work is done.</p>
+            <span class="positioning-label">What your brand brings</span>
+            <p>Your look, story, and direction. The visual identity and positioning that define who you are. That work is done.</p>
           </div>
-          <div class="positioning-divider"></div>
           <div class="positioning-col">
             <span class="positioning-label">What we build</span>
-            <p>The Visual Product World: a three-dimensional, moving environment your product inhabits, built from your existing identity rather than in place of it.</p>
+            <p>The Visual Product World: a three-dimensional environment that moves, built from your existing identity for content across commerce, campaigns, and retail.</p>
           </div>
-          <div class="positioning-divider"></div>
           <div class="positioning-col">
             <span class="positioning-label">What your team runs</span>
-            <p>Campaign content drawn from a world you own. Motion loops, stills, and channel assets all come from the same source.</p>
+            <p>Reusable product content drawn from a world you own. Motion loops, stills, and channel assets all come from the same source.</p>
           </div>
         </div>
       </div>
- <!-- ── OFFER ── -->
+
+      <!-- ── PROOF ── -->
+      <section class="proof reveal">
+        <span class="eyebrow">Worlds we've built</span>
+
+        <div class="proof-grid-3">
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/KO-1.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/KO-poster.png"></video>
+            <div class="proof-label">Kind Oasis · Wellness product world for launch and retail</div>
+          </div>
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/nail-bottle.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/polish-poster.png"></video>
+            <div class="proof-label">Beauty · Product world for ecommerce and campaign content</div>
+          </div>
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Bubbles.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/bubbles-poster.png"></video>
+            <div class="proof-label">Beverage · SKU family for retail sell-in and paid media</div>
+          </div>
+        </div>
+
+        <div class="proof-section-label">
+          <span>The world in motion</span>
+        </div>
+
+        <div class="proof-grid-2">
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Samsung0001-0100.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/samsung-poster.png"></video>
+            <div class="proof-label">Motion · Product in world for paid and social</div>
+          </div>
+          <div class="proof-item">
+            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/perfume-sq.mp4"
+              muted loop playsinline preload="none"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/perfume-poster.png"></video>
+            <div class="proof-label">Motion · Product launch content for PDP and paid</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── TRIGGER ── -->
+      <div class="trigger reveal">
+        <p>You're launching a new SKU, updating packaging, ramping paid media, pitching retail, or building product content across PDP, Amazon, social, and sales decks. That is when a product world starts making sense.</p>
+      </div>
+
+      <div class="use-cases reveal">
+        <span class="use-cases-eyebrow">Why brands build this</span>
+        <div class="use-cases-grid">
+          <div class="use-case-row">
+            <span class="use-case-label">SKU updates</span>
+            <span class="use-case-outcome">New flavors, packs, and label changes come from the same visual system.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Ecommerce</span>
+            <span class="use-case-outcome">PDP, Amazon, and product-detail assets stay consistent across every variant.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Paid and social</span>
+            <span class="use-case-outcome">Short-form motion assets come from the same world as your stills.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Retail selling</span>
+            <span class="use-case-outcome">Buyer decks and display assets look like the brand, not last-minute production.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Campaign reuse</span>
+            <span class="use-case-outcome">Seasonal content starts from an owned product world instead of a blank page.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── OFFER ── -->
       <section class="offer reveal">
         <span class="eyebrow">The offer</span>
         <p class="offer-name">Visual Product World</p>
@@ -620,66 +796,33 @@
           </div>
         </div>
 
-        <!-- What happens next -->
-        <div class="offer-next">
-          <span class="offer-next-label">After the first build</span>
+        <!-- Reuse -->
+        <div class="offer-reuse">
+          <span class="offer-reuse-label">After the first build</span>
           <p>A new SKU drops into the existing world. Same environment, same light, consistent with everything that came before. A seasonal campaign renders from the same system. A different aspect ratio for a new platform takes an afternoon, not a project. The world is built once. Every campaign after that draws from it.</p>
         </div>
-        
-      <!-- ── PROOF ── -->
-      <section class="proof reveal">
-        <span class="eyebrow">Worlds we've built</span>
 
-        <div class="proof-grid-3">
-          <div class="proof-item">
-            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/KO-1.mp4"
-              muted loop playsinline preload="none"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/KO-poster.png"></video>
-            <div class="proof-label">Product World · Kind Oasis</div>
-          </div>
-          <div class="proof-item">
-            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/nail-bottle.mp4"
-              muted loop playsinline preload="none"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/polish-poster.png"></video>
-            <div class="proof-label">Product World · Beauty</div>
-          </div>
-          <div class="proof-item">
-            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Bubbles.mp4"
-              muted loop playsinline preload="none"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/bubbles-poster.png"></video>
-            <div class="proof-label">Product World · Beverage</div>
-          </div>
-        </div>
-
-        <div class="proof-section-label">
-          <span>The world in motion</span>
-        </div>
-
-        <div class="proof-grid-2">
-          <div class="proof-item">
-            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Samsung0001-0100.mp4"
-              muted loop playsinline preload="none"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/samsung-poster.png"></video>
-            <div class="proof-label">Motion · Product in World</div>
-          </div>
-          <div class="proof-item">
-            <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/perfume-sq.mp4"
-              muted loop playsinline preload="none"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/perfume-poster.png"></video>
-            <div class="proof-label">Motion · Product Launch</div>
-          </div>
-        </div>
-
-      </section>
-
-        <!-- Pricing -->
-        <div class="offer-pricing">
+        <!-- Scope and pricing -->
+        <div class="offer-scope">
+          <span class="offer-scope-label">Scope and pricing</span>
           <span class="price-range"><!-- PRICING PLACEHOLDER: confirm with Grey before publishing --></span>
-          <p class="price-note">Scoped to your product family, environment complexity, and the number of initial deliverables. Most first builds deliver a complete world plus a full campaign launch set.</p>
-          <div class="price-fit">
-            <span class="price-fit-label">Right fit when</span>
+          <p class="scope-note">Scoped to your product family, environment complexity, and the number of initial deliverables. Most first builds deliver a complete world plus a full campaign launch set.</p>
+        </div>
+
+        <!-- Fit pair -->
+        <div class="fit-pair">
+          <div class="fit-cell">
+            <span class="fit-label">Right fit when</span>
             <p>Your brand has an established identity and your product needs a visual world to match it. You're launching a new line, ramping up paid media, pitching retail, or simply overdue for content that actually looks like the brand you built.</p>
           </div>
+          <div class="fit-cell negative">
+            <span class="fit-label">Not a fit when</span>
+            <p>You need only a few basic stills, your visual identity is still being defined, or you're satisfied with AI tools for your current catalog needs.</p>
+          </div>
+        </div>
+
+        <div class="offer-cta">
+          <a href="mailto:connect@higher-roads.com" class="btn-offer">Talk through a first product world build →</a>
         </div>
 
       </section>
