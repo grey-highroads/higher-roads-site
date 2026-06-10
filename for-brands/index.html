@@ -65,6 +65,7 @@
       font-family: 'Barlow', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
+      scroll-behavior: smooth;
       transition: background-color 0.4s ease, color 0.4s ease;
     }
 
@@ -179,7 +180,14 @@
     .hero-body {
       font-size: 1.05rem; line-height: 1.8;
       color: var(--white); opacity: 0.7;
-      max-width: 560px; margin-bottom: 2.6rem;
+      max-width: 560px; margin-bottom: 0.9rem;
+    }
+
+    .hero-support {
+      font-size: 0.9rem; line-height: 1.7;
+      color: var(--white); opacity: 0.42;
+      max-width: 500px; margin-bottom: 2.6rem;
+      letter-spacing: 0.015em;
     }
 
     .btn-primary {
@@ -280,6 +288,41 @@
       content: ''; flex: 1; height: 1px; background: var(--border);
     }
 
+    /* ── VIDEO BREAK ── */
+    .video-break {
+      width: calc(100% + 6rem);
+      margin-left: -3rem;
+      margin-bottom: 3rem;
+      height: 65vh;
+      min-height: 340px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-break video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-break::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,9,6,0.35) 0%,
+        rgba(10,9,6,0.05) 25%,
+        rgba(10,9,6,0.05) 75%,
+        rgba(10,9,6,0.35) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
     /* ── OFFER ── */
     .offer {
       padding: 4.5rem 3rem;
@@ -337,187 +380,9 @@
       border-left: 1px solid var(--border-sub);
     }
 
-    /* ── OFFER BOTTOM SECTION ── */
-    .offer-reuse {
-      padding-top: 2.5rem;
-      margin-top: 2.5rem;
-      border-top: 1px solid var(--border);
-      max-width: 680px;
-    }
-
-    .offer-reuse-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 0.8rem; display: block;
-    }
-
-    .offer-reuse p {
-      font-size: 0.92rem; line-height: 1.8;
-      color: var(--white); opacity: 0.65;
-    }
-
-    .offer-scope {
-      margin-top: 2.5rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .offer-scope-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 0.5rem; display: block;
-    }
-
-    .offer-scope .price-range {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem; color: var(--white);
-      display: block; margin-bottom: 0.4rem;
-    }
-
-    .offer-scope .scope-note {
-      font-size: 0.82rem; line-height: 1.65;
-      color: var(--muted); max-width: 520px;
-    }
-
-    .fit-pair {
-      margin-top: 1.6rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border: 1px solid var(--border);
-    }
-
-    .fit-cell {
-      padding: 1.4rem 1.6rem;
-    }
-
-    .fit-cell:first-child {
-      border-right: 1px solid var(--border);
-    }
-
-    .fit-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
-      display: block; margin-bottom: 0.55rem;
-    }
-
-    .fit-cell:first-child .fit-label { color: var(--accent); }
-    .fit-cell.negative .fit-label { color: var(--muted); }
-
-    .fit-cell p {
-      font-size: 0.87rem; line-height: 1.65;
-      color: var(--white); opacity: 0.6;
-    }
-
-    /* ── AUDIT ── */
-    .audit {
-      padding: 3.5rem 3rem;
-      border-top: 1px solid var(--border);
-      max-width: 600px;
-    }
-
-    .audit h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem; font-weight: 500;
-      color: var(--white); margin-bottom: 1rem; line-height: 1.3;
-    }
-
-    .audit p {
-      font-size: 0.9rem; line-height: 1.8;
-      color: var(--white); opacity: 0.6; margin-bottom: 0.9rem;
-    }
-
-    .audit-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem; color: var(--accent);
-    }
-
-    /* ── CTA CLOSE ── */
-    .cta-close {
-      padding: 5rem 3rem 6rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .cta-close-text {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
-      font-weight: 500; line-height: 1.15;
-      color: var(--white); margin-bottom: 2.2rem;
-      max-width: 640px;
-    }
-
-    .cta-close-text em { font-style: italic; color: var(--accent); }
-
-    .btn-cta {
-      display: inline-block;
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--accent); text-decoration: none;
-      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
-      transition: background 0.2s, color 0.2s;
-    }
-    .btn-cta:hover { background: var(--accent); color: var(--black); }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 2rem 3rem;
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 0.75rem; color: var(--muted);
-    }
-
-    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
-
-    .footer-email {
-      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
-      letter-spacing: 0.05em; color: var(--muted);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .footer-email:hover { color: var(--accent); }
-
-    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
-    .theme-label {
-      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
-      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
-    }
-    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
-    .theme-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .theme-dot:hover { transform: scale(1.3); }
-    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
-    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
-    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
-    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
-    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
-
-    /* ── HERO SUPPORT LINE ── */
-    .hero-body { margin-bottom: 0.9rem; }
-
-    .hero-support {
-      font-size: 0.9rem; line-height: 1.7;
-      color: var(--white); opacity: 0.42;
-      max-width: 500px; margin-bottom: 2.6rem;
-      letter-spacing: 0.015em;
-    }
-
-    /* ── TRIGGER CALLOUT ── */
-    .trigger {
-      padding: 3.5rem 3rem 0;
-      max-width: 780px;
-    }
-
-    .trigger p {
-      font-size: 1rem; line-height: 1.8;
-      color: var(--white); opacity: 0.75;
-      border-left: 2px solid var(--accent-dim);
-      padding-left: 1.5rem;
-    }
-
     /* ── USE CASES ── */
     .use-cases {
-      padding: 2.5rem 3rem 0;
+      padding: 0;
     }
 
     .use-cases-eyebrow {
@@ -554,23 +419,138 @@
       display: flex; align-items: center;
     }
 
-    /* ── OFFER CTA ── */
-    .offer-cta {
+    /* ── FIT PAIR ── */
+    .fit-pair {
       margin-top: 2.5rem;
-      padding-top: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+    }
+
+    .fit-cell {
+      padding: 1.4rem 1.6rem;
+    }
+
+    .fit-cell:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .fit-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      display: block; margin-bottom: 0.55rem;
+    }
+
+    .fit-cell:first-child .fit-label { color: var(--accent); }
+    .fit-cell.negative .fit-label { color: var(--muted); }
+
+    .fit-cell p {
+      font-size: 0.87rem; line-height: 1.65;
+      color: var(--white); opacity: 0.6;
+    }
+
+    /* ── CTA CLOSE ── */
+    .cta-close {
+      padding: 5rem 3rem 6rem;
       border-top: 1px solid var(--border);
     }
 
-    .btn-offer {
-      display: inline-block;
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--black); text-decoration: none;
+    .cta-close-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-weight: 500; line-height: 1.15;
+      color: var(--white); margin-bottom: 2.2rem;
+      max-width: 640px;
+    }
+
+    .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted);
+    }
+
+    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+
+    .footer-email {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-email:hover { color: var(--accent); }
+
+    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
+    .theme-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    }
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+    .theme-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    /* ── CONTACT FORM ── */
+    .lead-form {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 2.2rem;
+    }
+
+    .lead-form input,
+    .lead-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--white);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .lead-form input:focus,
+    .lead-form textarea:focus { border-color: var(--accent); }
+
+    .lead-form input::placeholder,
+    .lead-form textarea::placeholder { color: var(--muted); }
+
+    .lead-form textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .lead-form button {
+      align-self: flex-start;
       background: var(--accent);
-      padding: 0.75rem 1.8rem;
+      color: var(--black);
+      border: none;
+      padding: 0.85rem 2rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
       transition: opacity 0.2s;
     }
-    .btn-offer:hover { opacity: 0.85; }
+
+    .lead-form button:hover { opacity: 0.85; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
@@ -598,17 +578,21 @@
       .proof-item video { aspect-ratio: 4/3; }
       .proof-grid-2 .proof-item video { aspect-ratio: 4/3; }
 
-      .trigger { padding: 2.5rem 1.5rem 0; }
-      .use-cases { padding: 2rem 1.5rem 0; }
-      .use-case-row { grid-template-columns: 130px 1fr; }
+      .video-break {
+        width: calc(100% + 3rem);
+        margin-left: -1.5rem;
+        height: 45vh;
+        min-height: 240px;
+      }
+
+      .offer { padding: 3.5rem 1.5rem; }
+      .offer-flow { grid-template-columns: 1fr; }
+      .use-case-row { grid-template-columns: 120px 1fr; }
       .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
       .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
       .fit-pair { grid-template-columns: 1fr; }
       .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
-      .offer { padding: 3.5rem 1.5rem; }
-      .offer-flow { grid-template-columns: 1fr; }
 
-      .audit { padding: 3rem 1.5rem; }
       .cta-close { padding: 4rem 1.5rem 5rem; }
 
       footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
@@ -629,8 +613,7 @@
         <a href="../motion/">Motion Design</a>
         <a href="../3d/">3D Animation</a>
         <a href="../immersive/">Immersive</a>
-        <a href="mailto:connect@higher-roads.com">Contact</a>
-      </nav>
+        <a href="#contact">Contact</a>      </nav>
       <button class="nav-toggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -640,7 +623,7 @@
       <a href="../motion/">Motion Design</a>
       <a href="../3d/">3D Animation</a>
       <a href="../immersive/">Immersive</a>
-      <a href="mailto:connect@higher-roads.com">Contact</a>
+      <a href="#contact">Contact</a>
     </nav>
 
     <main>
@@ -655,7 +638,7 @@
         <p class="hero-support">
           Built from your existing identity, designed for motion, and owned by you.
         </p>
-        <a href="mailto:connect@higher-roads.com" class="btn-primary">Start a conversation →</a>
+        <a href="#contact" class="btn-primary">Start a conversation →</a>
       </section>
 
       <div class="accent-rule"></div>
@@ -724,7 +707,6 @@
 
       </section>
 
-     
       <!-- ── OFFER ── -->
       <section class="offer reveal">
         <span class="eyebrow">The offer</span>
@@ -766,39 +748,45 @@
           </div>
         </div>
 
-        <!-- ── TRIGGER ── -->
-<span class="eyebrow">Use Cases</span>
+        <!-- ── VIDEO BREAK ── -->
+        <div class="video-break">
+          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/House.mp4"
+            autoplay muted loop playsinline></video>
+        </div>
+
+        <!-- ── USE CASES ── -->
+        <span class="eyebrow">Use Cases</span>
         <p class="offer-name">Flexible Assets, On Your Timeline</p>
-       
-<p class="offer-body">
+
+        <p class="offer-body">
           You're launching a new SKU, updating packaging, ramping paid media, pitching retail, or building product content across PDP, Amazon, social, and sales decks. That is when a product world starts making sense.
         </p>
-      <div class="use-cases reveal">
-        <span class="use-cases-eyebrow">Why brands build this</span>
-        <div class="use-cases-grid">
-          <div class="use-case-row">
-            <span class="use-case-label">SKU updates</span>
-            <span class="use-case-outcome">New flavors, packs, and label changes come from the same visual system.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Ecommerce</span>
-            <span class="use-case-outcome">PDP, Amazon, and product-detail assets stay consistent across every variant.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Paid and social</span>
-            <span class="use-case-outcome">Short-form motion assets come from the same world as your stills.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Retail selling</span>
-            <span class="use-case-outcome">Buyer decks and display assets look like the brand, not last-minute production.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Campaign reuse</span>
-            <span class="use-case-outcome">Seasonal content starts from an owned product world instead of a blank page.</span>
+
+        <div class="use-cases">
+          <span class="use-cases-eyebrow">Why brands build this</span>
+          <div class="use-cases-grid">
+            <div class="use-case-row">
+              <span class="use-case-label">SKU updates</span>
+              <span class="use-case-outcome">New flavors, packs, and label changes come from the same visual system.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Ecommerce</span>
+              <span class="use-case-outcome">PDP, Amazon, and product-detail assets stay consistent across every variant.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Paid and social</span>
+              <span class="use-case-outcome">Short-form motion assets come from the same world as your stills.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Retail selling</span>
+              <span class="use-case-outcome">Buyer decks and display assets look like the brand, not last-minute production.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Campaign reuse</span>
+              <span class="use-case-outcome">Seasonal content starts from an owned product world instead of a blank page.</span>
+            </div>
           </div>
         </div>
-      </div>
-
 
         <!-- Fit pair -->
         <div class="fit-pair">
@@ -812,17 +800,23 @@
           </div>
         </div>
 
-    
       </section>
 
-
-
-      <!-- ── CTA CLOSE ── -->
-      <section class="cta-close reveal">
+      <!-- ── CONTACT FORM ── -->
+      <section id="contact" class="cta-close reveal">
         <p class="cta-close-text">
           Ready to give your product<br><em>a world worth living in?</em>
         </p>
-        <a href="mailto:connect@higher-roads.com" class="btn-cta">connect@higher-roads.com</a>
+        <form
+          class="lead-form"
+          action="https://formspree.io/f/xrerprnv"
+          method="POST"
+        >
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="email" name="email" placeholder="Your email" required />
+          <textarea name="message" placeholder="What are you working on?" rows="5"></textarea>
+          <button type="submit">Get in touch</button>
+        </form>
       </section>
 
     </main>
@@ -869,7 +863,7 @@
       });
     });
 
-    // Hover-to-play
+    // Hover-to-play on proof videos
     document.querySelectorAll('.proof-item').forEach(item => {
       const video = item.querySelector('video');
       if (!video) return;
