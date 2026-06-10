@@ -11,7 +11,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:title" content="For Partners — Higher Roads" />
-  <meta property="og:description" content="Higher Roads works with agencies, event producers, and fabricators as a white-label creative partner for motion design, 3D animation, and immersive environments." />
+  <meta property="og:description" content="Higher Roads works with experiential agencies, event production companies, and fabrication shops as a behind-the-scenes production partner for projection mapping, immersive content production, 3D animation, and motion design. Based in Nashville, available nationally." />
   <meta property="og:image" content="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png" />
   <meta property="og:url" content="https://higher-roads.com/for-partners/" />
   <meta property="og:type" content="website" />
@@ -441,7 +441,7 @@
 
     /* ── APPROACH / HOW WE WORK ── */
     .approach {
-      padding: 4rem 3rem 4.5rem;
+      padding: 4rem 3rem 2rem;
       max-width: 860px;
       border-top: 1px solid var(--border);
       margin-top: 4rem;
@@ -465,6 +465,99 @@
 
     @media (max-width: 640px) {
       .approach { padding: 2.5rem 1.5rem; }
+    }
+
+    /* ── WHERE WE'RE USEFUL ── */
+    .useful-section {
+      padding: 0 3rem;
+      margin-top: 2rem;
+    }
+
+    .useful-section .page-eyebrow {
+      margin-bottom: 1.5rem;
+    }
+
+    .useful-list {
+      list-style: none;
+      border: 1px solid var(--border);
+    }
+
+    .useful-item {
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--white);
+      opacity: 0.72;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      letter-spacing: 0.01em;
+    }
+
+    .useful-item:last-child { border-bottom: none; }
+
+    .useful-item::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .useful-section { padding: 0; margin-top: 2.5rem; }
+      .useful-item { padding: 1rem 1.5rem; }
+    }
+
+    /* ── PARTNER CONFIDENCE ── */
+    .confidence-section {
+      padding: 0 3rem;
+      margin-top: 3rem;
+    }
+
+    .confidence-section .page-eyebrow {
+      margin-bottom: 1.5rem;
+    }
+
+    .confidence-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .confidence-card {
+      background: var(--dark-card);
+      padding: 2rem 2.5rem;
+      transition: background 0.3s;
+    }
+
+    .confidence-card:hover { background: var(--dark); }
+
+    .confidence-q {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .confidence-a {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.82;
+    }
+
+    @media (max-width: 640px) {
+      .confidence-section { padding: 0; margin-top: 2.5rem; }
+      .confidence-grid { grid-template-columns: 1fr; }
+      .confidence-card { padding: 1.5rem; }
     }
 
     /* ── CTA CLOSER ── */
@@ -671,7 +764,7 @@
       <div class="partner-hero">
         <span class="page-eyebrow">For Partners</span>
         <h1 class="hero-h1">We make your most ambitious<br>projects deliverable.</h1>
-        <p class="hero-body">Higher Roads is a Nashville-based creative studio specializing in motion design, 3D animation, and immersive environments. We work with agencies, event producers, and fabricators as a white-label creative partner. Your name is on the work and the client relationship stays yours.</p>
+        <p class="hero-body">Higher Roads is a Nashville-based creative studio specializing in motion design, 3D animation, and immersive environments. We work with experiential agencies, event production companies, and fabricators as a behind-the-scenes or white-label production partner. Your name is on the work and the client relationship stays yours.</p>
       </div>
 
       <div class="accent-rule"></div>
@@ -682,20 +775,20 @@
         <div class="partner-row">
           <div class="partner-row-label">
             <span class="partner-num">01</span>
-            <span class="page-eyebrow">Creative &amp; Brand Agencies</span>
+            <span class="page-eyebrow">Experiential &amp; Brand Agencies</span>
           </div>
           <div class="partner-row-body">
-            <p>When a client needs motion, CGI, or an immersive environment, we integrate as the specialist production layer. You stay in the client relationship while we deliver what the brief requires, under your name.</p>
+            <p>When a creative or experiential agency needs motion, CGI, or an immersive environment, we integrate as the specialist production layer. You stay in the client relationship while we deliver what the brief requires, under your name.</p>
           </div>
         </div>
 
         <div class="partner-row">
           <div class="partner-row-label">
             <span class="partner-num">02</span>
-            <span class="page-eyebrow">DMCs &amp; Experience Producers</span>
+            <span class="page-eyebrow">DMCs &amp; Event Production Companies</span>
           </div>
           <div class="partner-row-body">
-            <p>Event producers compete on atmosphere as much as logistics. We work with DMCs and experience producers at the pitch stage to design projection environments, motion-mapped spaces, and visual installations that answer the question every strong proposal needs to answer: what will this actually feel like?</p>
+            <p>Event production companies and DMCs compete on atmosphere as much as logistics. We work with producers at the pitch stage to design projection environments, motion-mapped spaces, and visual installations that answer the question every strong proposal needs to answer: what will this actually feel like?</p>
           </div>
         </div>
 
@@ -705,7 +798,7 @@
             <span class="page-eyebrow">Fabricators &amp; Build Teams</span>
           </div>
           <div class="partner-row-body">
-            <p>Physical builds set the stage. We add the digital layer: projection content, motion design, and interactive elements that make what you've built feel like more than a structure. We extend what your team already does without adding to your production complexity.</p>
+            <p>Physical builds set the stage. We add the digital layer: projection content, motion design, and interactive elements that make what you've built feel like more than a structure. We extend what your team does without adding to your production complexity.</p>
           </div>
         </div>
 
@@ -752,8 +845,43 @@
       <!-- ── HOW WE WORK ── -->
       <div class="approach reveal">
         <span class="page-eyebrow">How we work</span>
-        <p class="approach-body">We work white-label by default, which means your client relationship stays yours. We handle the full production chain: content design, projection geometry, hardware specification, and on-site calibration.</p>
-        <p class="approach-body">Bring us in at the pitch stage or once the scope is set. Either entry point works.</p>
+        <p class="approach-body">We can support the pitch, the production, or both.</p>
+        <p class="approach-body">At pitch stage, we help shape the visual concept, identify the right technical approach, and create enough clarity for the client to say yes.</p>
+        <p class="approach-body">Once approved, we handle the production layer: content design, projection geometry, hardware planning, vendor coordination, and on-site calibration.</p>
+      </div>
+
+      <!-- ── WHERE WE'RE USEFUL ── -->
+      <div class="useful-section reveal">
+        <span class="page-eyebrow">Where we're useful</span>
+        <ul class="useful-list">
+          <li class="useful-item">The idea is strong but the technical approach is still undefined</li>
+          <li class="useful-item">The pitch needs a visual concept clients can actually picture</li>
+          <li class="useful-item">A room, screen, or build needs a digital layer to feel complete</li>
+          <li class="useful-item">Your team needs specialist production capacity without adding to headcount</li>
+        </ul>
+      </div>
+
+      <!-- ── PARTNER CONFIDENCE ── -->
+      <div class="confidence-section reveal">
+        <span class="page-eyebrow">Common questions</span>
+        <div class="confidence-grid">
+          <div class="confidence-card">
+            <p class="confidence-q">Do you stay invisible to the client?</p>
+            <p class="confidence-a">Yes, when needed. Your client sees your team. Our name never has to appear.</p>
+          </div>
+          <div class="confidence-card">
+            <p class="confidence-q">Can you join pitch calls?</p>
+            <p class="confidence-a">Yes, under your team's lead. We follow your cues on how much to say and to whom.</p>
+          </div>
+          <div class="confidence-card">
+            <p class="confidence-q">Can you spec hardware?</p>
+            <p class="confidence-a">Yes, or we work alongside your preferred AV team if one is already in place.</p>
+          </div>
+          <div class="confidence-card">
+            <p class="confidence-q">Can you work from an existing concept?</p>
+            <p class="confidence-a">Yes, but we'll flag technical gaps early so nothing surfaces as a problem during production.</p>
+          </div>
+        </div>
       </div>
 
       <!-- ── CTA CLOSER ── -->
@@ -771,7 +899,8 @@
         <span class="capability-item">Projection Mapping</span>
         <span class="capability-item">Motion Design</span>
         <span class="capability-item">3D Animation</span>
-        <span class="capability-item">Immersive Environments</span>
+        <span class="capability-item">Immersive Content Production</span>
+        <span class="capability-item">Experiential Production</span>
         <span class="capability-item">White-Label Production</span>
       </div>
 
