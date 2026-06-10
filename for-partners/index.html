@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="For Partners — Higher Roads" />
+  <meta property="og:description" content="Higher Roads works with agencies, event producers, and fabricators as a white-label creative partner for motion design, 3D animation, and immersive environments." />
+  <meta property="og:image" content="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png" />
+  <meta property="og:url" content="https://higher-roads.com/for-partners/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>For Partners — Higher Roads</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root, [data-theme="ember"] {
+      --black: #0a0906;
+      --dark: #181510;
+      --dark-card: #111009;
+      --accent: #e8782a;
+      --accent-dim: #a04f18;
+      --glow: rgba(232, 120, 42, 0.07);
+      --white: #f5ede2;
+      --muted: #6b6057;
+      --border: rgba(232, 120, 42, 0.18);
+    }
+
+    [data-theme="neon-noir"] {
+      --black: #07050f; --dark: #0e0a1a; --dark-card: #09071a;
+      --accent: #f72585; --accent-dim: #7b1fa2;
+      --glow: rgba(183,0,255,0.08); --white: #ede8f5;
+      --muted: #5c5470; --border: rgba(247,37,133,0.2);
+    }
+    [data-theme="ice"] {
+      --black: #050810; --dark: #0a0f1e; --dark-card: #070c18;
+      --accent: #4fc3f7; --accent-dim: #1a6a8a;
+      --glow: rgba(79,195,247,0.07); --white: #e8f4f8;
+      --muted: #4a6070; --border: rgba(79,195,247,0.18);
+    }
+    [data-theme="acid"] {
+      --black: #040a04; --dark: #081208; --dark-card: #060e06;
+      --accent: #39ff14; --accent-dim: #1a7a08;
+      --glow: rgba(57,255,20,0.06); --white: #e8f5e8;
+      --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease both;
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-logo {
+      display: block;
+      height: 32px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--white);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      border-top: 1px solid var(--border);
+      background: var(--black);
+      position: relative;
+      z-index: 10;
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .mobile-nav a:hover { color: var(--white); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      header { padding: 1.5rem; }
+    }
+
+    /* ── HERO ── */
+    .partner-hero {
+      padding: 5.5rem 3rem 4.5rem;
+      animation: fadeUp 0.9s 0.2s ease both;
+    }
+
+    .page-eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .hero-h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4.25rem);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 1.75rem;
+      max-width: 820px;
+    }
+
+    .hero-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--white);
+      opacity: 0.65;
+      max-width: 560px;
+      letter-spacing: 0.01em;
+    }
+
+    @media (max-width: 640px) {
+      .partner-hero { padding: 3.5rem 1.5rem 3rem; }
+    }
+
+    /* ── ACCENT RULE ── */
+    .accent-rule {
+      width: 48px;
+      height: 1px;
+      background: var(--accent-dim);
+      margin: 0 3rem 0;
+    }
+
+    /* ── PARTNER LIST ── */
+    .partner-list {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    .partner-row {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s ease;
+    }
+
+    .partner-row:hover {
+      background: var(--dark);
+    }
+
+    .partner-row-label {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .partner-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 400;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.22;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .partner-row .page-eyebrow {
+      margin-bottom: 0;
+    }
+
+    .partner-row-body {
+      padding: 3rem 3.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .partner-row-body p {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: var(--white);
+      opacity: 0.7;
+      max-width: 640px;
+      letter-spacing: 0.01em;
+    }
+
+    @media (max-width: 860px) {
+      .partner-row { grid-template-columns: 1fr; }
+      .partner-row-label {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        flex-direction: row;
+        align-items: center;
+        gap: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+      .partner-num { font-size: 2.5rem; margin-bottom: 0; }
+      .partner-row-body { padding: 1.75rem 2rem 2.5rem; }
+    }
+
+    @media (max-width: 640px) {
+      .partner-row-label { padding: 1.5rem; }
+      .partner-row-body { padding: 1.5rem; }
+    }
+
+    /* ── PROOF SECTION ── */
+    .proof-section {
+      padding: 4rem 3rem 0;
+    }
+
+    .proof-section .page-eyebrow {
+      margin-bottom: 2rem;
+    }
+
+    .proof-grid {
+      display: flex;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      width: 100%;
+    }
+
+    .proof-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--dark);
+      flex: 1;
+    }
+
+    .proof-item .proof-media {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+    }
+
+    .proof-item .proof-media video,
+    .proof-item .proof-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .proof-item:hover .proof-media img {
+      transform: scale(1.03);
+    }
+
+    .proof-reel {
+      cursor: default;
+    }
+
+    .play-btn {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      transition: opacity 0.25s;
+    }
+
+    .play-btn svg {
+      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
+      transition: transform 0.2s;
+    }
+
+    .play-btn:hover svg { transform: scale(1.1); }
+
+    .play-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .proof-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      pointer-events: none;
+    }
+
+    .proof-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .proof-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .proof-caption {
+      padding: 1.25rem 0 0;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.45;
+      letter-spacing: 0.01em;
+      font-family: 'Rajdhani', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 0.65rem;
+    }
+
+    @media (max-width: 640px) {
+      .proof-section { padding: 3rem 0 0; }
+      .proof-grid { flex-direction: column; }
+      .proof-section .page-eyebrow { padding: 0 1.5rem; }
+      .proof-caption { padding: 1rem 1.5rem 0; }
+    }
+
+    /* ── APPROACH / HOW WE WORK ── */
+    .approach {
+      padding: 4rem 3rem 4.5rem;
+      max-width: 860px;
+      border-top: 1px solid var(--border);
+      margin-top: 4rem;
+    }
+
+    .approach .page-eyebrow {
+      margin-bottom: 1rem;
+    }
+
+    .approach-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--white);
+      opacity: 0.7;
+      letter-spacing: 0.01em;
+    }
+
+    .approach-body + .approach-body {
+      margin-top: 1.1rem;
+    }
+
+    @media (max-width: 640px) {
+      .approach { padding: 2.5rem 1.5rem; }
+    }
+
+    /* ── CTA CLOSER ── */
+    .cta-closer {
+      margin: 0 3rem 6rem;
+      padding: 3rem;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .cta-closer-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .cta-closer-text em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--accent);
+      border: none;
+      padding: 1rem 1.75rem;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-cta:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      .cta-closer {
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 0 1.5rem 4rem;
+        padding: 2rem;
+      }
+    }
+
+    /* ── CAPABILITIES STRIP ── */
+    .capabilities {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .capability-item {
+      flex: 1;
+      min-width: 160px;
+      padding: 1.25rem 2rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-right: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .capability-item:last-child { border-right: none; }
+    .capability-item:hover { color: var(--white); }
+
+    @media (max-width: 640px) {
+      .capability-item { padding: 1rem 1.25rem; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-note {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-email {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-email:hover { color: var(--accent); }
+
+    .theme-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    @media (max-width: 640px) {
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="page">
+
+    <header>
+      <a href="../">
+        <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="../motion/">Motion Design</a>
+        <a href="../3d/">3D Animation</a>
+        <a href="../immersive/">Immersive</a>
+        <a href="mailto:connect@higher-roads.com">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="../motion/">Motion Design</a>
+      <a href="../3d/">3D Animation</a>
+      <a href="../immersive/">Immersive</a>
+      <a href="mailto:connect@higher-roads.com">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- ── HERO ── -->
+      <div class="partner-hero">
+        <span class="page-eyebrow">For Partners</span>
+        <h1 class="hero-h1">We make your most ambitious<br>projects deliverable.</h1>
+        <p class="hero-body">Higher Roads is a Nashville-based creative studio specializing in motion design, 3D animation, and immersive environments. We work with agencies, event producers, and fabricators as a white-label creative partner. Your name is on the work and the client relationship stays yours.</p>
+      </div>
+
+      <div class="accent-rule"></div>
+
+      <!-- ── PARTNER LIST ── -->
+      <div class="partner-list reveal">
+
+        <div class="partner-row">
+          <div class="partner-row-label">
+            <span class="partner-num">01</span>
+            <span class="page-eyebrow">Creative &amp; Brand Agencies</span>
+          </div>
+          <div class="partner-row-body">
+            <p>When a client needs motion, CGI, or an immersive environment, we integrate as the specialist production layer. You stay in the client relationship while we deliver what the brief requires, under your name.</p>
+          </div>
+        </div>
+
+        <div class="partner-row">
+          <div class="partner-row-label">
+            <span class="partner-num">02</span>
+            <span class="page-eyebrow">DMCs &amp; Experience Producers</span>
+          </div>
+          <div class="partner-row-body">
+            <p>Event producers compete on atmosphere as much as logistics. We work with DMCs and experience producers at the pitch stage to design projection environments, motion-mapped spaces, and visual installations that answer the question every strong proposal needs to answer: what will this actually feel like?</p>
+          </div>
+        </div>
+
+        <div class="partner-row">
+          <div class="partner-row-label">
+            <span class="partner-num">03</span>
+            <span class="page-eyebrow">Fabricators &amp; Build Teams</span>
+          </div>
+          <div class="partner-row-body">
+            <p>Physical builds set the stage. We add the digital layer: projection content, motion design, and interactive elements that make what you've built feel like more than a structure. We extend what your team already does without adding to your production complexity.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── PROOF SECTION ── -->
+      <div class="proof-section reveal">
+        <span class="page-eyebrow">What this looks like in practice</span>
+        <div class="proof-grid">
+
+          <!-- Mycopop reel: click-to-play -->
+          <div class="proof-item proof-reel">
+            <div class="proof-media">
+              <video playsinline preload="metadata"
+                poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png"
+                id="proof-video">
+                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+              </video>
+              <button class="play-btn" id="play-btn" aria-label="Play reel">
+                <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                  <polygon points="24,17 48,30 24,43" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Central High building projection -->
+          <div class="proof-item">
+            <div class="proof-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg"
+                alt="Imagine If Buildings Could Talk — projection event" />
+            </div>
+            <div class="proof-overlay">
+              <span class="proof-label">Projection Event</span>
+              <span class="proof-title">Imagine If Buildings Could Talk</span>
+            </div>
+          </div>
+
+        </div>
+        <p class="proof-caption">Built and live in five days: three mapped projection walls, a playable arcade wall, and a full panel backdrop.</p>
+      </div>
+
+      <!-- ── HOW WE WORK ── -->
+      <div class="approach reveal">
+        <span class="page-eyebrow">How we work</span>
+        <p class="approach-body">We work white-label by default, which means your client relationship stays yours. We handle the full production chain: content design, projection geometry, hardware specification, and on-site calibration.</p>
+        <p class="approach-body">Bring us in at the pitch stage or once the scope is set. Either entry point works.</p>
+      </div>
+
+      <!-- ── CTA CLOSER ── -->
+      <div class="cta-closer reveal">
+        <div class="cta-closer-text">
+          Working on something<br>that needs <em>this</em>?
+        </div>
+        <a class="btn-cta" href="mailto:connect@higher-roads.com">
+          connect@higher-roads.com &rarr;
+        </a>
+      </div>
+
+      <!-- ── CAPABILITIES STRIP ── -->
+      <div class="capabilities">
+        <span class="capability-item">Projection Mapping</span>
+        <span class="capability-item">Motion Design</span>
+        <span class="capability-item">3D Animation</span>
+        <span class="capability-item">Immersive Environments</span>
+        <span class="capability-item">White-Label Production</span>
+      </div>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">&copy; 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
+          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
+          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
+          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // ── Hamburger ──
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    // ── Theme switcher ──
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', dot.dataset.t);
+        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // ── Proof video play/pause ──
+    const proofVideo = document.getElementById('proof-video');
+    const playBtn    = document.getElementById('play-btn');
+
+    if (proofVideo && playBtn) {
+      playBtn.addEventListener('click', () => {
+        if (proofVideo.paused) {
+          proofVideo.play();
+          playBtn.classList.add('hidden');
+        }
+      });
+
+      proofVideo.addEventListener('click', () => {
+        if (!proofVideo.paused) {
+          proofVideo.pause();
+          playBtn.classList.remove('hidden');
+        }
+      });
+
+      proofVideo.addEventListener('ended', () => {
+        playBtn.classList.remove('hidden');
+      });
+    }
+
+    // ── Scroll reveal ──
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
