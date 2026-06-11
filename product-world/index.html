@@ -162,6 +162,31 @@ details summary:hover{color:var(--muted)}
 .export-row button{flex:1;padding:8px;font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:transparent;border-radius:4px;cursor:pointer;transition:color 0.2s,border-color 0.2s}
 .export-row button:hover{color:var(--cream);border-color:var(--border2)}
 
+/* Saved projects */
+.saved-wrap{margin-bottom:1.5rem;display:none}
+.saved-title{font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.saved-list{display:grid;gap:6px}
+.saved-item{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 14px}
+.saved-info{flex:1;min-width:0}
+.saved-name{font-family:'Rajdhani',sans-serif;font-size:0.82rem;font-weight:600;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-meta{font-size:0.7rem;color:var(--muted);margin-top:1px}
+.saved-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-notion{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--info);border:1px solid rgba(74,159,212,0.3);background:transparent;padding:3px 10px;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:border-color 0.2s,color 0.2s}
+.btn-notion:hover{color:#fff;border-color:var(--info)}
+.btn-del-saved{font-family:'Rajdhani',sans-serif;font-size:0.62rem;color:var(--dim);background:none;border:none;cursor:pointer;padding:3px 6px;transition:color 0.2s}
+.btn-del-saved:hover{color:var(--error)}
+
+/* Notion save area */
+.notion-save-wrap{margin-top:12px;padding:14px 16px;border:1px solid var(--border);border-radius:5px;background:var(--surface)}
+.notion-save-row{display:flex;align-items:center;gap:10px}
+.btn-save-notion{font-family:'Rajdhani',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--cream);border:1px solid var(--border2);background:transparent;padding:7px 16px;border-radius:4px;cursor:pointer;transition:color 0.2s,border-color 0.2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-save-notion:hover{border-color:var(--info);color:var(--info)}
+.btn-save-notion:disabled{opacity:0.35;cursor:not-allowed}
+.notion-save-status{font-size:0.75rem;flex:1}
+.notion-save-status.ok{color:var(--success)}
+.notion-save-status.err{color:var(--error)}
+.notion-link{color:var(--info);text-decoration:underline;font-size:0.75rem;cursor:pointer}
+
 @media(max-width:600px){
   #app{padding:1.25rem}
   .grid2,.grid3{grid-template-columns:1fr}
@@ -203,6 +228,19 @@ details summary:hover{color:var(--muted)}
     <span class="token-pill">Claude</span>
     <input type="password" id="claude-key" placeholder="Anthropic API key (saved in browser)" autocomplete="off">
     <div class="token-dot" id="claude-dot"></div>
+  </div>
+
+  <!-- Notion token -->
+  <div class="token-bar">
+    <span class="token-pill" style="background:rgba(74,159,212,0.15);color:var(--info)">Notion</span>
+    <input type="password" id="notion-key" placeholder="Notion integration token — secret_... (optional, for saving projects)" autocomplete="off">
+    <div class="token-dot" id="notion-dot"></div>
+  </div>
+
+  <!-- Saved projects -->
+  <div class="saved-wrap" id="saved-wrap">
+    <div class="saved-title">Saved Projects</div>
+    <div class="saved-list" id="saved-list"></div>
   </div>
 
   <!-- Project setup -->
@@ -523,8 +561,12 @@ details summary:hover{color:var(--muted)}
 <script>
 const PASS = 'worldbuilder';
 const CLAUDE_WORKER = 'https://higher-roads-claude.grey-4fe.workers.dev/';
+const NOTION_WORKER = 'https://higher-roads-notion.grey-4fe.workers.dev/';
+const NOTION_DB = '37cd6b444a2580f38e89d0bc3bfbeea3'; // ← paste your Product World Projects database ID here
 const SESSION_KEY = 'hr_world_auth';
 const CLAUDE_STORAGE = 'hr_claude_key';
+const NOTION_STORAGE = 'hr_notion_token';
+const PROJECTS_STORAGE = 'hr_world_projects';
 
 // ── lock ──────────────────────────────────────────────────────────────────────
 function unlock() {
@@ -546,6 +588,7 @@ function showApp() {
   document.getElementById('lock').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   loadToken();
+  renderSavedProjects();
 }
 document.getElementById('lock-input').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
 if (sessionStorage.getItem(SESSION_KEY)==='1') showApp();
@@ -554,13 +597,22 @@ if (sessionStorage.getItem(SESSION_KEY)==='1') showApp();
 function loadToken() {
   const k = localStorage.getItem(CLAUDE_STORAGE);
   if (k) { document.getElementById('claude-key').value = k; updateDot(isValidKey(k)); }
+  const n = localStorage.getItem(NOTION_STORAGE);
+  if (n) { document.getElementById('notion-key').value = n; updateNotionDot(isValidNotion(n)); }
 }
 function isValidKey(v) { return v && v.startsWith('sk-ant-') && v.length > 20; }
+function isValidNotion(v) { return v && (v.startsWith('secret_') || v.startsWith('ntn_')) && v.length > 20; }
 function updateDot(valid) { document.getElementById('claude-dot').classList.toggle('live', valid); }
+function updateNotionDot(valid) { document.getElementById('notion-dot').classList.toggle('live', valid); }
 document.getElementById('claude-key').addEventListener('input', e => {
   const v = e.target.value.trim();
   updateDot(isValidKey(v));
   if (isValidKey(v)) localStorage.setItem(CLAUDE_STORAGE, v);
+});
+document.getElementById('notion-key').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  updateNotionDot(isValidNotion(v));
+  if (isValidNotion(v)) localStorage.setItem(NOTION_STORAGE, v);
 });
 
 // ── checkboxes ────────────────────────────────────────────────────────────────
@@ -901,6 +953,15 @@ function renderOutput(data) {
   html += `<div class="export-row">
     <button id="exp-json" onclick="expJSON()">Copy suite as JSON</button>
     <button id="exp-md" onclick="expMD()">Copy as Markdown</button>
+  </div>
+  <div class="notion-save-wrap">
+    <div class="notion-save-row">
+      <button class="btn-save-notion" id="btn-save-notion" onclick="saveToNotion()">
+        <span>Save to Notion</span>
+        <span class="spinner" id="notion-spinner"></span>
+      </button>
+      <span class="notion-save-status" id="notion-status"></span>
+    </div>
   </div>`;
   wrap.innerHTML = html;
   toggleOut('visual_product_world_brief');
@@ -962,6 +1023,187 @@ function expMD() {
   });
   const btn = document.getElementById('exp-md');
   navigator.clipboard.writeText(md).then(()=>{btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy as Markdown',2000);});
+}
+
+// ── notion save ───────────────────────────────────────────────────────────────
+function rt(text) { return [{ type:'text', text:{ content: String(text||'').slice(0,1990) } }]; }
+function h2b(text) { return { object:'block', type:'heading_2', heading_2:{ rich_text: rt(text) } }; }
+function h3b(text) { return { object:'block', type:'heading_3', heading_3:{ rich_text: rt(text) } }; }
+function parab(text) { return { object:'block', type:'paragraph', paragraph:{ rich_text: rt(text) } }; }
+function bulletb(text) { return { object:'block', type:'bulleted_list_item', bulleted_list_item:{ rich_text: rt(text) } }; }
+function codeb(text) { return { object:'block', type:'code', code:{ rich_text: rt(String(text||'').slice(0,1990)), language:'plain text' } }; }
+function divb() { return { object:'block', type:'divider', divider:{} }; }
+
+function buildNotionBlocks(intake, analysis, output) {
+  const blocks = [];
+  const proj = intake.project || {};
+
+  // Project overview
+  blocks.push(h2b('Project'));
+  if (proj.client)    blocks.push(bulletb(`Client: ${proj.client}`));
+  if (proj.product)   blocks.push(bulletb(`Product: ${proj.product}`));
+  if (proj.sku)       blocks.push(bulletb(`SKU: ${proj.sku}`));
+  if (proj.goal)      blocks.push(bulletb(`Goal: ${proj.goal}`));
+  if (hasAssets())    blocks.push(bulletb(`Assets uploaded — disposition: ${Object.entries(buckets).filter(([,b])=>b.images.length>0).map(([k,b])=>`${k}: ${b.disposition}`).join(', ')}`));
+
+  // World concept
+  const brief = output?.visual_product_world_brief;
+  if (brief?.world_concept) {
+    blocks.push(divb());
+    blocks.push(h2b('World Concept'));
+    blocks.push(parab(brief.world_concept));
+    if (brief.visual_tension) blocks.push(parab(`Visual tension: ${brief.visual_tension}`));
+  }
+
+  // Master prompt
+  if (output?.master_world_prompt) {
+    blocks.push(divb());
+    blocks.push(h2b('Master World Prompt'));
+    blocks.push(codeb(output.master_world_prompt));
+  }
+
+  // Scene prompts
+  if (output?.scene_prompts?.length) {
+    blocks.push(divb());
+    blocks.push(h2b('Scene Prompts'));
+    output.scene_prompts.forEach(s => {
+      blocks.push(h3b(s.scene_name));
+      if (s.commercial_job) blocks.push(parab(`Job: ${s.commercial_job}`));
+      blocks.push(codeb(s.prompt_text));
+      if (s.negative_prompt_text) blocks.push(parab(`Negative: ${s.negative_prompt_text}`));
+    });
+  }
+
+  // Negative prompt
+  if (output?.negative_prompt) {
+    blocks.push(divb());
+    blocks.push(h2b('Global Negative Prompt'));
+    blocks.push(parab(output.negative_prompt));
+  }
+
+  // Creative guardrails
+  if (output?.creative_guardrails?.length) {
+    blocks.push(divb());
+    blocks.push(h2b('Creative Guardrails'));
+    output.creative_guardrails.forEach(g => blocks.push(bulletb(g)));
+  }
+
+  // Full JSON (split across code blocks if needed)
+  blocks.push(divb());
+  blocks.push(h2b('Full Suite JSON'));
+  const json = JSON.stringify(output, null, 2);
+  for (let i = 0; i < json.length; i += 1990) {
+    blocks.push(codeb(json.slice(i, i + 1990)));
+  }
+
+  return blocks;
+}
+
+async function saveToNotion() {
+  const notionKey = document.getElementById('notion-key').value.trim() || localStorage.getItem(NOTION_STORAGE) || '';
+  const statusEl = document.getElementById('notion-status');
+  const saveBtn = document.getElementById('btn-save-notion');
+
+  if (!isValidNotion(notionKey)) {
+    statusEl.textContent = 'Add your Notion integration token first.';
+    statusEl.className = 'notion-save-status err';
+    return;
+  }
+  if (!NOTION_DB) {
+    statusEl.textContent = 'Notion database ID not configured. Add it to NOTION_DB in the file.';
+    statusEl.className = 'notion-save-status err';
+    return;
+  }
+  if (!currentOutput) return;
+
+  saveBtn.disabled = true;
+  statusEl.textContent = 'Saving to Notion...';
+  statusEl.className = 'notion-save-status';
+
+  const intake = buildIntake();
+  const proj = intake.project;
+  const brief = currentOutput?.visual_product_world_brief || {};
+  const name = [proj.client, proj.product, proj.sku].filter(Boolean).join(' — ') || 'Untitled Project';
+
+  const properties = {
+    'Name':       { title: [{ text:{ content: name.slice(0,100) } }] },
+    'Client':     { rich_text: rt(proj.client||'') },
+    'Product':    { rich_text: rt(proj.product||'') },
+    'SKU':        { rich_text: rt(proj.sku||'') },
+    'Status':     { select: { name: 'Generated' } },
+    'Has Assets': { checkbox: hasAssets() }
+  };
+  if (proj.goal) properties['Goal'] = { select: { name: proj.goal } };
+
+  const children = buildNotionBlocks(intake, confirmedAnalysis, currentOutput);
+
+  try {
+    const res = await fetch(NOTION_WORKER, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${notionKey}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({ parent:{ database_id: NOTION_DB }, properties, children })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || `Notion error ${res.status}`);
+
+    // Save to local project list
+    const pageId = data.id;
+    const pageUrl = data.url || `https://notion.so/${pageId.replace(/-/g,'')}`;
+    saveProjectLocally({ id: pageId, name, client: proj.client||'', product: proj.product||'', sku: proj.sku||'', date: new Date().toLocaleDateString(), url: pageUrl });
+
+    statusEl.innerHTML = `Saved. <a class="notion-link" href="${pageUrl}" target="_blank" rel="noopener">Open in Notion ↗</a>`;
+    statusEl.className = 'notion-save-status ok';
+    renderSavedProjects();
+
+  } catch (err) {
+    statusEl.textContent = err.message;
+    statusEl.className = 'notion-save-status err';
+  }
+
+  saveBtn.disabled = false;
+}
+
+// ── local project storage ─────────────────────────────────────────────────────
+function saveProjectLocally(proj) {
+  const list = getSavedProjects();
+  list.unshift(proj);
+  localStorage.setItem(PROJECTS_STORAGE, JSON.stringify(list.slice(0, 20))); // keep last 20
+}
+
+function getSavedProjects() {
+  try { return JSON.parse(localStorage.getItem(PROJECTS_STORAGE) || '[]'); }
+  catch { return []; }
+}
+
+function deleteSavedProject(id) {
+  const list = getSavedProjects().filter(p => p.id !== id);
+  localStorage.setItem(PROJECTS_STORAGE, JSON.stringify(list));
+  renderSavedProjects();
+}
+
+function renderSavedProjects() {
+  const projects = getSavedProjects();
+  const wrap = document.getElementById('saved-wrap');
+  const list = document.getElementById('saved-list');
+  if (!projects.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = projects.map(p => `
+    <div class="saved-item">
+      <div class="saved-info">
+        <div class="saved-name">${e(p.name)}</div>
+        <div class="saved-meta">${e(p.client)} &nbsp;·&nbsp; ${e(p.date)}</div>
+      </div>
+      <div class="saved-actions">
+        <a class="btn-notion" href="${p.url}" target="_blank" rel="noopener">Open in Notion ↗</a>
+        <button class="btn-del-saved" onclick="deleteSavedProject('${p.id}')" title="Remove from list">×</button>
+      </div>
+    </div>`).join('');
 }
 
 // ── utils ─────────────────────────────────────────────────────────────────────
