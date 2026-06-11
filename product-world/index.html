@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product World Builder — Higher Roads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&family=Barlow:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0d0c0a;--cream:#f5f1eb;--muted:rgba(245,241,235,0.5);--dim:rgba(245,241,235,0.2);
+  --border:rgba(245,241,235,0.1);--border2:rgba(245,241,235,0.18);
+  --accent:#e8782a;--accent-dim:rgba(232,120,42,0.15);
+  --surface:rgba(245,241,235,0.04);--surface2:rgba(245,241,235,0.07);
+  --success:#52a87c;--error:#e05252;--info:#4a9fd4;
+}
+body{background:var(--black);color:var(--cream);font-family:'Barlow',sans-serif;font-weight:300;font-size:14px;line-height:1.6;min-height:100vh}
+a{color:inherit;text-decoration:none}
+input,textarea,select{font-family:'Barlow',sans-serif;font-weight:300;font-size:14px;color:var(--cream);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:9px 12px;width:100%;outline:none;transition:border-color 0.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--border2)}
+select option{background:#1a1915}
+textarea{resize:vertical;min-height:70px}
+label{display:block;font-family:'Rajdhani',sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+
+/* Lock */
+#lock{position:fixed;inset:0;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:1.5rem}
+.lock-logo{font-family:'Rajdhani',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.lock-box{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2rem;width:100%;max-width:340px;display:flex;flex-direction:column;gap:1rem}
+.lock-box h2{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:0.08em}
+.lock-err{font-size:0.75rem;color:var(--error);min-height:16px}
+.btn-lock{width:100%;padding:0.75rem;background:var(--accent);color:#fff;border:none;border-radius:4px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.btn-lock:hover{opacity:0.85}
+
+/* Nav */
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(13,12,10,0.9);backdrop-filter:blur(10px);z-index:50}
+.nav-logo{font-family:'Rajdhani',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.nav-label{font-family:'Rajdhani',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--cream)}
+.nav-lock{font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);background:none;border:1px solid var(--border);padding:4px 10px;border-radius:3px;cursor:pointer;transition:color 0.2s,border-color 0.2s}
+.nav-lock:hover{color:var(--cream);border-color:var(--border2)}
+
+/* App */
+#app{display:none;padding:2rem;max-width:780px;margin:0 auto}
+.page-eyebrow{font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem}
+.page-title{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:600;letter-spacing:0.04em;margin-bottom:1.75rem}
+
+/* Token bar */
+.token-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:8px 12px;margin-bottom:8px}
+.token-pill{font-family:'Rajdhani',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:3px;background:rgba(232,120,42,0.2);color:var(--accent);white-space:nowrap;flex-shrink:0}
+.token-bar input{background:transparent;border:none;padding:0;font-size:0.8rem;color:var(--muted)}
+.token-bar input:focus{border:none}
+.token-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background 0.3s}
+.token-dot.live{background:var(--success)}
+
+/* Cards / sections */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem;margin-bottom:1rem}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:0px}
+.field label{margin-bottom:4px}
+
+/* Checkbox groups */
+.check-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.check-item{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:4px 9px;cursor:pointer;transition:border-color 0.2s,background 0.2s;user-select:none}
+.check-item:hover{border-color:var(--border2)}
+.check-item.selected{border-color:var(--accent);background:var(--accent-dim)}
+.check-item span{font-size:0.78rem;color:var(--cream)}
+.check-item input{display:none}
+
+/* Asset upload */
+.bucket{border:1px solid var(--border);border-radius:5px;padding:1rem;margin-bottom:10px}
+.bucket-title{font-family:'Rajdhani',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;color:var(--cream);margin-bottom:3px}
+.bucket-hint{font-size:0.72rem;color:var(--muted);margin-bottom:10px}
+.drop-zone{border:1px dashed var(--border);border-radius:4px;padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.2s}
+.drop-zone:hover{border-color:var(--border2)}
+.drop-zone p{font-size:0.75rem;color:var(--dim);margin-top:3px}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.thumb{position:relative;width:60px;height:60px}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:3px;border:1px solid var(--border)}
+.thumb-del{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+.thumb-del:hover{color:var(--cream)}
+.disp-opts{display:grid;gap:6px;margin-top:10px}
+.disp-opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border);border-radius:4px;padding:10px 12px;cursor:pointer;transition:border-color 0.2s,background 0.2s}
+.disp-opt:hover{border-color:var(--border2)}
+.disp-opt.selected{border-color:var(--accent);background:var(--accent-dim)}
+.disp-opt input[type=radio]{display:none}
+.disp-name{font-family:'Rajdhani',sans-serif;font-size:0.78rem;font-weight:600;color:var(--cream)}
+.disp-desc{font-size:0.7rem;color:var(--muted);margin-top:1px}
+
+/* Buttons */
+.btn-primary{width:100%;padding:0.85rem;background:var(--accent);color:#fff;border:none;border-radius:4px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{opacity:0.88}
+.btn-primary:disabled{opacity:0.35;cursor:not-allowed}
+.btn-secondary{width:100%;padding:0.7rem;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:4px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s}
+.btn-secondary:hover{color:var(--cream);border-color:var(--border2)}
+.btn-copy{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:transparent;padding:3px 10px;border-radius:3px;cursor:pointer;transition:color 0.2s,border-color 0.2s;white-space:nowrap}
+.btn-copy:hover{color:var(--cream);border-color:var(--border2)}
+.btn-copy.copied{color:var(--success);border-color:var(--success)}
+
+/* Spinner */
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Status / error */
+.status-bar{padding:10px 14px;border-radius:4px;font-size:0.78rem;margin-bottom:1rem;display:none}
+.status-bar.err{background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.3);color:var(--error);display:block}
+.status-bar.info{background:rgba(74,159,212,0.08);border:1px solid rgba(74,159,212,0.2);color:var(--info);display:block}
+.status-bar.ok{background:rgba(82,168,124,0.08);border:1px solid rgba(82,168,124,0.2);color:var(--success);display:block}
+
+/* Analysis review */
+.analysis-wrap{border:1px solid rgba(232,120,42,0.4);border-radius:6px;margin-bottom:1rem;overflow:hidden;display:none}
+.analysis-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(232,120,42,0.08);border-bottom:1px solid rgba(232,120,42,0.2)}
+.analysis-hdr-title{font-family:'Rajdhani',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)}
+.analysis-body{padding:1.25rem}
+.color-swatch{display:flex;align-items:center;gap:8px;font-size:0.75rem;margin-bottom:6px}
+.swatch{width:18px;height:18px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.tag{font-size:0.7rem;padding:2px 8px;border-radius:3px;border:1px solid;display:inline-block;margin:2px}
+.tag-warn{border-color:rgba(232,120,42,0.4);color:rgba(232,120,42,0.8);background:rgba(232,120,42,0.06)}
+.tag-ok{border-color:rgba(82,168,124,0.4);color:rgba(82,168,124,0.9);background:rgba(82,168,124,0.06)}
+.analysis-field{margin-bottom:14px}
+.analysis-lbl{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;padding:6px 0}
+details summary:hover{color:var(--muted)}
+
+/* Output */
+.output-wrap{display:none}
+.output-section{border:1px solid var(--border);border-radius:5px;margin-bottom:6px;overflow:hidden}
+.output-trigger{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surface);cursor:pointer;border:none;text-align:left;transition:background 0.2s}
+.output-trigger:hover{background:var(--surface2)}
+.output-trigger.open{background:var(--surface2)}
+.output-trigger-title{font-family:'Rajdhani',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--cream);display:flex;align-items:center;gap:8px}
+.output-trigger-chevron{font-size:0.6rem;color:var(--dim);transition:transform 0.2s}
+.output-trigger.open .output-trigger-chevron{transform:rotate(180deg)}
+.output-body{display:none;padding:1.25rem;border-top:1px solid var(--border);background:rgba(0,0,0,0.2)}
+.output-body.open{display:block}
+.brief-grid{display:grid;gap:8px}
+.brief-row{display:grid;grid-template-columns:170px 1fr;gap:8px;align-items:start}
+.brief-key{font-family:monospace;font-size:0.68rem;color:var(--muted);padding-top:1px}
+.brief-val{font-size:0.82rem;color:var(--cream);line-height:1.55}
+.bible-entry{margin-bottom:14px}
+.entry-lbl{font-family:'Rajdhani',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.entry-list{padding-left:1rem;display:grid;gap:3px}
+.entry-list li{font-size:0.8rem;color:var(--cream);line-height:1.5}
+.entry-text{font-size:0.8rem;color:var(--cream);line-height:1.55}
+.prompt-block{font-size:0.8rem;color:var(--cream);line-height:1.75;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:4px;padding:1rem;margin-bottom:8px}
+.scene-card{border:1px solid var(--border);border-radius:5px;padding:1rem;margin-bottom:10px;background:rgba(0,0,0,0.2)}
+.scene-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.scene-name{font-family:'Rajdhani',sans-serif;font-size:0.88rem;font-weight:600;color:var(--cream);letter-spacing:0.04em}
+.scene-type{font-family:monospace;font-size:0.65rem;color:var(--muted);margin-top:2px}
+.scene-field{margin-bottom:10px}
+.scene-job{font-size:0.78rem;color:var(--accent);font-style:italic;line-height:1.5}
+.scene-prompt{font-size:0.78rem;color:var(--cream);line-height:1.7;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;padding:8px 10px}
+.scene-neg{font-size:0.72rem;color:var(--muted);font-style:italic;line-height:1.5}
+.pill-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.pill{font-family:monospace;font-size:0.62rem;color:var(--muted);border:1px solid var(--border);border-radius:2px;padding:2px 6px}
+.out-list{padding-left:1rem;display:grid;gap:4px}
+.out-list li{font-size:0.8rem;color:var(--cream);line-height:1.5}
+.section-badge{font-family:'Rajdhani',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:2px 7px;border-radius:2px}
+.export-row{display:flex;gap:8px;margin-top:1rem}
+.export-row button{flex:1;padding:8px;font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:transparent;border-radius:4px;cursor:pointer;transition:color 0.2s,border-color 0.2s}
+.export-row button:hover{color:var(--cream);border-color:var(--border2)}
+
+@media(max-width:600px){
+  #app{padding:1.25rem}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .brief-row{grid-template-columns:1fr;gap:2px}
+  nav{padding:0 1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock">
+  <span class="lock-logo">Higher Roads</span>
+  <div class="lock-box">
+    <h2>Team Access</h2>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="lock-input" autocomplete="current-password" placeholder="Enter password">
+    </div>
+    <div class="lock-err" id="lock-err"></div>
+    <button class="btn-lock" onclick="unlock()">Enter</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="../">Higher Roads</a>
+  <span class="nav-label">Product World Builder</span>
+  <button class="nav-lock" onclick="lock()">Lock</button>
+</nav>
+
+<!-- APP -->
+<div id="app">
+  <div class="page-eyebrow">Internal Tool</div>
+  <h1 class="page-title">Visual Product World Builder</h1>
+
+  <!-- Claude token -->
+  <div class="token-bar">
+    <span class="token-pill">Claude</span>
+    <input type="password" id="claude-key" placeholder="Anthropic API key (saved in browser)" autocomplete="off">
+    <div class="token-dot" id="claude-dot"></div>
+  </div>
+
+  <!-- Project setup -->
+  <div class="card">
+    <div class="card-title">Project Setup</div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="field"><label>Client name</label><input type="text" id="f-client" placeholder="e.g. MindBloom"></div>
+      <div class="field"><label>Product name</label><input type="text" id="f-product" placeholder="e.g. Functional Performance Beverage"></div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="field"><label>Category</label><input type="text" id="f-category" placeholder="e.g. Functional Beverage"></div>
+      <div class="field"><label>Primary SKU or flavor</label><input type="text" id="f-sku" placeholder="e.g. White Peach Jasmine Lime"></div>
+    </div>
+    <div class="field">
+      <label>Project goal</label>
+      <select id="f-goal">
+        <option value="">Select goal...</option>
+        <option>Build reusable launch visual system</option>
+        <option>Refresh existing visual identity</option>
+        <option>Improve paid ad creative</option>
+        <option>Improve ecommerce conversion</option>
+        <option>Support retail sell-in</option>
+        <option>Create content library</option>
+        <option>Prepare for SKU expansion</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Product truth -->
+  <div class="card">
+    <div class="card-title">Product Truth</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>What does the product do?</label>
+      <textarea id="f-does" placeholder="e.g. Delivers clean energy and calm focus without crash or anxiety"></textarea>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Top benefits (up to 3)</label>
+      <input type="text" id="f-benefits" placeholder="e.g. Clean sustained energy, calm focused state, daily composure">
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Key ingredients</label>
+      <input type="text" id="f-ingredients" placeholder="e.g. White peach, jasmine, lime, adaptogens, nootropics, mineral water">
+    </div>
+    <div class="field">
+      <label>What should it never be mistaken for?</label>
+      <input type="text" id="f-notfor" placeholder="e.g. Energy drinks, CBD beverages, pharmaceutical supplements">
+    </div>
+  </div>
+
+  <!-- Audience -->
+  <div class="card">
+    <div class="card-title">Audience</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Primary buyer</label>
+      <input type="text" id="f-buyer" placeholder="e.g. Health-conscious high-performers, 28-42, values function over indulgence">
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Desired post-use state (select all that apply)</label>
+      <div class="check-group" id="f-state">
+        <div class="check-item" data-val="Energized"><span>Energized</span></div>
+        <div class="check-item" data-val="Calm"><span>Calm</span></div>
+        <div class="check-item" data-val="Clear"><span>Clear</span></div>
+        <div class="check-item" data-val="Focused"><span>Focused</span></div>
+        <div class="check-item" data-val="Composed"><span>Composed</span></div>
+        <div class="check-item" data-val="Grounded"><span>Grounded</span></div>
+        <div class="check-item" data-val="Social"><span>Social</span></div>
+        <div class="check-item" data-val="Ready"><span>Ready</span></div>
+        <div class="check-item" data-val="Restored"><span>Restored</span></div>
+        <div class="check-item" data-val="Indulgent"><span>Indulgent</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>What are they tired of in the category?</label>
+      <div class="check-group" id="f-tired">
+        <div class="check-item" data-val="Stimulant crash"><span>Stimulant crash</span></div>
+        <div class="check-item" data-val="Artificial ingredients"><span>Artificial ingredients</span></div>
+        <div class="check-item" data-val="Confusing claims"><span>Confusing claims</span></div>
+        <div class="check-item" data-val="Cheap design"><span>Cheap design</span></div>
+        <div class="check-item" data-val="Sugar"><span>Sugar</span></div>
+        <div class="check-item" data-val="High caffeine"><span>High caffeine</span></div>
+        <div class="check-item" data-val="Supplement fatigue"><span>Supplement fatigue</span></div>
+        <div class="check-item" data-val="Poor taste"><span>Poor taste</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand state -->
+  <div class="card">
+    <div class="card-title">Brand State</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>What should the world make people feel?</label>
+      <input type="text" id="f-feel" placeholder="e.g. Clear, capable, and composed without trying too hard">
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Core brand adjectives (up to 5)</label>
+      <div class="check-group" id="f-adj">
+        <div class="check-item" data-val="Clear"><span>Clear</span></div>
+        <div class="check-item" data-val="Energized"><span>Energized</span></div>
+        <div class="check-item" data-val="Composed"><span>Composed</span></div>
+        <div class="check-item" data-val="Premium"><span>Premium</span></div>
+        <div class="check-item" data-val="Disciplined"><span>Disciplined</span></div>
+        <div class="check-item" data-val="Fresh"><span>Fresh</span></div>
+        <div class="check-item" data-val="Modern"><span>Modern</span></div>
+        <div class="check-item" data-val="Playful"><span>Playful</span></div>
+        <div class="check-item" data-val="Bold"><span>Bold</span></div>
+        <div class="check-item" data-val="Grounded"><span>Grounded</span></div>
+        <div class="check-item" data-val="Social"><span>Social</span></div>
+        <div class="check-item" data-val="Indulgent"><span>Indulgent</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>States to avoid</label>
+      <div class="check-group" id="f-avoid">
+        <div class="check-item" data-val="Chaotic"><span>Chaotic</span></div>
+        <div class="check-item" data-val="Clinical"><span>Clinical</span></div>
+        <div class="check-item" data-val="Psychedelic"><span>Psychedelic</span></div>
+        <div class="check-item" data-val="Generic wellness"><span>Generic wellness</span></div>
+        <div class="check-item" data-val="Masculine-heavy"><span>Masculine-heavy</span></div>
+        <div class="check-item" data-val="Feminine-heavy"><span>Feminine-heavy</span></div>
+        <div class="check-item" data-val="Corporate"><span>Corporate</span></div>
+        <div class="check-item" data-val="Cheap"><span>Cheap</span></div>
+        <div class="check-item" data-val="Medical"><span>Medical</span></div>
+        <div class="check-item" data-val="Artificial"><span>Artificial</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual territory -->
+  <div class="card">
+    <div class="card-title">Visual Territory</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>The visual world should feel closest to</label>
+      <div class="check-group" id="f-closest">
+        <div class="check-item" data-val="Premium product photography"><span>Premium product photography</span></div>
+        <div class="check-item" data-val="Natural science"><span>Natural science</span></div>
+        <div class="check-item" data-val="Editorial still life"><span>Editorial still life</span></div>
+        <div class="check-item" data-val="Modern wellness"><span>Modern wellness</span></div>
+        <div class="check-item" data-val="Athletic recovery"><span>Athletic recovery</span></div>
+        <div class="check-item" data-val="Luxury beverage"><span>Luxury beverage</span></div>
+        <div class="check-item" data-val="Cinematic brand film"><span>Cinematic brand film</span></div>
+        <div class="check-item" data-val="Hospitality environment"><span>Hospitality environment</span></div>
+        <div class="check-item" data-val="Futuristic but natural"><span>Futuristic but natural</span></div>
+        <div class="check-item" data-val="Clean CPG"><span>Clean CPG</span></div>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Stay away from</label>
+      <div class="check-group" id="f-away">
+        <div class="check-item" data-val="Neon energy drink"><span>Neon energy drink</span></div>
+        <div class="check-item" data-val="Pharmaceutical lab"><span>Pharmaceutical lab</span></div>
+        <div class="check-item" data-val="CBD smoke shop"><span>CBD smoke shop</span></div>
+        <div class="check-item" data-val="Stock fitness imagery"><span>Stock fitness imagery</span></div>
+        <div class="check-item" data-val="Generic spa wellness"><span>Generic spa wellness</span></div>
+        <div class="check-item" data-val="Overloaded fruit splash"><span>Overloaded fruit splash</span></div>
+        <div class="check-item" data-val="Generic Amazon supplement"><span>Generic Amazon supplement</span></div>
+        <div class="check-item" data-val="Psychedelic art"><span>Psychedelic art</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>What would make this world feel ownable?</label>
+      <textarea id="f-ownable" placeholder="e.g. Where botanical precision meets controlled performance — not serene, not aggressive, exactly composed"></textarea>
+    </div>
+  </div>
+
+  <!-- Sensory -->
+  <div class="card">
+    <div class="card-title">Sensory Inputs</div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="field"><label>Flavor profile</label><input type="text" id="f-flavor" placeholder="e.g. White peach, jasmine, fresh lime, light mineral"></div>
+      <div class="field"><label>Color palette</label><input type="text" id="f-palette" placeholder="e.g. Pale peach, warm cream, soft botanical green"></div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Texture and material cues</label>
+      <div class="check-group" id="f-textures">
+        <div class="check-item" data-val="Condensation on glass"><span>Condensation</span></div>
+        <div class="check-item" data-val="Borosilicate glass"><span>Glass</span></div>
+        <div class="check-item" data-val="Mineral water bubbles"><span>Mineral water</span></div>
+        <div class="check-item" data-val="Botanical petals"><span>Botanical petals</span></div>
+        <div class="check-item" data-val="Pale travertine stone"><span>Stone</span></div>
+        <div class="check-item" data-val="Sunlight diffusion"><span>Sunlight</span></div>
+        <div class="check-item" data-val="Linen fabric"><span>Linen</span></div>
+        <div class="check-item" data-val="Brushed metal"><span>Brushed metal</span></div>
+        <div class="check-item" data-val="Matte paper"><span>Matte paper</span></div>
+        <div class="check-item" data-val="Ice"><span>Ice</span></div>
+        <div class="check-item" data-val="Soft mist"><span>Mist</span></div>
+        <div class="check-item" data-val="Citrus peel"><span>Citrus peel</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Colors to avoid</label>
+      <input type="text" id="f-forbidden-colors" placeholder="e.g. Neon, dark heavy purple, harsh black">
+    </div>
+  </div>
+
+  <!-- Competitive -->
+  <div class="card">
+    <div class="card-title">Competitive Context</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Brands this client admires (and why)</label>
+      <textarea id="f-admires" placeholder="e.g. Recess (calm category ownership), Olipop (ingredient-forward), Aesop (austere premium)"></textarea>
+    </div>
+    <div class="field">
+      <label>Brands to avoid resembling</label>
+      <input type="text" id="f-avoidbrands" placeholder="e.g. Monster, Bang, generic Amazon supplement brands">
+    </div>
+  </div>
+
+  <!-- Asset upload -->
+  <div class="card">
+    <div class="card-title">Brand Assets <span style="font-family:'Barlow',sans-serif;font-size:0.7rem;font-weight:300;letter-spacing:0;text-transform:none;color:var(--dim);margin-left:4px">— optional</span></div>
+
+    <div class="bucket" id="bucket-packaging">
+      <div class="bucket-title">Packaging and product shots</div>
+      <div class="bucket-hint">Can or bottle renders, label files, existing product photography</div>
+      <label class="drop-zone" id="dz-packaging">
+        <div style="font-size:0.78rem;color:var(--muted)">Click to upload images</div>
+        <p>PNG, JPG, WebP</p>
+        <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('packaging',this.files)">
+      </label>
+      <div class="thumbs" id="thumbs-packaging"></div>
+      <div class="disp-opts" id="disp-packaging" style="display:none">
+        <div class="disp-opt selected" data-bucket="packaging" data-val="extend" onclick="setDisp('packaging','extend',this)">
+          <div><div class="disp-name">Extend</div><div class="disp-desc">Build the world outward from this visual language.</div></div>
+        </div>
+        <div class="disp-opt" data-bucket="packaging" data-val="reframe" onclick="setDisp('packaging','reframe',this)">
+          <div><div class="disp-name">Reframe</div><div class="disp-desc">Product appears in the world, but world aesthetic departs deliberately from packaging.</div></div>
+        </div>
+        <div class="disp-opt" data-bucket="packaging" data-val="reference_only" onclick="setDisp('packaging','reference_only',this)">
+          <div><div class="disp-name">Reference only</div><div class="disp-desc">Use for product form recognition only. Ignore aesthetic data.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bucket" id="bucket-brand_guide">
+      <div class="bucket-title">Brand guide or identity</div>
+      <div class="bucket-hint">Brand guide, logo files, typography sheets, color palette documents</div>
+      <label class="drop-zone" id="dz-brand_guide">
+        <div style="font-size:0.78rem;color:var(--muted)">Click to upload images</div>
+        <p>PNG, JPG, WebP</p>
+        <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('brand_guide',this.files)">
+      </label>
+      <div class="thumbs" id="thumbs-brand_guide"></div>
+      <div class="disp-opts" id="disp-brand_guide" style="display:none">
+        <div class="disp-opt selected" data-bucket="brand_guide" data-val="extend" onclick="setDisp('brand_guide','extend',this)">
+          <div><div class="disp-name">Extend</div><div class="disp-desc">Build the world outward from this visual language.</div></div>
+        </div>
+        <div class="disp-opt" data-bucket="brand_guide" data-val="reframe" onclick="setDisp('brand_guide','reframe',this)">
+          <div><div class="disp-name">Reframe</div><div class="disp-desc">Product appears in the world, but world aesthetic departs deliberately from packaging.</div></div>
+        </div>
+        <div class="disp-opt" data-bucket="brand_guide" data-val="reference_only" onclick="setDisp('brand_guide','reference_only',this)">
+          <div><div class="disp-name">Reference only</div><div class="disp-desc">Use for product form recognition only. Ignore aesthetic data.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bucket" id="bucket-campaign">
+      <div class="bucket-title">Existing campaign photography</div>
+      <div class="bucket-hint">Any photography or visual content the brand has produced or approved</div>
+      <label class="drop-zone" id="dz-campaign">
+        <div style="font-size:0.78rem;color:var(--muted)">Click to upload images</div>
+        <p>PNG, JPG, WebP</p>
+        <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('campaign',this.files)">
+      </label>
+      <div class="thumbs" id="thumbs-campaign"></div>
+      <div class="disp-opts" id="disp-campaign" style="display:none">
+        <div class="disp-opt selected" data-bucket="campaign" data-val="extend" onclick="setDisp('campaign','extend',this)">
+          <div><div class="disp-name">Extend</div><div class="disp-desc">Build the world outward from this visual language.</div></div>
+        </div>
+        <div class="disp-opt" data-bucket="campaign" data-val="reframe" onclick="setDisp('campaign','reframe',this)">
+          <div><div class="disp-name">Reframe</div><div class="disp-desc">Product appears in the world, but world aesthetic departs deliberately from packaging.</div></div>
+        </div>
+        <div class="disp-opt" data-bucket="campaign" data-val="reference_only" onclick="setDisp('campaign','reference_only',this)">
+          <div><div class="disp-name">Reference only</div><div class="disp-desc">Use for product form recognition only. Ignore aesthetic data.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="brand-intent-wrap" style="display:none;margin-top:4px">
+      <label>What do you want the world to feel like that your current assets don't communicate? <span style="color:var(--accent)">*</span></label>
+      <textarea id="f-intent" placeholder="e.g. Our can reads as an energy drink but we want to live in the world of morning rituals, botanical precision, and quiet confidence..."></textarea>
+      <div style="font-size:0.7rem;color:var(--dim);margin-top:4px">Required when Reframe or Reference only is selected.</div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="status-bar"></div>
+
+  <!-- Analysis review -->
+  <div class="analysis-wrap" id="analysis-wrap">
+    <div class="analysis-hdr">
+      <span class="analysis-hdr-title">Visual Analysis Complete — Review before generating</span>
+      <button class="btn-copy" onclick="toggleRawAnalysis()">Edit raw JSON</button>
+    </div>
+    <div class="analysis-body" id="analysis-body"></div>
+    <div style="padding:0 1.25rem 1.25rem">
+      <details id="raw-analysis-details">
+        <summary>Raw JSON editor</summary>
+        <textarea id="raw-analysis" style="min-height:180px;margin-top:8px;font-family:monospace;font-size:0.7rem" oninput="parseRawAnalysis()"></textarea>
+        <div style="font-size:0.7rem;color:var(--error);margin-top:4px;display:none" id="parse-err">Invalid JSON</div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Primary CTA -->
+  <div id="cta-area" style="margin-bottom:1rem">
+    <button class="btn-primary" id="primary-btn" onclick="handlePrimary()">
+      <span id="primary-label">Generate Visual Product World</span>
+      <span class="spinner" id="primary-spinner"></span>
+    </button>
+    <div style="font-size:0.7rem;color:var(--accent);text-align:center;margin-top:6px;display:none" id="intent-required">Brand intent statement required when Reframe or Reference only is selected.</div>
+  </div>
+
+  <!-- Output -->
+  <div class="output-wrap" id="output-wrap"></div>
+
+</div><!-- /app -->
+
+<script>
+const PASS = 'worldbuilder';
+const CLAUDE_WORKER = 'https://higher-roads-claude.grey-4fe.workers.dev/';
+const SESSION_KEY = 'hr_world_auth';
+const CLAUDE_STORAGE = 'hr_claude_key';
+
+// ── lock ──────────────────────────────────────────────────────────────────────
+function unlock() {
+  if (document.getElementById('lock-input').value === PASS) {
+    sessionStorage.setItem(SESSION_KEY,'1');
+    document.getElementById('lock-err').textContent = '';
+    showApp();
+  } else {
+    document.getElementById('lock-err').textContent = 'Incorrect password.';
+  }
+}
+function lock() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('lock').style.display = 'flex';
+  document.getElementById('lock-input').value = '';
+}
+function showApp() {
+  document.getElementById('lock').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadToken();
+}
+document.getElementById('lock-input').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
+if (sessionStorage.getItem(SESSION_KEY)==='1') showApp();
+
+// ── token ─────────────────────────────────────────────────────────────────────
+function loadToken() {
+  const k = localStorage.getItem(CLAUDE_STORAGE);
+  if (k) { document.getElementById('claude-key').value = k; updateDot(isValidKey(k)); }
+}
+function isValidKey(v) { return v && v.startsWith('sk-ant-') && v.length > 20; }
+function updateDot(valid) { document.getElementById('claude-dot').classList.toggle('live', valid); }
+document.getElementById('claude-key').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  updateDot(isValidKey(v));
+  if (isValidKey(v)) localStorage.setItem(CLAUDE_STORAGE, v);
+});
+
+// ── checkboxes ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.check-group').forEach(group => {
+  group.querySelectorAll('.check-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('selected'));
+  });
+});
+function getChecked(id) {
+  return Array.from(document.querySelectorAll(`#${id} .check-item.selected`)).map(i => i.dataset.val);
+}
+
+// ── asset upload ──────────────────────────────────────────────────────────────
+const buckets = {
+  packaging: { images: [], disposition: 'extend' },
+  brand_guide: { images: [], disposition: 'extend' },
+  campaign: { images: [], disposition: 'extend' }
+};
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res({ base64: r.result.split(',')[1], mediaType: file.type || 'image/jpeg', name: file.name });
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function handleFiles(bucket, files) {
+  const converted = await Promise.all(Array.from(files).map(fileToBase64));
+  buckets[bucket].images.push(...converted);
+  renderThumbs(bucket);
+  document.getElementById(`disp-${bucket}`).style.display = buckets[bucket].images.length > 0 ? 'grid' : 'none';
+  updateIntentVisibility();
+  updatePrimaryLabel();
+}
+
+function renderThumbs(bucket) {
+  const el = document.getElementById(`thumbs-${bucket}`);
+  el.innerHTML = buckets[bucket].images.map((img, i) => `
+    <div class="thumb">
+      <img src="data:${img.mediaType};base64,${img.base64}" alt="${img.name}">
+      <div class="thumb-del" onclick="removeThumb('${bucket}',${i})">×</div>
+    </div>`).join('');
+}
+
+function removeThumb(bucket, idx) {
+  buckets[bucket].images.splice(idx, 1);
+  renderThumbs(bucket);
+  if (buckets[bucket].images.length === 0) {
+    document.getElementById(`disp-${bucket}`).style.display = 'none';
+    buckets[bucket].disposition = 'extend';
+    document.querySelectorAll(`[data-bucket="${bucket}"]`).forEach((el,i) => el.classList.toggle('selected', i===0));
+  }
+  updateIntentVisibility();
+  updatePrimaryLabel();
+}
+
+function setDisp(bucket, val, el) {
+  buckets[bucket].disposition = val;
+  document.querySelectorAll(`[data-bucket="${bucket}"]`).forEach(e => e.classList.toggle('selected', e.dataset.val === val));
+  updateIntentVisibility();
+}
+
+function hasAssets() { return Object.values(buckets).some(b => b.images.length > 0); }
+function needsIntent() { return Object.values(buckets).some(b => b.images.length > 0 && (b.disposition === 'reframe' || b.disposition === 'reference_only')); }
+
+function updateIntentVisibility() {
+  document.getElementById('brand-intent-wrap').style.display = needsIntent() ? 'block' : 'none';
+  document.getElementById('intent-required').style.display = 'none';
+}
+
+function updatePrimaryLabel() {
+  const label = document.getElementById('primary-label');
+  if (currentPhase === 'analysis_ready') { label.textContent = 'Generate Visual Product World'; return; }
+  label.textContent = hasAssets() ? 'Analyze Assets and Continue' : 'Generate Visual Product World';
+}
+
+// ── intake ────────────────────────────────────────────────────────────────────
+function buildIntake() {
+  return {
+    project: {
+      client: v('f-client'), product: v('f-product'), category: v('f-category'),
+      sku: v('f-sku'), goal: v('f-goal')
+    },
+    product_truth: {
+      what_it_does: v('f-does'), top_benefits: v('f-benefits'),
+      key_ingredients: v('f-ingredients'), avoid_mistaken_for: v('f-notfor')
+    },
+    audience: {
+      primary: v('f-buyer'),
+      desired_state: getChecked('f-state'),
+      tired_of: getChecked('f-tired')
+    },
+    brand_state: {
+      make_people_feel: v('f-feel'),
+      core_adjectives: getChecked('f-adj'),
+      avoid_states: getChecked('f-avoid')
+    },
+    visual_territory: {
+      closest_to: getChecked('f-closest'),
+      stay_away_from: getChecked('f-away'),
+      ownable: v('f-ownable')
+    },
+    sensory: {
+      flavor: v('f-flavor'),
+      textures_and_materials: getChecked('f-textures'),
+      color_palette: v('f-palette'),
+      forbidden_colors: v('f-forbidden-colors')
+    },
+    competitive: {
+      admires: v('f-admires'),
+      avoid_resembling: v('f-avoidbrands')
+    }
+  };
+}
+function v(id) { return document.getElementById(id).value.trim(); }
+
+// ── system prompts ────────────────────────────────────────────────────────────
+const ANALYSIS_SYS = `You are a visual strategist analyzing brand assets for a CPG or beverage brand.
+
+Examine the provided images and return a structured visual inventory as JSON only. No preamble, explanation, or markdown.
+
+{"identified_colors":[{"name":"","approximate_hex":"","usage":"dominant|accent|background|typography"}],"materials_and_surfaces":[],"packaging_form":{"container_type":"","shape_description":"","label_hierarchy":"","notable_elements":[]},"photographic_aesthetic":"","category_associations":[],"visual_equity_worth_preserving":[],"visual_territory_to_escape":[]}
+
+Rules:
+- Approximate hex values for all colors where identifiable
+- Name specific materials (matte black aluminum, frosted glass, textured kraft paper)
+- category_associations: name brands or visual territories this aesthetic resembles
+- visual_equity_worth_preserving: distinctive, ownable elements
+- visual_territory_to_escape: elements that work against premium or differentiated positioning
+- Output only valid JSON`;
+
+const GEN_SYS = `You are a senior creative strategist and prompt architect for premium CPG and beverage brands.
+
+Output only valid JSON. No preamble, explanation, or markdown. Strict length limits are hard constraints.
+
+Schema:
+{"visual_product_world_brief":{"client":"","product":"","audience":"","commercial_goal":"","core_positioning":"","visual_tension":"","world_concept":"","what_the_world_communicates":"","what_the_world_avoids":""},"world_bible":{"core_world_idea":"","visual_constants":[],"sensory_constants":[],"composition_rules":[],"lighting_rules":[],"material_rules":[],"forbidden_territories":[]},"master_world_prompt":"","scene_prompts":[{"scene_type":"","scene_name":"","commercial_job":"","prompt_text":"","negative_prompt_text":"","recommended_crops":[],"recommended_use_cases":[]}],"negative_prompt":"","creative_guardrails":[],"suggested_asset_set":[]}
+
+LENGTH LIMITS (hard):
+- Every brief field: 1 sentence max
+- Every world_bible array: 5 items max, 12 words each
+- master_world_prompt: 80 words max
+- prompt_text per scene: 60 words max
+- negative_prompt_text per scene: 20 words max
+- negative_prompt: 40 words max
+- creative_guardrails: 6 items, 10 words each
+- suggested_asset_set: 6 items
+
+Rules:
+- Generate exactly 6 scene prompts: hero_product_world, flavor_world, benefit_world, lifestyle_ritual, retail_sell_in, motion_loop_concept
+- commercial_job = specific commercial outcome, never aesthetic description
+- Named ingredients and materials, not category terms
+- Specific lighting and composition
+- Avoidances name visual territories, not adjectives
+- When visual_analysis is provided and disposition includes reframe: build world aesthetic in deliberate contrast to identified packaging; name the tension explicitly in world_bible
+- When disposition is reference_only: use visual_analysis only for product form; ignore aesthetic data
+- Do not invent ingredients or claims not in the intake
+- Output only valid JSON`;
+
+// ── api calls ─────────────────────────────────────────────────────────────────
+async function callClaude(system, messages, maxTokens) {
+  const key = document.getElementById('claude-key').value.trim() || localStorage.getItem(CLAUDE_STORAGE) || '';
+  if (!isValidKey(key)) throw new Error('Add your Anthropic API key to continue.');
+  const res = await fetch(CLAUDE_WORKER, {
+    method: 'POST',
+    headers: {
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: maxTokens, system, messages })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  const text = (data.content || []).find(b => b.type === 'text')?.text || '';
+  return text.replace(/```json\n?|```\n?/g, '').trim();
+}
+
+function allImages() {
+  const out = [];
+  Object.entries(buckets).forEach(([key, b]) => b.images.forEach(img => out.push({ ...img, bucket: key, disposition: b.disposition })));
+  return out;
+}
+
+function buildImageBlocks(imgs) {
+  return imgs.map(img => ({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.base64 } }));
+}
+
+// ── phase state ───────────────────────────────────────────────────────────────
+let currentPhase = 'idle'; // idle | analyzing | analysis_ready | generating | done
+let confirmedAnalysis = null;
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status-bar');
+  el.textContent = msg;
+  el.className = `status-bar ${type}`;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setLoading(on, labelText) {
+  const btn = document.getElementById('primary-btn');
+  btn.disabled = on;
+  document.getElementById('primary-label').textContent = labelText;
+  document.getElementById('primary-spinner').style.display = on ? 'inline-block' : 'none';
+}
+
+async function handlePrimary() {
+  if (needsIntent() && !v('f-intent')) {
+    document.getElementById('intent-required').style.display = 'block';
+    return;
+  }
+  document.getElementById('intent-required').style.display = 'none';
+
+  if (currentPhase === 'analysis_ready') {
+    await runGeneration();
+    return;
+  }
+  if (hasAssets()) {
+    await runAnalysis();
+  } else {
+    await runGeneration();
+  }
+}
+
+async function runAnalysis() {
+  currentPhase = 'analyzing';
+  setLoading(true, 'Analyzing assets...');
+  setStatus('', '');
+  document.getElementById('analysis-wrap').style.display = 'none';
+  try {
+    const imgs = allImages();
+    const dispositionSummary = Object.entries(buckets).filter(([,b]) => b.images.length > 0)
+      .map(([k, b]) => `${k}: ${b.disposition}`).join(', ');
+    const context = `Uploaded asset buckets: ${dispositionSummary}. Brand intent: "${v('f-intent') || 'not provided'}". Analyze the uploaded images.`;
+    const raw = await callClaude(ANALYSIS_SYS, [{ role: 'user', content: [...buildImageBlocks(imgs), { type: 'text', text: context }] }], 2000);
+    const parsed = JSON.parse(raw);
+    confirmedAnalysis = parsed;
+    renderAnalysis(parsed);
+    document.getElementById('raw-analysis').value = JSON.stringify(parsed, null, 2);
+    document.getElementById('analysis-wrap').style.display = 'block';
+    currentPhase = 'analysis_ready';
+    setLoading(false, 'Generate Visual Product World');
+    setStatus('Visual analysis complete. Review above, then generate.', 'ok');
+  } catch (e) {
+    currentPhase = 'idle';
+    setLoading(false, 'Analyze Assets and Continue');
+    setStatus(e.message, 'err');
+  }
+}
+
+async function runGeneration() {
+  currentPhase = 'generating';
+  setLoading(true, 'Generating prompt suite...');
+  setStatus('', '');
+  document.getElementById('output-wrap').style.display = 'none';
+  try {
+    const intake = buildIntake();
+    const dispositionCtx = Object.entries(buckets).filter(([,b]) => b.images.length > 0)
+      .map(([k, b]) => `${k}: ${b.disposition}`).join(', ');
+    const analysisCtx = confirmedAnalysis
+      ? `\n\nVISUAL ANALYSIS:\n${JSON.stringify(confirmedAnalysis, null, 2)}\n\nAsset dispositions: ${dispositionCtx}\nBrand intent: "${v('f-intent') || 'not provided'}"`
+      : '';
+    const userMsg = `Generate a Visual Product World prompt suite for this intake:\n\n${JSON.stringify(intake, null, 2)}${analysisCtx}\n\nObey all length limits. Output only valid JSON.`;
+    const raw = await callClaude(GEN_SYS, [{ role: 'user', content: userMsg }], 4000);
+    const parsed = JSON.parse(raw);
+    renderOutput(parsed);
+    currentPhase = 'done';
+    setLoading(false, 'Regenerate');
+    setStatus('', '');
+    document.getElementById('output-wrap').style.display = 'block';
+    document.getElementById('output-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    currentPhase = hasAssets() ? 'analysis_ready' : 'idle';
+    setLoading(false, currentPhase === 'analysis_ready' ? 'Generate Visual Product World' : 'Generate Visual Product World');
+    setStatus(e.message, 'err');
+  }
+}
+
+function parseRawAnalysis() {
+  try {
+    confirmedAnalysis = JSON.parse(document.getElementById('raw-analysis').value);
+    document.getElementById('parse-err').style.display = 'none';
+  } catch {
+    document.getElementById('parse-err').style.display = 'block';
+  }
+}
+
+function toggleRawAnalysis() {
+  const d = document.getElementById('raw-analysis-details');
+  d.open = !d.open;
+}
+
+// ── analysis renderer ─────────────────────────────────────────────────────────
+function renderAnalysis(a) {
+  const el = document.getElementById('analysis-body');
+  let html = '';
+  if (a.identified_colors?.length) {
+    html += `<div class="analysis-field"><div class="analysis-lbl">Identified colors</div>`;
+    html += a.identified_colors.map(c => `<div class="color-swatch"><div class="swatch" style="background:${c.approximate_hex||'#666'}"></div><span style="font-size:0.75rem;color:var(--cream)">${c.name}</span><span style="font-size:0.72rem;color:var(--muted);font-family:monospace">${c.approximate_hex||''}</span><span style="font-size:0.7rem;color:var(--dim)">${c.usage}</span></div>`).join('');
+    html += `</div>`;
+  }
+  if (a.photographic_aesthetic) html += `<div class="analysis-field"><div class="analysis-lbl">Photographic aesthetic</div><div style="font-size:0.8rem;color:var(--cream)">${e(a.photographic_aesthetic)}</div></div>`;
+  if (a.category_associations?.length) {
+    html += `<div class="analysis-field"><div class="analysis-lbl">Category associations</div><div style="display:flex;flex-wrap:wrap;gap:4px">${a.category_associations.map(x=>`<span class="tag tag-warn">${e(x)}</span>`).join('')}</div></div>`;
+  }
+  if (a.visual_equity_worth_preserving?.length) {
+    html += `<div class="analysis-field"><div class="analysis-lbl">Worth preserving</div><ul class="out-list">${a.visual_equity_worth_preserving.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`;
+  }
+  if (a.visual_territory_to_escape?.length) {
+    html += `<div class="analysis-field"><div class="analysis-lbl">Territory to escape</div><div style="display:flex;flex-wrap:wrap;gap:4px">${a.visual_territory_to_escape.map(x=>`<span class="tag tag-warn">${e(x)}</span>`).join('')}</div></div>`;
+  }
+  el.innerHTML = html;
+}
+
+// ── output renderer ───────────────────────────────────────────────────────────
+const OUT_ORDER = ['visual_product_world_brief','world_bible','master_world_prompt','scene_prompts','negative_prompt','creative_guardrails','suggested_asset_set'];
+const OUT_LABELS = { visual_product_world_brief:'Visual Product World Brief', world_bible:'World Bible', master_world_prompt:'Master World Prompt', scene_prompts:'Scene Prompts', negative_prompt:'Global Negative Prompt', creative_guardrails:'Creative Guardrails', suggested_asset_set:'Suggested First Asset Set' };
+
+let currentOutput = null;
+
+function renderOutput(data) {
+  currentOutput = data;
+  const wrap = document.getElementById('output-wrap');
+  let html = '';
+  OUT_ORDER.forEach(key => {
+    if (!data[key]) return;
+    const badge = key === 'scene_prompts' ? `<span class="section-badge">${data[key].length} scenes</span>` : '';
+    html += `<div class="output-section">
+      <button class="output-trigger" onclick="toggleOut('${key}')">
+        <span class="output-trigger-title">${OUT_LABELS[key]}${badge}</span>
+        <span class="output-trigger-chevron" id="chev-${key}">▼</span>
+      </button>
+      <div class="output-body" id="body-${key}">${buildSection(key, data[key])}</div>
+    </div>`;
+  });
+  html += `<div class="export-row">
+    <button id="exp-json" onclick="expJSON()">Copy suite as JSON</button>
+    <button id="exp-md" onclick="expMD()">Copy as Markdown</button>
+  </div>`;
+  wrap.innerHTML = html;
+  toggleOut('visual_product_world_brief');
+}
+
+function toggleOut(key) {
+  const body = document.getElementById(`body-${key}`);
+  const chev = document.getElementById(`chev-${key}`);
+  const trigger = body.previousElementSibling;
+  const open = body.classList.toggle('open');
+  trigger.classList.toggle('open', open);
+  chev.textContent = open ? '▲' : '▼';
+}
+
+function buildSection(key, data) {
+  switch(key) {
+    case 'visual_product_world_brief':
+      return `<div class="brief-grid">${Object.entries(data).map(([k,v])=>`<div class="brief-row"><div class="brief-key">${e(k.replace(/_/g,' '))}</div><div class="brief-val">${e(v)}</div></div>`).join('')}</div>`;
+    case 'world_bible':
+      return Object.entries(data).map(([k,v])=>`<div class="bible-entry"><div class="entry-lbl">${e(k.replace(/_/g,' '))}</div>${Array.isArray(v)?`<ul class="entry-list">${v.map(i=>`<li>${e(i)}</li>`).join('')}</ul>`:`<div class="entry-text">${e(v)}</div>`}</div>`).join('');
+    case 'master_world_prompt':
+      return `<div class="prompt-block">${e(data)}</div><button class="btn-copy" onclick="cp(${JSON.stringify(data)},this)">Copy prompt</button>`;
+    case 'scene_prompts':
+      return data.map(s=>`<div class="scene-card">
+        <div class="scene-hdr"><div><div class="scene-name">${e(s.scene_name)}</div><div class="scene-type">${e(s.scene_type)}</div></div><button class="btn-copy" onclick="cp(${JSON.stringify(s.prompt_text||'')},this)">Copy prompt</button></div>
+        <div class="scene-field"><div class="entry-lbl">Commercial job</div><div class="scene-job">${e(s.commercial_job)}</div></div>
+        <div class="scene-field"><div class="entry-lbl">Prompt</div><div class="scene-prompt">${e(s.prompt_text)}</div></div>
+        ${s.negative_prompt_text?`<div class="scene-field"><div class="entry-lbl">Negative prompt</div><div class="scene-neg">${e(s.negative_prompt_text)}</div></div>`:''}
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          ${s.recommended_crops?.length?`<div><div class="entry-lbl">Crops</div><div class="pill-row">${s.recommended_crops.map(c=>`<span class="pill">${e(c)}</span>`).join('')}</div></div>`:''}
+          ${s.recommended_use_cases?.length?`<div><div class="entry-lbl">Use cases</div><div class="pill-row">${s.recommended_use_cases.map(u=>`<span class="pill">${e(u)}</span>`).join('')}</div></div>`:''}
+        </div>
+      </div>`).join('');
+    case 'negative_prompt':
+      return `<div class="prompt-block" style="font-style:italic">${e(data)}</div><button class="btn-copy" onclick="cp(${JSON.stringify(data)},this)">Copy</button>`;
+    case 'creative_guardrails': case 'suggested_asset_set':
+      return `<ul class="out-list">${(Array.isArray(data)?data:[data]).map(i=>`<li>${e(i)}</li>`).join('')}</ul>`;
+    default: return '';
+  }
+}
+
+function expJSON() {
+  if (!currentOutput) return;
+  const btn = document.getElementById('exp-json');
+  navigator.clipboard.writeText(JSON.stringify(currentOutput, null, 2)).then(() => { btn.textContent = 'Copied ✓'; setTimeout(()=>btn.textContent='Copy suite as JSON',2000); });
+}
+
+function expMD() {
+  if (!currentOutput) return;
+  const d = currentOutput; let md = `# Visual Product World: ${d.visual_product_world_brief?.client||'Project'}\n\n`;
+  OUT_ORDER.forEach(key => {
+    if (!d[key]) return;
+    md += `## ${OUT_LABELS[key]}\n\n`;
+    if (typeof d[key]==='string'){md+=d[key]+'\n\n';}
+    else if(key==='visual_product_world_brief'){Object.entries(d[key]).forEach(([k,v])=>{md+=`**${k.replace(/_/g,' ')}:** ${v}\n\n`;});}
+    else if(key==='world_bible'){Object.entries(d[key]).forEach(([k,v])=>{md+=`### ${k.replace(/_/g,' ')}\n\n`;md+=Array.isArray(v)?v.map(i=>`- ${i}`).join('\n')+'\n\n':v+'\n\n';});}
+    else if(key==='scene_prompts'){d[key].forEach(s=>{md+=`### ${s.scene_name}\n\n**Commercial job:** ${s.commercial_job}\n\n**Prompt:** ${s.prompt_text}\n\n${s.negative_prompt_text?`**Negative:** ${s.negative_prompt_text}\n\n`:''}---\n\n`;});}
+    else if(Array.isArray(d[key])){md+=d[key].map(i=>`- ${i}`).join('\n')+'\n\n';}
+  });
+  const btn = document.getElementById('exp-md');
+  navigator.clipboard.writeText(md).then(()=>{btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy as Markdown',2000);});
+}
+
+// ── utils ─────────────────────────────────────────────────────────────────────
+function e(s){const d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
+function cp(text, btn) {
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('copied'); btn.textContent='Copied';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='Copy prompt';},2000);
+  });
+}
+</script>
+</body>
+</html>
