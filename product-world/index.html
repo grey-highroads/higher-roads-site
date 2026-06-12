@@ -140,8 +140,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem
 .analysis-body{padding:1.25rem}
 .color-swatch{display:flex;align-items:center;gap:8px;font-size:0.75rem;margin-bottom:6px}
 .swatch{width:18px;height:18px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0}
-.tag{font-size:0.7rem;padding:2px 8px;border-radius:3px;border:1px solid;display:inline-block;margin:2px}
+.tag{font-size:0.7rem;padding:2px 8px;border-radius:3px;border:1px solid var(--border2);color:var(--muted);display:inline-block;margin:2px}
 .tag-warn{border-color:rgba(232,120,42,0.4);color:rgba(232,120,42,0.8);background:rgba(232,120,42,0.06)}
+
+/* Comfy packet (Addendum 6) */
+.comfy-packet{border-top:1px solid var(--border);margin-top:10px;padding-top:8px}
+.comfy-packet summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;padding:4px 0}
+.layer-grid{display:grid;gap:4px;margin-bottom:4px}
+.layer-row{display:flex;gap:8px;align-items:baseline;font-size:0.76rem}
+.layer-key{font-family:'Rajdhani',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);min-width:70px;flex-shrink:0}
+.layer-val{color:var(--cream)}
+.layer-neg{font-style:italic;color:var(--muted)}
 .analysis-field{margin-bottom:14px}
 .analysis-lbl{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .per-asset-note{font-size:0.78rem;color:var(--cream);margin-bottom:6px;line-height:1.5}
@@ -696,6 +705,181 @@ const LOCK_INSTRUCTION_TEMPLATES = {
 };
 function defaultPromptInstruction(a){return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status]||LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);}
 
+// ── production handoff (Addendum 6) ─────────────────────────────────────────────
+// Everything in this section is derived client-side from asset_preservation_layer
+// and scene data already produced by Calls 1-3. None of this requires extra API
+// calls or additional model output (beyond prompt_layers/negative_layers, which
+// are generated in Call 3 — see SCENE_SYS).
+
+const RENDER_MODE_BY_STATUS={
+  locked:'locked_asset_composite',
+  mixed:'regional_prompt_composite',
+  editable:'image_reference_required',
+  placeholder:'text_only_worldboard'
+};
+const RENDER_MODE_LABELS={
+  text_only_worldboard:'Text-only worldboard',
+  image_reference_required:'Image reference required',
+  locked_asset_composite:'Locked asset composite',
+  masked_edit:'Masked edit',
+  product_render_composite:'Product render composite',
+  regional_prompt_composite:'Regional prompt composite',
+  motion_reference:'Motion reference'
+};
+const RENDER_MODE_CLASS={
+  text_only_worldboard:'status-editable',
+  image_reference_required:'lock-inspiration_only',
+  locked_asset_composite:'status-locked',
+  masked_edit:'status-locked',
+  product_render_composite:'lock-inspiration_only',
+  regional_prompt_composite:'status-locked',
+  motion_reference:'driver-motion'
+};
+
+function deriveRenderMode(scene){
+  if(scene.scene_driver==='motion'&&(scene.asset_preservation_status==='placeholder'||scene.asset_preservation_status==='editable')){
+    return 'motion_reference';
+  }
+  return RENDER_MODE_BY_STATUS[scene.asset_preservation_status]||'text_only_worldboard';
+}
+function deriveTextOnlySafe(scene){
+  return scene.asset_preservation_status==='placeholder'||scene.asset_preservation_status==='editable';
+}
+function deriveRequiresLockedAssetReference(scene){
+  return scene.asset_preservation_status==='locked'||scene.asset_preservation_status==='mixed';
+}
+
+// Finds which uploaded assets this scene is actually using, by checking whether
+// the asset's name appears in the scene's prompt text (Call 3 is instructed to
+// reference locked/editable assets by name).
+function findRelevantAssets(scene){
+  const text=((scene.prompt_text||'')+' '+(scene.negative_prompt_text||'')).toLowerCase();
+  return assets.filter(a=>a.asset_name&&text.includes(a.asset_name.toLowerCase()));
+}
+
+const GENERIC_EDITABLE_REGIONS=['background','surface','lighting','shadow','reflection','atmosphere','props'];
+
+function deriveProtectedRegions(relevantAssets){
+  const set=new Set();
+  relevantAssets.forEach(a=>{
+    if(a.lock_status==='locked'||a.lock_status==='partially_editable'){
+      (a.preserve_elements||[]).forEach(p=>set.add(p));
+    }
+  });
+  return [...set];
+}
+function deriveEditableRegions(relevantAssets,scene){
+  const set=new Set(GENERIC_EDITABLE_REGIONS);
+  relevantAssets.forEach(a=>{
+    if(a.lock_status==='partially_editable'||a.lock_status==='editable'){
+      (a.editable_elements||[]).forEach(x=>set.add(x));
+    }
+  });
+  if(scene.scene_driver==='people'||(scene.people_present&&scene.people_present!=='none')){
+    set.add('people when scene driver requires people');
+  }
+  return [...set];
+}
+
+// Templated allowed/forbidden transformations per asset_type — what a Comfy
+// workflow may vs. may not do to a referenced asset.
+const ASSET_TRANSFORM_TEMPLATES={
+  logo:{allowed:['scale','position'],forbidden:['redraw_logo','retype_wordmark','recolor_logo','distort_logo']},
+  packaging:{allowed:['scale','position','lighting_match','shadow_integration','reflection_integration'],forbidden:['redraw_logo','retype_label','alter_gradient','change_dosage_callout','change_can_shape','simplify_label_hierarchy','invent_packaging']},
+  dieline:{allowed:['scale','position','lighting_match'],forbidden:['retype_label','alter_gradient','change_pack_proportions']},
+  product_render:{allowed:['scale','position','lighting_match','shadow_integration','reflection_integration'],forbidden:['redraw_product','change_product_shape','invent_packaging_details']},
+  product_photo:{allowed:['scale','position','color_grading_match'],forbidden:['redraw_product','change_product_shape','alter_label']},
+  brand_guideline:{allowed:['reference_only'],forbidden:['redraw_logo','recolor_palette','retype_typography']},
+  color_palette:{allowed:['reference_only'],forbidden:['shift_hue','recolor_palette']},
+  typography:{allowed:['reference_only'],forbidden:['retype_typography','substitute_typeface']},
+  claim_hierarchy:{allowed:['reference_only'],forbidden:['alter_claims','reorder_claims']},
+  default:{allowed:['reference_only'],forbidden:['regenerate_from_description']}
+};
+function preservationLevel(lockStatus){
+  return {locked:'exact',partially_editable:'guided',editable:'flexible',inspiration_only:'reference',avoid:'avoid'}[lockStatus]||'reference';
+}
+function buildRequiredAssets(relevantAssets,scene){
+  return relevantAssets.map(a=>{
+    const tpl=ASSET_TRANSFORM_TEMPLATES[a.asset_type]||ASSET_TRANSFORM_TEMPLATES.default;
+    const role=a.lock_status==='locked'?'locked_product_source':a.lock_status==='partially_editable'?'guided_reference':a.lock_status==='editable'?'editable_starting_point':'inspiration_reference';
+    return{
+      asset_id:a.asset_id,asset_name:a.asset_name,asset_type:a.asset_type,role,
+      use_in_scene:(scene.asset_preservation_status==='locked'||scene.asset_preservation_status==='mixed')?'primary product reference':'visual reference',
+      preservation_level:preservationLevel(a.lock_status),
+      allowed_transformations:tpl.allowed,
+      forbidden_transformations:tpl.forbidden
+    };
+  });
+}
+
+function buildMaskRequirements(protectedRegions,editableRegions){
+  if(!protectedRegions.length) return [];
+  const hasLogoOrLabel=protectedRegions.some(r=>r.includes('logo')||r.includes('label')||r.includes('typography')||r.includes('wordmark'));
+  const masks=[
+    {region:'product',purpose:'protect locked packaging while integrating with generated environment',mask_type:'hard_product_mask',required:true},
+    {region:'logo_and_label',purpose:'prevent logo and typography redraw',mask_type:'protected_detail_mask',required:hasLogoOrLabel},
+    {region:'background',purpose:'generate world environment around protected product',mask_type:'editable_background_mask',required:true}
+  ];
+  return masks.filter(m=>m.required);
+}
+
+function buildQAChecks(protectedRegions,scene){
+  const checks=protectedRegions.map(r=>`${r.charAt(0).toUpperCase()+r.slice(1)} matches locked source asset`);
+  checks.push(`Scene matches assigned scene driver: ${scene.scene_driver||'product'}`);
+  if(scene.scene_driver==='people') checks.push('No stock-model posing, staged cheers, or generic lifestyle clichés');
+  if(scene.scene_driver==='motion') checks.push('Motion direction matches brand-approved behavior, not chaotic or erratic');
+  return checks;
+}
+
+function buildProductionNotes(scene,relevantAssets,protectedRegions,editableRegions){
+  if(!scene.text_only_safe){
+    const lockedNames=relevantAssets.filter(a=>a.lock_status==='locked'||a.lock_status==='partially_editable').map(a=>a.asset_name);
+    const assetList=lockedNames.length?lockedNames.join(', '):'the locked source asset';
+    const editList=editableRegions.slice(0,4).join(', ');
+    const preserveList=protectedRegions.slice(0,4).join(', ')||'locked elements';
+    return `This scene is not text-only safe. Use ${assetList} as protected product source and generate ${editList} around it. Preserve ${preserveList} exactly.`;
+  }
+  if(scene.asset_preservation_status==='editable'){
+    return `This scene is text-only safe. The uploaded reference asset may inform mood and composition but does not need to be preserved exactly.`;
+  }
+  return `This scene is text-only safe. No exact brand asset preservation is required; placeholder packaging and branding are acceptable.`;
+}
+
+// Attaches all derived production-handoff fields to a scene object in place.
+// Order matters: render_mode/text_only_safe/requires_locked_asset_reference and
+// protected/editable regions must be set before production_notes is built.
+function applyProductionHandoff(scene){
+  const relevantAssets=findRelevantAssets(scene);
+  scene.render_mode=deriveRenderMode(scene);
+  scene.text_only_safe=deriveTextOnlySafe(scene);
+  scene.requires_locked_asset_reference=deriveRequiresLockedAssetReference(scene);
+  scene.protected_regions=deriveProtectedRegions(relevantAssets);
+  scene.editable_regions=deriveEditableRegions(relevantAssets,scene);
+  scene.required_assets=buildRequiredAssets(relevantAssets,scene);
+  scene.protected_asset_ids=relevantAssets.filter(a=>a.lock_status==='locked'||a.lock_status==='partially_editable').map(a=>a.asset_id);
+  scene.mask_requirements=buildMaskRequirements(scene.protected_regions,scene.editable_regions);
+  scene.qa_checks=buildQAChecks(scene.protected_regions,scene);
+  scene.production_notes=buildProductionNotes(scene,relevantAssets,scene.protected_regions,scene.editable_regions);
+}
+
+const PRODUCTION_CONTRACT_BASE={
+  locked_asset_policy:"Locked assets must be preserved through reference, mask, composite, or product render control. Text prompting alone is not sufficient for packaging, logo, typography, regulatory, or label fidelity.",
+  scene_generation_strategy:"Generate or edit the world around protected product assets. Do not rely on text generation to recreate locked brand assets."
+};
+function buildProductionContract(zones,overallMode){
+  const acceptable=new Set(),unacceptable=new Set();
+  zones.forEach(z=>(z.scenes||[]).forEach(s=>{
+    (s.editable_regions||[]).forEach(r=>acceptable.add(r));
+    (s.protected_regions||[]).forEach(r=>unacceptable.add(r));
+  }));
+  return{
+    ...PRODUCTION_CONTRACT_BASE,
+    product_fidelity_requirement:overallMode==='world_exploration'?'low':overallMode==='product_accurate'?'high':'mixed',
+    acceptable_worldboard_drift:[...acceptable],
+    unacceptable_drift:[...unacceptable]
+  };
+}
+
 // ── lock ──────────────────────────────────────────────────────────────────────
 function unlock() {
   if (document.getElementById('lock-input').value === PASS) {
@@ -979,7 +1163,9 @@ Rules: each zone must have a distinct commercial_job and a distinct primary_envi
 const SCENE_SYS=`You are a senior creative strategist. Call 3 of 3 — generate one primary scene per zone.
 Return ONLY: {"world_zones":[{"zone_id":"","scenes":[{scene}]}]}
 Output compact JSON with no extra whitespace, indentation, or line breaks — minified, single line.
-Scene schema: {"scene_name":"","commercial_job":"","primary_occasion":"","scene_driver":"product|ingredient|environment|people|motion|retail","people_present":"none|hands_only|partial_figures|full_people|crowd|background_only","occasion_type":"","asset_preservation_status":"locked|placeholder|editable|mixed","prompt_text":"","negative_prompt_text":"","recommended_crops":[],"recommended_use_cases":[],"drift_risks":[],"client_feedback_question":""}
+Scene schema: {"scene_name":"","commercial_job":"","primary_occasion":"","scene_driver":"product|ingredient|environment|people|motion|retail","people_present":"none|hands_only|partial_figures|full_people|crowd|background_only","occasion_type":"","asset_preservation_status":"locked|placeholder|editable|mixed","prompt_text":"","negative_prompt_text":"","prompt_layers":{"global":"","background":"","product":"","surface":"","props":"","lighting":"","people":"","motion":""},"negative_layers":{"global":"","product":"","background":"","typography":"","people":"","motion":""},"recommended_crops":[],"recommended_use_cases":[],"drift_risks":[],"client_feedback_question":""}
+
+PROMPT_LAYERS / NEGATIVE_LAYERS: decompose prompt_text into prompt_layers and negative_prompt_text into negative_layers — this is the SAME creative content split into compositional regions for a node-based workflow, not new or additional material. global = overall mood/style descriptors applying to the whole frame. product = locked/editable asset references and product-specific direction (reuse the same "use the uploaded [asset_name] exactly" phrasing from prompt_text, do not write new asset instructions here). background/surface/props/lighting/people/motion = whichever fragment of prompt_text applies to that region. Leave a layer as "" (empty string) if the scene has nothing for that region — do not pad, invent, or duplicate content to fill empty layers. negative_layers follows the same logic from negative_prompt_text; typography covers logo/wordmark/label legibility constraints. Each populated layer: 4-12 words max.
 
 DEFAULT SCENE_DRIVER per zone (use unless the zone's commercial_job clearly calls for a different driver): signature_product_world → product; ingredient_intelligence → ingredient; benefit_state → people; performance_ritual → environment; retail_precision → retail; motion_protocol → motion. Across the six scenes, scene_driver values should be varied — do not let every scene default to product or ingredient staging.
 
@@ -1211,6 +1397,8 @@ async function runZonesAndScenes(world,worldStr,intakeStr,hasLockedLogo){
       return{...zone,scenes:sz?.scenes||[]};
     });
     currentOutput={...withZones,world_zones:mergedZones};
+    currentOutput.world_zones.forEach(zone=>(zone.scenes||[]).forEach(scene=>applyProductionHandoff(scene)));
+    currentOutput.production_contract=buildProductionContract(currentOutput.world_zones,world.asset_preservation_layer?.overall_mode);
     currentOutput.world_board_summary=buildWorldBoardSummary(currentOutput);
     renderOutput(currentOutput,true);
     markStepDone('scenes');
@@ -1271,8 +1459,8 @@ function renderAnalysis(parsed){
 }
 
 // ── output renderers ──────────────────────────────────────────────────────────
-const OUT_ORDER=['asset_preservation_layer','visual_product_world_brief','world_bible','strict_world','expanded_world','world_zones','audience_environment_translation','world_board_summary','master_world_prompt','negative_prompt','creative_guardrails','forbidden_drift','suggested_asset_set'];
-const OUT_LABELS={asset_preservation_layer:'Asset Preservation Layer',visual_product_world_brief:'Visual Product World Brief',world_bible:'World Bible',strict_world:'Strict World',expanded_world:'Expanded World',world_zones:'World Zones',audience_environment_translation:'Audience → Environment',world_board_summary:'World Board Summary',master_world_prompt:'Master World Prompt',negative_prompt:'Global Negative Prompt',creative_guardrails:'Creative Guardrails',forbidden_drift:'Forbidden Drift',suggested_asset_set:'Suggested First Asset Set'};
+const OUT_ORDER=['asset_preservation_layer','production_contract','visual_product_world_brief','world_bible','strict_world','expanded_world','world_zones','audience_environment_translation','world_board_summary','master_world_prompt','negative_prompt','creative_guardrails','forbidden_drift','suggested_asset_set'];
+const OUT_LABELS={asset_preservation_layer:'Asset Preservation Layer',production_contract:'Production Contract',visual_product_world_brief:'Visual Product World Brief',world_bible:'World Bible',strict_world:'Strict World',expanded_world:'Expanded World',world_zones:'World Zones',audience_environment_translation:'Audience → Environment',world_board_summary:'World Board Summary',master_world_prompt:'Master World Prompt',negative_prompt:'Global Negative Prompt',creative_guardrails:'Creative Guardrails',forbidden_drift:'Forbidden Drift',suggested_asset_set:'Suggested First Asset Set'};
 
 let currentOutput=null;
 
@@ -1329,6 +1517,12 @@ function buildSection(key,data){
   switch(key){
     case 'asset_preservation_layer':
       return buildAPL(data);
+    case 'production_contract':
+      return `<div class="bible-entry"><div class="entry-lbl">Locked asset policy</div><div class="entry-text">${e(data.locked_asset_policy)}</div></div>
+        <div class="bible-entry"><div class="entry-lbl">Scene generation strategy</div><div class="entry-text">${e(data.scene_generation_strategy)}</div></div>
+        <div class="brief-grid" style="margin-bottom:10px"><div class="brief-row"><div class="brief-key">product fidelity requirement</div><div class="brief-val">${e(data.product_fidelity_requirement)}</div></div></div>
+        ${data.acceptable_worldboard_drift?.length?`<div class="bible-entry"><div class="entry-lbl">Acceptable World Board drift</div><div>${data.acceptable_worldboard_drift.map(r=>`<span class="tag">${e(r)}</span>`).join('')}</div></div>`:''}
+        ${data.unacceptable_drift?.length?`<div class="bible-entry"><div class="entry-lbl">Unacceptable drift</div><div>${data.unacceptable_drift.map(r=>`<span class="tag tag-warn">${e(r)}</span>`).join('')}</div></div>`:''}`;
     case 'visual_product_world_brief':
       return `<div class="brief-grid">${Object.entries(data).map(([k,v])=>`<div class="brief-row"><div class="brief-key">${e(k.replace(/_/g,' '))}</div><div class="brief-val">${Array.isArray(v)?v.join(', '):e(String(v||''))}</div></div>`).join('')}</div>`;
     case 'world_bible':
@@ -1464,6 +1658,8 @@ function buildSceneCard(s){
   const rawPrompt=s.prompt_text||'';
   const driverClass=DRIVER_CLASS[s.scene_driver]||'';
   const driverLabel=DRIVER_LABELS[s.scene_driver]||s.scene_driver||'';
+  const renderModeClass=RENDER_MODE_CLASS[s.render_mode]||'';
+  const renderModeLabel=RENDER_MODE_LABELS[s.render_mode]||s.render_mode||'';
   return `<div class="scene-card">
     <div class="scene-hdr">
       <div>
@@ -1472,6 +1668,8 @@ function buildSceneCard(s){
           <span class="status-pill ${statusClass}">${e(s.asset_preservation_status||'placeholder')}</span>
           ${driverLabel?`<span class="status-pill driver-pill ${driverClass}">${e(driverLabel)}</span>`:''}
           ${s.people_present&&s.people_present!=='none'?`<span class="status-pill driver-pill">${e(s.people_present.replace(/_/g,' '))}</span>`:''}
+          ${renderModeLabel?`<span class="status-pill ${renderModeClass}">${e(renderModeLabel)}</span>`:''}
+          ${s.text_only_safe!==undefined?`<span class="status-pill ${s.text_only_safe?'status-editable':'status-locked'}">${s.text_only_safe?'text-only safe':'requires asset reference'}</span>`:''}
         </div>
       </div>
       <button class="btn-copy" onclick="cp(${JSON.stringify(rawPrompt)},this)">Copy prompt</button>
@@ -1486,7 +1684,41 @@ function buildSceneCard(s){
       ${s.recommended_use_cases?.length?`<div><div class="entry-lbl">Use cases</div><div class="pill-row">${s.recommended_use_cases.map(u=>`<span class="pill">${e(u)}</span>`).join('')}</div></div>`:''}
     </div>
     ${s.client_feedback_question?`<div class="scene-field" style="margin-top:8px;margin-bottom:0"><div class="entry-lbl">Client feedback question</div><div class="client-question">${e(s.client_feedback_question)}</div></div>`:''}
+    ${buildComfyPacket(s)}
   </div>`;
+}
+
+function buildComfyPacket(s){
+  if(!s.render_mode) return '';
+  const layerRow=(layers,cls)=>Object.entries(layers||{}).filter(([,v])=>v).map(([k,v])=>`<div class="layer-row"><div class="layer-key">${e(k)}</div><div class="${cls}">${e(v)}</div></div>`).join('');
+  let html=`<details class="comfy-packet">
+    <summary>Comfy packet</summary>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:10px">
+      ${s.protected_regions?.length?`<div><div class="entry-lbl">Protected regions</div><div>${s.protected_regions.map(r=>`<span class="tag tag-warn">${e(r)}</span>`).join('')}</div></div>`:''}
+      ${s.editable_regions?.length?`<div><div class="entry-lbl">Editable regions</div><div>${s.editable_regions.map(r=>`<span class="tag">${e(r)}</span>`).join('')}</div></div>`:''}
+    </div>`;
+  if(s.required_assets?.length){
+    html+=`<div class="entry-lbl">Required assets</div>`;
+    html+=s.required_assets.map(a=>`<div class="apl-asset-card">
+      <div class="apl-asset-hdr"><span class="apl-asset-name">${e(a.asset_name)}</span><span class="asset-badge">${e((a.role||'').replace(/_/g,' '))}</span><span class="asset-badge">${e(a.preservation_level)} preservation</span></div>
+      <div class="apl-asset-instruction">Use: ${e(a.use_in_scene)}<br>Allowed: ${(a.allowed_transformations||[]).map(x=>e(x)).join(', ')}<br>Forbidden: ${(a.forbidden_transformations||[]).map(x=>e(x)).join(', ')}</div>
+    </div>`).join('');
+  }
+  if(s.mask_requirements?.length){
+    html+=`<div class="entry-lbl" style="margin-top:8px">Mask requirements</div><ul class="entry-list">${s.mask_requirements.map(m=>`<li><b>${e(m.region)}</b> (${e(m.mask_type)}) — ${e(m.purpose)}</li>`).join('')}</ul>`;
+  }
+  const promptLayers=layerRow(s.prompt_layers,'layer-val');
+  const negLayers=layerRow(s.negative_layers,'layer-val layer-neg');
+  if(promptLayers) html+=`<div class="entry-lbl" style="margin-top:8px">Prompt layers</div><div class="layer-grid">${promptLayers}</div>`;
+  if(negLayers) html+=`<div class="entry-lbl" style="margin-top:8px">Negative layers</div><div class="layer-grid">${negLayers}</div>`;
+  if(s.qa_checks?.length){
+    html+=`<div class="entry-lbl" style="margin-top:8px">QA checks</div><ul class="entry-list">${s.qa_checks.map(q=>`<li>${e(q)}</li>`).join('')}</ul>`;
+  }
+  if(s.production_notes){
+    html+=`<div class="entry-lbl" style="margin-top:8px">Production notes</div><div class="entry-text">${e(s.production_notes)}</div>`;
+  }
+  html+=`</details>`;
+  return html;
 }
 
 function toggleZone(idx){
@@ -1519,11 +1751,21 @@ function expMD(){
     d.world_zones.forEach(z=>{
       md+=`### ${z.zone_name}\n\n**Commercial job:** ${z.commercial_job}\n\n`;
       if(z.primary_environment) md+=`**Primary environment:** ${z.primary_environment}\n\n`;
-      if(z.scenes?.length) z.scenes.forEach(s=>{md+=`#### ${s.scene_name}${s.scene_driver?` (${s.scene_driver}-led)`:''}\n\n**Job:** ${s.commercial_job}\n\n**Prompt:** ${s.prompt_text}\n\n${s.negative_prompt_text?`**Negative:** ${s.negative_prompt_text}\n\n`:''}${s.client_feedback_question?`**Client question:** ${s.client_feedback_question}\n\n`:''}---\n\n`;});
+      if(z.scenes?.length) z.scenes.forEach(s=>{
+        md+=`#### ${s.scene_name}${s.scene_driver?` (${s.scene_driver}-led)`:''}\n\n**Job:** ${s.commercial_job}\n\n**Prompt:** ${s.prompt_text}\n\n${s.negative_prompt_text?`**Negative:** ${s.negative_prompt_text}\n\n`:''}`;
+        if(s.render_mode) md+=`**Render mode:** ${s.render_mode}  \n**Text-only safe:** ${s.text_only_safe?'Yes':'No'}  \n**Requires locked asset reference:** ${s.requires_locked_asset_reference?'Yes':'No'}\n\n`;
+        md+=`${s.client_feedback_question?`**Client question:** ${s.client_feedback_question}\n\n`:''}---\n\n`;
+      });
     });
   }
   if(d.negative_prompt) md+=`## Global Negative Prompt\n\n${d.negative_prompt}\n\n`;
   if(d.forbidden_drift) md+=`## Forbidden Drift\n\n${Object.entries(d.forbidden_drift).map(([k,v])=>`**${k.replace(/_/g,' ')}:** ${v}`).join('\n\n')}\n\n`;
+  if(d.production_contract){
+    const pc=d.production_contract;
+    md+=`## Production Contract\n\n**Locked asset policy:** ${pc.locked_asset_policy}\n\n**Scene generation strategy:** ${pc.scene_generation_strategy}\n\n**Product fidelity requirement:** ${pc.product_fidelity_requirement}\n\n`;
+    if(pc.acceptable_worldboard_drift?.length) md+=`**Acceptable World Board drift:** ${pc.acceptable_worldboard_drift.join(', ')}\n\n`;
+    if(pc.unacceptable_drift?.length) md+=`**Unacceptable drift:** ${pc.unacceptable_drift.join(', ')}\n\n`;
+  }
   const btn=document.getElementById('exp-md');
   navigator.clipboard.writeText(md).then(()=>{btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy as Markdown',2000);});
 }
@@ -1566,6 +1808,7 @@ function buildNotionBlocks(intake,analysis,output){
       if(z.scenes?.length) z.scenes.forEach(s=>{
         blocks.push(parab(`Scene: ${s.scene_name}${s.scene_driver?` (${s.scene_driver}-led)`:''} — ${s.commercial_job}`));
         blocks.push(codeb(s.prompt_text));
+        if(s.render_mode) blocks.push(bulletb(`Render mode: ${s.render_mode} · Text-only safe: ${s.text_only_safe?'Yes':'No'} · Requires locked asset reference: ${s.requires_locked_asset_reference?'Yes':'No'}`));
         if(s.client_feedback_question) blocks.push(bulletb(`Client question: ${s.client_feedback_question}`));
       });
     });
@@ -1574,6 +1817,15 @@ function buildNotionBlocks(intake,analysis,output){
   if(output?.forbidden_drift){
     blocks.push(divb());blocks.push(h2b('Forbidden Drift'));
     Object.entries(output.forbidden_drift).forEach(([k,v])=>blocks.push(bulletb(`${k.replace(/_/g,' ')}: ${v}`)));
+  }
+  if(output?.production_contract){
+    const pc=output.production_contract;
+    blocks.push(divb());blocks.push(h2b('Production Contract'));
+    blocks.push(parab(`Locked asset policy: ${pc.locked_asset_policy}`));
+    blocks.push(parab(`Scene generation strategy: ${pc.scene_generation_strategy}`));
+    blocks.push(bulletb(`Product fidelity requirement: ${pc.product_fidelity_requirement}`));
+    if(pc.acceptable_worldboard_drift?.length) blocks.push(bulletb(`Acceptable World Board drift: ${pc.acceptable_worldboard_drift.join(', ')}`));
+    if(pc.unacceptable_drift?.length) blocks.push(bulletb(`Unacceptable drift: ${pc.unacceptable_drift.join(', ')}`));
   }
   blocks.push(divb());blocks.push(h2b('Full Suite JSON'));
   const json=JSON.stringify(output,null,2);
