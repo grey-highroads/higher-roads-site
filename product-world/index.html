@@ -680,12 +680,11 @@ function defaultEditableElements(assetType,lockStatus){
 }
 
 const LOCK_INSTRUCTION_TEMPLATES = {
-  locked: a=>`Use the uploaded ${a.asset_name} exactly as supplied. Preserve ${(a.preserve_elements||[]).join(', ')||'all visible details'} precisely. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret. Reference this asset directly rather than describing it.`,
-  partially_editable: a=>`The uploaded ${a.asset_name} may be refined within: ${(a.editable_elements||[]).join(', ')||'approved areas'}. The following must remain unchanged: ${(a.preserve_elements||[]).join(', ')||'core elements'}.${a.forbidden_changes?' '+a.forbidden_changes:''}`,
-  editable: a=>`The uploaded ${a.asset_name} is a draft and may be evolved or redesigned. Use it as a starting point for exploration.`,
-  inspiration_only: a=>`Use the uploaded ${a.asset_name} to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference.`,
-  avoid: a=>`Do not resemble the uploaded ${a.asset_name} in mood, composition, color, materials, or category signals. Treat this as negative creative context.`
-};
+  locked: a=>{
+    const pe=(a.preserve_elements||[]).join(', ');
+    const crossRef=pe?` For cross-referencing against other assets in this project, this asset is the authoritative source for: ${pe}.`:'';
+    return `Use the uploaded ${a.asset_name} exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it.${crossRef}`;
+  },
 function defaultPromptInstruction(a){return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status]||LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);}
 
 // ── lock ──────────────────────────────────────────────────────────────────────
@@ -944,7 +943,7 @@ ASSET_PRESERVATION_LAYER INSTRUCTIONS:
 - For each input asset, output one entry with asset_id, asset_name, asset_type, lock_status copied exactly from input, and a prompt_instruction.
 - If the input asset's prompt_instruction is non-empty, copy it verbatim.
 - Otherwise generate prompt_instruction (max 35 words) following these templates by lock_status:
-  locked: "Use the uploaded [asset_name] exactly as supplied. Preserve [preserve_elements] precisely. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret. Reference this asset directly rather than describing it."
+  locked: "Use the uploaded [asset_name] exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it. If preserve_elements is non-empty, append one sentence: 'For cross-referencing against other assets in this project, this asset is the authoritative source for: [preserve_elements].'"
   partially_editable: "The uploaded [asset_name] may be refined within: [editable_elements]. The following must remain unchanged: [preserve_elements]. [forbidden_changes]"
   editable: "The uploaded [asset_name] is a draft and may be evolved or redesigned. Use it as a starting point for exploration."
   inspiration_only: "Use the uploaded [asset_name] to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference."
