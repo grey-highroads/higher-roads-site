@@ -242,6 +242,10 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
 .export-row button{flex:1;padding:8px;font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:transparent;border-radius:4px;cursor:pointer;transition:color 0.2s,border-color 0.2s}
 .export-row button:hover{color:var(--cream);border-color:var(--border2)}
 
+/* Incomplete generation states */
+.incomplete-banner{background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.3);color:var(--error);font-size:0.8rem;line-height:1.6;border-radius:5px;padding:12px 16px;margin-bottom:10px}
+.generating-note{font-size:0.75rem;color:var(--dim);font-style:italic;text-align:center;padding:10px 0;border-top:1px solid var(--border);margin-top:6px}
+
 /* Saved projects */
 .saved-wrap{margin-bottom:1.5rem;display:none}
 .saved-title{font-family:'Rajdhani',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
@@ -625,7 +629,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
 const PASS = 'worldbuilder';
 const CLAUDE_WORKER = 'https://higher-roads-claude.grey-4fe.workers.dev/';
 const NOTION_WORKER = 'https://higher-roads-notion.grey-4fe.workers.dev/';
-const NOTION_DB = ''; // ← paste your Product World Projects database ID here
+const NOTION_DB = '37cd6b444a2580f38e89d0bc3bfbeea3'; // ← paste your Product World Projects database ID here
 const SESSION_KEY = 'hr_world_auth';
 const CLAUDE_STORAGE = 'hr_claude_key';
 const NOTION_STORAGE = 'hr_notion_token';
@@ -680,37 +684,17 @@ function defaultEditableElements(assetType,lockStatus){
 }
 
 const LOCK_INSTRUCTION_TEMPLATES = {
-  locked: a => {
-    const pe = (a.preserve_elements || []).join(', ');
-    const crossRef = pe
-      ? ` For cross-referencing against other assets in this project, this asset is the authoritative source for: ${pe}.`
-      : '';
+  locked: a=>{
+    const pe=(a.preserve_elements||[]).join(', ');
+    const crossRef=pe?` For cross-referencing against other assets in this project, this asset is the authoritative source for: ${pe}.`:'';
     return `Use the uploaded ${a.asset_name} exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it.${crossRef}`;
   },
-
-  partially_editable: a => {
-    const preserve = (a.preserve_elements || []).join(', ') || 'the marked preserved elements';
-    const editable = (a.editable_elements || []).join(', ') || 'the marked editable elements';
-    const forbidden = a.forbidden_changes ? ` ${a.forbidden_changes}` : '';
-    return `The uploaded ${a.asset_name} may be refined within: ${editable}. The following must remain unchanged: ${preserve}.${forbidden}`;
-  },
-
-  editable: a => {
-    return `The uploaded ${a.asset_name} is a draft and may be evolved or redesigned. Use it as a starting point for exploration.`;
-  },
-
-  inspiration_only: a => {
-    return `Use the uploaded ${a.asset_name} to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference.`;
-  },
-
-  avoid: a => {
-    return `Do not resemble the uploaded ${a.asset_name} in mood, composition, color, materials, or category signals. Treat this as negative creative context.`;
-  }
+  partially_editable: a=>`The uploaded ${a.asset_name} may be refined within: ${(a.editable_elements||[]).join(', ')||'approved areas'}. The following must remain unchanged: ${(a.preserve_elements||[]).join(', ')||'core elements'}.${a.forbidden_changes?' '+a.forbidden_changes:''}`,
+  editable: a=>`The uploaded ${a.asset_name} is a draft and may be evolved or redesigned. Use it as a starting point for exploration.`,
+  inspiration_only: a=>`Use the uploaded ${a.asset_name} to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference.`,
+  avoid: a=>`Do not resemble the uploaded ${a.asset_name} in mood, composition, color, materials, or category signals. Treat this as negative creative context.`
 };
-
-function defaultPromptInstruction(a) {
-  return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status] || LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);
-}
+function defaultPromptInstruction(a){return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status]||LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);}
 
 // ── lock ──────────────────────────────────────────────────────────────────────
 function unlock() {
@@ -976,6 +960,12 @@ ASSET_PRESERVATION_LAYER INSTRUCTIONS:
 - conflict_resolutions: up to 3 entries, 20 words each. Generate an entry whenever a locked or partially_editable asset's preserve_elements could overlap with an editable asset's editable_elements (e.g. a locked logo and an editable packaging redesign). Each entry states which locked element takes precedence over which editable exploration. Empty array if no overlaps.
 - packaging_accuracy_risks: up to 4 items, 10 words each.
 
+DOWNSTREAM SCENE REQUIREMENTS: this world architecture will be used to generate one scene per zone across six drivers — product, ingredient, environment, people, motion, retail (signature_product_world→product, ingredient_intelligence→ingredient, benefit_state→people, performance_ritual→environment, retail_precision→retail, motion_protocol→motion). Unless the intake's brand_state.avoid_states or visual_territory.stay_away_from explicitly excludes people or human presence from this brand's world:
+- creative_guardrails and forbidden_drift.persona_drift must NOT contain an absolute ban on people, models, or consumption moments (e.g. never output something equivalent to "no people or consumption moments visible"). If there's a persona-related risk, phrase it conditionally: people may appear when the scene driver requires them, but avoid [specific clichés like generic stock-model posing, staged cheers, party chaos] — not a blanket exclusion.
+- expanded_world.approved_occasion_range must include at least one occasion involving people or a social context (e.g. paired, group, or social moments), not only solo/product-only occasions.
+- forbidden_drift.motion_drift should block chaotic, erratic, or off-brand motion, not motion itself.
+If the intake DOES explicitly exclude people, absolute bans are correct here, and the people-led scene in Call 3 will be generated as a people-free or hands-only/background-only variant instead.
+
 OTHER LENGTH LIMITS: brief fields 1 sentence each; world_bible arrays 4 items 10 words each; strict_world fields 1 sentence each; expanded_world arrays 3 items each; master_world_prompt 80 words; negative_prompt 40 words; creative_guardrails 6 items 10 words each; forbidden_drift fields 1 sentence each; suggested_asset_set 6 items.
 Output only valid JSON.`;
 
@@ -1020,6 +1010,43 @@ async function callClaude(system, messages) {
   return text.replace(/```json\n?|```\n?/g,'').trim();
 }
 
+// Parses model output as JSON; if direct parsing fails (e.g. stray preamble/trailing text),
+// falls back to extracting the outermost {...} block before giving up.
+function safeJSONParse(raw,label){
+  try{ return JSON.parse(raw); }
+  catch(e){
+    const start=raw.indexOf('{');
+    const end=raw.lastIndexOf('}');
+    if(start>=0&&end>start){
+      try{ return JSON.parse(raw.slice(start,end+1)); }catch(e2){/* fall through */}
+    }
+    throw new Error(`${label} returned invalid JSON (${e.message}). Raw output started with: "${raw.slice(0,120)}..."`);
+  }
+}
+
+// Detects whether any locked asset functions as the brand's logo, even if typed as
+// brand_guideline/color_palette/typography/other rather than asset_type 'logo'.
+function detectLockedLogo(assetList){
+  return assetList.some(a=>
+    a.lock_status==='locked' && (
+      a.asset_type==='logo' ||
+      (a.asset_name||'').toLowerCase().includes('logo') ||
+      (a.preserve_elements||[]).some(x=>x.toLowerCase().includes('logo'))
+    )
+  );
+}
+
+// If the model returns an identical negative_prompt and master_world_prompt (invalid),
+// rebuilds negative_prompt from forbidden_territories and intake avoidances.
+function buildFallbackNegativePrompt(world,intake){
+  const parts=[];
+  if(world.world_bible?.forbidden_territories?.length) parts.push(...world.world_bible.forbidden_territories);
+  if(intake.visual_territory?.stay_away_from?.length) parts.push(...intake.visual_territory.stay_away_from);
+  if(intake.sensory?.forbidden_colors) parts.push(intake.sensory.forbidden_colors);
+  if(intake.brand_state?.avoid_states?.length) parts.push(...intake.brand_state.avoid_states.map(s=>s.toLowerCase()));
+  return parts.length ? parts.slice(0,8).join(', ') : 'low quality, distorted proportions, watermark, text artifacts, generic stock photography';
+}
+
 function buildAnalysisContent(){
   const content=[];
   assets.forEach(a=>{
@@ -1059,6 +1086,10 @@ function markStepDone(step){
 async function handlePrimary(){
   if(needsIntent()&&!v('f-intent')){document.getElementById('intent-required').style.display='block';return;}
   document.getElementById('intent-required').style.display='none';
+  if(currentPhase==='partial_failure'&&lastWorldContext){
+    await runZonesAndScenes(lastWorldContext.world,lastWorldContext.worldStr,lastWorldContext.intakeStr,lastWorldContext.hasLockedLogo);
+    return;
+  }
   if(currentPhase==='analysis_ready'){await runGeneration();return;}
   if(hasAssets()){await runAnalysis();}else{await runGeneration();}
 }
@@ -1072,7 +1103,7 @@ async function runAnalysis(){
   setStep('analyze');
   try{
     const raw=await callClaude(ANALYSIS_SYS,[{role:'user',content:buildAnalysisContent()}]);
-    const parsed=JSON.parse(raw);
+    const parsed=safeJSONParse(raw,'Visual analysis');
     confirmedAnalysis=parsed;
     (parsed.per_asset||[]).forEach(pa=>{
       const a=assets.find(x=>x.asset_id===pa.asset_id);
@@ -1092,6 +1123,8 @@ async function runAnalysis(){
   }
 }
 
+let lastWorldContext=null; // {world, worldStr, intakeStr, hasLockedLogo} — set after Call 1 succeeds, used for retry
+
 async function runGeneration(){
   setStatus('','');
   document.getElementById('output-wrap').style.display='none';
@@ -1110,10 +1143,10 @@ async function runGeneration(){
     setLoading(true,'Building world architecture...');
     setStep('world');
     const worldRaw=await callClaude(WORLD_SYS,[{role:'user',content:`Generate core world architecture for this intake:\n\n${intakeStr}${assetCtx}\n\nOutput only valid JSON.`}]);
-    const world=JSON.parse(worldRaw);
+    const world=safeJSONParse(worldRaw,'World architecture (Call 1)');
 
     // Post-process asset_preservation_layer for robustness
-    const hasLockedLogo=assets.some(a=>a.asset_type==='logo'&&a.lock_status==='locked');
+    const hasLockedLogo=detectLockedLogo(assets);
     if(hasAssets()){
       const modelAssets=world.asset_preservation_layer?.assets||[];
       world.asset_preservation_layer=world.asset_preservation_layer||{};
@@ -1132,18 +1165,37 @@ async function runGeneration(){
     }
     world.asset_preservation_layer.has_locked_logo=hasLockedLogo;
 
-    const worldStr=JSON.stringify(world);
-    renderOutput(world);
-    markStepDone('world');
+    // Guard against negative_prompt duplicating master_world_prompt
+    if(world.negative_prompt&&world.master_world_prompt&&world.negative_prompt.trim()===world.master_world_prompt.trim()){
+      world.negative_prompt=buildFallbackNegativePrompt(world,intake);
+    }
 
+    const worldStr=JSON.stringify(world);
+    renderOutput(world,false);
+    markStepDone('world');
+    lastWorldContext={world,worldStr,intakeStr,hasLockedLogo};
+
+    await runZonesAndScenes(world,worldStr,intakeStr,hasLockedLogo);
+  }catch(e){
+    currentPhase=confirmedAnalysis?'analysis_ready':'idle';
+    setLoading(false,hasAssets()&&currentPhase==='idle'?'Analyze Assets and Continue':'Generate Visual Product World');
+    setStatus(e.message,'err');
+  }
+}
+
+// Calls 2 (Zones) and 3 (Scenes). Separated from runGeneration so a failure here can be
+// retried without re-running Call 1. Only this function's success results in a "done"
+// state with export/Notion controls — anything else leaves the output marked incomplete.
+async function runZonesAndScenes(world,worldStr,intakeStr,hasLockedLogo){
+  try{
     // Call 2: Zones
     currentPhase='zones';
     setLoading(true,'Defining zones...');
     setStep('zones');
     const zonesRaw=await callClaude(ZONES_SYS,[{role:'user',content:`World architecture:\n${worldStr}\n\nIntake:\n${intakeStr}\n\nGenerate 6 zone definitions and 3 AE translations. Output only valid JSON.`}]);
-    const zonesResult=JSON.parse(zonesRaw);
+    const zonesResult=safeJSONParse(zonesRaw,'Zone definitions (Call 2)');
     const withZones={...world,world_zones:zonesResult.world_zones||[],audience_environment_translation:zonesResult.audience_environment_translation||[]};
-    renderOutput(withZones);
+    renderOutput(withZones,false);
     markStepDone('zones');
 
     // Call 3: Scenes
@@ -1152,24 +1204,34 @@ async function runGeneration(){
     setStep('scenes');
     const zonesStr=JSON.stringify({world_zones:withZones.world_zones,audience_environment_translation:withZones.audience_environment_translation});
     const scenesRaw=await callClaude(SCENE_SYS,[{role:'user',content:`World architecture:\n${worldStr}\n\nZones:\n${zonesStr}\n\nIntake:\n${intakeStr}\n\nHAS_LOCKED_LOGO: ${hasLockedLogo}\n\nGenerate one primary scene per zone. Output only valid JSON.`}]);
-    const scenesResult=JSON.parse(scenesRaw);
+    const scenesResult=safeJSONParse(scenesRaw,'Scene generation (Call 3)');
     const mergedZones=withZones.world_zones.map(zone=>{
       const sz=scenesResult.world_zones?.find(z=>z.zone_id===zone.zone_id);
       return{...zone,scenes:sz?.scenes||[]};
     });
     currentOutput={...withZones,world_zones:mergedZones};
     currentOutput.world_board_summary=buildWorldBoardSummary(currentOutput);
-    renderOutput(currentOutput);
+    renderOutput(currentOutput,true);
     markStepDone('scenes');
     currentPhase='done';
     setLoading(false,'Regenerate');
     document.getElementById('output-wrap').style.display='block';
     document.getElementById('output-wrap').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
-    currentPhase=confirmedAnalysis?'analysis_ready':'idle';
-    setLoading(false,hasAssets()&&currentPhase==='idle'?'Analyze Assets and Continue':'Generate Visual Product World');
-    setStatus(e.message,'err');
+    currentPhase='partial_failure';
+    setLoading(false,'Retry Zones & Scenes');
+    setStatus('','');
+    showIncompleteBanner(e.message);
   }
+}
+
+function showIncompleteBanner(message){
+  const wrap=document.getElementById('output-wrap');
+  wrap.insertAdjacentHTML('afterbegin',`<div class="incomplete-banner">
+    <strong>Generation incomplete.</strong> World Zones and Scenes did not finish (${e(message)}). The sections below show World Architecture (Call 1) only — this is not a finished Visual Product World and should not be exported or saved yet. Click "Retry Zones &amp; Scenes" below to continue without regenerating the world architecture.
+  </div>`);
+  wrap.style.display='block';
+  wrap.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function parseRawAnalysis(){
@@ -1213,7 +1275,7 @@ const OUT_LABELS={asset_preservation_layer:'Asset Preservation Layer',visual_pro
 
 let currentOutput=null;
 
-function renderOutput(data){
+function renderOutput(data,final){
   currentOutput=data;
   const wrap=document.getElementById('output-wrap');
   let html='';
@@ -1232,16 +1294,20 @@ function renderOutput(data){
       <div class="output-body" id="body-${key}">${buildSection(key,data[key])}</div>
     </div>`;
   });
-  html+=`<div class="export-row">
-    <button id="exp-json" onclick="expJSON()">Copy suite as JSON</button>
-    <button id="exp-md" onclick="expMD()">Copy as Markdown</button>
-  </div>
-  <div class="notion-save-wrap">
-    <div class="notion-save-row">
-      <button class="btn-save-notion" id="btn-save-notion" onclick="saveToNotion()">Save to Notion</button>
-      <span class="notion-save-status" id="notion-status"></span>
+  if(final){
+    html+=`<div class="export-row">
+      <button id="exp-json" onclick="expJSON()">Copy suite as JSON</button>
+      <button id="exp-md" onclick="expMD()">Copy as Markdown</button>
     </div>
-  </div>`;
+    <div class="notion-save-wrap">
+      <div class="notion-save-row">
+        <button class="btn-save-notion" id="btn-save-notion" onclick="saveToNotion()">Save to Notion</button>
+        <span class="notion-save-status" id="notion-status"></span>
+      </div>
+    </div>`;
+  }else{
+    html+=`<div class="generating-note">Generating remaining sections... export and save will appear once the full suite is ready.</div>`;
+  }
   wrap.innerHTML=html;
   wrap.style.display='block';
   toggleOut('visual_product_world_brief');
