@@ -13,7 +13,7 @@
   --border:rgba(245,241,235,0.1);--border2:rgba(245,241,235,0.18);
   --accent:#e8782a;--accent-dim:rgba(232,120,42,0.15);
   --surface:rgba(245,241,235,0.04);--surface2:rgba(245,241,235,0.07);
-  --success:#52a87c;--error:#e05252;--info:#4a9fd4;
+  --success:#52a87c;--error:#e05252;--info:#4a9fd4;--warn:#d4922a;
 }
 body{background:var(--black);color:var(--cream);font-family:'Barlow',sans-serif;font-weight:300;font-size:14px;line-height:1.6;min-height:100vh}
 a{color:inherit;text-decoration:none}
@@ -67,31 +67,46 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem
 .check-item.selected{border-color:var(--accent);background:var(--accent-dim)}
 .check-item span{font-size:0.78rem;color:var(--cream)}
 
-/* Asset upload */
+/* Asset upload buckets */
 .bucket{border:1px solid var(--border);border-radius:5px;padding:1rem;margin-bottom:10px}
 .bucket-title{font-family:'Rajdhani',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;color:var(--cream);margin-bottom:3px}
 .bucket-hint{font-size:0.72rem;color:var(--muted);margin-bottom:10px}
 .drop-zone{border:1px dashed var(--border);border-radius:4px;padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.2s}
 .drop-zone:hover{border-color:var(--border2)}
 .drop-zone p{font-size:0.75rem;color:var(--dim);margin-top:3px}
-.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.thumb{position:relative;width:60px;height:60px}
-.thumb img{width:100%;height:100%;object-fit:cover;border-radius:3px;border:1px solid var(--border)}
-.thumb-del{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.thumb-del:hover{color:var(--cream)}
-.role-opts{display:grid;gap:5px;margin-top:10px}
-.role-opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border);border-radius:4px;padding:9px 12px;cursor:pointer;transition:border-color 0.2s,background 0.2s}
-.role-opt:hover{border-color:var(--border2)}
-.role-opt.selected{border-color:var(--accent);background:var(--accent-dim)}
-.role-opt input[type=radio]{display:none}
-.role-name{font-family:'Rajdhani',sans-serif;font-size:0.76rem;font-weight:600;color:var(--cream)}
-.role-desc{font-size:0.68rem;color:var(--muted);margin-top:1px}
+
+/* Per-asset cards */
+.asset-card{border:1px solid var(--border);border-radius:5px;margin-top:10px;overflow:hidden;background:rgba(0,0,0,0.15)}
+.asset-card-hdr{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;transition:background 0.2s}
+.asset-card-hdr:hover{background:var(--surface2)}
+.asset-thumb{width:44px;height:44px;object-fit:cover;border-radius:3px;border:1px solid var(--border);flex-shrink:0}
+.asset-card-info{flex:1;min-width:0}
+.asset-card-name{font-size:0.8rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.asset-card-badges{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.asset-badge{font-family:'Rajdhani',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid var(--border);color:var(--muted);white-space:nowrap}
+.asset-badge.lock-locked{color:var(--warn);border-color:rgba(212,146,42,0.4);background:rgba(212,146,42,0.08)}
+.asset-badge.lock-partially_editable{color:var(--info);border-color:rgba(74,159,212,0.4);background:rgba(74,159,212,0.08)}
+.asset-badge.lock-editable{color:var(--success);border-color:rgba(82,168,124,0.4);background:rgba(82,168,124,0.08)}
+.asset-badge.lock-inspiration_only{color:var(--cream);border-color:var(--border2);background:var(--surface2)}
+.asset-badge.lock-avoid{color:var(--error);border-color:rgba(224,82,82,0.4);background:rgba(224,82,82,0.08)}
+.asset-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.asset-del{width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.asset-del:hover{color:var(--cream)}
+.asset-chevron{font-size:0.6rem;color:var(--dim);flex-shrink:0}
+.asset-card-body{padding:12px;border-top:1px solid var(--border);display:grid;gap:10px}
+.chip-multi{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.chip{font-size:0.7rem;padding:3px 9px;border-radius:3px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;transition:border-color 0.2s,color 0.2s,background 0.2s;user-select:none}
+.chip.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--cream)}
+.asset-card-body details summary{margin-top:2px}
+.asset-card-body textarea{min-height:54px}
+.field-hint{font-size:0.68rem;color:var(--dim);margin-top:3px}
 
 /* Generation mode badge */
 .mode-badge{display:none;padding:10px 14px;border-radius:4px;margin-bottom:12px;font-size:0.78rem}
 .mode-badge.exploration{background:rgba(74,159,212,0.08);border:1px solid rgba(74,159,212,0.2);color:var(--info)}
 .mode-badge.accurate{background:rgba(82,168,124,0.08);border:1px solid rgba(82,168,124,0.2);color:var(--success)}
 .mode-badge.evolution{background:var(--accent-dim);border:1px solid rgba(232,120,42,0.3);color:var(--accent)}
+.mode-badge.mixed{background:rgba(212,146,42,0.08);border:1px solid rgba(212,146,42,0.3);color:var(--warn)}
 
 /* Progress steps */
 .progress-steps{display:flex;gap:0;margin-bottom:8px}
@@ -129,6 +144,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 2rem
 .tag-warn{border-color:rgba(232,120,42,0.4);color:rgba(232,120,42,0.8);background:rgba(232,120,42,0.06)}
 .analysis-field{margin-bottom:14px}
 .analysis-lbl{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.per-asset-note{font-size:0.78rem;color:var(--cream);margin-bottom:6px;line-height:1.5}
+.per-asset-note b{color:var(--muted);font-weight:600}
 details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);cursor:pointer;padding:6px 0}
 
 /* Output */
@@ -156,6 +173,12 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
 .entry-text{font-size:0.8rem;color:var(--cream);line-height:1.55}
 .prompt-block{font-size:0.8rem;color:var(--cream);line-height:1.75;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:4px;padding:1rem;margin-bottom:8px}
 
+/* APL output */
+.apl-asset-card{border:1px solid var(--border);border-radius:4px;padding:10px 12px;margin-bottom:8px;background:rgba(0,0,0,0.2)}
+.apl-asset-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.apl-asset-name{font-family:'Rajdhani',sans-serif;font-size:0.78rem;font-weight:600;color:var(--cream)}
+.apl-asset-instruction{font-size:0.78rem;color:var(--cream);line-height:1.55}
+
 /* Zone accordion */
 .zone-acc{border:1px solid var(--border);border-radius:5px;margin-bottom:8px;overflow:hidden}
 .zone-trigger{width:100%;display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px;background:var(--surface);cursor:pointer;border:none;text-align:left;transition:background 0.2s;gap:10px}
@@ -176,7 +199,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
 .scene-prompt{font-size:0.78rem;color:var(--cream);line-height:1.7;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;padding:8px 10px}
 .scene-neg{font-size:0.72rem;color:var(--muted);font-style:italic;line-height:1.5}
 .status-pill{font-family:'Rajdhani',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid}
-.status-locked{color:#d4922a;border-color:rgba(212,146,42,0.4);background:rgba(212,146,42,0.08)}
+.status-locked{color:var(--warn);border-color:rgba(212,146,42,0.4);background:rgba(212,146,42,0.08)}
 .status-placeholder{color:var(--info);border-color:rgba(74,159,212,0.4);background:rgba(74,159,212,0.08)}
 .status-editable{color:var(--success);border-color:rgba(82,168,124,0.4);background:rgba(82,168,124,0.08)}
 .drift-tag{font-size:0.68rem;padding:2px 8px;border-radius:3px;border:1px solid rgba(232,120,42,0.3);color:rgba(232,120,42,0.8);background:rgba(232,120,42,0.06);display:inline-block;margin:2px}
@@ -487,6 +510,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
   <!-- Brand assets -->
   <div class="card">
     <div class="card-title">Brand Assets <span style="font-family:'Barlow',sans-serif;font-size:0.7rem;font-weight:300;letter-spacing:0;text-transform:none;color:var(--dim);margin-left:4px">— optional</span></div>
+    <div class="field-hint" style="margin-bottom:12px">Upload images and Higher Roads will suggest a type, role, and lock status for each. Expand any asset to review or override its rules before generating.</div>
 
     <div class="bucket" id="bucket-packaging">
       <div class="bucket-title">Packaging and product shots</div>
@@ -496,8 +520,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
         <p>PNG, JPG, WebP</p>
         <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('packaging',this.files)">
       </label>
-      <div class="thumbs" id="thumbs-packaging"></div>
-      <div class="role-opts" id="roles-packaging" style="display:none"></div>
+      <div id="assets-packaging"></div>
     </div>
 
     <div class="bucket" id="bucket-brand_guide">
@@ -508,8 +531,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
         <p>PNG, JPG, WebP</p>
         <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('brand_guide',this.files)">
       </label>
-      <div class="thumbs" id="thumbs-brand_guide"></div>
-      <div class="role-opts" id="roles-brand_guide" style="display:none"></div>
+      <div id="assets-brand_guide"></div>
     </div>
 
     <div class="bucket" id="bucket-campaign">
@@ -520,8 +542,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
         <p>PNG, JPG, WebP</p>
         <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('campaign',this.files)">
       </label>
-      <div class="thumbs" id="thumbs-campaign"></div>
-      <div class="role-opts" id="roles-campaign" style="display:none"></div>
+      <div id="assets-campaign"></div>
     </div>
 
     <div class="bucket" id="bucket-references">
@@ -532,14 +553,13 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
         <p>PNG, JPG, WebP</p>
         <input type="file" accept="image/*" multiple style="display:none" onchange="handleFiles('references',this.files)">
       </label>
-      <div class="thumbs" id="thumbs-references"></div>
-      <div class="role-opts" id="roles-references" style="display:none"></div>
+      <div id="assets-references"></div>
     </div>
 
     <div id="brand-intent-wrap" style="display:none;margin-top:4px">
       <label>What do you want the world to feel like that your current assets don't communicate? <span style="color:var(--accent)">*</span></label>
       <textarea id="f-intent" placeholder="e.g. Our can reads as an energy drink but we want to live in the world of morning rituals, botanical precision, and quiet confidence..."></textarea>
-      <div style="font-size:0.7rem;color:var(--dim);margin-top:4px">Required when any asset is not Source of Truth.</div>
+      <div style="font-size:0.7rem;color:var(--dim);margin-top:4px">Required when any asset is not locked as Source of Truth.</div>
     </div>
   </div>
 
@@ -558,7 +578,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
     <div class="analysis-body" id="analysis-body"></div>
     <div style="padding:0 1.25rem 1.25rem">
       <details id="raw-analysis-details">
-        <summary>Raw JSON editor</summary>
+        <summary>Raw JSON editor (global analysis)</summary>
         <textarea id="raw-analysis" style="min-height:160px;margin-top:8px;font-family:monospace;font-size:0.7rem" oninput="parseRawAnalysis()"></textarea>
         <div style="font-size:0.7rem;color:var(--error);margin-top:4px;display:none" id="parse-err">Invalid JSON</div>
       </details>
@@ -577,7 +597,7 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
       <span id="primary-label">Generate Visual Product World</span>
       <span class="spinner" id="primary-spinner"></span>
     </button>
-    <div style="font-size:0.7rem;color:var(--accent);text-align:center;margin-top:6px;display:none" id="intent-required">Brand intent required when assets are not Source of Truth.</div>
+    <div style="font-size:0.7rem;color:var(--accent);text-align:center;margin-top:6px;display:none" id="intent-required">Brand intent required when an asset is not locked as Source of Truth.</div>
   </div>
 
   <!-- Output -->
@@ -595,14 +615,62 @@ const CLAUDE_STORAGE = 'hr_claude_key';
 const NOTION_STORAGE = 'hr_notion_token';
 const PROJECTS_STORAGE = 'hr_world_projects';
 
-const BUCKET_DEFAULTS = { packaging:'source_of_truth', brand_guide:'source_of_truth', campaign:'source_of_truth', references:'world_influence' };
-const ROLE_OPTIONS = [
-  { value:'source_of_truth', label:'My brand asset — preserve exactly', desc:'Logo, packaging, approved artwork, product photos' },
-  { value:'world_influence', label:'Visual inspiration — use directionally', desc:'Moodboards, lighting refs, material refs, style direction' },
-  { value:'competitor_reference', label:'Competitor reference — avoid copying', desc:'Category brands for differentiation context' },
-  { value:'avoid_reference', label:'Off-brand reference — avoid', desc:'Visual territory the brand must not resemble' },
-  { value:'editable', label:'Editable draft — changes allowed', desc:'Draft packaging, early concept renders, exploratory logos' }
-];
+// ── per-asset taxonomy ────────────────────────────────────────────────────────
+const BUCKET_DEFAULT_TYPE = { packaging:'packaging', brand_guide:'brand_guideline', campaign:'product_photo', references:'moodboard' };
+
+const ASSET_TYPE_OPTIONS = ['logo','packaging','dieline','product_photo','product_render','brand_guideline','color_palette','typography','claim_hierarchy','moodboard','competitor_reference','avoid_reference','other'];
+const ASSET_TYPE_LABELS = { logo:'Logo', packaging:'Packaging', dieline:'Dieline', product_photo:'Product Photo', product_render:'Product Render', brand_guideline:'Brand Guideline', color_palette:'Color Palette', typography:'Typography', claim_hierarchy:'Claim Hierarchy', moodboard:'Moodboard', competitor_reference:'Competitor Reference', avoid_reference:'Avoid Reference', other:'Other' };
+
+const ASSET_ROLE_OPTIONS = ['source_of_truth','editable_asset','world_influence','competitor_reference','avoid_reference'];
+const ASSET_ROLE_LABELS = { source_of_truth:'Source of Truth', editable_asset:'Editable Asset', world_influence:'World Influence', competitor_reference:'Competitor Reference', avoid_reference:'Avoid Reference' };
+
+const LOCK_STATUS_OPTIONS = ['locked','partially_editable','editable','inspiration_only','avoid'];
+const LOCK_STATUS_LABELS = { locked:'Locked', partially_editable:'Partially Editable', editable:'Editable', inspiration_only:'Inspiration Only', avoid:'Avoid' };
+
+const PRESERVE_ELEMENT_OPTIONS = ['logo shape','logo typography','logo color','product shape','can format','label hierarchy','claims','flavor name','color palette','materials','layout','illustration style','iconography','pack proportions'];
+const EDITABLE_ELEMENT_OPTIONS = ['background world','lighting','materials','label layout','supporting graphics','secondary typography','claims hierarchy','color accents','surface finish','composition','prop styling','environment','ingredient styling'];
+
+function defaultAssetRole(assetType){
+  const map={logo:'source_of_truth',packaging:'source_of_truth',dieline:'source_of_truth',product_photo:'source_of_truth',product_render:'source_of_truth',brand_guideline:'source_of_truth',color_palette:'source_of_truth',typography:'source_of_truth',claim_hierarchy:'source_of_truth',moodboard:'world_influence',other:'world_influence',competitor_reference:'competitor_reference',avoid_reference:'avoid_reference'};
+  return map[assetType]||'world_influence';
+}
+function defaultLockStatus(assetRole){
+  const map={source_of_truth:'locked',editable_asset:'editable',world_influence:'inspiration_only',competitor_reference:'avoid',avoid_reference:'avoid'};
+  return map[assetRole]||'inspiration_only';
+}
+function defaultPreserveElements(assetType,lockStatus){
+  if(lockStatus!=='locked'&&lockStatus!=='partially_editable') return [];
+  const map={
+    logo:['logo shape','logo typography','logo color'],
+    packaging: lockStatus==='locked'?['can format','label hierarchy','pack proportions','color palette']:['pack proportions'],
+    dieline:['pack proportions','label hierarchy'],
+    product_photo:['product shape','color palette'],
+    product_render:['product shape'],
+    brand_guideline:['color palette','logo typography','logo color'],
+    color_palette:['color palette'],
+    typography:['logo typography'],
+    claim_hierarchy:['claims']
+  };
+  return map[assetType]||[];
+}
+function defaultEditableElements(assetType,lockStatus){
+  if(lockStatus!=='partially_editable'&&lockStatus!=='editable') return [];
+  const map={
+    packaging:['label layout','surface finish','color accents','composition'],
+    dieline:['label layout','surface finish'],
+    product_render:['lighting','materials','surface finish','environment']
+  };
+  return map[assetType]||['background world','lighting','composition'];
+}
+
+const LOCK_INSTRUCTION_TEMPLATES = {
+  locked: a=>`Use the uploaded ${a.asset_name} exactly as supplied. Preserve ${(a.preserve_elements||[]).join(', ')||'all visible details'} precisely. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret. Reference this asset directly rather than describing it.`,
+  partially_editable: a=>`The uploaded ${a.asset_name} may be refined within: ${(a.editable_elements||[]).join(', ')||'approved areas'}. The following must remain unchanged: ${(a.preserve_elements||[]).join(', ')||'core elements'}.${a.forbidden_changes?' '+a.forbidden_changes:''}`,
+  editable: a=>`The uploaded ${a.asset_name} is a draft and may be evolved or redesigned. Use it as a starting point for exploration.`,
+  inspiration_only: a=>`Use the uploaded ${a.asset_name} to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference.`,
+  avoid: a=>`Do not resemble the uploaded ${a.asset_name} in mood, composition, color, materials, or category signals. Treat this as negative creative context.`
+};
+function defaultPromptInstruction(a){return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status]||LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);}
 
 // ── lock ──────────────────────────────────────────────────────────────────────
 function unlock() {
@@ -648,8 +716,9 @@ document.querySelectorAll('.check-group').forEach(group=>{
 });
 function getChecked(id){return Array.from(document.querySelectorAll(`#${id} .check-item.selected`)).map(i=>i.dataset.val);}
 
-// ── asset upload ──────────────────────────────────────────────────────────────
-const buckets={packaging:{images:[],role:'source_of_truth'},brand_guide:{images:[],role:'source_of_truth'},campaign:{images:[],role:'source_of_truth'},references:{images:[],role:'world_influence'}};
+// ── per-asset state ───────────────────────────────────────────────────────────
+let assets=[];
+let assetIdCounter=0;
 
 function fileToBase64(file){
   return new Promise((res,rej)=>{
@@ -661,71 +730,154 @@ function fileToBase64(file){
 
 async function handleFiles(bucket,files){
   const converted=await Promise.all(Array.from(files).map(fileToBase64));
-  buckets[bucket].images.push(...converted);
-  renderThumbs(bucket);
-  renderRoleOpts(bucket);
+  converted.forEach(img=>{
+    const asset_type=BUCKET_DEFAULT_TYPE[bucket]||'other';
+    const asset_role=defaultAssetRole(asset_type);
+    const lock_status=defaultLockStatus(asset_role);
+    assets.push({
+      asset_id:'a'+(++assetIdCounter),
+      bucket,
+      name:img.name,
+      base64:img.base64,
+      mediaType:img.mediaType,
+      asset_name:img.name.replace(/\.[^/.]+$/,''),
+      asset_type,
+      asset_role,
+      lock_status,
+      preserve_elements:defaultPreserveElements(asset_type,lock_status),
+      editable_elements:defaultEditableElements(asset_type,lock_status),
+      forbidden_changes:'',
+      prompt_instruction:'',
+      analysis_summary:'',
+      expanded:false
+    });
+  });
+  renderAssetCards(bucket);
   updateModeDisplay();
   updateIntentVisibility();
   updatePrimaryLabel();
 }
 
-function renderThumbs(bucket){
-  document.getElementById(`thumbs-${bucket}`).innerHTML=buckets[bucket].images.map((img,i)=>`
-    <div class="thumb">
-      <img src="data:${img.mediaType};base64,${img.base64}" alt="${img.name}">
-      <div class="thumb-del" onclick="removeThumb('${bucket}',${i})">×</div>
+function assetsForBucket(bucket){return assets.filter(a=>a.bucket===bucket);}
+
+function renderAssetCards(bucket){
+  const el=document.getElementById(`assets-${bucket}`);
+  el.innerHTML=assetsForBucket(bucket).map(a=>`
+    <div class="asset-card" data-id="${a.asset_id}">
+      <div class="asset-card-hdr" onclick="toggleAssetCard('${a.asset_id}')">
+        <img class="asset-thumb" src="data:${a.mediaType};base64,${a.base64}" alt="${e(a.name)}">
+        <div class="asset-card-info">
+          <div class="asset-card-name">${e(a.asset_name)}</div>
+          <div class="asset-card-badges">
+            <span class="asset-badge">${ASSET_TYPE_LABELS[a.asset_type]||a.asset_type}</span>
+            <span class="asset-badge lock-${a.lock_status}">${LOCK_STATUS_LABELS[a.lock_status]||a.lock_status}</span>
+          </div>
+        </div>
+        <div class="asset-card-actions">
+          <button class="asset-del" onclick="event.stopPropagation();removeAsset('${a.asset_id}')" title="Remove">×</button>
+          <span class="asset-chevron">${a.expanded?'▲':'▼'}</span>
+        </div>
+      </div>
+      ${a.expanded?buildAssetCardBody(a):''}
     </div>`).join('');
 }
 
-function renderRoleOpts(bucket){
-  const el=document.getElementById(`roles-${bucket}`);
-  if(!buckets[bucket].images.length){el.style.display='none';return;}
-  el.style.display='grid';
-  el.innerHTML=ROLE_OPTIONS.map(opt=>`
-    <div class="role-opt${buckets[bucket].role===opt.value?' selected':''}" data-bucket="${bucket}" data-val="${opt.value}" onclick="setRole('${bucket}','${opt.value}',this)">
-      <div><div class="role-name">${opt.label}</div><div class="role-desc">${opt.desc}</div></div>
-    </div>`).join('');
+function buildAssetCardBody(a){
+  const showPreserve = a.lock_status==='locked'||a.lock_status==='partially_editable';
+  const showEditable = a.lock_status==='partially_editable'||a.lock_status==='editable';
+  return `<div class="asset-card-body">
+    <div class="grid2">
+      <div class="field"><label>Asset name</label><input type="text" value="${e(a.asset_name)}" oninput="updateAsset('${a.asset_id}','asset_name',this.value,false)"></div>
+      <div class="field"><label>Asset type</label><select onchange="updateAsset('${a.asset_id}','asset_type',this.value,false)">${ASSET_TYPE_OPTIONS.map(t=>`<option value="${t}"${a.asset_type===t?' selected':''}>${ASSET_TYPE_LABELS[t]}</option>`).join('')}</select></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Asset role</label><select onchange="updateAsset('${a.asset_id}','asset_role',this.value,false)">${ASSET_ROLE_OPTIONS.map(r=>`<option value="${r}"${a.asset_role===r?' selected':''}>${ASSET_ROLE_LABELS[r]}</option>`).join('')}</select></div>
+      <div class="field"><label>Lock status</label><select onchange="updateAsset('${a.asset_id}','lock_status',this.value,true)">${LOCK_STATUS_OPTIONS.map(s=>`<option value="${s}"${a.lock_status===s?' selected':''}>${LOCK_STATUS_LABELS[s]}</option>`).join('')}</select></div>
+    </div>
+    ${showPreserve?`<div class="field"><label>Preserve elements</label><div class="chip-multi">${PRESERVE_ELEMENT_OPTIONS.map(opt=>`<span class="chip${a.preserve_elements.includes(opt)?' selected':''}" onclick="toggleAssetElement('${a.asset_id}','preserve_elements','${opt}')">${opt}</span>`).join('')}</div></div>`:''}
+    ${showEditable?`<div class="field"><label>Editable elements</label><div class="chip-multi">${EDITABLE_ELEMENT_OPTIONS.map(opt=>`<span class="chip${a.editable_elements.includes(opt)?' selected':''}" onclick="toggleAssetElement('${a.asset_id}','editable_elements','${opt}')">${opt}</span>`).join('')}</div></div>`:''}
+    <div class="field"><label>Forbidden changes <span style="text-transform:none;font-weight:300;color:var(--dim)">(optional)</span></label><textarea placeholder="e.g. Never alter the wordmark or substitute a different typeface" oninput="updateAsset('${a.asset_id}','forbidden_changes',this.value,false)">${e(a.forbidden_changes)}</textarea></div>
+    <details${a.prompt_instruction?' open':''}>
+      <summary>Prompt instruction override</summary>
+      <textarea style="margin-top:8px" placeholder="Leave blank to auto-generate from lock status" oninput="updateAsset('${a.asset_id}','prompt_instruction',this.value,false)">${e(a.prompt_instruction)}</textarea>
+      <div class="field-hint">If left blank, Higher Roads generates an instruction based on lock status and preserve/editable elements.</div>
+    </details>
+  </div>`;
 }
 
-function removeThumb(bucket,idx){
-  buckets[bucket].images.splice(idx,1);
-  renderThumbs(bucket);
-  renderRoleOpts(bucket);
+function toggleAssetCard(id){
+  const a=assets.find(x=>x.asset_id===id);
+  if(!a) return;
+  a.expanded=!a.expanded;
+  renderAssetCards(a.bucket);
+}
+
+function removeAsset(id){
+  const a=assets.find(x=>x.asset_id===id);
+  if(!a) return;
+  const bucket=a.bucket;
+  assets=assets.filter(x=>x.asset_id!==id);
+  renderAssetCards(bucket);
   updateModeDisplay();
   updateIntentVisibility();
   updatePrimaryLabel();
 }
 
-function setRole(bucket,val){
-  buckets[bucket].role=val;
-  document.querySelectorAll(`[data-bucket="${bucket}"]`).forEach(el=>el.classList.toggle('selected',el.dataset.val===val));
+function updateAsset(id,field,value,recascade){
+  const a=assets.find(x=>x.asset_id===id);
+  if(!a) return;
+  a[field]=value;
+  if(recascade && field==='lock_status'){
+    a.preserve_elements=defaultPreserveElements(a.asset_type,a.lock_status);
+    a.editable_elements=defaultEditableElements(a.asset_type,a.lock_status);
+  }
+  if(field==='asset_type'||field==='asset_role'||field==='lock_status'){
+    renderAssetCards(a.bucket);
+  }
   updateModeDisplay();
   updateIntentVisibility();
 }
 
-function hasAssets(){return Object.values(buckets).some(b=>b.images.length>0);}
-function hasSourceOfTruth(){return Object.values(buckets).some(b=>b.images.length>0&&b.role==='source_of_truth');}
-function hasEditable(){return Object.values(buckets).some(b=>b.images.length>0&&b.role==='editable');}
+function toggleAssetElement(id,field,value){
+  const a=assets.find(x=>x.asset_id===id);
+  if(!a) return;
+  const list=a[field];
+  const idx=list.indexOf(value);
+  if(idx>=0) list.splice(idx,1); else list.push(value);
+  renderAssetCards(a.bucket);
+}
 
-function getGenerationMode(){
-  if(!hasAssets()) return 'world_exploration';
-  if(hasSourceOfTruth()) return 'product_accurate';
-  if(hasEditable()) return 'brand_evolution';
+function hasAssets(){return assets.length>0;}
+
+function needsIntent(){
+  return assets.some(a=>a.asset_role!=='source_of_truth');
+}
+
+function getOverallMode(){
+  if(!assets.length) return 'world_exploration';
+  const meaningful=assets.filter(a=>['locked','partially_editable','editable'].includes(a.lock_status));
+  if(!meaningful.length) return 'world_exploration';
+  const statuses=new Set(meaningful.map(a=>a.lock_status));
+  if(statuses.size>1) return 'mixed';
+  const s=[...statuses][0];
+  if(s==='locked'||s==='partially_editable') return 'product_accurate';
+  if(s==='editable') return 'brand_evolution';
   return 'world_exploration';
 }
 
 function updateModeDisplay(){
-  const mode=getGenerationMode();
+  const mode=getOverallMode();
   const badge=document.getElementById('mode-badge');
-  const labels={world_exploration:'World Exploration mode — no source-of-truth assets uploaded, packaging may be placeholder',product_accurate:'Product-Accurate mode — uploaded assets will be preserved exactly as locked references',brand_evolution:'Brand Evolution mode — editable assets may be refined or transformed'};
-  const classes={world_exploration:'exploration',product_accurate:'accurate',brand_evolution:'evolution'};
+  const labels={
+    world_exploration:'World Exploration mode — no locked or editable source assets, packaging may be placeholder',
+    product_accurate:'Product-Accurate mode — locked assets will be preserved exactly as supplied references',
+    brand_evolution:'Brand Evolution mode — editable assets may be refined or transformed',
+    mixed:'Mixed mode — some assets are locked references while others are editable or inspiration; per-asset rules will be applied'
+  };
+  const classes={world_exploration:'exploration',product_accurate:'accurate',brand_evolution:'evolution',mixed:'mixed'};
   badge.textContent=labels[mode];
   badge.className='mode-badge '+classes[mode];
   badge.style.display=hasAssets()?'block':'none';
-}
-
-function needsIntent(){
-  return Object.values(buckets).some(b=>b.images.length>0&&b.role!=='source_of_truth');
 }
 
 function updateIntentVisibility(){
@@ -739,6 +891,14 @@ function updatePrimaryLabel(){
   label.textContent=hasAssets()?'Analyze Assets and Continue':'Generate Visual Product World';
 }
 
+function buildAssetRulesPayload(){
+  return assets.map(a=>({
+    asset_id:a.asset_id,asset_name:a.asset_name,asset_type:a.asset_type,asset_role:a.asset_role,lock_status:a.lock_status,
+    preserve_elements:a.preserve_elements,editable_elements:a.editable_elements,forbidden_changes:a.forbidden_changes,
+    analysis_summary:a.analysis_summary,prompt_instruction:a.prompt_instruction
+  }));
+}
+
 // ── intake ────────────────────────────────────────────────────────────────────
 function buildIntake(){
   return {
@@ -749,21 +909,35 @@ function buildIntake(){
     visual_territory:{closest_to:getChecked('f-closest'),stay_away_from:getChecked('f-away'),ownable:v('f-ownable')},
     sensory:{flavor:v('f-flavor'),textures_and_materials:getChecked('f-textures'),color_palette:v('f-palette'),forbidden_colors:v('f-forbidden-colors')},
     competitive:{admires:v('f-admires'),avoid_resembling:v('f-avoidbrands')},
-    assets:{mode:getGenerationMode(),has_source_of_truth:hasSourceOfTruth(),brand_intent:v('f-intent')}
+    assets:{mode:getOverallMode(),brand_intent:v('f-intent')}
   };
 }
 function v(id){return document.getElementById(id).value.trim();}
 
 // ── system prompts ────────────────────────────────────────────────────────────
-const ANALYSIS_SYS=`You are a visual strategist analyzing brand assets for a CPG or beverage brand. Examine the images and return a structured visual inventory as JSON only. No preamble or markdown.
-{"identified_colors":[{"name":"","approximate_hex":"","usage":"dominant|accent|background|typography"}],"materials_and_surfaces":[],"packaging_form":{"container_type":"","shape_description":"","label_hierarchy":"","notable_elements":[]},"photographic_aesthetic":"","category_associations":[],"visual_equity_worth_preserving":[],"visual_territory_to_escape":[]}
-Rules: approximate hex values where visible; specific materials; category_associations names brands this aesthetic resembles; output only valid JSON`;
+const ANALYSIS_SYS=`You are a visual strategist analyzing brand assets for a CPG or beverage brand. Each image is preceded by a text block stating its ASSET id, name, type, role, and lock status. Return JSON only, no preamble or markdown.
+{"global":{"identified_colors":[{"name":"","approximate_hex":"","usage":"dominant|accent|background|typography"}],"materials_and_surfaces":[],"photographic_aesthetic":"","category_associations":[],"visual_equity_worth_preserving":[],"visual_territory_to_escape":[]},"per_asset":[{"asset_id":"","analysis_summary":""}]}
+Rules: per_asset must include exactly one entry for every ASSET id provided, in order; analysis_summary is 1-2 sentences describing what is visible in that specific asset (colors, materials, form, typography, packaging shape) scoped to that asset only; global fields describe the overall upload set; approximate hex values where visible; category_associations names brands this aesthetic resembles; output only valid JSON.`;
 
 const WORLD_SYS=`You are a senior creative strategist and prompt architect for premium CPG and beverage brands. Call 1 of 3 — generate core world architecture only. No world_zones, no audience_environment_translation.
 Output only valid JSON. No preamble or markdown. Hard length limits apply.
-Schema: {"asset_preservation_layer":{"mode":"world_exploration|product_accurate|brand_evolution","locked_elements":[],"flexible_elements":[],"prompt_preservation_clause":"","packaging_accuracy_risks":[]},"visual_product_world_brief":{"client":"","product":"","audience":"","commercial_goal":"","core_positioning":"","visual_tension":"","world_concept":"","what_the_world_communicates":"","what_the_world_avoids":""},"world_bible":{"core_world_idea":"","visual_constants":[],"sensory_constants":[],"composition_rules":[],"lighting_rules":[],"material_rules":[],"emotional_rules":[],"forbidden_territories":[]},"strict_world":{"core_visual_premise":"","primary_material_system":"","primary_lighting_logic":"","primary_composition_logic":"","signature_ingredient_behavior":"","risks_if_overused":""},"expanded_world":{"what_can_flex":[],"what_cannot_flex":[],"approved_environmental_range":[],"approved_material_range":[],"approved_occasion_range":[]},"master_world_prompt":"","negative_prompt":"","creative_guardrails":[],"forbidden_drift":{"category_drift":"","tonal_drift":"","ingredient_drift":"","persona_drift":"","material_drift":"","lighting_drift":"","motion_drift":"","packaging_drift":"","channel_drift":""},"suggested_asset_set":[]}
-LENGTH LIMITS: brief fields 1 sentence each; world_bible arrays 4 items 10 words each; strict_world fields 1 sentence each; expanded_world arrays 3 items each; master_world_prompt 80 words; negative_prompt 40 words; creative_guardrails 6 items 10 words each; forbidden_drift fields 1 sentence each; suggested_asset_set 6 items; asset_preservation_layer arrays 4 items each.
-When mode is product_accurate set prompt_preservation_clause to the full preservation clause. Output only valid JSON.`;
+Schema: {"asset_preservation_layer":{"overall_mode":"world_exploration|product_accurate|brand_evolution|mixed","assets":[{"asset_id":"","asset_name":"","asset_type":"","lock_status":"","prompt_instruction":""}],"conflict_resolutions":[],"packaging_accuracy_risks":[]},"visual_product_world_brief":{"client":"","product":"","audience":"","commercial_goal":"","core_positioning":"","visual_tension":"","world_concept":"","what_the_world_communicates":"","what_the_world_avoids":""},"world_bible":{"core_world_idea":"","visual_constants":[],"sensory_constants":[],"composition_rules":[],"lighting_rules":[],"material_rules":[],"emotional_rules":[],"forbidden_territories":[]},"strict_world":{"core_visual_premise":"","primary_material_system":"","primary_lighting_logic":"","primary_composition_logic":"","signature_ingredient_behavior":"","risks_if_overused":""},"expanded_world":{"what_can_flex":[],"what_cannot_flex":[],"approved_environmental_range":[],"approved_material_range":[],"approved_occasion_range":[]},"master_world_prompt":"","negative_prompt":"","creative_guardrails":[],"forbidden_drift":{"category_drift":"","tonal_drift":"","ingredient_drift":"","persona_drift":"","material_drift":"","lighting_drift":"","motion_drift":"","packaging_drift":"","channel_drift":""},"suggested_asset_set":[]}
+
+ASSET_PRESERVATION_LAYER INSTRUCTIONS:
+- The input includes an ASSET RULES array (asset_id, asset_name, asset_type, asset_role, lock_status, preserve_elements, editable_elements, forbidden_changes, analysis_summary, prompt_instruction) and an overall_mode value. If ASSET RULES is empty, output overall_mode "world_exploration" and assets: [].
+- For each input asset, output one entry with asset_id, asset_name, asset_type, lock_status copied exactly from input, and a prompt_instruction.
+- If the input asset's prompt_instruction is non-empty, copy it verbatim.
+- Otherwise generate prompt_instruction (max 35 words) following these templates by lock_status:
+  locked: "Use the uploaded [asset_name] exactly as supplied. Preserve [preserve_elements] precisely. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret. Reference this asset directly rather than describing it."
+  partially_editable: "The uploaded [asset_name] may be refined within: [editable_elements]. The following must remain unchanged: [preserve_elements]. [forbidden_changes]"
+  editable: "The uploaded [asset_name] is a draft and may be evolved or redesigned. Use it as a starting point for exploration."
+  inspiration_only: "Use the uploaded [asset_name] to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference."
+  avoid: "Do not resemble the uploaded [asset_name] in mood, composition, color, materials, or category signals. Treat this as negative creative context."
+- conflict_resolutions: up to 3 entries, 20 words each. Generate an entry whenever a locked or partially_editable asset's preserve_elements could overlap with an editable asset's editable_elements (e.g. a locked logo and an editable packaging redesign). Each entry states which locked element takes precedence over which editable exploration. Empty array if no overlaps.
+- packaging_accuracy_risks: up to 4 items, 10 words each.
+
+OTHER LENGTH LIMITS: brief fields 1 sentence each; world_bible arrays 4 items 10 words each; strict_world fields 1 sentence each; expanded_world arrays 3 items each; master_world_prompt 80 words; negative_prompt 40 words; creative_guardrails 6 items 10 words each; forbidden_drift fields 1 sentence each; suggested_asset_set 6 items.
+Output only valid JSON.`;
 
 const ZONES_SYS=`You are a senior creative strategist. Call 2 of 3 — generate 6 zone definitions and 3 audience-to-environment translations. No scenes.
 Output only valid JSON. No preamble or markdown.
@@ -774,10 +948,10 @@ Rules: each zone must have a distinct commercial_job; no two zones share same ma
 
 const SCENE_SYS=`You are a senior creative strategist. Call 3 of 3 — generate one primary scene per zone.
 Return ONLY: {"world_zones":[{"zone_id":"","scenes":[{scene}]}]}
-Scene schema: {"scene_name":"","commercial_job":"","primary_occasion":"","asset_preservation_status":"locked|placeholder|editable","prompt_text":"","negative_prompt_text":"","recommended_crops":[],"recommended_use_cases":[],"drift_risks":[]}
-Scene flow: 1) read zone commercial_job and visual rules 2) apply World Bible 3) apply Asset Preservation Layer 4) add indirect occasion cues from AE translation 5) check Forbidden Drift 6) generate scene.
+Scene schema: {"scene_name":"","commercial_job":"","primary_occasion":"","asset_preservation_status":"locked|placeholder|editable|mixed","prompt_text":"","negative_prompt_text":"","recommended_crops":[],"recommended_use_cases":[],"drift_risks":[]}
+Scene flow: 1) read zone commercial_job and visual rules 2) apply World Bible 3) identify which assets in asset_preservation_layer.assets are relevant to this zone by asset_type and weave their prompt_instruction into prompt_text — reference locked assets by name ("use the uploaded [asset_name] exactly"), never regenerate or re-describe them 4) apply conflict_resolutions where relevant 5) add indirect occasion cues from AE translation 6) check Forbidden Drift 7) generate scene.
 LENGTH LIMITS: prompt_text 60 words; negative_prompt_text 20 words; drift_risks 2 items; recommended_crops 3 items; recommended_use_cases 3 items.
-Rules: commercial_job is specific outcome not aesthetic description; asset_preservation_status from APL mode; each scene differs from every other in setting/material/composition; no smiling models no stock personas; include preservation clause in prompt when mode is product_accurate. Output only valid JSON.`;
+Rules: commercial_job is specific outcome not aesthetic description; asset_preservation_status reflects the dominant status of assets referenced in this scene — use "mixed" when both locked and editable assets are referenced; each scene differs from every other in setting/material/composition; no smiling models no stock personas; locked or partially_editable assets must be referenced by name, not described generatively. Output only valid JSON.`;
 
 // ── api call ──────────────────────────────────────────────────────────────────
 async function callClaude(system, messages) {
@@ -794,17 +968,19 @@ async function callClaude(system, messages) {
   return text.replace(/```json\n?|```\n?/g,'').trim();
 }
 
-function buildImageBlocks(imgs){return imgs.map(img=>({type:'image',source:{type:'base64',media_type:img.mediaType,data:img.base64}}));}
-
-function allImages(){
-  const out=[];
-  Object.entries(buckets).forEach(([key,b])=>b.images.forEach(img=>out.push({...img,bucket:key,role:b.role})));
-  return out;
+function buildAnalysisContent(){
+  const content=[];
+  assets.forEach(a=>{
+    content.push({type:'text',text:`ASSET ${a.asset_id}: name="${a.asset_name}", type=${a.asset_type}, role=${a.asset_role}, lock_status=${a.lock_status}`});
+    content.push({type:'image',source:{type:'base64',media_type:a.mediaType,data:a.base64}});
+  });
+  content.push({type:'text',text:`Brand intent: "${v('f-intent')||'not provided'}". Analyze each asset above and return per-asset analysis_summary entries plus a global visual inventory.`});
+  return content;
 }
 
 // ── phase state ───────────────────────────────────────────────────────────────
 let currentPhase='idle'; // idle | analyzing | analysis_ready | world | zones | scenes | done
-let confirmedAnalysis=null;
+let confirmedAnalysis=null; // {global:{...}, per_asset:[...]}
 
 function setStatus(msg,type){const el=document.getElementById('status-bar');el.textContent=msg;el.className=`status-bar ${type}`;el.style.display=msg?'block':'none';}
 
@@ -843,14 +1019,15 @@ async function runAnalysis(){
   document.getElementById('progress-steps').style.display='flex';
   setStep('analyze');
   try{
-    const imgs=allImages();
-    const roleSummary=Object.entries(buckets).filter(([,b])=>b.images.length>0).map(([k,b])=>`${k}: ${b.role}`).join(', ');
-    const context=`Asset roles: ${roleSummary}. Brand intent: "${v('f-intent')||'not provided'}". Analyze the uploaded images.`;
-    const raw=await callClaude(ANALYSIS_SYS,[{role:'user',content:[...buildImageBlocks(imgs),{type:'text',text:context}]}]);
+    const raw=await callClaude(ANALYSIS_SYS,[{role:'user',content:buildAnalysisContent()}]);
     const parsed=JSON.parse(raw);
     confirmedAnalysis=parsed;
+    (parsed.per_asset||[]).forEach(pa=>{
+      const a=assets.find(x=>x.asset_id===pa.asset_id);
+      if(a) a.analysis_summary=pa.analysis_summary||'';
+    });
     renderAnalysis(parsed);
-    document.getElementById('raw-analysis').value=JSON.stringify(parsed,null,2);
+    document.getElementById('raw-analysis').value=JSON.stringify(parsed.global||{},null,2);
     document.getElementById('analysis-wrap').style.display='block';
     currentPhase='analysis_ready';
     markStepDone('analyze');
@@ -869,15 +1046,39 @@ async function runGeneration(){
   document.getElementById('progress-steps').style.display='flex';
   const intake=buildIntake();
   const intakeStr=JSON.stringify(intake,null,2);
-  const analysisCtx=confirmedAnalysis?`\n\nVISUAL ANALYSIS:\n${JSON.stringify(confirmedAnalysis,null,2)}\n\nAsset roles: ${Object.entries(buckets).filter(([,b])=>b.images.length>0).map(([k,b])=>`${k}: ${b.role}`).join(', ')}\nBrand intent: "${v('f-intent')||'not provided'}"`:'' ;
+  let assetCtx='';
+  if(hasAssets()){
+    const globalAnalysis=confirmedAnalysis?.global?JSON.stringify(confirmedAnalysis.global,null,2):'{}';
+    assetCtx=`\n\nGLOBAL VISUAL ANALYSIS:\n${globalAnalysis}\n\nASSET RULES:\n${JSON.stringify(buildAssetRulesPayload(),null,2)}\n\noverall_mode: ${getOverallMode()}\nBrand intent: "${v('f-intent')||'not provided'}"`;
+  }
 
   try{
     // Call 1: World architecture
     currentPhase='world';
     setLoading(true,'Building world architecture...');
     setStep('world');
-    const worldRaw=await callClaude(WORLD_SYS,[{role:'user',content:`Generate core world architecture for this intake:\n\n${intakeStr}${analysisCtx}\n\nOutput only valid JSON.`}]);
+    const worldRaw=await callClaude(WORLD_SYS,[{role:'user',content:`Generate core world architecture for this intake:\n\n${intakeStr}${assetCtx}\n\nOutput only valid JSON.`}]);
     const world=JSON.parse(worldRaw);
+
+    // Post-process asset_preservation_layer for robustness
+    if(hasAssets()){
+      const modelAssets=world.asset_preservation_layer?.assets||[];
+      world.asset_preservation_layer=world.asset_preservation_layer||{};
+      world.asset_preservation_layer.overall_mode=world.asset_preservation_layer.overall_mode||getOverallMode();
+      world.asset_preservation_layer.assets=assets.map(a=>{
+        const fromModel=modelAssets.find(x=>x.asset_id===a.asset_id)||{};
+        return{
+          asset_id:a.asset_id,asset_name:a.asset_name,asset_type:a.asset_type,lock_status:a.lock_status,
+          prompt_instruction:a.prompt_instruction||fromModel.prompt_instruction||defaultPromptInstruction(a)
+        };
+      });
+      world.asset_preservation_layer.conflict_resolutions=world.asset_preservation_layer.conflict_resolutions||[];
+      world.asset_preservation_layer.packaging_accuracy_risks=world.asset_preservation_layer.packaging_accuracy_risks||[];
+    }else{
+      world.asset_preservation_layer={overall_mode:'world_exploration',assets:[],conflict_resolutions:[],packaging_accuracy_risks:[]};
+    }
+
+    const worldStr=JSON.stringify(world);
     renderOutput(world);
     markStepDone('world');
 
@@ -885,7 +1086,7 @@ async function runGeneration(){
     currentPhase='zones';
     setLoading(true,'Defining zones...');
     setStep('zones');
-    const zonesRaw=await callClaude(ZONES_SYS,[{role:'user',content:`World architecture:\n${worldRaw}\n\nIntake:\n${intakeStr}\n\nGenerate 6 zone definitions and 3 AE translations. Output only valid JSON.`}]);
+    const zonesRaw=await callClaude(ZONES_SYS,[{role:'user',content:`World architecture:\n${worldStr}\n\nIntake:\n${intakeStr}\n\nGenerate 6 zone definitions and 3 AE translations. Output only valid JSON.`}]);
     const zonesResult=JSON.parse(zonesRaw);
     const withZones={...world,world_zones:zonesResult.world_zones||[],audience_environment_translation:zonesResult.audience_environment_translation||[]};
     renderOutput(withZones);
@@ -895,7 +1096,8 @@ async function runGeneration(){
     currentPhase='scenes';
     setLoading(true,'Generating scenes...');
     setStep('scenes');
-    const scenesRaw=await callClaude(SCENE_SYS,[{role:'user',content:`World architecture:\n${worldRaw}\n\nZones:\n${zonesRaw}\n\nIntake:\n${intakeStr}\n\nGenerate one primary scene per zone. Output only valid JSON.`}]);
+    const zonesStr=JSON.stringify({world_zones:withZones.world_zones,audience_environment_translation:withZones.audience_environment_translation});
+    const scenesRaw=await callClaude(SCENE_SYS,[{role:'user',content:`World architecture:\n${worldStr}\n\nZones:\n${zonesStr}\n\nIntake:\n${intakeStr}\n\nGenerate one primary scene per zone. Output only valid JSON.`}]);
     const scenesResult=JSON.parse(scenesRaw);
     const mergedZones=withZones.world_zones.map(zone=>{
       const sz=scenesResult.world_zones?.find(z=>z.zone_id===zone.zone_id);
@@ -916,13 +1118,18 @@ async function runGeneration(){
 }
 
 function parseRawAnalysis(){
-  try{confirmedAnalysis=JSON.parse(document.getElementById('raw-analysis').value);document.getElementById('parse-err').style.display='none';}
-  catch{document.getElementById('parse-err').style.display='block';}
+  try{
+    const g=JSON.parse(document.getElementById('raw-analysis').value);
+    confirmedAnalysis=confirmedAnalysis||{};
+    confirmedAnalysis.global=g;
+    document.getElementById('parse-err').style.display='none';
+  }catch{document.getElementById('parse-err').style.display='block';}
 }
 
 // ── analysis renderer ─────────────────────────────────────────────────────────
-function renderAnalysis(a){
+function renderAnalysis(parsed){
   const el=document.getElementById('analysis-body');
+  const a=parsed.global||{};
   let html='';
   if(a.identified_colors?.length){
     html+=`<div class="analysis-field"><div class="analysis-lbl">Identified colors</div>`;
@@ -933,6 +1140,15 @@ function renderAnalysis(a){
   if(a.category_associations?.length) html+=`<div class="analysis-field"><div class="analysis-lbl">Category associations</div><div>${a.category_associations.map(x=>`<span class="tag tag-warn">${e(x)}</span>`).join('')}</div></div>`;
   if(a.visual_equity_worth_preserving?.length) html+=`<div class="analysis-field"><div class="analysis-lbl">Worth preserving</div><ul class="out-list">${a.visual_equity_worth_preserving.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`;
   if(a.visual_territory_to_escape?.length) html+=`<div class="analysis-field"><div class="analysis-lbl">Territory to escape</div><div>${a.visual_territory_to_escape.map(x=>`<span class="tag tag-warn">${e(x)}</span>`).join('')}</div></div>`;
+  if(parsed.per_asset?.length){
+    html+=`<div class="analysis-field"><div class="analysis-lbl">Per-asset notes</div>`;
+    html+=parsed.per_asset.map(pa=>{
+      const asset=assets.find(x=>x.asset_id===pa.asset_id);
+      const name=asset?asset.asset_name:pa.asset_id;
+      return `<div class="per-asset-note"><b>${e(name)}:</b> ${e(pa.analysis_summary||'')}</div>`;
+    }).join('');
+    html+=`</div>`;
+  }
   el.innerHTML=html;
 }
 
@@ -948,7 +1164,10 @@ function renderOutput(data){
   let html='';
   OUT_ORDER.forEach(key=>{
     if(data[key]===undefined) return;
-    const badge=key==='world_zones'?`<span class="section-badge">${(data[key]||[]).length} zones</span>`:'';
+    if(key==='asset_preservation_layer'&&(!data[key].assets||!data[key].assets.length)&&!hasAssets()) return;
+    let badge='';
+    if(key==='world_zones') badge=`<span class="section-badge">${(data[key]||[]).length} zones</span>`;
+    if(key==='asset_preservation_layer') badge=`<span class="section-badge">${(data[key].assets||[]).length} assets</span>`;
     html+=`<div class="output-section">
       <button class="output-trigger" onclick="toggleOut('${key}')">
         <span class="output-trigger-title">${OUT_LABELS[key]}${badge}</span>
@@ -986,6 +1205,7 @@ function buildSection(key,data){
   if(!data) return '';
   switch(key){
     case 'asset_preservation_layer':
+      return buildAPL(data);
     case 'visual_product_world_brief':
       return `<div class="brief-grid">${Object.entries(data).map(([k,v])=>`<div class="brief-row"><div class="brief-key">${e(k.replace(/_/g,' '))}</div><div class="brief-val">${Array.isArray(v)?v.join(', '):e(String(v||''))}</div></div>`).join('')}</div>`;
     case 'world_bible':
@@ -1042,8 +1262,34 @@ function buildSection(key,data){
   }
 }
 
+function buildAPL(data){
+  let html=`<div class="brief-grid" style="margin-bottom:14px"><div class="brief-row"><div class="brief-key">overall mode</div><div class="brief-val">${e(data.overall_mode||'world_exploration')}</div></div></div>`;
+  if(data.assets?.length){
+    html+=`<div class="bible-entry"><div class="entry-lbl">Per-asset rules</div>`;
+    html+=data.assets.map(a=>`
+      <div class="apl-asset-card">
+        <div class="apl-asset-hdr">
+          <span class="apl-asset-name">${e(a.asset_name)}</span>
+          <span class="asset-badge">${e(ASSET_TYPE_LABELS[a.asset_type]||a.asset_type)}</span>
+          <span class="asset-badge lock-${a.lock_status}">${e(LOCK_STATUS_LABELS[a.lock_status]||a.lock_status)}</span>
+        </div>
+        <div class="apl-asset-instruction">${e(a.prompt_instruction)}</div>
+      </div>`).join('');
+    html+=`</div>`;
+  }else{
+    html+=`<div style="font-size:0.78rem;color:var(--dim);font-style:italic">No brand assets uploaded — generation runs in World Exploration mode.</div>`;
+  }
+  if(data.conflict_resolutions?.length){
+    html+=`<div class="bible-entry"><div class="entry-lbl">Conflict resolutions</div><ul class="entry-list">${data.conflict_resolutions.map(c=>`<li>${e(c)}</li>`).join('')}</ul></div>`;
+  }
+  if(data.packaging_accuracy_risks?.length){
+    html+=`<div class="bible-entry"><div class="entry-lbl">Packaging accuracy risks</div><ul class="entry-list">${data.packaging_accuracy_risks.map(r=>`<li>${e(r)}</li>`).join('')}</ul></div>`;
+  }
+  return html;
+}
+
 function buildSceneCard(s){
-  const statusClass={locked:'status-locked',placeholder:'status-placeholder',editable:'status-editable'}[s.asset_preservation_status]||'status-placeholder';
+  const statusClass={locked:'status-locked',placeholder:'status-placeholder',editable:'status-editable',mixed:'status-locked'}[s.asset_preservation_status]||'status-placeholder';
   const rawPrompt=s.prompt_text||'';
   return `<div class="scene-card">
     <div class="scene-hdr">
@@ -1082,6 +1328,11 @@ function expMD(){
   if(!currentOutput) return;
   const d=currentOutput;
   let md=`# Visual Product World: ${d.visual_product_world_brief?.client||'Project'}\n\n`;
+  if(d.asset_preservation_layer?.assets?.length){
+    md+=`## Asset Preservation Layer\n\nOverall mode: ${d.asset_preservation_layer.overall_mode}\n\n`;
+    d.asset_preservation_layer.assets.forEach(a=>{md+=`**${a.asset_name}** (${a.asset_type}, ${a.lock_status}): ${a.prompt_instruction}\n\n`;});
+    if(d.asset_preservation_layer.conflict_resolutions?.length) md+=`Conflict resolutions:\n\n${d.asset_preservation_layer.conflict_resolutions.map(c=>`- ${c}`).join('\n')}\n\n`;
+  }
   if(d.visual_product_world_brief) md+=`## World Brief\n\n${Object.entries(d.visual_product_world_brief).map(([k,v])=>`**${k.replace(/_/g,' ')}:** ${v}`).join('\n\n')}\n\n`;
   if(d.master_world_prompt) md+=`## Master World Prompt\n\n${d.master_world_prompt}\n\n`;
   if(d.world_zones?.length){
@@ -1113,7 +1364,14 @@ function buildNotionBlocks(intake,analysis,output){
   if(proj.product) blocks.push(bulletb(`Product: ${proj.product}`));
   if(proj.sku) blocks.push(bulletb(`SKU: ${proj.sku}`));
   if(proj.goal) blocks.push(bulletb(`Goal: ${proj.goal}`));
-  blocks.push(bulletb(`Mode: ${output?.asset_preservation_layer?.mode||'world_exploration'}`));
+  blocks.push(bulletb(`Mode: ${output?.asset_preservation_layer?.overall_mode||'world_exploration'}`));
+  if(output?.asset_preservation_layer?.assets?.length){
+    blocks.push(divb());blocks.push(h2b('Asset Preservation Layer'));
+    output.asset_preservation_layer.assets.forEach(a=>{
+      blocks.push(parab(`${a.asset_name} (${a.asset_type}, ${a.lock_status}): ${a.prompt_instruction}`));
+    });
+    (output.asset_preservation_layer.conflict_resolutions||[]).forEach(c=>blocks.push(bulletb(`Conflict resolution: ${c}`)));
+  }
   if(output?.visual_product_world_brief?.world_concept){blocks.push(divb());blocks.push(h2b('World Concept'));blocks.push(parab(output.visual_product_world_brief.world_concept));}
   if(output?.visual_product_world_brief?.visual_tension) blocks.push(parab(`Visual tension: ${output.visual_product_world_brief.visual_tension}`));
   if(output?.strict_world?.core_visual_premise){blocks.push(divb());blocks.push(h2b('Strict World'));blocks.push(parab(output.strict_world.core_visual_premise));}
@@ -1153,8 +1411,7 @@ async function saveToNotion(){
     'Product':{rich_text:rt(proj.product||'')},
     'SKU':{rich_text:rt(proj.sku||'')},
     'Status':{select:{name:'World Generated'}},
-    'Has Assets':{checkbox:hasAssets()},
-    'Mode':{select:{name:getGenerationMode().replace(/_/g,' ')}}
+    'Has Assets':{checkbox:hasAssets()}
   };
   if(proj.goal) properties['Goal']={select:{name:proj.goal}};
   const children=buildNotionBlocks(intake,confirmedAnalysis,currentOutput);
