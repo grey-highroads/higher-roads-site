@@ -680,12 +680,37 @@ function defaultEditableElements(assetType,lockStatus){
 }
 
 const LOCK_INSTRUCTION_TEMPLATES = {
-  locked: a=>{
-    const pe=(a.preserve_elements||[]).join(', ');
-    const crossRef=pe?` For cross-referencing against other assets in this project, this asset is the authoritative source for: ${pe}.`:'';
+  locked: a => {
+    const pe = (a.preserve_elements || []).join(', ');
+    const crossRef = pe
+      ? ` For cross-referencing against other assets in this project, this asset is the authoritative source for: ${pe}.`
+      : '';
     return `Use the uploaded ${a.asset_name} exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it.${crossRef}`;
   },
-function defaultPromptInstruction(a){return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status]||LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);}
+
+  partially_editable: a => {
+    const preserve = (a.preserve_elements || []).join(', ') || 'the marked preserved elements';
+    const editable = (a.editable_elements || []).join(', ') || 'the marked editable elements';
+    const forbidden = a.forbidden_changes ? ` ${a.forbidden_changes}` : '';
+    return `The uploaded ${a.asset_name} may be refined within: ${editable}. The following must remain unchanged: ${preserve}.${forbidden}`;
+  },
+
+  editable: a => {
+    return `The uploaded ${a.asset_name} is a draft and may be evolved or redesigned. Use it as a starting point for exploration.`;
+  },
+
+  inspiration_only: a => {
+    return `Use the uploaded ${a.asset_name} to inform mood, lighting, material, or composition. Do not copy specific design elements, layouts, or logos from this reference.`;
+  },
+
+  avoid: a => {
+    return `Do not resemble the uploaded ${a.asset_name} in mood, composition, color, materials, or category signals. Treat this as negative creative context.`;
+  }
+};
+
+function defaultPromptInstruction(a) {
+  return (LOCK_INSTRUCTION_TEMPLATES[a.lock_status] || LOCK_INSTRUCTION_TEMPLATES.inspiration_only)(a);
+}
 
 // ── lock ──────────────────────────────────────────────────────────────────────
 function unlock() {
