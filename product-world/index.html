@@ -1485,8 +1485,9 @@ function renderOutput(data,final){
   });
   if(final){
     html+=`<div class="export-row">
-      <button id="exp-json" onclick="expJSON()">Copy suite as JSON</button>
-      <button id="exp-md" onclick="expMD()">Copy as Markdown</button>
+      <button id="exp-summary-md" onclick="expSummaryMD()">Copy Summary Markdown</button>
+      <button id="exp-full-md" onclick="expFullProductionMD()">Copy Full Production Markdown</button>
+      <button id="exp-json" onclick="expJSON()">Copy Full JSON</button>
     </div>
     <div class="notion-save-wrap">
       <div class="notion-save-row">
@@ -1732,43 +1733,217 @@ function toggleZone(idx){
 }
 
 // ── export ────────────────────────────────────────────────────────────────────
-function expJSON(){if(!currentOutput) return;const btn=document.getElementById('exp-json');navigator.clipboard.writeText(JSON.stringify(currentOutput,null,2)).then(()=>{btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy suite as JSON',2000);});}
+function markCopyButton(btnId,readyLabel){
+  const btn=document.getElementById(btnId);
+  if(!btn) return;
+  btn.textContent='Copied ✓';
+  setTimeout(()=>btn.textContent=readyLabel,2000);
+}
 
-function expMD(){
+function expJSON(){
   if(!currentOutput) return;
-  const d=currentOutput;
-  let md=`# Visual Product World: ${d.visual_product_world_brief?.client||'Project'}\n\n`;
-  if(d.asset_preservation_layer?.assets?.length){
-    md+=`## Asset Preservation Layer\n\nOverall mode: ${d.asset_preservation_layer.overall_mode}\n\n`;
-    d.asset_preservation_layer.assets.forEach(a=>{md+=`**${a.asset_name}** (${a.asset_type}, ${a.lock_status}): ${a.prompt_instruction}\n\n`;});
-    if(d.asset_preservation_layer.conflict_resolutions?.length) md+=`Conflict resolutions:\n\n${d.asset_preservation_layer.conflict_resolutions.map(c=>`- ${c}`).join('\n')}\n\n`;
+  navigator.clipboard.writeText(JSON.stringify(currentOutput,null,2)).then(()=>{
+    markCopyButton('exp-json','Copy Full JSON');
+  });
+}
+
+// Markdown export helpers — deterministic client-side serialization only.
+// These functions do not call Claude or increase generation token load.
+function mdSafe(v){return v===undefined||v===null?'':String(v);}
+function mdLine(label,value){
+  if(value===undefined||value===null||value==='') return '';
+  return `**${label}:** ${mdSafe(value)}\n\n`;
+}
+function mdList(title,arr){
+  if(!Array.isArray(arr)||!arr.length) return '';
+  return `**${title}:**\n${arr.map(x=>`- ${mdSafe(x)}`).join('\n')}\n\n`;
+}
+function mdKVSection(obj){
+  if(!obj) return '';
+  return Object.entries(obj).map(([k,v])=>{
+    const label=k.replace(/_/g,' ');
+    if(Array.isArray(v)) return mdList(label,v);
+    if(v&&typeof v==='object') return `**${label}:**\n\n\`\`\`json\n${JSON.stringify(v,null,2)}\n\`\`\`\n\n`;
+    return mdLine(label,v);
+  }).join('');
+}
+function mdPromptBlock(title,value){
+  if(!value) return '';
+  return `**${title}:**  \n${mdSafe(value)}\n\n`;
+}
+function mdLayerBlock(title,layers){
+  if(!layers) return '';
+  const entries=Object.entries(layers).filter(([,v])=>v);
+  if(!entries.length) return '';
+  return `**${title}:**\n${entries.map(([k,v])=>`- **${k}:** ${mdSafe(v)}`).join('\n')}\n\n`;
+}
+function mdAssetPreservation(apl){
+  if(!apl?.assets?.length) return '';
+  let md=`## Asset Preservation Layer\n\nOverall mode: ${mdSafe(apl.overall_mode)}\n\n`;
+  apl.assets.forEach(a=>{
+    md+=`**${mdSafe(a.asset_name)}** (${mdSafe(a.asset_type)}, ${mdSafe(a.lock_status)}): ${mdSafe(a.prompt_instruction)}\n\n`;
+  });
+  if(apl.conflict_resolutions?.length) md+=`Conflict resolutions:\n\n${apl.conflict_resolutions.map(c=>`- ${mdSafe(c)}`).join('\n')}\n\n`;
+  if(apl.packaging_accuracy_risks?.length) md+=mdList('Packaging accuracy risks',apl.packaging_accuracy_risks);
+  if(apl.has_locked_logo!==undefined) md+=`**Has locked logo:** ${apl.has_locked_logo?'Yes':'No'}\n\n`;
+  return md;
+}
+function mdProductionContract(pc){
+  if(!pc) return '';
+  let md=`## Production Contract\n\n`;
+  md+=mdLine('Locked asset policy',pc.locked_asset_policy);
+  md+=mdLine('Scene generation strategy',pc.scene_generation_strategy);
+  md+=mdLine('Product fidelity requirement',pc.product_fidelity_requirement);
+  md+=mdList('Acceptable World Board drift',pc.acceptable_worldboard_drift);
+  md+=mdList('Unacceptable drift',pc.unacceptable_drift);
+  return md;
+}
+function mdWorldBoardSummary(wb){
+  if(!wb) return '';
+  let md=`## World Board Summary\n\n`;
+  if(wb.disclaimer) md+=`${wb.disclaimer}\n\n`;
+  if(wb.scenes?.length){
+    md+=`**Scene mix:**\n`;
+    wb.scenes.forEach(s=>{
+      md+=`- **${mdSafe(s.scene_name)}** (${mdSafe(s.scene_driver)}-led) — ${mdSafe(s.zone_name)}${s.client_feedback_question?` — ${mdSafe(s.client_feedback_question)}`:''}\n`;
+    });
+    md+='\n';
   }
-  if(d.visual_product_world_brief) md+=`## World Brief\n\n${Object.entries(d.visual_product_world_brief).map(([k,v])=>`**${k.replace(/_/g,' ')}:** ${v}`).join('\n\n')}\n\n`;
+  return md;
+}
+function mdAudienceEnvironment(list){
+  if(!Array.isArray(list)||!list.length) return '';
+  let md=`## Audience → Environment Translation\n\n`;
+  list.forEach(ae=>{
+    md+=`### ${mdSafe(ae.audience_or_occasion||'Audience / Occasion')}\n\n`;
+    md+=mdLine('Desired state',ae.desired_state);
+    md+=mdList('Indirect cues',ae.indirect_cues);
+    md+=mdList('Materials',ae.materials);
+    md+=mdList('Avoidances',ae.avoidances);
+    md+=mdPromptBlock('Scene prompt starter',ae.scene_prompt_starter);
+  });
+  return md;
+}
+function mdScene(s,full){
+  let md=`#### ${mdSafe(s.scene_name)}${s.scene_driver?` (${mdSafe(s.scene_driver)}-led)`:''}\n\n`;
+  if(full){
+    md+=mdLine('Asset preservation status',s.asset_preservation_status);
+    md+=mdLine('Scene driver',s.scene_driver?`${s.scene_driver}-led`:s.scene_driver);
+    md+=mdLine('People presence',s.people_present);
+  }
+  md+=mdLine('Commercial job',s.commercial_job);
+  if(full) md+=mdLine('Occasion',[s.primary_occasion,s.occasion_type].filter(Boolean).join(' · '));
+  md+=mdPromptBlock('Prompt',s.prompt_text);
+  md+=mdPromptBlock('Negative prompt',s.negative_prompt_text);
+  if(full){
+    md+=mdList('Drift risks',s.drift_risks);
+    md+=mdList('Recommended crops',s.recommended_crops);
+    md+=mdList('Recommended use cases',s.recommended_use_cases);
+    if(s.render_mode||s.text_only_safe!==undefined||s.requires_locked_asset_reference!==undefined){
+      md+=`**Render mode:** ${mdSafe(s.render_mode)}  \n`;
+      md+=`**Text-only safe:** ${s.text_only_safe?'Yes':'No'}  \n`;
+      md+=`**Requires locked asset reference:** ${s.requires_locked_asset_reference?'Yes':'No'}\n\n`;
+    }
+    if(s.required_assets?.length){
+      md+=`**Required assets:**\n`;
+      s.required_assets.forEach(a=>{
+        md+=`- **${mdSafe(a.asset_name)}** — ${mdSafe(a.role)} — ${mdSafe(a.preservation_level)} preservation\n`;
+        if(a.use_in_scene) md+=`  - Use: ${mdSafe(a.use_in_scene)}\n`;
+        if(a.allowed_transformations?.length) md+=`  - Allowed: ${a.allowed_transformations.map(mdSafe).join(', ')}\n`;
+        if(a.forbidden_transformations?.length) md+=`  - Forbidden: ${a.forbidden_transformations.map(mdSafe).join(', ')}\n`;
+      });
+      md+='\n';
+    }
+    md+=mdList('Protected regions',s.protected_regions);
+    md+=mdList('Editable regions',s.editable_regions);
+    if(s.mask_requirements?.length){
+      md+=`**Mask requirements:**\n`;
+      s.mask_requirements.forEach(m=>{
+        md+=`- **${mdSafe(m.region)}** — ${mdSafe(m.mask_type)} — ${mdSafe(m.purpose)}\n`;
+      });
+      md+='\n';
+    }
+    md+=mdLayerBlock('Prompt layers',s.prompt_layers);
+    md+=mdLayerBlock('Negative layers',s.negative_layers);
+    md+=mdPromptBlock('Production notes',s.production_notes);
+    md+=mdList('QA checks',s.qa_checks);
+  }
+  md+=mdPromptBlock('Client feedback question',s.client_feedback_question);
+  return md;
+}
+function mdZone(z,full){
+  let md=`### ${mdSafe(z.zone_name)}\n\n`;
+  md+=mdLine('Commercial job',z.commercial_job);
+  if(full){
+    md+=mdLine('Strategic purpose',z.strategic_purpose);
+    md+=mdLine('Primary environment',z.primary_environment);
+    md+=mdList('Visual cues',z.visual_cues);
+    md+=mdList('Material cues',z.material_cues);
+    md+=mdList('Lighting cues',z.lighting_cues);
+    md+=mdList('Composition cues',z.composition_cues);
+    md+=mdList('Approved props',z.approved_props);
+    md+=mdList('Forbidden props',z.forbidden_props);
+    md+=mdList('Neighboring-zone exclusions',z.neighboring_zone_exclusions);
+    md+=mdPromptBlock('Ingredient behavior',z.ingredient_behavior);
+    md+=mdList('Zone avoidances',z.avoidances);
+  }else if(z.primary_environment){
+    md+=mdLine('Primary environment',z.primary_environment);
+  }
+  if(z.scenes?.length){
+    z.scenes.forEach(s=>{md+=mdScene(s,full)+'---\n\n';});
+  }
+  return md;
+}
+function buildSummaryMarkdown(d){
+  let md=`# Visual Product World: ${d.visual_product_world_brief?.client||'Project'}\n\n`;
+  md+=mdAssetPreservation(d.asset_preservation_layer);
+  if(d.visual_product_world_brief) md+=`## World Brief\n\n${mdKVSection(d.visual_product_world_brief)}`;
   if(d.master_world_prompt) md+=`## Master World Prompt\n\n${d.master_world_prompt}\n\n`;
   if(d.world_board_summary?.disclaimer) md+=`## World Board Summary\n\n${d.world_board_summary.disclaimer}\n\n`;
   if(d.world_zones?.length){
     md+=`## World Zones\n\n`;
-    d.world_zones.forEach(z=>{
-      md+=`### ${z.zone_name}\n\n**Commercial job:** ${z.commercial_job}\n\n`;
-      if(z.primary_environment) md+=`**Primary environment:** ${z.primary_environment}\n\n`;
-      if(z.scenes?.length) z.scenes.forEach(s=>{
-        md+=`#### ${s.scene_name}${s.scene_driver?` (${s.scene_driver}-led)`:''}\n\n**Job:** ${s.commercial_job}\n\n**Prompt:** ${s.prompt_text}\n\n${s.negative_prompt_text?`**Negative:** ${s.negative_prompt_text}\n\n`:''}`;
-        if(s.render_mode) md+=`**Render mode:** ${s.render_mode}  \n**Text-only safe:** ${s.text_only_safe?'Yes':'No'}  \n**Requires locked asset reference:** ${s.requires_locked_asset_reference?'Yes':'No'}\n\n`;
-        md+=`${s.client_feedback_question?`**Client question:** ${s.client_feedback_question}\n\n`:''}---\n\n`;
-      });
-    });
+    d.world_zones.forEach(z=>{md+=mdZone(z,false);});
   }
   if(d.negative_prompt) md+=`## Global Negative Prompt\n\n${d.negative_prompt}\n\n`;
-  if(d.forbidden_drift) md+=`## Forbidden Drift\n\n${Object.entries(d.forbidden_drift).map(([k,v])=>`**${k.replace(/_/g,' ')}:** ${v}`).join('\n\n')}\n\n`;
-  if(d.production_contract){
-    const pc=d.production_contract;
-    md+=`## Production Contract\n\n**Locked asset policy:** ${pc.locked_asset_policy}\n\n**Scene generation strategy:** ${pc.scene_generation_strategy}\n\n**Product fidelity requirement:** ${pc.product_fidelity_requirement}\n\n`;
-    if(pc.acceptable_worldboard_drift?.length) md+=`**Acceptable World Board drift:** ${pc.acceptable_worldboard_drift.join(', ')}\n\n`;
-    if(pc.unacceptable_drift?.length) md+=`**Unacceptable drift:** ${pc.unacceptable_drift.join(', ')}\n\n`;
-  }
-  const btn=document.getElementById('exp-md');
-  navigator.clipboard.writeText(md).then(()=>{btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy as Markdown',2000);});
+  if(d.forbidden_drift) md+=`## Forbidden Drift\n\n${mdKVSection(d.forbidden_drift)}`;
+  if(d.production_contract) md+=mdProductionContract(d.production_contract);
+  return md;
 }
+function buildFullProductionMarkdown(d){
+  let md=`# Visual Product World: ${d.visual_product_world_brief?.client||'Project'}\n\n`;
+  md+=mdAssetPreservation(d.asset_preservation_layer);
+  if(d.production_contract) md+=mdProductionContract(d.production_contract);
+  if(d.visual_product_world_brief) md+=`## Visual Product World Brief\n\n${mdKVSection(d.visual_product_world_brief)}`;
+  if(d.world_bible) md+=`## World Bible\n\n${mdKVSection(d.world_bible)}`;
+  if(d.strict_world) md+=`## Strict World\n\n${mdKVSection(d.strict_world)}`;
+  if(d.expanded_world) md+=`## Expanded World\n\n${mdKVSection(d.expanded_world)}`;
+  if(d.master_world_prompt) md+=`## Master World Prompt\n\n${d.master_world_prompt}\n\n`;
+  if(d.negative_prompt) md+=`## Global Negative Prompt\n\n${d.negative_prompt}\n\n`;
+  if(d.creative_guardrails?.length) md+=`## Creative Guardrails\n\n${d.creative_guardrails.map(x=>`- ${mdSafe(x)}`).join('\n')}\n\n`;
+  if(d.forbidden_drift) md+=`## Forbidden Drift\n\n${mdKVSection(d.forbidden_drift)}`;
+  if(d.suggested_asset_set?.length) md+=`## Suggested First Asset Set\n\n${d.suggested_asset_set.map(x=>`- ${mdSafe(x)}`).join('\n')}\n\n`;
+  if(d.audience_environment_translation?.length) md+=mdAudienceEnvironment(d.audience_environment_translation);
+  if(d.world_board_summary) md+=mdWorldBoardSummary(d.world_board_summary);
+  if(d.world_zones?.length){
+    md+=`## World Zones\n\n`;
+    d.world_zones.forEach(z=>{md+=mdZone(z,true);});
+  }
+  return md;
+}
+function expSummaryMD(){
+  if(!currentOutput) return;
+  navigator.clipboard.writeText(buildSummaryMarkdown(currentOutput)).then(()=>{
+    markCopyButton('exp-summary-md','Copy Summary Markdown');
+  });
+}
+function expFullProductionMD(){
+  if(!currentOutput) return;
+  navigator.clipboard.writeText(buildFullProductionMarkdown(currentOutput)).then(()=>{
+    markCopyButton('exp-full-md','Copy Full Production Markdown');
+  });
+}
+// Backward-compatible alias for any older onclick references.
+function expMD(){ expSummaryMD(); }
 
 // ── notion save ───────────────────────────────────────────────────────────────
 function rt(text){return[{type:'text',text:{content:String(text||'').slice(0,1990)}}];}
