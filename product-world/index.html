@@ -650,12 +650,12 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
 // property schema, call structure). MINOR bumps on additive features, UI changes,
 // fixes, or internal tooling (e.g. Dev Tools panel). Bump this when shipping a change
 // that's worth being able to point back to later — not required for every tiny edit.
-const APP_VERSION = '6.5';
+const APP_VERSION = '6.6';
 
 const PASS = 'worldbuilder';
 const CLAUDE_WORKER = 'https://higher-roads-claude.grey-4fe.workers.dev/';
 const NOTION_WORKER = 'https://higher-roads-notion.grey-4fe.workers.dev/';
-const NOTION_DB = '37cd6b444a2580f38e89d0bc3bfbeea3'; // ← paste your Product World Projects database ID here
+const NOTION_DB = ''; // ← paste your Product World Projects database ID here
 const SESSION_KEY = 'hr_world_auth';
 const CLAUDE_STORAGE = 'hr_claude_key';
 const NOTION_STORAGE = 'hr_notion_token';
@@ -1359,7 +1359,7 @@ async function runGeneration(){
       world.asset_preservation_layer.assets=assets.map(a=>{
         const fromModel=modelAssets.find(x=>x.asset_id===a.asset_id)||{};
         return{
-          asset_id:a.asset_id,asset_name:a.asset_name,asset_type:a.asset_type,lock_status:a.lock_status,
+          asset_id:a.asset_id,asset_name:a.asset_name,asset_type:a.asset_type,asset_role:a.asset_role||defaultAssetRole(a.asset_type),lock_status:a.lock_status,
           prompt_instruction:a.prompt_instruction||fromModel.prompt_instruction||defaultPromptInstruction(a)
         };
       });
@@ -2140,8 +2140,8 @@ const SAMPLE_WORLD_OUTPUT={
   asset_preservation_layer:{
     overall_mode:'product_accurate',
     assets:[
-      {asset_id:'asset_1',asset_name:'MindBloom White Peach Jasmine Can',asset_type:'packaging',lock_status:'locked',prompt_instruction:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it.'},
-      {asset_id:'asset_2',asset_name:'MindBloom Brand Guide',asset_type:'brand_guideline',lock_status:'partially_editable',prompt_instruction:'The uploaded MindBloom Brand Guide may be refined within: secondary color applications. The following must remain unchanged: logo, primary palette, typography.'}
+      {asset_id:'asset_1',asset_name:'MindBloom White Peach Jasmine Can',asset_type:'packaging',asset_role:'source_of_truth',lock_status:'locked',prompt_instruction:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it.'},
+      {asset_id:'asset_2',asset_name:'MindBloom Brand Guide',asset_type:'brand_guideline',asset_role:'source_of_truth',lock_status:'partially_editable',prompt_instruction:'The uploaded MindBloom Brand Guide may be refined within: secondary color applications. The following must remain unchanged: logo, primary palette, typography.'}
     ],
     conflict_resolutions:['Locked can artwork takes precedence over any brand guide color exploration in product-facing scenes.'],
     packaging_accuracy_risks:['Label legibility at small social crop sizes','Condensation overlay obscuring flavor name'],
