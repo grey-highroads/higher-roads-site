@@ -333,6 +333,16 @@ details summary{font-family:'Rajdhani',sans-serif;font-size:0.62rem;font-weight:
     <div class="saved-list" id="saved-list"></div>
   </div>
 
+  <!-- Dev tools (internal testing only) -->
+  <details class="card" style="margin-bottom:1.5rem">
+    <summary class="card-title" style="cursor:pointer;list-style:none">Dev Tools</summary>
+    <div class="field-hint" style="margin:10px 0 12px">Internal testing only. Skips manual entry and live API calls so Save to Notion can be tested in seconds.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn-copy" onclick="loadSampleIntake()">Load sample intake</button>
+      <button class="btn-copy" onclick="loadSampleOutput()">Load sample output</button>
+    </div>
+  </details>
+
   <!-- Project setup -->
   <div class="card">
     <div class="card-title">Project Setup</div>
@@ -2071,6 +2081,331 @@ function renderSavedProjects(){
   if(!projects.length){wrap.style.display='none';return;}
   wrap.style.display='block';
   list.innerHTML=projects.map(p=>`<div class="saved-item"><div class="saved-info"><div class="saved-name">${e(p.name)}</div><div class="saved-meta">${e(p.client)} &nbsp;·&nbsp; ${e(p.date)}</div></div><div class="saved-actions"><a class="btn-notion" href="${p.url}" target="_blank" rel="noopener">Open in Notion ↗</a><button class="btn-del-saved" onclick="deleteSavedProject('${p.id}')" title="Remove from list">×</button></div></div>`).join('');
+}
+
+// ── dev tools (internal testing only) ─────────────────────────────────────────
+const SAMPLE_INTAKE_VALUES={
+  'f-client':'MindBloom',
+  'f-product':'MindBloom Sparkling Adaptogen Water',
+  'f-category':'Functional Beverage',
+  'f-sku':'White Peach Jasmine',
+  'f-goal':'Launch campaign assets for a new SKU rollout',
+  'f-does':'A sparkling adaptogen water with ashwagandha and L-theanine for calm focus without sedation.',
+  'f-benefits':'Calm clarity, reduced stress response, no crash, light sparkling refreshment',
+  'f-ingredients':'Ashwagandha, L-theanine, white peach, jasmine, lime, mineral water',
+  'f-notfor':'An energy drink, a sedative, a supplement pill, a sugary soda',
+  'f-buyer':'High-performing professionals in their late 20s to 40s who want calm focus without caffeine crashes',
+  'f-feel':'Composed, clear-headed, quietly confident',
+  'f-ownable':'Where botanical precision meets quiet mental clarity, crystalline, never sterile',
+  'f-flavor':'White peach, jasmine, fresh lime, light mineral finish',
+  'f-palette':'Pale peach, warm cream, soft botanical green, mineral white',
+  'f-forbidden-colors':'Neon, dark heavy purple, harsh black',
+  'f-admires':'Recess (calm category ownership), Olipop (ingredient-forward), Aesop (austere premium)',
+  'f-avoidbrands':'Monster, Bang, generic Amazon nootropic brands'
+};
+const SAMPLE_INTAKE_CHECKS={
+  'f-state':['Calm','Clear','Focused','Composed'],
+  'f-tired':['Stimulant crash','Artificial ingredients','Cheap design'],
+  'f-adj':['Clear','Composed','Premium','Grounded'],
+  'f-avoid':['Chaotic','Clinical','Generic wellness'],
+  'f-closest':['Premium product photography','Natural science','Modern wellness'],
+  'f-away':['Neon energy drink','Generic spa wellness','Generic Amazon supplement'],
+  'f-textures':['Condensation on glass','Borosilicate glass','Pale travertine stone','Botanical petals']
+};
+function loadSampleIntake(){
+  Object.entries(SAMPLE_INTAKE_VALUES).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el) el.value=val;
+  });
+  Object.entries(SAMPLE_INTAKE_CHECKS).forEach(([groupId,vals])=>{
+    document.querySelectorAll(`#${groupId} .check-item`).forEach(item=>{
+      item.classList.toggle('selected',vals.includes(item.dataset.val));
+    });
+  });
+  setStatus('Sample intake loaded — review and generate, or load a sample output below.','ok');
+}
+
+// Base world output (pre production-handoff). loadSampleOutput() runs this through
+// the same post-processing as a real Call 3 result (applyProductionHandoff,
+// buildProductionContract, buildWorldBoardSummary) before rendering.
+const SAMPLE_WORLD_OUTPUT={
+  asset_preservation_layer:{
+    overall_mode:'product_accurate',
+    assets:[
+      {asset_id:'asset_1',asset_name:'MindBloom White Peach Jasmine Can',asset_type:'packaging',lock_status:'locked',prompt_instruction:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied in its entirety. Do not redraw, retype, recolor, resize, simplify, distort, or reinterpret any part of it. Reference this asset directly rather than describing it.'},
+      {asset_id:'asset_2',asset_name:'MindBloom Brand Guide',asset_type:'brand_guideline',lock_status:'partially_editable',prompt_instruction:'The uploaded MindBloom Brand Guide may be refined within: secondary color applications. The following must remain unchanged: logo, primary palette, typography.'}
+    ],
+    conflict_resolutions:['Locked can artwork takes precedence over any brand guide color exploration in product-facing scenes.'],
+    packaging_accuracy_risks:['Label legibility at small social crop sizes','Condensation overlay obscuring flavor name'],
+    has_locked_logo:true
+  },
+  visual_product_world_brief:{
+    client:'MindBloom',
+    product:'MindBloom Sparkling Adaptogen Water',
+    audience:'High-performing professionals seeking calm focus without caffeine crashes',
+    commercial_goal:'Launch campaign assets for the White Peach Jasmine SKU rollout',
+    core_positioning:'The clearest way to feel calm and sharp at the same time',
+    visual_tension:'Crystalline precision against soft botanical warmth',
+    world_concept:'A world of mineral clarity and quiet ritual, where adaptogenic calm is rendered as light, glass, and stone rather than spa cliche',
+    what_the_world_communicates:'Composed performance, ingredient honesty, and a state of clear-headed calm',
+    what_the_world_avoids:'Sedation, spa softness, supplement sterility, and stimulant intensity'
+  },
+  world_bible:{
+    core_world_idea:'Adaptogenic calm rendered as mineral clarity, not sedation',
+    visual_constants:['Pale travertine surfaces','Soft north light','Suspended botanicals','Cool glassware'],
+    sensory_constants:['Condensation','Mineral bubbles','Citrus brightness','Quiet stillness'],
+    composition_rules:['Generous negative space','Centered product anchor','Asymmetric botanical balance','Low horizon lines'],
+    lighting_rules:['Soft diffused daylight','No harsh specular hotspots','Cool color temperature','Gentle directional shadow'],
+    material_rules:['Stone, glass, linen','No plastic or neon','Matte over glossy','Natural over synthetic'],
+    emotional_rules:['Calm not sleepy','Premium not clinical','Confident not loud'],
+    forbidden_territories:['Energy drink iconography','Spa cliche softness','Pharmaceutical sterility','Psychedelic color']
+  },
+  strict_world:{
+    core_visual_premise:'A still, mineral world where the can rests on pale stone in diffused daylight, surrounded by suspended peach and jasmine.',
+    primary_material_system:'Travertine stone, borosilicate glass, linen, brushed cream surfaces',
+    primary_lighting_logic:'Soft north-facing daylight with gentle directional shadow and no harsh specular hits',
+    primary_composition_logic:'Centered product on a low horizon with generous negative space and asymmetric botanical balance',
+    signature_ingredient_behavior:'White peach and jasmine suspended mid-air or in mineral water with light refraction',
+    risks_if_overused:'Can feel too sterile or repetitive if every scene relies on the same stone-and-glass still life'
+  },
+  expanded_world:{
+    what_can_flex:['Environment','Occasion','Camera angle','Prop selection'],
+    what_cannot_flex:['Can fidelity','Color temperature','Calm tonal register'],
+    approved_environmental_range:['Home kitchen counter','Quiet desk setup','Morning bathroom shelf','Travel surfaces','Paired social moment'],
+    approved_material_range:['Travertine','Linen','Brushed oak','Frosted glass','Pale ceramic'],
+    approved_occasion_range:['Solo morning reset','Midday focus break','Paired evening wind-down','Shared quiet moment with a friend']
+  },
+  world_zones:[
+    {
+      zone_id:'signature_product_world',zone_name:'Signature Product World',
+      commercial_job:"Own the brand's most recognizable hero visual for launch and PDP",
+      strategic_purpose:'Establish the most controlled, ownable expression of the MindBloom world',
+      primary_environment:'Pale travertine plinth in soft daylight',
+      visual_cues:['Centered can','Negative space','Soft shadow','Mineral surface'],
+      material_cues:['Travertine stone','Borosilicate glass','Brushed cream linen'],
+      lighting_cues:['Diffused daylight','Cool temperature','Gentle directional shadow'],
+      composition_cues:['Centered hero','Low horizon','Generous negative space'],
+      approved_props:['White peach','Jasmine sprig','Water droplets'],
+      forbidden_props:['Neon signage','Plastic cups','Energy drink iconography'],
+      neighboring_zone_exclusions:['Macro ingredient close-ups belong to Ingredient Intelligence','Human presence belongs to Benefit State'],
+      ingredient_behavior:'White peach and jasmine rest near the can without obscuring it',
+      avoidances:['Cluttered props','Warm golden light'],
+      scenes:[{
+        scene_name:'Hero Can on Travertine',
+        commercial_job:'Deliver the primary launch hero image for PDP and paid social',
+        primary_occasion:'Hero still life',
+        scene_driver:'product',
+        people_present:'none',
+        occasion_type:'Hero still life',
+        asset_preservation_status:'locked',
+        prompt_text:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, centered on a pale travertine plinth in soft diffused daylight, with a single jasmine sprig and white peach slice resting nearby, cool color temperature, generous negative space, gentle directional shadow.',
+        negative_prompt_text:'Do not redesign the can, no neon, no harsh specular highlights, no clutter, no warm golden light.',
+        prompt_layers:{global:'Cool diffused daylight, mineral calm, generous negative space',background:'Pale travertine surface fading to soft cream',product:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, centered',surface:'Travertine stone plinth',props:'Single jasmine sprig and white peach slice nearby',lighting:'Soft diffused daylight, cool temperature, gentle directional shadow',people:'',motion:''},
+        negative_layers:{global:'No clutter, no warm golden light',product:'Do not redesign or recolor the can',background:'No neon or synthetic backdrops',typography:'No additional logos or wordmarks',people:'',motion:''},
+        recommended_crops:['Square','4:5 portrait'],
+        recommended_use_cases:['PDP hero','Paid social hero'],
+        drift_risks:['Could feel too sterile if overused','Could lose warmth without botanical props'],
+        client_feedback_question:'Does this feel like the definitive hero image for the can?'
+      }]
+    },
+    {
+      zone_id:'ingredient_intelligence',zone_name:'Ingredient Intelligence',
+      commercial_job:'Make ashwagandha, L-theanine, peach, and jasmine feel purposeful and functional',
+      strategic_purpose:'Translate adaptogenic ingredients into structured, credible visual proof',
+      primary_environment:'Macro arrangement on a frosted glass surface',
+      visual_cues:['Macro detail','Suspended botanicals','Mineral clarity'],
+      material_cues:['Frosted glass','Mineral water','Botanical matter'],
+      lighting_cues:['Backlit clarity','Cool white light'],
+      composition_cues:['Macro framing','Suspension and refraction'],
+      approved_props:['Ashwagandha root','Jasmine petals','White peach segment','L-theanine leaf'],
+      forbidden_props:['Pills or capsules','Lab glassware','Clinical signage'],
+      neighboring_zone_exclusions:['Full can hero shots belong to Signature Product World','Retail shelf context belongs to Retail Precision'],
+      ingredient_behavior:'Ashwagandha root, jasmine petals, and peach segments suspended in mineral water with light refraction',
+      avoidances:['Pharmaceutical staging','Overly clinical framing'],
+      scenes:[{
+        scene_name:'Suspended Botanical Macro',
+        commercial_job:'Communicate ingredient credibility for retail decks and education content',
+        primary_occasion:'Macro ingredient still life',
+        scene_driver:'ingredient',
+        people_present:'none',
+        occasion_type:'Macro still life',
+        asset_preservation_status:'placeholder',
+        prompt_text:'Macro shot of ashwagandha root, jasmine petals, and white peach segments suspended in mineral water on a frosted glass surface, backlit with cool white light, sharp refraction, no can visible, mineral clarity throughout.',
+        negative_prompt_text:'No pills, no lab glassware, no clinical signage, no warm tones.',
+        prompt_layers:{global:'Mineral clarity, sharp refraction, cool white light',background:'Frosted glass surface, soft white',product:'',surface:'Frosted glass',props:'Ashwagandha root, jasmine petals, white peach segments',lighting:'Backlit cool white light',people:'',motion:''},
+        negative_layers:{global:'No clinical staging',product:'',background:'No lab glassware',typography:'No text overlays',people:'',motion:''},
+        recommended_crops:['Square','16:9'],
+        recommended_use_cases:['Retail buyer decks','Ingredient education content'],
+        drift_risks:['Could feel too sterile if glass and metal dominate','Could lose refreshment if condensation cues are weak'],
+        client_feedback_question:'Does this make the ingredients feel credible without feeling like a supplement ad?'
+      }]
+    },
+    {
+      zone_id:'benefit_state',zone_name:'Benefit State',
+      commercial_job:'Visualize the calm, clear-headed state MindBloom delivers',
+      strategic_purpose:'Translate the emotional benefit into atmosphere rather than product staging',
+      primary_environment:'Quiet morning desk with soft window light',
+      visual_cues:['Soft focus','Quiet stillness','Indirect human presence'],
+      material_cues:['Linen','Brushed oak','Pale ceramic'],
+      lighting_cues:['Soft morning window light'],
+      composition_cues:['Asymmetric balance','Shallow depth of field'],
+      approved_props:['Notebook','Single pen','Folded linen'],
+      forbidden_props:['Laptops dominating frame','Crowded desks'],
+      neighboring_zone_exclusions:['Full ingredient macros belong to Ingredient Intelligence','Shelf staging belongs to Retail Precision'],
+      ingredient_behavior:'Can rests softly in frame with condensation forming, not the focal point',
+      avoidances:['Smiling stock-model energy','Generic productivity staging'],
+      scenes:[{
+        scene_name:'Quiet Morning Focus',
+        commercial_job:'Support paid social and email storytelling around calm focus',
+        primary_occasion:'Morning desk reset',
+        scene_driver:'people',
+        people_present:'partial_figures',
+        occasion_type:'Morning reset',
+        asset_preservation_status:'mixed',
+        prompt_text:'A pair of hands resting near a MindBloom can on a brushed oak desk in soft morning window light, notebook and single pen nearby, shallow depth of field, calm and unhurried mood, no face visible.',
+        negative_prompt_text:'Avoid smiling stock-model energy, no staged productivity setups, no crowded desks, no harsh light.',
+        prompt_layers:{global:'Calm unhurried morning mood, shallow depth of field',background:'Brushed oak desk, soft window light',product:'MindBloom can resting near hands, condensation visible',surface:'Brushed oak desk surface',props:'Notebook and single pen',lighting:'Soft morning window light',people:'Pair of hands resting near the can, no face visible',motion:''},
+        negative_layers:{global:'No staged productivity clutter',product:'',background:'No crowded desk',typography:'',people:'Avoid smiling stock-model energy and staged posing',motion:''},
+        recommended_crops:['4:5 portrait','1:1'],
+        recommended_use_cases:['Paid social','Email hero'],
+        drift_risks:['Could become generic productivity stock image','Could overuse laptop props'],
+        client_feedback_question:'Does this feel like calm focus rather than a staged productivity ad?'
+      }]
+    },
+    {
+      zone_id:'performance_ritual',zone_name:'Performance Ritual',
+      commercial_job:'Show where MindBloom enters daily routines without generic lifestyle cliches',
+      strategic_purpose:'Carry the brand world into real-life contexts via indirect cues',
+      primary_environment:'Home kitchen counter at midday',
+      visual_cues:['Indirect human cues','Clean domestic surfaces'],
+      material_cues:['Pale ceramic','Linen towel','Brushed metal'],
+      lighting_cues:['Bright midday light'],
+      composition_cues:['Off-center can','Negative space for context'],
+      approved_props:['Folded linen towel','Citrus peel','Ceramic bowl'],
+      forbidden_props:['Messy kitchen clutter','Smiling models'],
+      neighboring_zone_exclusions:['Macro ingredient shots belong to Ingredient Intelligence','Retail shelf framing belongs to Retail Precision'],
+      ingredient_behavior:'Can placed off-center on a clean kitchen counter, citrus peel and condensation visible',
+      avoidances:['Messy lifestyle clutter','Overt demographic signaling'],
+      scenes:[{
+        scene_name:'Midday Kitchen Reset',
+        commercial_job:'Support website use-case sections and launch campaign content',
+        primary_occasion:'Midday kitchen reset',
+        scene_driver:'environment',
+        people_present:'background_only',
+        occasion_type:'Midday reset',
+        asset_preservation_status:'locked',
+        prompt_text:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, placed off-center on a clean kitchen counter at midday, folded linen towel and citrus peel nearby, condensation on the can, bright but soft daylight, a blurred figure barely visible in the background.',
+        negative_prompt_text:'No messy clutter, no smiling models, no overt demographic signaling, no harsh shadows.',
+        prompt_layers:{global:'Bright soft midday light, clean domestic calm',background:'Kitchen counter, blurred figure barely visible',product:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, off-center',surface:'Clean kitchen counter',props:'Folded linen towel, citrus peel',lighting:'Bright soft midday daylight',people:'Blurred figure barely visible in background',motion:''},
+        negative_layers:{global:'No clutter',product:'Do not redesign the can',background:'No messy kitchen',typography:'',people:'No overt demographic signaling',motion:''},
+        recommended_crops:['16:9','1:1'],
+        recommended_use_cases:['Website use-case section','Launch campaign support'],
+        drift_risks:['Could drift into generic lifestyle stock if the figure becomes prominent','Could feel staged if props are overloaded'],
+        client_feedback_question:"Does this feel like a real moment in someone's day rather than a staged lifestyle shot?"
+      }]
+    },
+    {
+      zone_id:'retail_precision',zone_name:'Retail Precision',
+      commercial_job:'Make the can feel shelf-ready and premium for buyer decks and sell sheets',
+      strategic_purpose:'Demonstrate front-facing clarity and commercial credibility',
+      primary_environment:'Cooler shelf with soft retail lighting',
+      visual_cues:['Front-facing label clarity','Clean shelf logic'],
+      material_cues:['Brushed metal shelving','Frosted cooler glass'],
+      lighting_cues:['Even retail lighting'],
+      composition_cues:['Straight-on framing','Limited props'],
+      approved_props:['Adjacent SKU silhouette','Cooler frost'],
+      forbidden_props:['Cluttered shelf signage','Competitor branding'],
+      neighboring_zone_exclusions:['Macro ingredient framing belongs to Ingredient Intelligence','Lifestyle context belongs to Performance Ritual'],
+      ingredient_behavior:'Can faces forward on a cooler shelf with light frost on the glass',
+      avoidances:['Cluttered signage','Uneven lighting'],
+      scenes:[{
+        scene_name:'Cooler Shelf Front-Facing',
+        commercial_job:'Provide a retail-ready image for buyer decks and sell sheets',
+        primary_occasion:'Retail shelf presentation',
+        scene_driver:'retail',
+        people_present:'none',
+        occasion_type:'Retail shelf',
+        asset_preservation_status:'locked',
+        prompt_text:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, front-facing on a frosted cooler shelf with even retail lighting, light frost on the glass door, adjacent SKU silhouettes softly out of focus, clean and premium shelf presentation.',
+        negative_prompt_text:'No cluttered signage, no competitor branding, no uneven lighting, no redesign of the can.',
+        prompt_layers:{global:'Clean premium retail presentation, even lighting',background:'Frosted cooler shelf, soft frost on glass',product:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, front-facing',surface:'Cooler shelf surface',props:'Adjacent SKU silhouettes out of focus',lighting:'Even retail lighting',people:'',motion:''},
+        negative_layers:{global:'No clutter',product:'Do not redesign the can',background:'No competitor branding visible',typography:'No additional signage text',people:'',motion:''},
+        recommended_crops:['1:1','4:5'],
+        recommended_use_cases:['Retail buyer decks','Sell sheets'],
+        drift_risks:['Could feel generic if shelf context is too plain','Could lose premium feel if lighting is uneven'],
+        client_feedback_question:'Does this feel premium and shelf-ready for buyer conversations?'
+      }]
+    },
+    {
+      zone_id:'motion_protocol',zone_name:'Motion Protocol',
+      commercial_job:'Define how the MindBloom world moves for social video and retail screens',
+      strategic_purpose:'Establish controlled, choreographed motion behavior for the brand',
+      primary_environment:'Travertine plinth with slow condensation movement',
+      visual_cues:['Slow rotation','Condensation trails'],
+      material_cues:['Travertine','Borosilicate glass'],
+      lighting_cues:['Stable diffused light'],
+      composition_cues:['Stable centered anchor'],
+      approved_props:['Water droplets','Jasmine petal drift'],
+      forbidden_props:['Explosive splashes','Speed lines'],
+      neighboring_zone_exclusions:['Static hero framing belongs to Signature Product World','Macro ingredient motion belongs to Ingredient Intelligence'],
+      ingredient_behavior:'Condensation trails move slowly down the can while a jasmine petal drifts past in soft focus',
+      avoidances:['Chaotic splashes','Spinning product gimmicks'],
+      scenes:[{
+        scene_name:'Slow Condensation Drift',
+        commercial_job:'Provide a 6 to 10 second loop for retail screens and social video',
+        primary_occasion:'Motion loop',
+        scene_driver:'motion',
+        people_present:'none',
+        occasion_type:'Motion loop',
+        asset_preservation_status:'locked',
+        prompt_text:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, stable centered on a travertine plinth, condensation trails moving slowly down the can while a single jasmine petal drifts gently past in soft focus, diffused stable lighting, calm and controlled motion throughout.',
+        negative_prompt_text:'No explosive splashes, no spinning product, no speed lines, no chaotic motion.',
+        prompt_layers:{global:'Calm controlled motion, diffused stable light',background:'Travertine plinth, soft cream backdrop',product:'Use the uploaded MindBloom White Peach Jasmine can exactly as supplied, stable centered',surface:'Travertine plinth',props:'Single jasmine petal drifting past',lighting:'Diffused stable lighting',people:'',motion:'Condensation trails moving slowly down the can, jasmine petal drift'},
+        negative_layers:{global:'No chaotic motion',product:'Do not redesign the can',background:'',typography:'',people:'',motion:'No explosive splashes, no spinning, no speed lines'},
+        recommended_crops:['9:16','1:1'],
+        recommended_use_cases:['Social video loop','Retail screens'],
+        drift_risks:['Could feel gimmicky if motion is too fast','Could lose calm tone if condensation is too dramatic'],
+        client_feedback_question:'Does this motion feel calm and controlled rather than gimmicky?'
+      }]
+    }
+  ],
+  audience_environment_translation:[
+    {audience_or_occasion:'Morning desk reset',desired_state:'Composed, clear, ready to focus',indirect_cues:['Soft window light','Notebook edge','Single pen','Folded linen'],materials:['Brushed oak','Linen','Pale ceramic'],avoidances:['Smiling stock models','Crowded desks'],scene_prompt_starter:'Soft morning light across a brushed oak desk with a single pen and folded linen nearby'},
+    {audience_or_occasion:'Midday kitchen pause',desired_state:'Calm, grounded, briefly unhurried',indirect_cues:['Citrus peel','Linen towel','Condensation'],materials:['Pale ceramic','Linen','Brushed metal'],avoidances:['Messy clutter','Overt demographic signaling'],scene_prompt_starter:'A clean kitchen counter at midday with citrus peel and a folded linen towel nearby'},
+    {audience_or_occasion:'Shared quiet evening',desired_state:'Connected, calm, unhurried together',indirect_cues:['Two glasses','Shared linen surface','Low warm-cool light'],materials:['Linen','Frosted glass','Pale ceramic'],avoidances:['Party imagery','Staged cheers'],scene_prompt_starter:'Two cans resting on a linen-covered table in soft evening light, no faces visible'}
+  ],
+  master_world_prompt:"MindBloom's world is mineral clarity rendered through travertine stone, borosilicate glass, and linen, lit by soft diffused daylight. White peach and jasmine appear suspended or resting near the can, never staged. The mood is composed, calm, and quietly confident, never sedated, never sterile, never loud.",
+  negative_prompt:'No neon, no energy drink iconography, no spa softness, no pharmaceutical sterility, no smiling stock models, no chaotic splashes, no harsh specular highlights, no warm golden haze.',
+  creative_guardrails:['Keep calm distinct from sleepy','Keep precision distinct from sterile','Vary material stack across zones','Use indirect human cues only','Preserve locked can exactly','Avoid repeating the same still life'],
+  forbidden_drift:{
+    category_drift:'Do not let MindBloom become an energy drink, supplement pill brand, or spa beverage.',
+    tonal_drift:'Do not let calm become sleepy or let precision become sterile.',
+    ingredient_drift:'Do not let jasmine become romantic floral styling or let peach feel sugary.',
+    persona_drift:'Do not turn indirect human cues into stock executives or wellness influencers; people may appear when the scene driver calls for them.',
+    material_drift:'Do not overuse travertine and glass until every scene feels identical.',
+    lighting_drift:'Do not let diffused light become hazy golden spa lighting.',
+    motion_drift:'Do not use chaotic splashes or spinning product gimmicks; motion should feel controlled.',
+    packaging_drift:'Do not redesign, recolor, retype, or simplify the uploaded can artwork.',
+    channel_drift:'Do not use the same still-life structure for every channel; retail, social, and motion should serve different jobs.'
+  },
+  suggested_asset_set:['Transparent can render for compositing','High-resolution label artwork','Lifestyle reference photography of kitchen and desk environments','Macro ingredient photography of ashwagandha and jasmine']
+};
+
+// Skips Calls 1-3 entirely: clones the sample world, runs it through the same
+// post-processing as a real Call 3 result, and renders it as a finished suite
+// so Save to Notion (including the append-pagination path) can be tested instantly.
+function loadSampleOutput(){
+  const data=JSON.parse(JSON.stringify(SAMPLE_WORLD_OUTPUT));
+  data.world_zones.forEach(zone=>(zone.scenes||[]).forEach(scene=>applyProductionHandoff(scene)));
+  data.production_contract=buildProductionContract(data.world_zones,data.asset_preservation_layer?.overall_mode);
+  data.world_board_summary=buildWorldBoardSummary(data);
+  currentOutput=data;
+  currentPhase='done';
+  renderOutput(data,true);
+  const wrap=document.getElementById('output-wrap');
+  wrap.style.display='block';
+  wrap.scrollIntoView({behavior:'smooth',block:'start'});
+  setStatus('Sample output loaded — export or Save to Notion below.','ok');
 }
 
 // ── utils ─────────────────────────────────────────────────────────────────────
