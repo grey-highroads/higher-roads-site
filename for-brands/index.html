@@ -183,13 +183,6 @@
       max-width: 560px; margin-bottom: 0.9rem;
     }
 
-    .hero-support {
-      font-size: 0.9rem; line-height: 1.7;
-      color: var(--white); opacity: 0.42;
-      max-width: 500px; margin-bottom: 2.6rem;
-      letter-spacing: 0.015em;
-    }
-
     .btn-primary {
       display: inline-block;
       font-family: 'Rajdhani', sans-serif; font-weight: 600;
@@ -199,6 +192,18 @@
       transition: background 0.2s, color 0.2s;
     }
     .btn-primary:hover { background: var(--accent); color: var(--black); }
+
+    /* ── HERO IMAGE BREAK ── */
+    .hero-image-break {
+      width: 100%;
+      line-height: 0;
+    }
+
+    .hero-image-break img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
     /* ── POSITIONING BAND ── */
     .positioning {
@@ -459,6 +464,35 @@
       color: var(--white); opacity: 0.6;
     }
 
+    .fit-items {
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+
+    .fit-item {
+      font-size: 0.85rem; line-height: 1.6;
+      color: var(--white); opacity: 0.62;
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border-sub);
+    }
+
+    .fit-cell.negative .fit-item {
+      border-left-color: rgba(107, 96, 87, 0.25);
+    }
+
+    /* ── WHAT THIS SOLVES ── */
+    .what-this-solves {
+      padding: 4rem 3rem;
+      border-top: 1px solid var(--border);
+      max-width: 700px;
+    }
+
+    .what-this-solves p {
+      font-size: 1rem; line-height: 1.85;
+      color: var(--white); opacity: 0.65;
+    }
+
+    .what-this-solves p + p { margin-top: 0.8rem; }
+
     /* ── CTA CLOSE ── */
     .cta-close {
       padding: 5rem 3rem 6rem;
@@ -469,11 +503,17 @@
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.9rem, 3.8vw, 2.8rem);
       font-weight: 500; line-height: 1.15;
-      color: var(--white); margin-bottom: 2.2rem;
+      color: var(--white); margin-bottom: 1.2rem;
       max-width: 640px;
     }
 
     .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    .cta-sub {
+      font-size: 0.95rem; line-height: 1.8;
+      color: var(--white); opacity: 0.55;
+      max-width: 520px; margin-bottom: 2.2rem;
+    }
 
     /* ── FOOTER ── */
     footer {
@@ -642,15 +682,17 @@
       <!-- ── HERO ── -->
       <section class="hero reveal">
         <span class="eyebrow">For Product Brands</span>
-        <h1>Your brand has an identity.<br><em>Your product needs a world.</em></h1>
+        <h1>Your content needs<br><em>to catch up.</em></h1>
         <p class="hero-body">
-          We build visual product worlds for brands that need reusable content across ecommerce, paid media, social, retail selling, and future SKU updates.
+          We build reusable 3D product worlds for product brands that need stronger assets across ecommerce, paid media, social, retail, and future SKU updates.
         </p>
-        <p class="hero-support">
-          Built from your existing identity, designed for motion, and owned by you.
-        </p>
-        <a href="#contact" class="btn-primary">Start a conversation →</a>
+        <a href="#contact" class="btn-primary">Build the product world →</a>
       </section>
+
+      <!-- ── HERO IMAGE BREAK ── -->
+      <div class="hero-image-break">
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage.png" alt="Higher Roads Visual Product World: sample assets" />
+      </div>
 
       <div class="accent-rule"></div>
 
@@ -671,48 +713,7 @@
           </div>
         </div>
       </div>
-
-      <!-- ── MINDBLOOM CALLOUT CARD ── -->
-      <div class="mb-world-wrap reveal">
-        <div class="mb-world">
-
-          <div class="mb-intro">
-            <span class="eyebrow">Sample Product World</span>
-            <h2 class="mb-headline">Meet MindBloom</h2>
-            <p class="mb-bio">
-              MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people oriented toward longevity rather than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
-            </p>
-          </div>
-
-          <div class="mb-grids">
-
-            <!-- Row 1: square | 16:9 | square -->
-            <div class="mb-row mb-row-1">
-              <div class="mb-item mb-item-square">
-                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom: couple at mountain overlook" />
-              </div>
-              <div class="mb-item mb-item-wide">
-                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom: brand composition" />
-              </div>
-              <div class="mb-item mb-item-square">
-                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom: three-can product lineup" />
-              </div>
-            </div>
-
-            <!-- Row 2: two 16:9 autoplay motion loops -->
-            <div class="mb-row mb-row-2">
-              <div class="mb-item mb-item-wide">
-                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-brushvid.mp4" autoplay muted loop playsinline></video>
-              </div>
-              <div class="mb-item mb-item-wide">
-                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" autoplay muted loop playsinline></video>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <!-- ── OFFER ── -->
+ <!-- ── OFFER ── -->
       <section class="offer reveal">
         <span class="eyebrow">The offer</span>
         <p class="offer-name">Visual Product World</p>
@@ -752,7 +753,54 @@
             </div>
           </div>
         </div>
+        
+          <!-- ── REUSE ECONOMICS ── -->
+      <div class="what-this-solves reveal">
+        <span class="eyebrow">Why it works this way</span>
+        <p>Early on, one-off content gets the job done. As the brand grows, it starts creating drag. Every new SKU, retailer, launch, and channel needs another set of assets. The brand ends up rebuilding the same visual foundation over and over.</p>
+        <p>A Visual Product World replaces that cycle. One build becomes the source for product imagery, motion, launch content, retail materials, and every future update.</p>
+      </div>
+        
+      <!-- ── MINDBLOOM CALLOUT CARD ── -->
+      <div class="mb-world-wrap reveal">
+        <div class="mb-world">
 
+          <div class="mb-intro">
+            <span class="eyebrow">Sample Product World</span>
+            <h2 class="mb-headline">Introducing MindBloom</h2>
+            <p class="mb-bio">
+              MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
+            </p>
+          </div>
+
+          <div class="mb-grids">
+
+            <!-- Row 1: square | 16:9 | square -->
+            <div class="mb-row mb-row-1">
+              <div class="mb-item mb-item-square">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom: couple at mountain overlook" />
+              </div>
+              <div class="mb-item mb-item-wide">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom: brand composition" />
+              </div>
+              <div class="mb-item mb-item-square">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom: three-can product lineup" />
+              </div>
+            </div>
+
+            <!-- Row 2: two 16:9 autoplay motion loops -->
+            <div class="mb-row mb-row-2">
+              <div class="mb-item mb-item-wide">
+                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-brushvid.mp4" autoplay muted loop playsinline></video>
+              </div>
+              <div class="mb-item mb-item-wide">
+                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
         <!-- ── VIDEO BREAK ── -->
         <div class="video-break">
           <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/House.mp4"
@@ -760,46 +808,61 @@
         </div>
 
         <!-- ── USE CASES ── -->
-        <span class="eyebrow">When it makes sense</span>
+        <span class="eyebrow">Where it shows up</span>
         <p class="offer-body">
-          You're launching a new SKU, updating packaging, ramping paid media, pitching retail, or building product content across PDP, Amazon, social, and sales presentations. That is when a product world starts making sense.
+          One Visual Product World build supports the full range of channels where product brands need to show up consistently.
         </p>
 
         <div class="use-cases">
-          <span class="use-cases-eyebrow">Why brands build this</span>
+          <span class="use-cases-eyebrow">Where the assets work</span>
           <div class="use-cases-grid">
             <div class="use-case-row">
-              <span class="use-case-label">SKU updates</span>
-              <span class="use-case-outcome">New flavors, packs, and label changes come from the same visual system.</span>
+              <span class="use-case-label">Ecommerce and PDPs</span>
+              <span class="use-case-outcome">Product stills, detail crops, and motion loops for product pages and marketplace listings.</span>
             </div>
             <div class="use-case-row">
-              <span class="use-case-label">Ecommerce</span>
-              <span class="use-case-outcome">PDP, Amazon, and product-detail assets stay consistent across every SKU and variant without starting a new production each time.</span>
+              <span class="use-case-label">Amazon and marketplaces</span>
+              <span class="use-case-outcome">Consistent SKU imagery, feature graphics, and clean product visuals across every listing.</span>
             </div>
             <div class="use-case-row">
-              <span class="use-case-label">Paid and social</span>
-              <span class="use-case-outcome">Short-form motion assets come from the same world as your stills.</span>
+              <span class="use-case-label">Paid and organic social</span>
+              <span class="use-case-outcome">Short loops, product reveals, motion backgrounds, and campaign visuals for every platform format.</span>
             </div>
             <div class="use-case-row">
-              <span class="use-case-label">Sales presentations</span>
-              <span class="use-case-outcome">Sell-in meetings, trade show booths, and launch presentations need imagery before you have product to sample or photograph.</span>
+              <span class="use-case-label">Retail sell-in</span>
+              <span class="use-case-outcome">Presentation-ready visuals for buyer decks, distributor conversations, and launch planning.</span>
             </div>
             <div class="use-case-row">
-              <span class="use-case-label">Before it ships</span>
-              <span class="use-case-outcome">Your launch content needs to exist before your product does. We build paid creative, ecommerce imagery, and launch materials from packaging files while the product is still in production.</span>
+              <span class="use-case-label">Trade shows and events</span>
+              <span class="use-case-outcome">Motion-ready assets for screens, booth displays, and in-person sales moments.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Future SKU updates</span>
+              <span class="use-case-outcome">New flavors, packaging changes, and line extensions render from the same visual foundation.</span>
             </div>
           </div>
         </div>
 
-        <!-- Fit pair -->
         <div class="fit-pair">
           <div class="fit-cell">
-            <span class="fit-label">Right fit when</span>
-            <p>Your brand has an established identity and your product needs a visual world to match it. You're launching a new line, ramping up paid media, pitching retail, or simply overdue for content that actually looks like the brand you built.</p>
+            <span class="fit-label">Good fit when</span>
+            <div class="fit-items">
+              <span class="fit-item">Your product identity and packaging are mostly settled</span>
+              <span class="fit-item">You need assets across more than one channel</span>
+              <span class="fit-item">You have a launch, retail, ecommerce, or SKU expansion need</span>
+              <span class="fit-item">You want a reusable system instead of one-off content</span>
+              <span class="fit-item">Your current visuals make the product feel less credible than it is</span>
+            </div>
           </div>
           <div class="fit-cell negative">
             <span class="fit-label">Not a fit when</span>
-            <p>You need only a few basic stills, your visual identity is still being defined, or you're satisfied with AI tools for your current catalog needs.</p>
+            <div class="fit-items">
+              <span class="fit-item">The product, packaging, or core identity is still unresolved</span>
+              <span class="fit-item">You only need a basic product photo</span>
+              <span class="fit-item">You want a single asset without a broader channel plan</span>
+              <span class="fit-item">The budget only supports one-off content</span>
+              <span class="fit-item">There is no clear channel plan for the assets</span>
+            </div>
           </div>
         </div>
 
@@ -808,8 +871,9 @@
       <!-- ── CONTACT FORM ── -->
       <section id="contact" class="cta-close reveal">
         <p class="cta-close-text">
-          Ready to give your product<br><em>a world worth living in?</em>
+          Ready to stop rebuilding<br><em>content from scratch?</em>
         </p>
+        <p class="cta-sub">Let's build the product world your team can use for launch, retail, ecommerce, paid media, and every SKU that comes next.</p>
         <form
           class="lead-form"
           action="https://formspree.io/f/xrerprnv"
@@ -818,7 +882,7 @@
           <input type="text" name="name" placeholder="Your name" required />
           <input type="email" name="email" placeholder="Your email" required />
           <textarea name="message" placeholder="What are you working on?" rows="5"></textarea>
-          <button type="submit">Get in touch</button>
+          <button type="submit">Start a product world build</button>
         </form>
       </section>
 
