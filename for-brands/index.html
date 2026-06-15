@@ -180,7 +180,7 @@
     .hero-body {
       font-size: 1.05rem; line-height: 1.8;
       color: var(--white); opacity: 0.7;
-      max-width: 560px; margin-bottom: 0.9rem;
+      max-width: 560px; margin-bottom: 2.6rem;
     }
 
     .btn-primary {
@@ -307,7 +307,8 @@
     .video-break {
       width: calc(100% + 6rem);
       margin-left: -3rem;
-      margin-bottom: 3rem;
+      margin-top: 4rem;
+      margin-bottom: 0;
       height: 65vh;
       min-height: 340px;
       position: relative;
@@ -340,7 +341,7 @@
 
     /* ── OFFER ── */
     .offer {
-      padding: 4.5rem 3rem;
+      padding: 4.5rem 3rem 0;
       border-top: 1px solid var(--border);
     }
 
@@ -458,11 +459,6 @@
 
     .fit-cell:first-child .fit-label { color: var(--accent); }
     .fit-cell.negative .fit-label { color: var(--muted); }
-
-    .fit-cell p {
-      font-size: 0.87rem; line-height: 1.65;
-      color: var(--white); opacity: 0.6;
-    }
 
     .fit-items {
       display: flex; flex-direction: column; gap: 0.55rem;
@@ -636,7 +632,7 @@
         min-height: 240px;
       }
 
-      .offer { padding: 3.5rem 1.5rem; }
+      .offer { padding: 3.5rem 1.5rem 0; }
       .offer-flow { grid-template-columns: 1fr; }
       .use-case-row { grid-template-columns: 120px 1fr; }
       .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
@@ -664,7 +660,8 @@
         <a href="../motion/">Motion Design</a>
         <a href="../3d/">3D Animation</a>
         <a href="../immersive/">Immersive</a>
-        <a href="#contact">Contact</a>      </nav>
+        <a href="#contact">Contact</a>
+      </nav>
       <button class="nav-toggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -680,7 +677,7 @@
     <main>
 
       <!-- ── HERO ── -->
-     <section class="hero reveal">
+      <section class="hero reveal">
         <span class="eyebrow">For Product Brands</span>
         <h1>Your brand has an identity.<br><em>Your product needs a world.</em></h1>
         <p class="hero-body">
@@ -688,7 +685,8 @@
         </p>
         <a href="#contact" class="btn-primary">Build the product world →</a>
       </section>
-  <!-- ── POSITIONING BAND ── -->
+
+      <!-- ── POSITIONING BAND ── -->
       <div class="positioning reveal">
         <div class="positioning-inner">
           <div class="positioning-col">
@@ -705,6 +703,7 @@
           </div>
         </div>
       </div>
+
       <!-- ── HERO IMAGE BREAK ── -->
       <div class="hero-image-break">
         <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage.png" alt="Higher Roads Visual Product World: sample assets" />
@@ -712,14 +711,14 @@
 
       <div class="accent-rule"></div>
 
-    
-       <!-- ── REUSE ECONOMICS ── -->
+      <!-- ── REUSE ECONOMICS ── -->
       <div class="what-this-solves reveal">
         <span class="eyebrow">Why it works this way</span>
         <p>Early on, one-off content gets the job done. As the brand grows, it starts creating drag. Every new SKU, retailer, launch, and channel needs another set of assets. The brand ends up rebuilding the same visual foundation over and over.</p>
         <p>A Visual Product World replaces that cycle. One build becomes the source for product imagery, motion, launch content, retail materials, and every future update.</p>
       </div>
- <!-- ── OFFER ── -->
+
+      <!-- ── OFFER ── -->
       <section class="offer reveal">
         <span class="eyebrow">The offer</span>
         <p class="offer-name">Visual Product World</p>
@@ -759,47 +758,40 @@
             </div>
           </div>
         </div>
-        
-      <!-- ── MINDBLOOM CALLOUT CARD ── -->
-      <div class="mb-world-wrap reveal">
-        <div class="mb-world">
 
-          <div class="mb-intro">
-            <span class="eyebrow">Sample Product World</span>
-            <h2 class="mb-headline">Introducing MindBloom</h2>
-            <p class="mb-bio">
-              MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
-            </p>
-          </div>
-
-          <div class="mb-grids">
-
-            <!-- Row 1: square | 16:9 | square -->
-            <div class="mb-row mb-row-1">
-              <div class="mb-item mb-item-square">
-                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom: couple at mountain overlook" />
+        <!-- ── MINDBLOOM CALLOUT CARD ── -->
+        <div class="mb-world-wrap reveal">
+          <div class="mb-world">
+            <div class="mb-intro">
+              <span class="eyebrow">Sample Product World</span>
+              <h2 class="mb-headline">Introducing MindBloom</h2>
+              <p class="mb-bio">
+                MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
+              </p>
+            </div>
+            <div class="mb-grids">
+              <div class="mb-row mb-row-1">
+                <div class="mb-item mb-item-square">
+                  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom: couple at mountain overlook" />
+                </div>
+                <div class="mb-item mb-item-wide">
+                  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom: brand composition" />
+                </div>
+                <div class="mb-item mb-item-square">
+                  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom: three-can product lineup" />
+                </div>
               </div>
-              <div class="mb-item mb-item-wide">
-                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom: brand composition" />
-              </div>
-              <div class="mb-item mb-item-square">
-                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom: three-can product lineup" />
+              <div class="mb-row mb-row-2">
+                <div class="mb-item mb-item-wide">
+                  <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-brushvid.mp4" autoplay muted loop playsinline></video>
+                </div>
+                <div class="mb-item mb-item-wide">
+                  <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" autoplay muted loop playsinline></video>
+                </div>
               </div>
             </div>
-
-            <!-- Row 2: two 16:9 autoplay motion loops -->
-            <div class="mb-row mb-row-2">
-              <div class="mb-item mb-item-wide">
-                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-brushvid.mp4" autoplay muted loop playsinline></video>
-              </div>
-              <div class="mb-item mb-item-wide">
-                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" autoplay muted loop playsinline></video>
-              </div>
-            </div>
-
           </div>
         </div>
-      </div>
 
         <!-- ── USE CASES ── -->
         <span class="eyebrow">Where it shows up</span>
@@ -859,11 +851,13 @@
             </div>
           </div>
         </div>
- <!-- ── VIDEO BREAK ── -->
+
+        <!-- ── VIDEO BREAK ── -->
         <div class="video-break">
           <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/House.mp4"
             autoplay muted loop playsinline></video>
         </div>
+
       </section>
 
       <!-- ── CONTACT FORM ── -->
@@ -903,7 +897,6 @@
   </div>
 
   <script>
-    // Hamburger
     const navToggle = document.querySelector('.nav-toggle');
     const mobileNav = document.querySelector('.mobile-nav');
     navToggle.addEventListener('click', () => {
@@ -917,7 +910,6 @@
       });
     });
 
-    // Theme switcher
     const dots = document.querySelectorAll('.theme-dot');
     const root = document.documentElement;
     dots.forEach(dot => {
@@ -928,7 +920,6 @@
       });
     });
 
-    // Scroll reveal
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
