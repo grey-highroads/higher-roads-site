@@ -1,331 +1,558 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="ember">
 <head>
-   <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NM73WT97');</script>
-   <!-- End Google Tag Manager -->
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="Projection Mapping & Immersive Environments — Nashville | Higher Roads" />
-  <meta property="og:description" content="Nashville projection mapping and immersive environment studio. Venues, events, and permanent installs where the room becomes the experience." />
-  <meta property="og:url" content="https://higher-roads.com/immersive" />
+  <meta name="description" content="Nashville projection mapping studio building immersive environments for brand activations, venue installs, and live events." />
+  <meta property="og:title" content="For Spaces — Higher Roads" />
+  <meta property="og:description" content="Nashville projection mapping studio. Brand activations, venue installs, and live events where the room becomes the experience." />
+  <meta property="og:url" content="https://higher-roads.com/spaces" />
   <meta property="og:type" content="website" />
-  <title>Projection Mapping & Immersive Environments — Higher Roads | Nashville</title>
+  <title>Projection Mapping and Immersive Events — Higher Roads | Nashville</title>
   <link rel="icon" type="image/png" href="../images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/site.css" />
+
   <style>
-  /* ── WORK GRID WRAPPER ── */
-    .work-grid-wrap {
-      padding: 0 3rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      align-items: center;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root, [data-theme="ember"] {
+      --black:      #0a0906;
+      --dark:       #181510;
+      --dark-card:  #111009;
+      --accent:     #e8782a;
+      --accent-dim: #a04f18;
+      --glow:       rgba(232, 120, 42, 0.07);
+      --white:      #f5ede2;
+      --muted:      #6b6057;
+      --border:     rgba(232, 120, 42, 0.18);
+      --border-sub: rgba(232, 120, 42, 0.09);
+    }
+    [data-theme="neon-noir"] {
+      --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
+      --accent: #f72585; --accent-dim: #7b1fa2;
+      --glow: rgba(183,0,255,0.08); --white: #ede8f5;
+      --muted: #5c5470; --border: rgba(247,37,133,0.2);
+      --border-sub: rgba(247,37,133,0.09);
+    }
+    [data-theme="ice"] {
+      --black: #050810; --dark: #0a0f1e; --dark-card: #060a14;
+      --accent: #4fc3f7; --accent-dim: #1a6a8a;
+      --glow: rgba(79,195,247,0.07); --white: #e8f4f8;
+      --muted: #4a6070; --border: rgba(79,195,247,0.18);
+      --border-sub: rgba(79,195,247,0.09);
+    }
+    [data-theme="acid"] {
+      --black: #040a04; --dark: #081208; --dark-card: #050d05;
+      --accent: #39ff14; --accent-dim: #1a7a08;
+      --glow: rgba(57,255,20,0.06); --white: #e8f5e8;
+      --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
+      --border-sub: rgba(57,255,20,0.09);
     }
 
-    .grid-row {
-      display: flex;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-bottom: none;
-      width: 75%;
+    html, body {
+      min-height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    .grid-row.row-wide { border-bottom: 1px solid var(--border); }
-
-    /* ── WORK ITEMS ── */
-    .work-item {
-      position: relative;
-      overflow: hidden;
-      background: var(--dark);
-      cursor: pointer;
-      flex: 1;
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.8;
     }
 
-    .grid-row.row-wide .work-item .work-media { padding-top: 56.25%; }
-
-    .work-media {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
+    body::after {
+      content: '';
+      position: fixed; top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
 
-    .work-media video,
-    .work-media .placeholder-media {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: rgba(10,9,6,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .header-logo { height: 28px; width: auto; display: block; }
+
+    nav.nav-links {
+      display: flex; gap: 2.2rem; align-items: center;
+    }
+
+    nav.nav-links a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    nav.nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--white); transition: all 0.3s; transform-origin: center;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none; flex-direction: column;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem; gap: 1.25rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+    }
+    .mobile-nav a:hover { color: var(--white); }
+
+    /* ── SHARED ── */
+    main { flex: 1; display: flex; flex-direction: column; }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    .eyebrow {
       display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem 3rem 4rem;
+      max-width: 860px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 1.8rem;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-body {
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--white); opacity: 0.7;
+      max-width: 560px; margin-bottom: 2.6rem;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent); color: var(--black); }
+
+    /* ── POSITIONING BAND ── */
+    .positioning {
+      padding: 2.2rem 3rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--dark-card);
+    }
+
+    .positioning-inner {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      align-items: start;
+    }
+
+    .positioning-col {
+      padding: 0 2.2rem;
+      border-right: 1px solid var(--border);
+    }
+    .positioning-col:first-child { padding-left: 0; }
+    .positioning-col:last-child { padding-right: 0; border-right: none; }
+
+    .positioning-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.6rem; display: block;
+    }
+
+    .positioning-col p {
+      font-size: 0.88rem; line-height: 1.7;
+      color: var(--white); opacity: 0.65;
+    }
+
+    /* ── MYCOPOP EDITORIAL BOX ── */
+    .myco-wrap {
+      padding: 5rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .myco-world {
+      width: 68%;
+      margin: 0 auto;
+      background: #1a1712;
+      border: 1px solid rgba(232, 120, 42, 0.28);
+      overflow: hidden;
+    }
+
+    .myco-intro {
+      padding: 3rem 2.8rem 2.2rem;
+    }
+
+    .myco-intro > .eyebrow { margin-bottom: 0.6rem; }
+
+    .myco-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 2.4vw, 1.95rem);
+      font-weight: 500; line-height: 1.2;
+      color: var(--white); margin-bottom: 0.85rem;
+    }
+
+    .myco-bio {
+      font-size: 0.88rem; line-height: 1.8;
+      color: var(--white); opacity: 0.58;
+    }
+
+    .myco-stats {
+      display: flex; gap: 2.5rem;
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(232, 120, 42, 0.2);
+    }
+
+    .stat { display: flex; flex-direction: column; }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem; font-weight: 500;
+      color: var(--accent); line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-top: 0.45rem;
+    }
+
+    /* Reel inside box */
+    .myco-reel {
+      position: relative;
+      width: 100%; aspect-ratio: 16 / 9;
+      background: var(--dark);
+    }
+
+    .myco-reel video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    .play-btn {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: none; border: none; cursor: pointer; padding: 0;
+      transition: opacity 0.3s, transform 0.3s; z-index: 2;
+    }
+    .play-btn:hover { transform: translate(-50%, -50%) scale(1.08); }
+    .play-btn.hidden { opacity: 0; pointer-events: none; }
+
+    /* Three-column process grid inside box */
+    .myco-process {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: rgba(232, 120, 42, 0.18);
+      border-top: 1px solid rgba(232, 120, 42, 0.18);
+    }
+
+    .myco-process-item {
+      background: #1a1712;
+      overflow: hidden;
+    }
+
+    .myco-process-img {
+      width: 100%; aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+
+    .myco-process-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
       transition: transform 0.6s ease;
     }
 
-    .work-media .placeholder-media {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--dark);
-      color: var(--muted);
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+    .myco-process-item:hover .myco-process-img img { transform: scale(1.04); }
+
+    .myco-process-caption {
+      padding: 1.4rem 1.6rem 1.9rem;
     }
 
-    .work-item:hover .work-media video { transform: scale(1.03); }
-
-    .work-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 1.25rem 1.5rem;
+    .myco-process-num {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.5rem;
     }
 
-    .work-item:hover .work-overlay { opacity: 1; }
-
-    .work-tag {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.3rem;
-    }
-
-    .work-title {
+    .myco-process-title {
       font-family: 'Playfair Display', serif;
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: var(--white);
-      line-height: 1.2;
+      font-size: 1.1rem; font-weight: 500;
+      color: var(--white); margin-bottom: 0.6rem; line-height: 1.25;
     }
 
-    /* ── PROMO ITEM ── */
-    .promo-item { cursor: default; }
-
-    .promo-item:hover .work-media video { transform: none; }
-
-    .promo-item .work-overlay { display: none; }
-
-    .promo-item .play-btn {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 10;
-      transition: opacity 0.25s;
+    .myco-process-body {
+      font-size: 0.83rem; line-height: 1.75;
+      color: var(--white); opacity: 0.58;
     }
 
-    .promo-item .play-btn svg {
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
-      transition: transform 0.2s;
-    }
-
-    .promo-item .play-btn:hover svg { transform: scale(1.1); }
-
-    .promo-item .play-btn.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* ── PROCESS SECTION ── */
-    .process-header {
-      width: 75%;
+    /* ── USE CASES ── */
+    .use-cases {
+      padding: 4.5rem 3rem 0;
       border-top: 1px solid var(--border);
-      border-left: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      padding: 1.75rem 2rem 1.5rem;
     }
 
-    .grid-row.row-process {
-      width: 75%;
+    .use-cases-grid {
+      border: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .use-case-row {
+      display: grid; grid-template-columns: 180px 1fr;
       border-bottom: 1px solid var(--border);
     }
+    .use-case-row:last-child { border-bottom: none; }
 
-    .process-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid var(--border);
-      background: var(--dark);
-    }
-
-    .process-item:last-child { border-right: none; }
-
-    .process-media {
-      position: relative;
-      width: 100%;
-      padding-top: 66.67%;
-      overflow: hidden;
-    }
-
-    .process-media img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .process-caption {
-      padding: 1.25rem 1.5rem 1.75rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .process-step {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
+    .use-case-label {
+      background: var(--dark-card);
+      padding: 0.85rem 1.1rem;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
       color: var(--accent);
+      display: flex; align-items: center;
+      border-right: 1px solid var(--border);
     }
 
-    .process-title {
+    .use-case-outcome {
+      padding: 0.85rem 1.2rem;
+      font-size: 0.87rem; line-height: 1.65;
+      color: var(--white); opacity: 0.62;
+      display: flex; align-items: center;
+    }
+
+    /* ── FIT PAIR ── */
+    .fit-pair {
+      margin-top: 2.5rem;
+      margin-bottom: 0;
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+    }
+
+    .fit-cell { padding: 1.4rem 1.6rem; }
+    .fit-cell:first-child { border-right: 1px solid var(--border); }
+
+    .fit-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      display: block; margin-bottom: 0.55rem;
+    }
+    .fit-cell:first-child .fit-label { color: var(--accent); }
+    .fit-cell.negative .fit-label    { color: var(--muted); }
+
+    .fit-items {
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+
+    .fit-item {
+      font-size: 0.85rem; line-height: 1.6;
+      color: var(--white); opacity: 0.62;
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border-sub);
+    }
+    .fit-cell.negative .fit-item {
+      border-left-color: rgba(107, 96, 87, 0.25);
+    }
+
+    /* Wrapper for use-cases + fit so they sit flush */
+    .qualify-block {
+      padding: 4.5rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── CONTACT ── */
+    .cta-close {
+      padding: 5rem 3rem 6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-close-text {
       font-family: 'Playfair Display', serif;
-      font-weight: 500;
-      font-size: 1rem;
-      color: var(--white);
-      line-height: 1.2;
-      margin-bottom: 0.5rem;
+      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-weight: 500; line-height: 1.15;
+      color: var(--white); margin-bottom: 1.2rem;
+      max-width: 640px;
     }
 
-    .process-body {
+    .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    .cta-sub {
+      font-size: 0.95rem; line-height: 1.8;
+      color: var(--white); opacity: 0.55;
+      max-width: 520px; margin-bottom: 2.2rem;
+    }
+
+    .lead-form {
+      width: 100%; max-width: 560px;
+      display: flex; flex-direction: column;
+      gap: 0.9rem; margin-top: 2.2rem;
+    }
+
+    .lead-form input,
+    .lead-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--white);
+      border: 1px solid var(--border);
+      padding: 1rem;
       font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 0.8rem;
-      line-height: 1.7;
-      color: var(--white);
-      opacity: 0.6;
-      letter-spacing: 0.01em;
+      font-size: 0.95rem; font-weight: 300;
+      outline: none; transition: border-color 0.2s;
     }
-/* ── CLIENT FIT ── */
-.client-fit {
-  padding: 3rem 3rem 4rem;
-  border-top: 1px solid var(--border);
-  margin-top: 3rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-}
 
-.fit-col-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--accent);
-  display: block;
-  margin-bottom: 1.25rem;
-}
+    .lead-form input:focus,
+    .lead-form textarea:focus { border-color: var(--accent); }
 
-.fit-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+    .lead-form input::placeholder,
+    .lead-form textarea::placeholder { color: var(--muted); }
 
-.fit-list li {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 300;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: var(--white);
-  opacity: 0.65;
-  padding-left: 1rem;
-  position: relative;
-}
+    .lead-form textarea { min-height: 160px; resize: vertical; }
 
-.fit-list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.6em;
-  width: 4px;
-  height: 1px;
-  background: var(--accent);
-  opacity: 0.5;
-}
+    .lead-form button {
+      align-self: flex-start;
+      background: var(--accent); color: var(--black);
+      border: none; padding: 0.85rem 2rem;
+      font-family: 'Rajdhani', sans-serif; font-size: 0.8rem;
+      font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .lead-form button:hover { opacity: 0.85; }
 
-.fit-not {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 300;
-  font-size: 0.9rem;
-  line-height: 1.8;
-  color: var(--white);
-  opacity: 0.5;
-}
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted);
+    }
 
-.fit-divider {
-  width: 36px;
-  height: 1px;
-  background: var(--accent-dim);
-  margin: 1.25rem 0;
-}
+    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
 
-.fit-closing {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 300;
-  font-size: 0.9rem;
-  line-height: 1.8;
-  color: var(--white);
-  opacity: 0.65;
-  font-style: italic;
-}
+    .footer-email {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-email:hover { color: var(--accent); }
 
-@media (max-width: 640px) {
-  .client-fit {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 2.5rem 1.5rem;
-  }
-}
-    /* ── MOBILE ── */
-    @media (max-width: 640px) {
-      .work-grid-wrap { padding: 0; align-items: stretch; }
-      .grid-row { width: 100%; flex-wrap: wrap; }
-      .grid-row.row-wide .work-item { flex: 0 0 100%; }
-      .grid-row.row-wide .work-item .work-media { padding-top: 56.25%; }
-      .capabilities { width: 100%; margin: 0; }
-      .page-intro { padding: 2rem 1.5rem 1.5rem; }
-      .accent-rule { margin: 0 1.5rem 2rem; }
-      .capability-item { padding: 1rem 1.25rem; }
-      .process-header { width: 100%; }
-      .grid-row.row-process { width: 100%; flex-wrap: wrap; }
-      .process-item { flex: 0 0 100%; border-right: none; border-bottom: 1px solid var(--border); }
-      .process-item:last-child { border-bottom: none; }
+    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
+    .theme-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    }
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+    .theme-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      header { padding: 1.5rem; }
+      nav.nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .mobile-nav { padding: 1.5rem; }
+
+      .hero { padding: 4rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.1rem; }
+
+      .positioning { padding: 2rem 1.5rem; }
+      .positioning-inner { grid-template-columns: 1fr; }
+      .positioning-col {
+        padding: 1.1rem 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .positioning-col:last-child { border-bottom: none; }
+
+      .myco-wrap  { padding: 3.5rem 1.5rem; }
+      .myco-world { width: 100%; }
+      .myco-intro { padding: 2.2rem 1.5rem 1.8rem; }
+      .myco-stats { gap: 1.5rem; flex-wrap: wrap; }
+      .stat-value { font-size: 2rem; }
+      .myco-process { grid-template-columns: 1fr; }
+
+      .qualify-block { padding: 3.5rem 1.5rem; }
+      .use-case-row  { grid-template-columns: 120px 1fr; }
+      .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
+      .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
+      .fit-pair { grid-template-columns: 1fr; }
+      .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+
+      .cta-close { padding: 4rem 1.5rem 5rem; }
+
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
     }
   </style>
 </head>
 <body>
   <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
   <div class="page">
 
     <header>
@@ -335,7 +562,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <nav class="nav-links">
         <a href="../screens/">For Screens</a>
         <a href="../spaces/">For Spaces</a>
-        <a href="../#contact">Contact</a>
+        <a href="#contact">Contact</a>
       </nav>
       <button class="nav-toggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
@@ -343,143 +570,183 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </header>
 
     <nav class="mobile-nav">
-     <a href="../screens/">For Screens</a>
-        <a href="../spaces/">For Spaces</a>
-      <a href="../#contact">Contact</a>
+      <a href="../screens/">For Screens</a>
+      <a href="../spaces/">For Spaces</a>
+      <a href="#contact">Contact</a>
     </nav>
+
     <main>
 
-      <!-- ── PAGE INTRO ── -->
-      <div class="page-intro">
-        <a class="back-link" href="../">
-          <span class="arrow">←</span> Back to Higher Roads
-        </a>
-        <h1 class="page-eyebrow">Immersive Environments</h1>
-        <p class="page-descriptor">
-          Projection mapping, permanent installs, and live event environments. We design and produce work where the room (or the building itself) is the medium.
+      <!-- ── HERO ── -->
+      <section class="hero reveal">
+        <span class="eyebrow">For Spaces</span>
+        <h1>You have the room.<br><em>We build what fills it.</em></h1>
+        <p class="hero-body">Projection-mapped environments for brand activations, venue installs, and live events.</p>
+        <a href="#contact" class="btn-primary">Start a conversation →</a>
+      </section>
+
+      <!-- ── POSITIONING BAND ── -->
+      <div class="positioning reveal">
+        <div class="positioning-inner">
+          <div class="positioning-col">
+            <span class="positioning-label">What you bring</span>
+            <p>The space, your brand identity, and a brief for what you want people to feel. Everything we need to start is already there.</p>
+          </div>
+          <div class="positioning-col">
+            <span class="positioning-label">What we build</span>
+            <p>Motion content designed for your specific surfaces, the geometry and hardware to deliver it, and full on-site execution from brief through strike.</p>
+          </div>
+          <div class="positioning-col">
+            <span class="positioning-label">What your room does</span>
+            <p>Holds attention after guests arrive, becomes the thing they photograph, and gives the venue something to be known for.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MYCOPOP EDITORIAL BOX ── -->
+      <div class="myco-wrap reveal">
+        <div class="myco-world">
+
+          <div class="myco-intro">
+            <span class="eyebrow">The Work</span>
+            <h2 class="myco-headline">Meet Mycopop</h2>
+            <p class="myco-bio">Mycopop Functional Energy activated at Culture Club in Nashville with a brief, five days, and a brand built on retro gaming aesthetics. The room needed to feel like the product. We mapped five surfaces and built a playable branded game wall. One hundred guests walked into a space that moved.</p>
+            <div class="myco-stats">
+              <div class="stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Days concept to event</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Surfaces mapped and live</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">100+</span>
+                <span class="stat-label">Guests in the room</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="myco-reel">
+            <video id="proof-video" playsinline preload="metadata"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+            </video>
+            <button class="play-btn" id="play-btn" aria-label="Play video">
+              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                <polygon points="24,17 48,30 24,43" fill="white"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="myco-process">
+
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-1c.png" alt="Content production" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">01</span>
+                <h3 class="myco-process-title">Content production</h3>
+                <p class="myco-process-body">We design and produce motion content from your existing brand identity. Every asset is built for the specific surfaces it lands on.</p>
+              </div>
+            </div>
+
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Technical production" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">02</span>
+                <h3 class="myco-process-title">Technical production</h3>
+                <p class="myco-process-body">We model the space before content production begins. Throw distances, overlap zones, and geometry corrections are resolved before anything gets rendered.</p>
+              </div>
+            </div>
+
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="On-site execution" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">03</span>
+                <h3 class="myco-process-title">On-site execution</h3>
+                <p class="myco-process-body">We spec and source the hardware, manage load-in, run calibration and rehearsal, and execute on event night. You arrive to a room that's ready.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── USE CASES + FIT (single padded block) ── -->
+      <div class="qualify-block reveal">
+
+        <span class="eyebrow">Where This Fits</span>
+        <div class="use-cases-grid">
+          <div class="use-case-row">
+            <span class="use-case-label">Brand activations</span>
+            <span class="use-case-outcome">A branded environment mapped to the specific room you're activating in, built from your existing identity.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Venue installs</span>
+            <span class="use-case-outcome">Permanent or seasonal visual content that gives the space a recurring identity guests come back for.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Music venues</span>
+            <span class="use-case-outcome">Content systems that shift with your programming without requiring a full production rebuild each time.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Agency projects</span>
+            <span class="use-case-outcome">White-label production behind your creative direction. We handle the technical and execution layer.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Product launches</span>
+            <span class="use-case-outcome">A physical environment that becomes the visual statement guests photograph.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Recurring events</span>
+            <span class="use-case-outcome">Content built once and refreshed efficiently as the programming evolves.</span>
+          </div>
+        </div>
+
+        <div class="fit-pair">
+          <div class="fit-cell">
+            <span class="fit-label">Right fit</span>
+            <div class="fit-items">
+              <span class="fit-item">Venues and events with a deliberate visual ambition</span>
+              <span class="fit-item">Brands looking to own a physical activation moment</span>
+              <span class="fit-item">Experiential agencies who need a production partner behind their creative direction</span>
+              <span class="fit-item">Event producers building a designed environment, not sourcing AV</span>
+            </div>
+          </div>
+          <div class="fit-cell negative">
+            <span class="fit-label">Not a fit</span>
+            <div class="fit-items">
+              <span class="fit-item">Generic AV rental or equipment sourcing</span>
+              <span class="fit-item">Basic event lighting without environmental content</span>
+              <span class="fit-item">Field marketing and sampling activations</span>
+              <span class="fit-item">Events where space design isn't part of the brief</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── CONTACT ── -->
+      <section id="contact" class="cta-close reveal">
+        <p class="cta-close-text">
+          Have a space that should<br><em>feel like something?</em>
         </p>
-      </div>
-
-      <div class="accent-rule"></div>
-
-      <!-- ── WORK GRID ── -->
-      <div class="work-grid-wrap reveal">
-
-        <!-- Row A: two 16:9 wide items -->
-        <div class="grid-row row-wide">
-
-          <!-- Promo video: click-to-play with audio -->
-          <div class="work-item promo-item">
-            <div class="work-media">
-              <video playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png" id="promo-video">
-                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
-              </video>
-              <button class="play-btn" id="play-btn" aria-label="Play video">
-                <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
-                  <polygon points="24,17 48,30 24,43" fill="white"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Central High -->
-         <div class="work-item">
-  <div class="work-media">
-    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Projection Event" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;">
-  </div>
-  <div class="work-overlay">
-    <span class="work-tag">Projection Event</span>
-    <span class="work-title">Imagine If Buildings Could Talk</span>
-  </div>
-</div>
-
-        </div>
-
-        <!-- Process separator + headline -->
-        <div class="process-header">
-          <span class="page-eyebrow">From Space to Screen</span>
-        </div>
-
-        <!-- Row B: three-step process grid -->
-        <div class="grid-row row-process">
-          <div class="process-item">
-            <div class="process-media">
-              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-1c.png" alt="Capture the Space" />
-            </div>
-            <div class="process-caption">
-              <span class="process-step">01</span>
-              <span class="process-title">Capture the Space</span>
-              <p class="process-body">We photograph and measure every surface, angle, and architectural detail. From that, we build a precise 3D model of the environment. The foundation everything else is built on.</p>
-            </div>
-          </div>
-          <div class="process-item">
-            <div class="process-media">
-              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Map the Surfaces" />
-            </div>
-            <div class="process-caption">
-              <span class="process-step">02</span>
-              <span class="process-title">Map the Surfaces</span>
-              <p class="process-body">Using the 3D model, we define every projection surface down to the inch. Throw distances, overlap zones, geometry corrections. All resolved before a single frame of content is made.</p>
-            </div>
-          </div>
-          <div class="process-item">
-            <div class="process-media">
-              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="Make it Move" />
-            </div>
-            <div class="process-caption">
-              <span class="process-step">03</span>
-              <span class="process-title">Make it Move</span>
-              <p class="process-body">With the space fully understood, we design and produce content that fits it exactly. Video, animation, generative loops, or layered stills. Whatever the moment calls for, built to land where it's supposed to.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-<!-- ── CLIENT FIT ── -->
-<div class="client-fit reveal">
-  <div>
-    <span class="fit-col-label">A fit for</span>
-    <ul class="fit-list">
-      <li>Hotels and rooftop bars</li>
-      <li>Music venues and event spaces</li>
-      <li>Beverage and CPG brands</li>
-      <li>Experiential marketing agencies</li>
-      <li>Event producers and hospitality groups</li>
-      <li>Creative teams that need an immersive production partner</li>
-    </ul>
-  </div>
-  <div>
-    <span class="fit-col-label">Not a fit for</span>
-    <p class="fit-not">Generic AV rental, basic event lighting, field marketing, sampling logistics, or low-cost screen installs.</p>
-    <div class="fit-divider"></div>
-    <p class="fit-closing">Our work starts where the space, the brand, and the visual experience need to feel connected.</p>
-  </div>
-</div>
-      <!-- ── APPROACH ── -->
-      <div class="approach reveal">
-        <span class="page-eyebrow">How we work</span>
-        <p class="approach-body">Immersive work starts with understanding the space, the architecture, the audience, and the moment you're designing for. A hotel bar is not a music venue. A brand activation is not a museum install.</p>
-        <p class="approach-body">We handle the full chain: content design, projection geometry, hardware specification, and on-site calibration. You don't need to know how any of it works. You need to know what you want people to feel.</p>
-        <p class="approach-body">Immersive work and experiential marketing often overlap, but they're not the same thing. We don't lead staffing, permits, sampling, or tour logistics. We create the visual experience layer: the part people see, feel, remember, and post.</p>   
-      </div>
-
-      <!-- ── CTA CLOSER ── -->
-      <div class="cta-closer reveal">
-        <div class="cta-closer-text">
-          Have a space that should<br><em>feel</em> like something?
-        </div>
-        <a class="btn-cta" href="../#contact">Start a conversation →</a>
-      </div>
-
-      <!-- ── CAPABILITIES ── -->
-      <div class="capabilities reveal">
-        <span class="capability-item">Projection Mapping</span>
-        <span class="capability-item">Permanent Installs</span>
-        <span class="capability-item">Event Environments</span>
-        <span class="capability-item">Hotel & Venue</span>
-        <span class="capability-item">Brand Activations</span>
-      </div>
+        <p class="cta-sub">Tell us about the room, the event, and what you want people to feel.</p>
+        <form class="lead-form" action="https://formspree.io/f/xrerprnv" method="POST">
+          <input type="text"  name="name"    placeholder="Your name"  required />
+          <input type="email" name="email"   placeholder="Your email" required />
+          <textarea name="message" placeholder="Tell us about the space and the brief." rows="5"></textarea>
+          <button type="submit">Start a conversation</button>
+        </form>
+      </section>
 
     </main>
 
@@ -488,10 +755,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="theme-switcher">
         <span class="theme-label">Theme</span>
         <div class="theme-dots">
-          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
-          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
-          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
-          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
+          <div class="theme-dot active" data-t="ember"></div>
+          <div class="theme-dot"        data-t="neon-noir"></div>
+          <div class="theme-dot"        data-t="ice"></div>
+          <div class="theme-dot"        data-t="acid"></div>
         </div>
       </div>
       <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
@@ -500,7 +767,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   <script>
-    // Hamburger
     const navToggle = document.querySelector('.nav-toggle');
     const mobileNav = document.querySelector('.mobile-nav');
     navToggle.addEventListener('click', () => {
@@ -514,7 +780,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
     });
 
-    // Theme switcher
     const dots = document.querySelectorAll('.theme-dot');
     const root = document.documentElement;
     dots.forEach(dot => {
@@ -525,57 +790,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
     });
 
-    // Hover-to-play on grid videos (excludes promo item)
-    document.querySelectorAll('.work-item:not(.promo-item)').forEach(item => {
-      const video = item.querySelector('video');
-      if (!video) return;
-      item.addEventListener('mouseenter', () => video.play());
-      item.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
-    });
-
-   // Promo video: click-to-play with audio
-const promoVideo = document.getElementById('promo-video');
-const playBtn = document.getElementById('play-btn');
-if (promoVideo && playBtn) {
-  playBtn.addEventListener('click', () => {
-    const playPromise = promoVideo.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          playBtn.classList.add('hidden');
-        })
-        .catch(() => {
-          promoVideo.muted = true;
-          promoVideo.play().then(() => {
-            promoVideo.muted = false;
-            playBtn.classList.add('hidden');
-          });
-        });
+    // Mycopop reel: click-to-play with audio
+    const proofVideo = document.getElementById('proof-video');
+    const playBtn    = document.getElementById('play-btn');
+    if (proofVideo && playBtn) {
+      playBtn.addEventListener('click', () => {
+        const playPromise = proofVideo.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => { playBtn.classList.add('hidden'); })
+            .catch(() => {
+              proofVideo.muted = true;
+              proofVideo.play().then(() => {
+                proofVideo.muted = false;
+                playBtn.classList.add('hidden');
+              });
+            });
+        }
+      });
+      proofVideo.addEventListener('pause', () => {
+        proofVideo.removeAttribute('controls');
+        playBtn.classList.remove('hidden');
+      });
+      proofVideo.addEventListener('ended', () => {
+        proofVideo.removeAttribute('controls');
+        playBtn.classList.remove('hidden');
+      });
+      proofVideo.addEventListener('mouseenter', () => {
+        if (!proofVideo.paused) proofVideo.setAttribute('controls', '');
+      });
+      proofVideo.addEventListener('mouseleave', () => {
+        proofVideo.removeAttribute('controls');
+      });
     }
-  });
 
-  promoVideo.addEventListener('pause', () => {
-    promoVideo.removeAttribute('controls');
-    playBtn.classList.remove('hidden');
-  });
-
-  promoVideo.addEventListener('ended', () => {
-    promoVideo.removeAttribute('controls');
-    playBtn.classList.remove('hidden');
-  });
-
-  // Show/hide controls on hover while playing
-  promoVideo.addEventListener('mouseenter', () => {
-    if (!promoVideo.paused) promoVideo.setAttribute('controls', '');
-  });
-
-  promoVideo.addEventListener('mouseleave', () => {
-    promoVideo.removeAttribute('controls');
-  });
-}
-
-    // Scroll reveal
-    const reveals = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -583,9 +831,9 @@ if (promoVideo && playBtn) {
           revealObserver.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.08 });
+    }, { threshold: 0.06 });
 
-    reveals.forEach(el => revealObserver.observe(el));
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   </script>
 </body>
 </html>
