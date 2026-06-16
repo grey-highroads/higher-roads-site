@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+   <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+   <!-- End Google Tag Manager -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Projection Mapping & Immersive Environments — Nashville | Higher Roads" />
+  <meta property="og:description" content="Nashville projection mapping and immersive environment studio. Venues, events, and permanent installs where the room becomes the experience." />
+  <meta property="og:url" content="https://higher-roads.com/immersive" />
+  <meta property="og:type" content="website" />
+  <title>Projection Mapping & Immersive Environments — Higher Roads | Nashville</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/site.css" />
+  <style>
+  /* ── WORK GRID WRAPPER ── */
+    .work-grid-wrap {
+      padding: 0 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-items: center;
+    }
+
+    .grid-row {
+      display: flex;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      width: 75%;
+    }
+
+    .grid-row.row-wide { border-bottom: 1px solid var(--border); }
+
+    /* ── WORK ITEMS ── */
+    .work-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--dark);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .grid-row.row-wide .work-item .work-media { padding-top: 56.25%; }
+
+    .work-media {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .work-media video,
+    .work-media .placeholder-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .work-media .placeholder-media {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--dark);
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .work-item:hover .work-media video { transform: scale(1.03); }
+
+    .work-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .work-item:hover .work-overlay { opacity: 1; }
+
+    .work-tag {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .work-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    /* ── PROMO ITEM ── */
+    .promo-item { cursor: default; }
+
+    .promo-item:hover .work-media video { transform: none; }
+
+    .promo-item .work-overlay { display: none; }
+
+    .promo-item .play-btn {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      transition: opacity 0.25s;
+    }
+
+    .promo-item .play-btn svg {
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+      transition: transform 0.2s;
+    }
+
+    .promo-item .play-btn:hover svg { transform: scale(1.1); }
+
+    .promo-item .play-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ── PROCESS SECTION ── */
+    .process-header {
+      width: 75%;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 1.75rem 2rem 1.5rem;
+    }
+
+    .grid-row.row-process {
+      width: 75%;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .process-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .process-item:last-child { border-right: none; }
+
+    .process-media {
+      position: relative;
+      width: 100%;
+      padding-top: 66.67%;
+      overflow: hidden;
+    }
+
+    .process-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .process-caption {
+      padding: 1.25rem 1.5rem 1.75rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .process-step {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .process-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.6;
+      letter-spacing: 0.01em;
+    }
+/* ── CLIENT FIT ── */
+.client-fit {
+  padding: 3rem 3rem 4rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+.fit-col-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.fit-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fit-list li {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.65;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.fit-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 4px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+.fit-not {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.5;
+}
+
+.fit-divider {
+  width: 36px;
+  height: 1px;
+  background: var(--accent-dim);
+  margin: 1.25rem 0;
+}
+
+.fit-closing {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--white);
+  opacity: 0.65;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .client-fit {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.5rem 1.5rem;
+  }
+}
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      .work-grid-wrap { padding: 0; align-items: stretch; }
+      .grid-row { width: 100%; flex-wrap: wrap; }
+      .grid-row.row-wide .work-item { flex: 0 0 100%; }
+      .grid-row.row-wide .work-item .work-media { padding-top: 56.25%; }
+      .capabilities { width: 100%; margin: 0; }
+      .page-intro { padding: 2rem 1.5rem 1.5rem; }
+      .accent-rule { margin: 0 1.5rem 2rem; }
+      .capability-item { padding: 1rem 1.25rem; }
+      .process-header { width: 100%; }
+      .grid-row.row-process { width: 100%; flex-wrap: wrap; }
+      .process-item { flex: 0 0 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .process-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <div class="page">
+
+    <header>
+      <a href="../">
+        <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="../motion/">Motion Design</a>
+        <a href="../3d/">3D Animation</a>
+        <a href="../immersive/" class="active">Immersive</a>
+         <a href="../about/">About</a>
+        <a href="../#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="../motion/">Motion Design</a>
+      <a href="../3d/">3D Animation</a>
+      <a href="../immersive/">Immersive</a>
+       <a href="../about/">About</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- ── PAGE INTRO ── -->
+      <div class="page-intro">
+        <a class="back-link" href="../">
+          <span class="arrow">←</span> Back to Higher Roads
+        </a>
+        <h1 class="page-eyebrow">Immersive Environments</h1>
+        <p class="page-descriptor">
+          Projection mapping, permanent installs, and live event environments. We design and produce work where the room (or the building itself) is the medium.
+        </p>
+      </div>
+
+      <div class="accent-rule"></div>
+
+      <!-- ── WORK GRID ── -->
+      <div class="work-grid-wrap reveal">
+
+        <!-- Row A: two 16:9 wide items -->
+        <div class="grid-row row-wide">
+
+          <!-- Promo video: click-to-play with audio -->
+          <div class="work-item promo-item">
+            <div class="work-media">
+              <video playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png" id="promo-video">
+                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+              </video>
+              <button class="play-btn" id="play-btn" aria-label="Play video">
+                <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                  <polygon points="24,17 48,30 24,43" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Central High -->
+         <div class="work-item">
+  <div class="work-media">
+    <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Projection Event" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;">
+  </div>
+  <div class="work-overlay">
+    <span class="work-tag">Projection Event</span>
+    <span class="work-title">Imagine If Buildings Could Talk</span>
+  </div>
+</div>
+
+        </div>
+
+        <!-- Process separator + headline -->
+        <div class="process-header">
+          <span class="page-eyebrow">From Space to Screen</span>
+        </div>
+
+        <!-- Row B: three-step process grid -->
+        <div class="grid-row row-process">
+          <div class="process-item">
+            <div class="process-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-1c.png" alt="Capture the Space" />
+            </div>
+            <div class="process-caption">
+              <span class="process-step">01</span>
+              <span class="process-title">Capture the Space</span>
+              <p class="process-body">We photograph and measure every surface, angle, and architectural detail. From that, we build a precise 3D model of the environment. The foundation everything else is built on.</p>
+            </div>
+          </div>
+          <div class="process-item">
+            <div class="process-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Map the Surfaces" />
+            </div>
+            <div class="process-caption">
+              <span class="process-step">02</span>
+              <span class="process-title">Map the Surfaces</span>
+              <p class="process-body">Using the 3D model, we define every projection surface down to the inch. Throw distances, overlap zones, geometry corrections. All resolved before a single frame of content is made.</p>
+            </div>
+          </div>
+          <div class="process-item">
+            <div class="process-media">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="Make it Move" />
+            </div>
+            <div class="process-caption">
+              <span class="process-step">03</span>
+              <span class="process-title">Make it Move</span>
+              <p class="process-body">With the space fully understood, we design and produce content that fits it exactly. Video, animation, generative loops, or layered stills. Whatever the moment calls for, built to land where it's supposed to.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+<!-- ── CLIENT FIT ── -->
+<div class="client-fit reveal">
+  <div>
+    <span class="fit-col-label">A fit for</span>
+    <ul class="fit-list">
+      <li>Hotels and rooftop bars</li>
+      <li>Music venues and event spaces</li>
+      <li>Beverage and CPG brands</li>
+      <li>Experiential marketing agencies</li>
+      <li>Event producers and hospitality groups</li>
+      <li>Creative teams that need an immersive production partner</li>
+    </ul>
+  </div>
+  <div>
+    <span class="fit-col-label">Not a fit for</span>
+    <p class="fit-not">Generic AV rental, basic event lighting, field marketing, sampling logistics, or low-cost screen installs.</p>
+    <div class="fit-divider"></div>
+    <p class="fit-closing">Our work starts where the space, the brand, and the visual experience need to feel connected.</p>
+  </div>
+</div>
+      <!-- ── APPROACH ── -->
+      <div class="approach reveal">
+        <span class="page-eyebrow">How we work</span>
+        <p class="approach-body">Immersive work starts with understanding the space, the architecture, the audience, and the moment you're designing for. A hotel bar is not a music venue. A brand activation is not a museum install.</p>
+        <p class="approach-body">We handle the full chain: content design, projection geometry, hardware specification, and on-site calibration. You don't need to know how any of it works. You need to know what you want people to feel.</p>
+        <p class="approach-body">Immersive work and experiential marketing often overlap, but they're not the same thing. We don't lead staffing, permits, sampling, or tour logistics. We create the visual experience layer: the part people see, feel, remember, and post.</p>   
+      </div>
+
+      <!-- ── CTA CLOSER ── -->
+      <div class="cta-closer reveal">
+        <div class="cta-closer-text">
+          Have a space that should<br><em>feel</em> like something?
+        </div>
+        <a class="btn-cta" href="../#contact">Start a conversation →</a>
+      </div>
+
+      <!-- ── CAPABILITIES ── -->
+      <div class="capabilities reveal">
+        <span class="capability-item">Projection Mapping</span>
+        <span class="capability-item">Permanent Installs</span>
+        <span class="capability-item">Event Environments</span>
+        <span class="capability-item">Hotel & Venue</span>
+        <span class="capability-item">Brand Activations</span>
+      </div>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
+          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
+          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
+          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Hamburger
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    // Theme switcher
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Hover-to-play on grid videos (excludes promo item)
+    document.querySelectorAll('.work-item:not(.promo-item)').forEach(item => {
+      const video = item.querySelector('video');
+      if (!video) return;
+      item.addEventListener('mouseenter', () => video.play());
+      item.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
+    });
+
+   // Promo video: click-to-play with audio
+const promoVideo = document.getElementById('promo-video');
+const playBtn = document.getElementById('play-btn');
+if (promoVideo && playBtn) {
+  playBtn.addEventListener('click', () => {
+    const playPromise = promoVideo.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          playBtn.classList.add('hidden');
+        })
+        .catch(() => {
+          promoVideo.muted = true;
+          promoVideo.play().then(() => {
+            promoVideo.muted = false;
+            playBtn.classList.add('hidden');
+          });
+        });
+    }
+  });
+
+  promoVideo.addEventListener('pause', () => {
+    promoVideo.removeAttribute('controls');
+    playBtn.classList.remove('hidden');
+  });
+
+  promoVideo.addEventListener('ended', () => {
+    promoVideo.removeAttribute('controls');
+    playBtn.classList.remove('hidden');
+  });
+
+  // Show/hide controls on hover while playing
+  promoVideo.addEventListener('mouseenter', () => {
+    if (!promoVideo.paused) promoVideo.setAttribute('controls', '');
+  });
+
+  promoVideo.addEventListener('mouseleave', () => {
+    promoVideo.removeAttribute('controls');
+  });
+}
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    reveals.forEach(el => revealObserver.observe(el));
+  </script>
+</body>
+</html>
