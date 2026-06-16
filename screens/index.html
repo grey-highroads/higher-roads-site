@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Visual Product World | Higher Roads" />
+  <meta property="og:description" content="We take your brand identity and build the three-dimensional world where your product actually lives. Motion, 3D, owned by you." />
+  <meta property="og:url" content="https://higher-roads.com/for-brands/" />
+  <meta property="og:type" content="website" />
+  <title>Visual Product World | Higher Roads</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root, [data-theme="ember"] {
+      --black:      #0a0906;
+      --dark:       #181510;
+      --dark-card:  #111009;
+      --accent:     #e8782a;
+      --accent-dim: #a04f18;
+      --glow:       rgba(232, 120, 42, 0.07);
+      --white:      #f5ede2;
+      --muted:      #6b6057;
+      --border:     rgba(232, 120, 42, 0.18);
+      --border-sub: rgba(232, 120, 42, 0.09);
+    }
+    [data-theme="neon-noir"] {
+      --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
+      --accent: #f72585; --accent-dim: #7b1fa2;
+      --glow: rgba(183,0,255,0.08); --white: #ede8f5;
+      --muted: #5c5470; --border: rgba(247,37,133,0.2);
+      --border-sub: rgba(247,37,133,0.09);
+    }
+    [data-theme="ice"] {
+      --black: #050810; --dark: #0a0f1e; --dark-card: #060a14;
+      --accent: #4fc3f7; --accent-dim: #1a6a8a;
+      --glow: rgba(79,195,247,0.07); --white: #e8f4f8;
+      --muted: #4a6070; --border: rgba(79,195,247,0.18);
+      --border-sub: rgba(79,195,247,0.09);
+    }
+    [data-theme="acid"] {
+      --black: #040a04; --dark: #081208; --dark-card: #050d05;
+      --accent: #39ff14; --accent-dim: #1a7a08;
+      --glow: rgba(57,255,20,0.06); --white: #e8f5e8;
+      --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
+      --border-sub: rgba(57,255,20,0.09);
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.8;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: rgba(10,9,6,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .header-logo { height: 28px; width: auto; display: block; }
+
+    nav.nav-links {
+      display: flex; gap: 2.2rem; align-items: center;
+    }
+
+    nav.nav-links a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    nav.nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--white); transition: all 0.3s; transform-origin: center;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none; flex-direction: column;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem; gap: 1.25rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+    }
+    .mobile-nav a:hover { color: var(--white); }
+
+    /* ── SHARED ── */
+    main { flex: 1; display: flex; flex-direction: column; }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    .eyebrow {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+
+    .accent-rule {
+      width: 48px; height: 2px;
+      background: var(--accent-dim);
+      margin: 0 3rem 3.5rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem 3rem 4rem;
+      max-width: 860px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 1.8rem;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-body {
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--white); opacity: 0.7;
+      max-width: 560px; margin-bottom: 2.6rem;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent); color: var(--black); }
+
+    /* ── HERO IMAGE BREAK ── */
+    .hero-image-break {
+      width: 100%;
+      line-height: 0;
+    }
+
+    .hero-image-break img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── POSITIONING BAND ── */
+    .positioning {
+      padding: 2.2rem 3rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--dark-card);
+    }
+
+    .positioning-inner {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      align-items: start;
+    }
+
+    .positioning-col {
+      padding: 0 2.2rem;
+      border-right: 1px solid var(--border);
+    }
+    .positioning-col:first-child { padding-left: 0; }
+    .positioning-col:last-child { padding-right: 0; border-right: none; }
+
+    .positioning-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.6rem; display: block;
+    }
+
+    .positioning-col p {
+      font-size: 0.88rem; line-height: 1.7;
+      color: var(--white); opacity: 0.65;
+    }
+
+    /* ── MINDBLOOM CALLOUT CARD ── */
+    .mb-world-wrap {
+      padding: 5rem 0;
+    }
+
+    .mb-world {
+      width: 68%;
+      margin: 0 auto;
+      background: #1a1712;
+      border: 1px solid rgba(232, 120, 42, 0.28);
+      overflow: hidden;
+    }
+
+    .mb-intro {
+      padding: 3rem 2.8rem 2.2rem;
+    }
+
+    .mb-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+      font-weight: 500; line-height: 1.2;
+      color: var(--white); margin-bottom: 0.8rem;
+    }
+
+    .mb-bio {
+      font-size: 0.88rem; line-height: 1.8;
+      color: var(--white); opacity: 0.58;
+    }
+
+    .mb-grids {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: rgba(232, 120, 42, 0.15);
+    }
+
+    .mb-row {
+      display: grid;
+      gap: 1px;
+      background: rgba(232, 120, 42, 0.15);
+    }
+
+    .mb-row-1 { grid-template-columns: 9fr 16fr 9fr; }
+    .mb-row-2 { grid-template-columns: 1fr 1fr; }
+
+    .mb-item {
+      position: relative;
+      overflow: hidden;
+      background: #1a1712;
+    }
+
+    .mb-item-square { aspect-ratio: 1; }
+    .mb-item-wide   { aspect-ratio: 16/9; }
+
+    .mb-item img,
+    .mb-item video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── VIDEO BREAK ── */
+    .video-break {
+      width: calc(100% + 6rem);
+      margin-left: -3rem;
+      margin-top: 4rem;
+      margin-bottom: 0;
+      height: 65vh;
+      min-height: 340px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-break video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-break::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,9,6,0.35) 0%,
+        rgba(10,9,6,0.05) 25%,
+        rgba(10,9,6,0.05) 75%,
+        rgba(10,9,6,0.35) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── OFFER ── */
+    .offer {
+      padding: 4.5rem 3rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .offer > .eyebrow { margin-bottom: 0.5rem; }
+
+    .offer-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500; line-height: 1.1;
+      color: var(--white); margin-bottom: 0.6rem;
+    }
+
+    .offer-tag {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.82rem;
+      letter-spacing: 0.08em; color: var(--muted);
+      margin-bottom: 2.8rem; display: block;
+    }
+
+    .offer-body {
+      font-size: 1rem; line-height: 1.85;
+      color: var(--white); opacity: 0.7;
+      max-width: 620px; margin-bottom: 3.5rem;
+    }
+
+    /* Three-column flow */
+    .offer-flow {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: var(--border);
+      margin-bottom: 3rem;
+    }
+
+    .offer-flow-col {
+      background: var(--dark-card);
+      padding: 2rem 1.8rem;
+    }
+
+    .flow-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem; display: block;
+    }
+
+    .flow-items {
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+
+    .flow-item {
+      font-size: 0.88rem; line-height: 1.6;
+      color: var(--white); opacity: 0.68;
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border-sub);
+    }
+
+    /* ── USE CASES ── */
+    .use-cases {
+      padding: 0;
+    }
+
+    .use-cases-eyebrow {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1rem;
+    }
+
+    .use-cases-grid {
+      border: 1px solid var(--border);
+    }
+
+    .use-case-row {
+      display: grid; grid-template-columns: 180px 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .use-case-row:last-child { border-bottom: none; }
+
+    .use-case-label {
+      background: var(--dark-card);
+      padding: 0.85rem 1.1rem;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent);
+      display: flex; align-items: center;
+      border-right: 1px solid var(--border);
+    }
+
+    .use-case-outcome {
+      padding: 0.85rem 1.2rem;
+      font-size: 0.87rem; line-height: 1.65;
+      color: var(--white); opacity: 0.62;
+      display: flex; align-items: center;
+    }
+
+    /* ── FIT PAIR ── */
+    .fit-pair {
+      margin-top: 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+    }
+
+    .fit-cell {
+      padding: 1.4rem 1.6rem;
+    }
+
+    .fit-cell:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .fit-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      display: block; margin-bottom: 0.55rem;
+    }
+
+    .fit-cell:first-child .fit-label { color: var(--accent); }
+    .fit-cell.negative .fit-label { color: var(--muted); }
+
+    .fit-items {
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+
+    .fit-item {
+      font-size: 0.85rem; line-height: 1.6;
+      color: var(--white); opacity: 0.62;
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border-sub);
+    }
+
+    .fit-cell.negative .fit-item {
+      border-left-color: rgba(107, 96, 87, 0.25);
+    }
+
+    /* ── WHAT THIS SOLVES ── */
+    .what-this-solves {
+      padding: 4rem 3rem;
+      border-top: 1px solid var(--border);
+      max-width: 700px;
+    }
+
+    .what-this-solves p {
+      font-size: 1rem; line-height: 1.85;
+      color: var(--white); opacity: 0.65;
+    }
+
+    .what-this-solves p + p { margin-top: 0.8rem; }
+
+    /* ── CTA CLOSE ── */
+    .cta-close {
+      padding: 5rem 3rem 6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-close-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-weight: 500; line-height: 1.15;
+      color: var(--white); margin-bottom: 1.2rem;
+      max-width: 640px;
+    }
+
+    .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    .cta-sub {
+      font-size: 0.95rem; line-height: 1.8;
+      color: var(--white); opacity: 0.55;
+      max-width: 520px; margin-bottom: 2.2rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted);
+    }
+
+    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+
+    .footer-email {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-email:hover { color: var(--accent); }
+
+    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
+    .theme-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    }
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+    .theme-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    /* ── CONTACT FORM ── */
+    .lead-form {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 2.2rem;
+    }
+
+    .lead-form input,
+    .lead-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--white);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .lead-form input:focus,
+    .lead-form textarea:focus { border-color: var(--accent); }
+
+    .lead-form input::placeholder,
+    .lead-form textarea::placeholder { color: var(--muted); }
+
+    .lead-form textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .lead-form button {
+      align-self: flex-start;
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      padding: 0.85rem 2rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .lead-form button:hover { opacity: 0.85; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      header { padding: 1.5rem; }
+      nav.nav-links { display: none; }
+      .nav-toggle { display: flex; }
+
+      .hero { padding: 4rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.1rem; }
+
+      .accent-rule { margin: 0 1.5rem 2.5rem; }
+
+      .positioning { padding: 2rem 1.5rem; }
+      .positioning-inner { grid-template-columns: 1fr; }
+      .positioning-col {
+        padding: 1.1rem 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .positioning-col:last-child { border-bottom: none; }
+
+      .mb-world-wrap { padding: 3rem 1.5rem; }
+      .mb-world { width: 100%; }
+      .mb-intro { padding: 2.2rem 1.5rem 1.8rem; }
+      .mb-row-1 { grid-template-columns: 1fr; }
+      .mb-row-2 { grid-template-columns: 1fr; }
+      .mb-item-square { aspect-ratio: 4/3; }
+
+      .video-break {
+        width: calc(100% + 3rem);
+        margin-left: -1.5rem;
+        height: 45vh;
+        min-height: 240px;
+      }
+
+      .offer { padding: 3.5rem 1.5rem 0; }
+      .offer-flow { grid-template-columns: 1fr; }
+      .use-case-row { grid-template-columns: 120px 1fr; }
+      .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
+      .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
+      .fit-pair { grid-template-columns: 1fr; }
+      .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+
+      .cta-close { padding: 4rem 1.5rem 5rem; }
+
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <div class="page">
+
+    <header>
+      <a href="../">
+        <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="../motion/">Motion Design</a>
+        <a href="../3d/">3D Animation</a>
+        <a href="../immersive/">Immersive</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="../motion/">Motion Design</a>
+      <a href="../3d/">3D Animation</a>
+      <a href="../immersive/">Immersive</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- ── HERO ── -->
+      <section class="hero reveal">
+        <span class="eyebrow">For Product Brands</span>
+        <h1>Your brand has an identity.<br><em>Your product needs a world.</em></h1>
+        <p class="hero-body">
+          We build visual product worlds for brands that need reusable content across ecommerce, paid media, social, retail selling, and future SKU updates.
+        </p>
+        <a href="#contact" class="btn-primary">Build the product world →</a>
+      </section>
+
+      <!-- ── POSITIONING BAND ── -->
+      <div class="positioning reveal">
+        <div class="positioning-inner">
+          <div class="positioning-col">
+            <span class="positioning-label">What your brand brings</span>
+            <p>Your ethos, story, and direction. The visual identity and aspirations that define who you are. That work is done.</p>
+          </div>
+          <div class="positioning-col">
+            <span class="positioning-label">What we build</span>
+            <p>The Visual Product World: a three-dimensional environment that moves, shaped from your existing identity into content across commerce, campaigns, and retail.</p>
+          </div>
+          <div class="positioning-col">
+            <span class="positioning-label">What your team runs</span>
+            <p>Reusable product content drawn from a brand world you own. Motion loops, stills, and channel assets all come from the same source.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── HERO IMAGE BREAK ── -->
+      <div class="hero-image-break">
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png" alt="Higher Roads Visual Product World: sample assets" />
+      </div>
+
+      <div class="accent-rule"></div>
+
+      <!-- ── REUSE ECONOMICS ── -->
+      <div class="what-this-solves reveal">
+        <span class="eyebrow">Why it works this way</span>
+        <p>Early on, one-off content gets the job done. As the brand grows, it starts creating drag. Every new SKU, retailer, launch, and channel needs another set of assets. The brand ends up rebuilding the same visual foundation over and over.</p>
+        <p>A Visual Product World replaces that cycle. One build becomes the source for product imagery, motion, launch content, retail materials, and every future update.</p>
+      </div>
+
+      <!-- ── OFFER ── -->
+      <section class="offer reveal">
+        <span class="eyebrow">The offer</span>
+        <p class="offer-name">Visual Product World</p>
+        <span class="offer-tag">A three-dimensional world built from your brand identity, designed to move, owned by you.</span>
+
+        <p class="offer-body">
+          We work from your brand's existing identity: the guidelines, values, and visual direction already established. From that, we build the environment where your product actually lives. The world is built for motion first. Stills, campaign loops, and channel assets all come from it. You own the master files.
+        </p>
+
+        <!-- Three-column flow -->
+        <div class="offer-flow">
+          <div class="offer-flow-col">
+            <span class="flow-label">You bring</span>
+            <div class="flow-items">
+              <span class="flow-item">Brand guidelines and visual identity</span>
+              <span class="flow-item">Positioning and values</span>
+              <span class="flow-item">Product specifications and packaging files</span>
+              <span class="flow-item">The visual direction your brand already has</span>
+            </div>
+          </div>
+          <div class="offer-flow-col">
+            <span class="flow-label">We build</span>
+            <div class="flow-items">
+              <span class="flow-item">A complete 3D product environment</span>
+              <span class="flow-item">Materials, lighting, and atmosphere true to your brand</span>
+              <span class="flow-item">Camera systems and motion logic built in from the start</span>
+              <span class="flow-item">A world your product actually inhabits</span>
+            </div>
+          </div>
+          <div class="offer-flow-col">
+            <span class="flow-label">You get</span>
+            <div class="flow-items">
+              <span class="flow-item">The world asset: master files, owned by you</span>
+              <span class="flow-item">2–4 motion loops for paid, social, and PDP</span>
+              <span class="flow-item">A stills set for ecommerce, retail, and Amazon</span>
+              <span class="flow-item">A production source for everything that follows</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MINDBLOOM CALLOUT CARD ── -->
+        <div class="mb-world-wrap reveal">
+          <div class="mb-world">
+            <div class="mb-intro">
+              <span class="eyebrow">Sample Product World</span>
+              <h2 class="mb-headline">Meet MindBloom</h2>
+              <p class="mb-bio">
+                MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
+              </p>
+            </div>
+            <div class="mb-grids">
+              <div class="mb-row mb-row-1">
+                <div class="mb-item mb-item-square">
+                  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom: couple at mountain overlook" />
+                </div>
+                <div class="mb-item mb-item-wide">
+                  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom: brand composition" />
+                </div>
+                <div class="mb-item mb-item-square">
+                  <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom: three-can product lineup" />
+                </div>
+              </div>
+              <div class="mb-row mb-row-2">
+                <div class="mb-item mb-item-wide">
+                  <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-brushvid.mp4" autoplay muted loop playsinline></video>
+                </div>
+                <div class="mb-item mb-item-wide">
+                  <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" autoplay muted loop playsinline></video>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── USE CASES ── -->
+        <span class="eyebrow">Where it shows up</span>
+        <p class="offer-body">
+          One Visual Product World build supports the full range of channels where product brands need to show up consistently.
+        </p>
+
+        <div class="use-cases">
+          <span class="use-cases-eyebrow">Where the assets work</span>
+          <div class="use-cases-grid">
+            <div class="use-case-row">
+              <span class="use-case-label">Ecommerce and PDPs</span>
+              <span class="use-case-outcome">Product stills, detail crops, and motion loops for product pages and marketplace listings.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Amazon and marketplaces</span>
+              <span class="use-case-outcome">Consistent SKU imagery, feature graphics, and clean product visuals across every listing.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Paid and organic social</span>
+              <span class="use-case-outcome">Short loops, product reveals, motion backgrounds, and campaign visuals for every platform format.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Retail sell-in</span>
+              <span class="use-case-outcome">Presentation-ready visuals for buyer decks, distributor conversations, and launch planning.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Trade shows and events</span>
+              <span class="use-case-outcome">Motion-ready assets for screens, booth displays, and in-person sales moments.</span>
+            </div>
+            <div class="use-case-row">
+              <span class="use-case-label">Future SKU updates</span>
+              <span class="use-case-outcome">New flavors, packaging changes, and line extensions render from the same visual foundation.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fit-pair">
+          <div class="fit-cell">
+            <span class="fit-label">Good fit when</span>
+            <div class="fit-items">
+              <span class="fit-item">Your product identity and packaging are mostly settled</span>
+              <span class="fit-item">You need assets across more than one channel</span>
+              <span class="fit-item">You have a launch, retail, ecommerce, or SKU expansion need</span>
+              <span class="fit-item">You want a reusable system instead of one-off content</span>
+              <span class="fit-item">Your current visuals make the product feel less credible than it is</span>
+            </div>
+          </div>
+          <div class="fit-cell negative">
+            <span class="fit-label">Not a fit when</span>
+            <div class="fit-items">
+              <span class="fit-item">The product, packaging, or core identity is still unresolved</span>
+              <span class="fit-item">You only need a basic product photo</span>
+              <span class="fit-item">You want a single asset without a broader channel plan</span>
+              <span class="fit-item">The budget only supports one-off content</span>
+              <span class="fit-item">There is no clear channel plan for the assets</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── VIDEO BREAK ── -->
+        <div class="video-break">
+          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/House.mp4"
+            autoplay muted loop playsinline></video>
+        </div>
+
+      </section>
+
+      <!-- ── CONTACT FORM ── -->
+      <section id="contact" class="cta-close reveal">
+        <p class="cta-close-text">
+          It's time to expand<br><em>your brand</em>
+        </p>
+        <p class="cta-sub">Let's build the product world your team can use for launch, retail, ecommerce, paid media, and every SKU that comes next.</p>
+        <form
+          class="lead-form"
+          action="https://formspree.io/f/xrerprnv"
+          method="POST"
+        >
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="email" name="email" placeholder="Your email" required />
+          <textarea name="message" placeholder="What are you working on?" rows="5"></textarea>
+          <button type="submit">Start a product world build</button>
+        </form>
+      </section>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"></div>
+          <div class="theme-dot"        data-t="neon-noir"></div>
+          <div class="theme-dot"        data-t="ice"></div>
+          <div class="theme-dot"        data-t="acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
