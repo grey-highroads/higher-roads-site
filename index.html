@@ -1,29 +1,191 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="ember">
 <head>
-   <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NM73WT97');</script>
-   <!-- End Google Tag Manager -->
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:title" content="Higher Roads" />
-  <meta property="og:description" content="Higher Roads is a Nashville motion design and animation studio. Brand campaigns, product launches, 3D visualization, and immersive environments." />
+  <meta property="og:description" content="Higher Roads builds the visual world of your brand — for screens and for spaces. Based in Nashville." />
   <meta property="og:image" content="https://higher-roads.com/images/og-image1.png" />
   <meta property="og:url" content="https://higher-roads.com" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <title>Higher Roads — Motion Design, 3D Animation & Immersive Environments Studio</title>
+  <title>Higher Roads — Visual Worlds for Screens and Spaces</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/site.css" />
+
   <style>
-    /* ── HERO ── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root, [data-theme="ember"] {
+      --black: #0a0906;
+      --dark: #181510;
+      --accent: #e8782a;
+      --accent-dim: #a04f18;
+      --glow: rgba(232, 120, 42, 0.07);
+      --white: #f5ede2;
+      --muted: #6b6057;
+      --border: rgba(232, 120, 42, 0.18);
+    }
+
+    [data-theme="neon-noir"] {
+      --black: #07050f;
+      --dark: #0e0a1a;
+      --accent: #f72585;
+      --accent-dim: #7b1fa2;
+      --glow: rgba(183, 0, 255, 0.08);
+      --white: #ede8f5;
+      --muted: #5c5470;
+      --border: rgba(247, 37, 133, 0.2);
+    }
+
+    [data-theme="ice"] {
+      --black: #050810;
+      --dark: #0a0f1e;
+      --accent: #4fc3f7;
+      --accent-dim: #1a6a8a;
+      --glow: rgba(79, 195, 247, 0.07);
+      --white: #e8f4f8;
+      --muted: #4a6070;
+      --border: rgba(79, 195, 247, 0.18);
+    }
+
+    [data-theme="acid"] {
+      --black: #040a04;
+      --dark: #081208;
+      --accent: #39ff14;
+      --accent-dim: #1a7a08;
+      --glow: rgba(57, 255, 20, 0.06);
+      --white: #e8f5e8;
+      --muted: #4a6b4a;
+      --border: rgba(57, 255, 20, 0.18);
+    }
+
+    /* ── THEME SWITCHER ── */
+    .theme-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .theme-dots {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-dot:hover { transform: scale(1.3); }
+
+    .theme-dot.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 7px 2px var(--dot-color);
+    }
+
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    html, body {
+      height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Radial atmospheric glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .wordmark {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .wordmark span { color: var(--accent); }
+
+    .header-logo {
+      display: block;
+      width: auto;
+      height: 32px;
+      max-width: none;
+    }
+
     .contact-link {
       font-size: 0.7rem;
       letter-spacing: 0.2em;
@@ -34,6 +196,77 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     .contact-link:hover { color: var(--accent); }
 
+    /* ── NAV ── */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--white);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      background: var(--black);
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .mobile-nav a:hover { color: var(--white); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+    }
+
+    /* ── HERO ── */
     .hero {
       flex: 1;
       display: flex;
@@ -79,95 +312,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       max-width: 440px;
       letter-spacing: 0.03em;
       animation: fadeUp 0.8s 0.5s ease both;
-    }
-
-    /* ── ROOM SECTION ── */
-    .room-section {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .room-bg {
-      position: absolute;
-      inset: 0;
-      background-image: url('images/room-bg.png');
-      background-size: cover;
-      background-position: center;
-      filter: brightness(0.28);
-      z-index: 0;
-    }
-
-    .room-section::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      background: linear-gradient(to bottom, transparent, var(--black));
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .room-section .reel-wrapper {
-      position: relative;
-      z-index: 2;
-      padding: 2rem;
-      width: 100%;
-      max-width: 900px;
-    }
-
-    /* Fade to dark at bottom of triptych */
-    .triptych-section::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      background: linear-gradient(to bottom, transparent, var(--black));
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .reel-wrapper {
-      width: 100%;
-      max-width: 900px;
-      animation: fadeUp 0.9s 0.65s ease both;
-    }
-
-    .reel-frame {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .reel-frame::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      z-index: 2;
-    }
-
-    .reel-frame video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      object-fit: cover;
-      background: var(--dark);
-      display: block;
     }
 
     /* ── PORTFOLIO SECTIONS ── */
@@ -297,7 +441,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     /* ── TRIPTYCH SECTION ── */
     .triptych-section {
-      position: relative;
       display: flex;
       align-items: stretch;
       min-height: 100vh;
@@ -305,7 +448,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
 
     .triptych-copy {
-      flex: 0 0 35%;
+      flex: 0 0 42%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -375,30 +518,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       animation: fadeUp 0.8s 0.8s ease both;
     }
 
-    /* ── SERVICES STRIP ── */
-    .services {
-      display: flex;
-      gap: 0;
-      justify-content: center;
-      flex-wrap: wrap;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      animation: fadeUp 0.8s 0.9s ease both;
-    }
-
-    .service-item {
-      padding: 1.1rem 2.5rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-right: 1px solid var(--border);
-      transition: color 0.3s;
-    }
-
-    .service-item:last-child { border-right: none; }
-    .service-item:hover { color: var(--white); }
-
     /* ── FORM ── */
     .lead-form-section {
       padding: 6rem 2rem 5rem;
@@ -461,17 +580,86 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       transition: opacity 0.3s ease;
     }
 
-    .lead-form button:hover { opacity: 0.92; }
-
-    @media (max-width: 640px) {
-      .lead-form-section { padding: 4rem 1.5rem 4rem; }
-      .form-intro { margin-bottom: 1.5rem; }
+    .lead-form button:hover {
+      opacity: 0.92;
     }
 
-    /* ── FOOTER (page override: fade-in only; base styles in site.css) ── */
-    footer { animation: fadeUp 0.8s 1s ease both; }
+    @media (max-width: 640px) {
+      .lead-form-section {
+        padding: 4rem 1.5rem 4rem;
+      }
+      .form-intro {
+        margin-bottom: 1.5rem;
+      }
+    }
 
-    /* ── DRILL DOWN BUTTONS ── */
+    /* ── POSITIONING SECTION ── */
+    .positioning-section {
+      padding: 6rem 2rem;
+      display: flex;
+      justify-content: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .positioning-inner {
+      width: 100%;
+      max-width: 680px;
+      text-align: center;
+    }
+
+    .positioning-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1.75rem;
+    }
+
+    .positioning-body {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.85;
+    }
+
+    @media (max-width: 640px) {
+      .positioning-section { padding: 4rem 1.5rem; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.8s 1s ease both;
+    }
+
+    .footer-note {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-email {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-email:hover { color: var(--accent); }
+
+    /* ── BUTTONS ── */
     .btn-see-more {
       display: inline-flex;
       align-items: center;
@@ -500,38 +688,51 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       transition: transform 0.2s;
     }
 
-    .btn-see-more:hover .arrow { transform: translateX(4px); }
+    .btn-see-more:hover .arrow {
+      transform: translateX(4px);
+    }
 
-    .triptych-copy .btn-see-more { align-self: flex-start; }
+    .triptych-copy .btn-see-more {
+      align-self: flex-start;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
       header { padding: 1.5rem; justify-content: center; }
       header .contact-link { display: none; }
       footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
-      .service-item { padding: 1rem 1.5rem; }
       .hero { padding: 3rem 1.5rem; }
     }
   </style>
 </head>
 <body>
   <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
   <div class="page">
 
     <header>
       <a class="wordmark" href="#">
         <img src="images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
       </a>
-     <nav class="nav-links">
-   <a href="immersive/">Immersive</a>
-   <a href="motion/">Motion Design</a>
-   <a href="3d/">3D Animation</a>
-  
-  <a href="#contact">Contact</a>
-</nav>
+      <nav class="nav-links">
+        <a href="screens/">For Screens</a>
+        <a href="spaces/">For Spaces</a>
+        <a href="#contact">Contact</a>
+      </nav>
       <button class="nav-toggle" aria-label="Toggle menu">
         <span></span>
         <span></span>
@@ -540,86 +741,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </header>
 
     <nav class="mobile-nav">
-   <a href="immersive/">Immersive</a>
-   <a href="motion/">Motion Design</a>
-   <a href="3d/">3D Animation</a>
- 
-  <a href="#contact">Contact</a>
-</nav>
+      <a href="screens/">For Screens</a>
+      <a href="spaces/">For Spaces</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
     <main>
 
       <!-- ── HERO ── -->
       <section class="hero">
-        <p class="eyebrow">Motion Design · 3D Animation · Immersive Environments</p>
-
+        <p class="eyebrow">For Screens · For Spaces</p>
         <h1 class="headline">
-          <span style="display:block">Make every impression</span>
-          <span style="display:block"><em>actually make</em> one.</span>
+          <span style="display:block">Your brand deserves</span>
+          <span style="display:block">its own <em>world.</em></span>
         </h1>
+        <p class="subhead">Higher Roads builds yours.</p>
       </section>
 
-      <!-- ── ROOM / VIDEO ── -->
-      <section class="room-section">
-        <div class="room-bg"></div>
-        <div class="reel-wrapper">
-          <div class="reel-frame">
-            <video controls playsinline preload="metadata" poster="images/reel-poster.png">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/HigherRoadsDemoWebYT40MB.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
+      <!-- ── POSITIONING ── -->
+      <section class="positioning-section">
+        <div class="positioning-inner">
+          <span class="positioning-label">The Studio</span>
+          <p class="positioning-body">Higher Roads is a Nashville studio building visual worlds for brands. Those worlds live on screens as motion content and in rooms as immersive environments.</p>
         </div>
       </section>
 
-        <!-- ── IMMERSIVE EXPERIENCES ── -->
-      <section class="portfolio-section" id="immersive">
-        <div class="portfolio-bg">
-           <video autoplay muted loop playsinline preload="auto">
-            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" />
-          </video>
+      <!-- ── FOR SCREENS ── -->
+      <section class="triptych-section" id="screens">
+        <div class="triptych-copy">
+          <span class="portfolio-category">For Screens</span>
+          <h2 class="portfolio-title">Your brand's world.<br>Your product's scene.<br>Your customer's moment.</h2>
+          <p class="section-clarifier">We call it the Visual Product World, a motion-first environment built from your existing brand identity to turn product content into a place your audience wants to be.</p>
+          <a href="/screens/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
         </div>
-        <div class="portfolio-overlay"></div>
-        <div class="portfolio-content">
-          <span class="portfolio-category">Immersive Environments</span>
-          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that amaze.</h2>
-          <p class="section-clarifier">Venues, events, and permanent installs where the room becomes the experience.</p>
-          <a href="/immersive/" class="btn-see-more">See more <span class="arrow">→</span></a>
-        </div>
-        <div class="scroll-cue">
-          <div class="scroll-cue-line"></div>
-          <span>Scroll</span>
-        </div>
-      </section>
-
-      <!-- ── PORTFOLIO ── -->
-      <section class="portfolio-section" id="work">
-        <div class="portfolio-bg">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Champagne.mp4" type="video/mp4" />
-          </video>
-        </div>
-        <div class="portfolio-overlay"></div>
-        <div class="portfolio-content">
-          <span class="portfolio-category">Motion Design</span>
-          <h2 class="portfolio-title">Any setting.<br>Any mood.<br>Any world.</h2>
-          <p class="section-clarifier">Brand campaigns, product launches, and social content built to move.</p>
-          <a href="/motion/" class="btn-see-more">See more <span class="arrow">→</span></a>
-        </div>
-        <div class="scroll-cue">
-          <div class="scroll-cue-line"></div>
-          <span>Scroll</span>
-        </div>
-      </section>
-
-      <!-- ── 3D ANIMATION TRIPTYCH ── -->
-      <section class="triptych-section" id="3d-animation">
-      <div class="triptych-copy">
-  <span class="portfolio-category">3D Animation</span>
-  <h2 class="portfolio-title">Every surface.<br>Every detail.<br>Every angle.</h2>
-  <p class="section-clarifier">Product visualization and brand assets for work that lives in the real world and online.</p>
-        <a href="/3d/" class="btn-see-more">See more <span class="arrow">→</span></a>
-</div>
         <div class="triptych-videos">
           <div class="triptych-video">
             <video autoplay muted loop playsinline preload="auto">
@@ -639,33 +793,43 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
       </section>
 
-     
-      <!-- ── SERVICES ── -->
-      <div class="divider"></div>
-      <div class="services">
-        <span class="service-item">Experiential & Display</span>
-         <span class="service-item">Product Animation</span>
-        <span class="service-item">Brand Motion Systems</span>
-        <span class="service-item">Short-Form Content</span>
-        
-      </div>
+      <!-- ── FOR SPACES ── -->
+      <section class="portfolio-section" id="spaces">
+        <div class="portfolio-bg">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-category">For Spaces</span>
+          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that hold attention.</h2>
+          <p class="section-clarifier">Brand activations, events, and permanent installs where the room becomes the experience.</p>
+          <a href="/spaces/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
+        </div>
+        <div class="scroll-cue">
+          <div class="scroll-cue-line"></div>
+          <span>Scroll</span>
+        </div>
+      </section>
 
-     <!-- ── FORM ── -->
-<section id="contact" class="lead-form-section">
-  <div class="lead-form-wrap">
-    <p class="form-intro">What's your vision?</p>
-    <form
-      class="lead-form"
-      action="https://formspree.io/f/xrerprnv"
-      method="POST"
-    >
-      <input type="text" name="name" placeholder="Your name" required />
-      <input type="email" name="email" placeholder="Your email" required />
-      <textarea name="message" placeholder="What are you working on?" rows="5" required></textarea>
-      <button type="submit">Get in touch</button>
-    </form>
-  </div>
-</section>
+      <!-- ── CONTACT ── -->
+      <section id="contact" class="lead-form-section">
+        <div class="lead-form-wrap">
+          <p class="form-intro">What's your vision?</p>
+          <form
+            class="lead-form"
+            action="https://formspree.io/f/xrerprnv"
+            method="POST"
+          >
+            <input type="text" name="name" placeholder="Your name" required />
+            <input type="email" name="email" placeholder="Your email" required />
+            <textarea name="message" placeholder="What are you working on?" rows="5" required></textarea>
+            <button type="submit">Get in touch</button>
+          </form>
+        </div>
+      </section>
+
     </main>
 
     <footer>
@@ -714,17 +878,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
     });
 
-    // Portfolio scroll-trigger
+    // Portfolio scroll-trigger + video autoplay
     const portfolioSections = document.querySelectorAll('.portfolio-section');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('in-view');
-          // Autoplay video when in view
           const video = entry.target.querySelector('video');
           if (video) video.play();
         } else {
-          // Pause when out of view to save resources
           const video = entry.target.querySelector('video');
           if (video) video.pause();
         }
@@ -733,14 +895,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     portfolioSections.forEach(section => observer.observe(section));
 
-    if (window.innerWidth <= 640) {
-      const video = document.querySelector('.reel-frame video');
-      video.removeAttribute('controls');
-      video.addEventListener('click', () => {
-        video.play();
-        video.setAttribute('controls', '');
-      });
-    }
   </script>
 </body>
 </html>
