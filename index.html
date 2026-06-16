@@ -633,6 +633,159 @@
       .positioning-section { padding: 4rem 1.5rem; }
     }
 
+    /* ── WHY A VISUAL WORLD ── */
+    .world-why-section {
+      padding: 6rem 4rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .world-why-text {
+      max-width: 680px;
+      margin: 0 auto 3.5rem;
+    }
+
+    .world-why-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 500;
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .world-why-body {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+
+    .world-why-visual {
+      max-width: 680px;
+      margin: 0 auto;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .world-why-visual video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .world-why-section { padding: 4rem 1.5rem; }
+    }
+
+    /* ── WHERE WE FIT ── */
+    .where-we-fit-section {
+      padding: 6rem 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .where-we-fit-header {
+      max-width: 760px;
+      margin: 0 auto 4rem;
+      text-align: center;
+    }
+
+    .where-we-fit-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--white);
+      margin-top: 1rem;
+    }
+
+    .where-we-fit-columns {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border: 1px solid var(--border);
+    }
+
+    .fit-column {
+      padding: 2.5rem;
+      border-right: 1px solid var(--border);
+      border-top: 2px solid transparent;
+    }
+
+    .fit-column:last-child {
+      border-right: none;
+      border-top: 2px solid var(--accent);
+    }
+
+    .fit-column-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .fit-column-body {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: 0.65;
+    }
+
+    .fit-image-strip {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+
+    .fit-image {
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      background: var(--dark);
+    }
+
+    .fit-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.65);
+      transition: filter 0.4s ease;
+    }
+
+    .fit-image:hover img { filter: brightness(0.85); }
+
+    @media (max-width: 640px) {
+      .where-we-fit-section { padding: 4rem 1.5rem; }
+      .where-we-fit-columns { grid-template-columns: 1fr; }
+      .fit-column {
+        border-right: none;
+        border-top: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .fit-column:last-child {
+        border-bottom: none;
+        border-top: 2px solid var(--accent);
+      }
+      .fit-image-strip { grid-template-columns: 1fr; }
+    }
+
     /* ── FOOTER ── */
     footer {
       padding: 2rem 3rem;
@@ -756,14 +909,14 @@
           <span style="display:block">Your brand deserves</span>
           <span style="display:block">its own <em>world.</em></span>
         </h1>
-        <p class="subhead">We'll help you build it.</p>
+        <p class="subhead">Higher Roads builds yours.</p>
       </section>
 
       <!-- ── POSITIONING ── -->
       <section class="positioning-section">
         <div class="positioning-inner">
           <span class="positioning-label">The Studio</span>
-          <p class="positioning-body">Higher Roads is a Nashville-based studio building visual worlds for brands. Those worlds live on screens as motion content and in rooms as immersive environments.</p>
+          <p class="positioning-body">Higher Roads is a Nashville studio building visual worlds for brands. Those worlds live on screens as motion content and in rooms as immersive environments.</p>
         </div>
       </section>
 
@@ -772,7 +925,7 @@
         <div class="triptych-copy">
           <span class="portfolio-category">For Screens</span>
           <h2 class="portfolio-title">Your brand's world.<br>Your product's scene.<br>Your customer's moment.</h2>
-          <p class="section-clarifier">We call it the Visual Product World, a motion-first environment built as an extension of your brand identity. Product content that helps find your tribe.</p>
+          <p class="section-clarifier">We call it the Visual Product World, a motion-first environment built from your existing brand identity to turn product content into a place your audience wants to be.</p>
           <a href="/screens/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
         </div>
         <div class="triptych-videos">
@@ -804,13 +957,58 @@
         <div class="portfolio-overlay"></div>
         <div class="portfolio-content">
           <span class="portfolio-category">For Spaces</span>
-          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that entertain.</h2>
+          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that hold attention.</h2>
           <p class="section-clarifier">Brand activations, events, and permanent installs where the room becomes the experience.</p>
           <a href="/spaces/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
         </div>
         <div class="scroll-cue">
           <div class="scroll-cue-line"></div>
           <span>Scroll</span>
+        </div>
+      </section>
+
+      <!-- ── WHY A VISUAL WORLD ── -->
+      <section class="world-why-section">
+        <div class="world-why-text">
+          <span class="portfolio-category">The Case for a World</span>
+          <h2 class="world-why-headline">Create the world your customers want to live in.</h2>
+          <p class="world-why-body">Your logo and your packaging are the starting point. A visual world is what happens when that identity is put in motion, given depth, and made into a place where your audience can see the best version of themselves.</p>
+          <p class="world-why-body">Your brand world communicates who you are, what you value, and why you exist in ways catalog photography or marketing copy can't. We help our clients put that ethos into motion, so the right customers find you, connect with you, and stick with you for the long haul.</p>
+        </div>
+        <div class="world-why-visual">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </section>
+
+      <!-- ── WHERE WE FIT ── -->
+      <section class="where-we-fit-section">
+        <div class="where-we-fit-header">
+          <span class="portfolio-category">Our Role</span>
+          <h2 class="where-we-fit-headline">The production layer between your brand identity and the world it needs to inhabit.</h2>
+        </div>
+        <div class="where-we-fit-columns">
+          <div class="fit-column">
+            <span class="fit-column-label">Your brand team owns</span>
+            <p class="fit-column-body">The identity, the story, the strategic direction. The guidelines, values, and visual language that define who you are. That work is done. We start from it.</p>
+          </div>
+          <div class="fit-column">
+            <span class="fit-column-label">Your agency owns</span>
+            <p class="fit-column-body">The campaign strategy, the channel plan, the media buy. The distribution layer that gets your content in front of the right people. We work alongside that.</p>
+          </div>
+          <div class="fit-column">
+            <span class="fit-column-label">Higher Roads builds</span>
+            <p class="fit-column-body">The visual world where your product lives and your brand shows up. Motion content, 3D environments, and immersive installations. The production layer between having an identity and inhabiting a world.</p>
+          </div>
+        </div>
+        <div class="fit-image-strip">
+          <div class="fit-image">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png" alt="Visual Product World for screens" />
+          </div>
+          <div class="fit-image">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Immersive environment for spaces" />
+          </div>
         </div>
       </section>
 
