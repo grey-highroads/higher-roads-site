@@ -8,60 +8,58 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
   <!-- End Google Tag Manager -->
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Higher Roads is the specialist production partner for agencies, DMCs, and fabricators who need visual worlds for screens and for spaces, behind their client work." />
   <meta property="og:title" content="For Partners — Higher Roads" />
-  <meta property="og:description" content="Higher Roads works with experiential agencies, event production companies, and fabrication shops as a behind-the-scenes production partner for projection mapping, immersive content production, 3D animation, and motion design. Based in Nashville, available nationally." />
+  <meta property="og:description" content="We build the visual worlds your clients need. On screens as motion and 3D product environments. In rooms as projection-mapped spaces. Under your name." />
   <meta property="og:image" content="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png" />
   <meta property="og:url" content="https://higher-roads.com/for-partners/" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <title>For Partners — Higher Roads</title>
   <link rel="icon" type="image/png" href="../images/favicon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
 
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root, [data-theme="ember"] {
-      --black: #0a0906;
-      --dark: #181510;
-      --dark-card: #111009;
-      --accent: #e8782a;
+      --black:      #0a0906;
+      --dark:       #181510;
+      --dark-card:  #111009;
+      --accent:     #e8782a;
       --accent-dim: #a04f18;
-      --glow: rgba(232, 120, 42, 0.07);
-      --white: #f5ede2;
-      --muted: #6b6057;
-      --border: rgba(232, 120, 42, 0.18);
+      --glow:       rgba(232, 120, 42, 0.07);
+      --white:      #f5ede2;
+      --muted:      #6b6057;
+      --border:     rgba(232, 120, 42, 0.18);
+      --border-sub: rgba(232, 120, 42, 0.09);
     }
-
     [data-theme="neon-noir"] {
-      --black: #07050f; --dark: #0e0a1a; --dark-card: #09071a;
+      --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
       --accent: #f72585; --accent-dim: #7b1fa2;
       --glow: rgba(183,0,255,0.08); --white: #ede8f5;
       --muted: #5c5470; --border: rgba(247,37,133,0.2);
+      --border-sub: rgba(247,37,133,0.09);
     }
     [data-theme="ice"] {
-      --black: #050810; --dark: #0a0f1e; --dark-card: #070c18;
+      --black: #050810; --dark: #0a0f1e; --dark-card: #060a14;
       --accent: #4fc3f7; --accent-dim: #1a6a8a;
       --glow: rgba(79,195,247,0.07); --white: #e8f4f8;
       --muted: #4a6070; --border: rgba(79,195,247,0.18);
+      --border-sub: rgba(79,195,247,0.09);
     }
     [data-theme="acid"] {
-      --black: #040a04; --dark: #081208; --dark-card: #060e06;
+      --black: #040a04; --dark: #081208; --dark-card: #050d05;
       --accent: #39ff14; --accent-dim: #1a7a08;
       --glow: rgba(57,255,20,0.06); --white: #e8f5e8;
       --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
-    }
-
-    html {
-      scroll-behavior: smooth;
+      --border-sub: rgba(57,255,20,0.09);
     }
 
     html, body {
@@ -71,629 +69,619 @@
       font-family: 'Barlow', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
+      scroll-behavior: smooth;
       transition: background-color 0.4s ease, color 0.4s ease;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 700px;
-      height: 500px;
-      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.8;
+      pointer-events: none; z-index: 0; opacity: 0.8;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
 
     .page {
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
 
     /* ── HEADER ── */
     header {
       padding: 2rem 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid var(--border);
-      animation: fadeDown 0.8s ease both;
-      position: relative;
-      z-index: 10;
+      position: sticky; top: 0;
+      background: rgba(10,9,6,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
     }
 
-    .header-logo {
-      display: block;
-      height: 32px;
-      width: auto;
-    }
+    .header-logo { height: 28px; width: auto; display: block; }
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 2.5rem;
+    nav.nav-links {
+      display: flex; gap: 2.2rem; align-items: center;
     }
-
-    .nav-links a {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.3s;
+    nav.nav-links a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
     }
-
-    .nav-links a:hover { color: var(--white); }
+    nav.nav-links a:hover { color: var(--white); }
 
     .nav-toggle {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      padding: 4px;
-      background: none;
-      border: none;
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
     }
-
     .nav-toggle span {
-      display: block;
-      width: 22px;
-      height: 1px;
-      background: var(--white);
-      transition: transform 0.3s, opacity 0.3s;
+      display: block; width: 22px; height: 1.5px;
+      background: var(--white); transition: all 0.3s; transform-origin: center;
     }
-
-    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .nav-toggle.open span:nth-child(2) { opacity: 0; }
-    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
     .mobile-nav {
-      display: none;
-      flex-direction: column;
-      border-top: 1px solid var(--border);
-      background: var(--black);
-      position: relative;
-      z-index: 10;
+      display: none; flex-direction: column;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem; gap: 1.25rem;
     }
-
     .mobile-nav.open { display: flex; }
-
     .mobile-nav a {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      transition: color 0.3s;
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
     }
-
     .mobile-nav a:hover { color: var(--white); }
 
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .nav-toggle { display: flex; }
-      header { padding: 1.5rem; }
+    /* ── SHARED ── */
+    main { flex: 1; display: flex; flex-direction: column; }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    .eyebrow {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+
+    .accent-rule {
+      width: 48px; height: 2px;
+      background: var(--accent-dim);
+      margin: 0 3rem 3.5rem;
     }
 
     /* ── HERO ── */
-    .partner-hero {
-      padding: 5.5rem 3rem 4.5rem;
-      animation: fadeUp 0.9s 0.2s ease both;
+    .hero {
+      padding: 6rem 3rem 4rem;
+      max-width: 1000px;
     }
 
-    .page-eyebrow {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-      display: block;
-    }
-
-    .hero-h1 {
+    .hero h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2.4rem, 5vw, 4.25rem);
-      font-weight: 400;
-      line-height: 1.1;
-      color: var(--white);
-      margin-bottom: 1.75rem;
-      max-width: 820px;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 1.8rem;
     }
+    .hero h1 em { font-style: italic; color: var(--accent); }
 
     .hero-body {
-      font-size: 1rem;
-      line-height: 1.85;
-      color: var(--white);
-      opacity: 0.65;
-      max-width: 560px;
-      letter-spacing: 0.01em;
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--white); opacity: 0.7;
+      max-width: 560px; margin-bottom: 2.6rem;
     }
 
-    @media (max-width: 640px) {
-      .partner-hero { padding: 3.5rem 1.5rem 3rem; }
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
     }
+    .btn-primary:hover { background: var(--accent); color: var(--black); }
 
-    /* ── ACCENT RULE ── */
-    .accent-rule {
-      width: 48px;
-      height: 1px;
-      background: var(--accent-dim);
-      margin: 0 3rem 0;
-    }
-
-    /* ── PARTNER LIST ── */
-    .partner-list {
-      width: 100%;
+    /* ── POSITIONING BAND ── */
+    .positioning {
+      padding: 2.8rem 3rem;
       border-top: 1px solid var(--border);
-      margin-top: 3rem;
-    }
-
-    .partner-row {
-      display: grid;
-      grid-template-columns: 280px 1fr;
       border-bottom: 1px solid var(--border);
-      transition: background 0.3s ease;
+      background: var(--dark-card);
     }
 
-    .partner-row:hover {
-      background: var(--dark);
+    .positioning-inner {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      align-items: start;
     }
 
-    .partner-row-label {
-      padding: 3rem;
+    .positioning-col {
+      padding: 0 2.2rem;
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
     }
+    .positioning-col:first-child { padding-left: 0; }
+    .positioning-col:last-child { padding-right: 0; border-right: none; }
+
+    .positioning-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.85rem; display: block;
+    }
+
+    .positioning-col p {
+      font-size: 0.88rem; line-height: 1.7;
+      color: var(--white); opacity: 0.65;
+    }
+
+    .positioning-col ul {
+      list-style: none;
+    }
+
+    .positioning-col ul li {
+      font-size: 0.9rem; line-height: 1.55;
+      color: var(--white); opacity: 0.72;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border-sub);
+    }
+
+    .positioning-col ul li:last-child { border-bottom: none; }
+
+    /* ── PARTNER TYPES ── */
+    .partner-types {
+      padding: 4.5rem 3rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .partner-type {
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      padding: 2.25rem 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .partner-type:first-of-type { border-top: none; }
 
     .partner-num {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.68rem; letter-spacing: 0.1em;
+      color: var(--accent); padding-top: 0.2rem;
+    }
+
+    .partner-type-title {
       font-family: 'Playfair Display', serif;
-      font-size: 4rem;
-      font-weight: 400;
-      line-height: 1;
-      color: var(--accent);
-      opacity: 0.22;
-      display: block;
-      margin-bottom: 0.75rem;
+      font-size: 1.15rem; font-weight: 500;
+      color: var(--white); margin-bottom: 0.6rem;
     }
 
-    .partner-row .page-eyebrow {
-      margin-bottom: 0;
+    .partner-type-body {
+      font-size: 0.94rem; line-height: 1.8;
+      color: var(--white); opacity: 0.65;
     }
 
-    .partner-row-body {
-      padding: 3rem 3.5rem;
+    /* ── MINDBLOOM CALLOUT (screens proof) ── */
+    .mb-world-wrap {
+      padding: 5rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .mb-world-label {
+      padding: 0 3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .mb-world {
+      width: 68%;
+      margin: 0 auto;
+      background: #1a1712;
+      border: 1px solid rgba(232, 120, 42, 0.28);
+      overflow: hidden;
+    }
+
+    .mb-intro {
+      padding: 3rem 2.8rem 2.2rem;
+    }
+
+    .mb-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+      font-weight: 500; line-height: 1.2;
+      color: var(--white); margin-bottom: 0.8rem;
+    }
+
+    .mb-bio {
+      font-size: 0.88rem; line-height: 1.8;
+      color: var(--white); opacity: 0.58;
+    }
+
+    .mb-partner-note {
+      margin-top: 1.2rem;
+      font-size: 0.84rem; line-height: 1.75;
+      color: var(--white); opacity: 0.45;
+      font-style: italic;
+    }
+
+    .mb-grids {
       display: flex;
-      align-items: center;
-    }
-
-    .partner-row-body p {
-      font-size: 1.05rem;
-      line-height: 1.9;
-      color: var(--white);
-      opacity: 0.7;
-      max-width: 640px;
-      letter-spacing: 0.01em;
-    }
-
-    @media (max-width: 860px) {
-      .partner-row { grid-template-columns: 1fr; }
-      .partner-row-label {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        flex-direction: row;
-        align-items: center;
-        gap: 1.5rem;
-        padding-bottom: 1.5rem;
-      }
-      .partner-num { font-size: 2.5rem; margin-bottom: 0; }
-      .partner-row-body { padding: 1.75rem 2rem 2.5rem; }
-    }
-
-    @media (max-width: 640px) {
-      .partner-row-label { padding: 1.5rem; }
-      .partner-row-body { padding: 1.5rem; }
-    }
-
-    /* ── PROOF SECTION ── */
-    .proof-section {
-      padding: 4rem 3rem 0;
-    }
-
-    .proof-section .page-eyebrow {
-      margin-bottom: 2rem;
-    }
-
-    .proof-grid {
-      display: flex;
+      flex-direction: column;
       gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      width: 100%;
+      background: rgba(232, 120, 42, 0.15);
     }
 
-    .proof-item {
+    .mb-row {
+      display: grid;
+      gap: 1px;
+      background: rgba(232, 120, 42, 0.15);
+    }
+
+    .mb-row-1 { grid-template-columns: 9fr 16fr 9fr; }
+    .mb-row-2 { grid-template-columns: 1fr 1fr; }
+
+    .mb-item {
       position: relative;
       overflow: hidden;
-      background: var(--dark);
-      flex: 1;
+      background: #1a1712;
     }
 
-    .proof-item .proof-media {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%;
-    }
+    .mb-item-square { aspect-ratio: 1; }
+    .mb-item-wide   { aspect-ratio: 16/9; }
 
-    .proof-item .proof-media video,
-    .proof-item .proof-media img {
+    .mb-item img,
+    .mb-item video {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.6s ease;
     }
 
-    .proof-item:hover .proof-media img {
-      transform: scale(1.03);
+    /* ── MYCOPOP EDITORIAL BOX (spaces proof) ── */
+    .myco-wrap {
+      padding: 5rem 3rem;
+      border-top: 1px solid var(--border);
     }
 
-    .proof-reel {
-      cursor: default;
+    .myco-world {
+      width: 68%;
+      margin: 0 auto;
+      background: #1a1712;
+      border: 1px solid rgba(232, 120, 42, 0.28);
+      overflow: hidden;
+    }
+
+    .myco-intro {
+      padding: 3rem 2.8rem 2.2rem;
+    }
+
+    .myco-intro > .eyebrow { margin-bottom: 0.6rem; }
+
+    .myco-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 2.4vw, 1.95rem);
+      font-weight: 500; line-height: 1.2;
+      color: var(--white); margin-bottom: 0.85rem;
+    }
+
+    .myco-bio {
+      font-size: 0.88rem; line-height: 1.8;
+      color: var(--white); opacity: 0.58;
+    }
+
+    .myco-stats {
+      display: flex; gap: 2.5rem;
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(232, 120, 42, 0.2);
+    }
+
+    .stat { display: flex; flex-direction: column; }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem; font-weight: 500;
+      color: var(--accent); line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-top: 0.45rem;
+    }
+
+    .myco-reel {
+      position: relative;
+      width: 100%; aspect-ratio: 16 / 9;
+      background: var(--dark);
+    }
+
+    .myco-reel video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
     }
 
     .play-btn {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 10;
-      transition: opacity 0.25s;
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: none; border: none; cursor: pointer; padding: 0;
+      transition: opacity 0.3s, transform 0.3s; z-index: 2;
+    }
+    .play-btn:hover { transform: translate(-50%, -50%) scale(1.08); }
+    .play-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .myco-process {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: rgba(232, 120, 42, 0.18);
+      border-top: 1px solid rgba(232, 120, 42, 0.18);
     }
 
-    .play-btn svg {
-      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
-      transition: transform 0.2s;
+    .myco-process-item {
+      background: #1a1712;
+      overflow: hidden;
     }
 
-    .play-btn:hover svg { transform: scale(1.1); }
-
-    .play-btn.hidden {
-      opacity: 0;
-      pointer-events: none;
+    .myco-process-img {
+      width: 100%; aspect-ratio: 4 / 3;
+      overflow: hidden;
     }
 
-    .proof-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 1.5rem;
-      pointer-events: none;
+    .myco-process-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.6s ease;
     }
 
-    .proof-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.3rem;
+    .myco-process-item:hover .myco-process-img img { transform: scale(1.04); }
+
+    .myco-process-caption {
+      padding: 1.4rem 1.6rem 1.9rem;
     }
 
-    .proof-title {
+    .myco-process-num {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.5rem;
+    }
+
+    .myco-process-title {
       font-family: 'Playfair Display', serif;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--white);
-      line-height: 1.2;
+      font-size: 1.1rem; font-weight: 500;
+      color: var(--white); margin-bottom: 0.6rem; line-height: 1.25;
     }
 
-    .proof-caption {
-      padding: 1.25rem 0 0;
-      font-size: 0.8rem;
-      line-height: 1.7;
-      color: var(--white);
-      opacity: 0.45;
-      letter-spacing: 0.01em;
-      font-family: 'Rajdhani', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      font-size: 0.65rem;
+    .myco-process-body {
+      font-size: 0.83rem; line-height: 1.75;
+      color: var(--white); opacity: 0.58;
     }
 
-    @media (max-width: 640px) {
-      .proof-section { padding: 3rem 0 0; }
-      .proof-grid { flex-direction: column; }
-      .proof-section .page-eyebrow { padding: 0 1.5rem; }
-      .proof-caption { padding: 1rem 1.5rem 0; }
-    }
-
-    /* ── APPROACH / HOW WE WORK ── */
-    .approach {
-      padding: 4rem 3rem 2rem;
-      max-width: 860px;
+    /* ── HOW WE WORK ── */
+    .how-section {
+      padding: 4.5rem 3rem;
       border-top: 1px solid var(--border);
-      margin-top: 4rem;
+      max-width: 700px;
     }
 
-    .approach .page-eyebrow {
-      margin-bottom: 1rem;
+    .how-section p {
+      font-size: 1rem; line-height: 1.85;
+      color: var(--white); opacity: 0.65;
     }
 
-    .approach-body {
-      font-size: 1rem;
-      line-height: 1.85;
-      color: var(--white);
-      opacity: 0.7;
-      letter-spacing: 0.01em;
-    }
+    .how-section p + p { margin-top: 0.8rem; }
 
-    .approach-body + .approach-body {
-      margin-top: 1.1rem;
-    }
-
-    @media (max-width: 640px) {
-      .approach { padding: 2.5rem 1.5rem; }
-    }
-
-    /* ── WHERE WE'RE USEFUL ── */
-    .useful-section {
-      padding: 0 3rem;
-      margin-top: 2rem;
-    }
-
-    .useful-section .page-eyebrow {
-      margin-bottom: 1.5rem;
-    }
-
-    .useful-list {
-      list-style: none;
-      border: 1px solid var(--border);
-    }
-
-    .useful-item {
-      padding: 1.1rem 2rem;
+    /* ── THREE MODELS ── */
+    .models-section {
+      border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      font-size: 0.95rem;
-      line-height: 1.65;
-      color: var(--white);
-      opacity: 0.72;
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      letter-spacing: 0.01em;
     }
 
-    .useful-item:last-child { border-bottom: none; }
-
-    .useful-item::before {
-      content: '';
-      display: block;
-      width: 18px;
-      height: 1px;
-      background: var(--accent);
-      opacity: 0.6;
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 640px) {
-      .useful-section { padding: 0; margin-top: 2.5rem; }
-      .useful-item { padding: 1rem 1.5rem; }
-    }
-
-    /* ── PARTNER CONFIDENCE ── */
-    .confidence-section {
-      padding: 0 3rem;
-      margin-top: 3rem;
-    }
-
-    .confidence-section .page-eyebrow {
-      margin-bottom: 1.5rem;
-    }
-
-    .confidence-grid {
+    .models-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 1px;
       background: var(--border);
-      border: 1px solid var(--border);
     }
 
-    .confidence-card {
+    .model-col {
       background: var(--dark-card);
-      padding: 2rem 2.5rem;
-      transition: background 0.3s;
+      padding: 2.2rem 2rem;
     }
 
-    .confidence-card:hover { background: var(--dark); }
-
-    .confidence-q {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.7rem;
+    .model-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); display: block; margin-bottom: 0.65rem;
     }
 
-    .confidence-a {
-      font-size: 0.95rem;
-      line-height: 1.7;
-      color: var(--white);
-      opacity: 0.82;
-    }
-
-    @media (max-width: 640px) {
-      .confidence-section { padding: 0; margin-top: 2.5rem; }
-      .confidence-grid { grid-template-columns: 1fr; }
-      .confidence-card { padding: 1.5rem; }
-    }
-
-    /* ── CTA CLOSER ── */
-    .cta-closer {
-      margin: 0 3rem 6rem;
-      padding: 3rem;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
-    }
-
-    .cta-closer-text {
+    .model-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(1.2rem, 2.5vw, 1.75rem);
-      font-weight: 400;
-      color: var(--white);
-      line-height: 1.2;
+      font-size: 1.05rem; font-weight: 500;
+      color: var(--white); margin-bottom: 0.6rem;
     }
 
-    .cta-closer-text em {
-      font-style: italic;
-      color: var(--accent);
+    .model-body {
+      font-size: 0.86rem; line-height: 1.72;
+      color: var(--white); opacity: 0.58;
     }
 
-    .btn-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--black);
-      background: var(--accent);
-      border: none;
-      padding: 1rem 1.75rem;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: opacity 0.2s, transform 0.15s;
-    }
-
-    .btn-cta:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    @media (max-width: 640px) {
-      .cta-closer {
-        flex-direction: column;
-        align-items: flex-start;
-        margin: 0 1.5rem 4rem;
-        padding: 2rem;
-      }
-    }
-
-    /* ── CAPABILITIES STRIP ── */
-    .capabilities {
-      width: 100%;
+    /* ── QUALIFY BLOCK ── */
+    .qualify-block {
+      padding: 4.5rem 3rem;
       border-top: 1px solid var(--border);
-      display: flex;
-      flex-wrap: wrap;
     }
 
-    .capability-item {
-      flex: 1;
-      min-width: 160px;
-      padding: 1.25rem 2rem;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .use-cases-grid {
+      border: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .use-case-row {
+      display: grid; grid-template-columns: 200px 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .use-case-row:last-child { border-bottom: none; }
+
+    .use-case-label {
+      background: var(--dark-card);
+      padding: 0.85rem 1.1rem;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent);
+      display: flex; align-items: center;
       border-right: 1px solid var(--border);
-      transition: color 0.3s;
     }
 
-    .capability-item:last-child { border-right: none; }
-    .capability-item:hover { color: var(--white); }
-
-    @media (max-width: 640px) {
-      .capability-item { padding: 1rem 1.25rem; }
+    .use-case-outcome {
+      padding: 0.85rem 1.2rem;
+      font-size: 0.87rem; line-height: 1.65;
+      color: var(--white); opacity: 0.62;
+      display: flex; align-items: center;
     }
+
+    .fit-pair {
+      margin-top: 2.5rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+    }
+
+    .fit-cell { padding: 1.4rem 1.6rem; }
+    .fit-cell:first-child { border-right: 1px solid var(--border); }
+
+    .fit-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      display: block; margin-bottom: 0.55rem;
+    }
+    .fit-cell:first-child .fit-label { color: var(--accent); }
+    .fit-cell.negative .fit-label    { color: var(--muted); }
+
+    .fit-items {
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+
+    .fit-item {
+      font-size: 0.85rem; line-height: 1.6;
+      color: var(--white); opacity: 0.62;
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border-sub);
+    }
+    .fit-cell.negative .fit-item {
+      border-left-color: rgba(107, 96, 87, 0.25);
+    }
+
+    /* ── FAQ ── */
+    .faq-section {
+      padding: 4.5rem 3rem;
+      border-top: 1px solid var(--border);
+      max-width: 700px;
+    }
+
+    .faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .faq-item:first-of-type { border-top: 1px solid rgba(255,255,255,0.06); }
+
+    .faq-trigger {
+      width: 100%; background: none; border: none; cursor: pointer;
+      padding: 1.2rem 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      text-align: left;
+    }
+
+    .faq-question {
+      font-family: 'Barlow', sans-serif; font-size: 0.96rem; font-weight: 300;
+      color: var(--white); line-height: 1.4;
+    }
+
+    .faq-icon {
+      flex-shrink: 0; width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-size: 1.1rem;
+      transition: transform 0.25s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+
+    .faq-answer-inner {
+      font-size: 0.9rem; line-height: 1.8;
+      color: var(--white); opacity: 0.6;
+      padding-bottom: 1.25rem;
+    }
+
+    /* ── CTA CLOSE ── */
+    .cta-close {
+      padding: 5rem 3rem 6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-close-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-weight: 500; line-height: 1.15;
+      color: var(--white); margin-bottom: 1.2rem;
+      max-width: 640px;
+    }
+    .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    .cta-sub {
+      font-size: 0.95rem; line-height: 1.8;
+      color: var(--white); opacity: 0.55;
+      max-width: 520px; margin-bottom: 2.2rem;
+    }
+
+    .cta-email-link {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cta-email-link:hover { background: var(--accent); color: var(--black); }
 
     /* ── FOOTER ── */
     footer {
       padding: 2rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted);
     }
 
-    .footer-note {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
+    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
 
     .footer-email {
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.3s;
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
     }
-
     .footer-email:hover { color: var(--accent); }
 
-    .theme-switcher {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
+    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
     .theme-label {
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
     }
-
     .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
-
     .theme-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.15);
-      cursor: pointer;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-
     .theme-dot:hover { transform: scale(1.3); }
     .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
     .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
@@ -701,30 +689,57 @@
     .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
     .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
 
-    @media (max-width: 640px) {
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      header { padding: 1.5rem; }
+      nav.nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .mobile-nav { padding: 1.5rem; }
+
+      .hero { padding: 4rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.1rem; }
+
+      .positioning { padding: 2rem 1.5rem; }
+      .positioning-inner { grid-template-columns: 1fr; }
+      .positioning-col {
+        padding: 1.1rem 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .positioning-col:last-child { border-bottom: none; }
+
+      .partner-types { padding: 3.5rem 1.5rem 0; }
+      .partner-type { grid-template-columns: 2.5rem 1fr; gap: 1rem; }
+
+      .mb-world-wrap { padding: 3rem 1.5rem; }
+      .mb-world-label { padding: 0; }
+      .mb-world { width: 100%; }
+      .mb-intro { padding: 2.2rem 1.5rem 1.8rem; }
+      .mb-row-1 { grid-template-columns: 1fr; }
+      .mb-row-2 { grid-template-columns: 1fr; }
+      .mb-item-square { aspect-ratio: 4/3; }
+
+      .myco-wrap { padding: 3.5rem 1.5rem; }
+      .myco-world { width: 100%; }
+      .myco-intro { padding: 2.2rem 1.5rem 1.8rem; }
+      .myco-stats { gap: 1.5rem; flex-wrap: wrap; }
+      .stat-value { font-size: 2rem; }
+      .myco-process { grid-template-columns: 1fr; }
+
+      .how-section { padding: 3.5rem 1.5rem; }
+      .models-grid { grid-template-columns: 1fr; }
+
+      .qualify-block { padding: 3.5rem 1.5rem; }
+      .use-case-row { grid-template-columns: 130px 1fr; }
+      .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
+      .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
+      .fit-pair { grid-template-columns: 1fr; }
+      .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+
+      .faq-section { padding: 3.5rem 1.5rem; }
+      .cta-close { padding: 4rem 1.5rem 5rem; }
+
       footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    .reveal.in-view {
-      opacity: 1;
-      transform: translateY(0);
     }
   </style>
 </head>
@@ -741,9 +756,8 @@
         <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
       </a>
       <nav class="nav-links">
-        <a href="../motion/">Motion Design</a>
-        <a href="../3d/">3D Animation</a>
-        <a href="../immersive/">Immersive</a>
+        <a href="../screens/">For Screens</a>
+        <a href="../spaces/">For Spaces</a>
         <a href="mailto:connect@higher-roads.com">Contact</a>
       </nav>
       <button class="nav-toggle" aria-label="Toggle menu">
@@ -752,163 +766,358 @@
     </header>
 
     <nav class="mobile-nav">
-      <a href="../motion/">Motion Design</a>
-      <a href="../3d/">3D Animation</a>
-      <a href="../immersive/">Immersive</a>
+      <a href="../screens/">For Screens</a>
+      <a href="../spaces/">For Spaces</a>
       <a href="mailto:connect@higher-roads.com">Contact</a>
     </nav>
 
     <main>
 
       <!-- ── HERO ── -->
-      <div class="partner-hero">
-        <span class="page-eyebrow">For Partners</span>
-        <h1 class="hero-h1">We make your most ambitious<br>projects deliverable.</h1>
-        <p class="hero-body">Higher Roads is a Nashville-based creative studio specializing in motion design, 3D animation, and immersive environments. We work with experiential agencies, event production companies, and fabricators as a behind-the-scenes or white-label production partner. Your name is on the work and the client relationship stays yours.</p>
+      <section class="hero reveal">
+        <span class="eyebrow">For Partners</span>
+        <h1>Your client just asked for something<br><em>you don't build in-house.</em></h1>
+        <p class="hero-body">
+          Higher Roads is a Nashville-based creative studio building motion-driven visual worlds for screens and spaces. We work behind the scenes, under your name, as the specialist production layer that lets your team say yes.
+        </p>
+        <a href="mailto:connect@higher-roads.com" class="btn-primary">Start a partner conversation →</a>
+      </section>
+
+      <!-- ── POSITIONING BAND ── -->
+      <div class="positioning reveal">
+        <div class="positioning-inner">
+          <div class="positioning-col">
+            <span class="positioning-label">What your team brings</span>
+            <ul>
+              <li>Client relationships</li>
+              <li>Creative direction</li>
+              <li>Project management</li>
+              <li>Event logistics</li>
+              <li>The brief</li>
+            </ul>
+          </div>
+          <div class="positioning-col">
+            <span class="positioning-label">What we build</span>
+            <ul>
+              <li>Visual worlds for screens</li>
+              <li>Visual worlds for spaces</li>
+              <li>3D product environments</li>
+              <li>Projection-mapped rooms</li>
+              <li>End-to-end production</li>
+            </ul>
+          </div>
+          <div class="positioning-col">
+            <span class="positioning-label">What your client gets</span>
+            <ul>
+              <li>Premium creative execution</li>
+              <li>Deliverables on deadline</li>
+              <li>Screens and spaces covered</li>
+              <li>Work they remember</li>
+              <li>Your name on it</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <div class="accent-rule"></div>
+      <!-- ── PARTNER TYPES ── -->
+      <div class="partner-types reveal">
+        <span class="eyebrow">Who we work with</span>
 
-      <!-- ── PARTNER LIST ── -->
-      <div class="partner-list reveal">
-
-        <div class="partner-row">
-          <div class="partner-row-label">
-            <span class="partner-num">01</span>
-            <span class="page-eyebrow">Experiential &amp; Brand Agencies</span>
-          </div>
-          <div class="partner-row-body">
-            <p>When a creative or experiential agency needs motion, CGI, or an immersive environment, we integrate as the specialist production layer. You stay in the client relationship while we deliver what the brief requires, under your name.</p>
+        <div class="partner-type">
+          <span class="partner-num">01</span>
+          <div>
+            <h2 class="partner-type-title">Digital and Interactive Agencies</h2>
+            <p class="partner-type-body">When a digital agency wins a brand activation or campaign that needs a physical world or artist-driven motion, we step in as the production layer. You handle the platform, the interaction design, and the client relationship. We build the world. For screens, for spaces, or both.</p>
           </div>
         </div>
 
-        <div class="partner-row">
-          <div class="partner-row-label">
-            <span class="partner-num">02</span>
-            <span class="page-eyebrow">DMCs &amp; Event Production Companies</span>
-          </div>
-          <div class="partner-row-body">
-            <p>Event production companies and DMCs compete on atmosphere as much as logistics. We work with producers at the pitch stage to design projection environments, motion-mapped spaces, and visual installations that answer the question every strong proposal needs to answer: what will this actually feel like?</p>
+        <div class="partner-type">
+          <span class="partner-num">02</span>
+          <div>
+            <h2 class="partner-type-title">Experiential and Brand Agencies</h2>
+            <p class="partner-type-body">When a creative brief calls for a visual world and your team doesn't build them in-house, we integrate as the specialist production layer. You stay in the client relationship. We deliver what the brief requires, under your name.</p>
           </div>
         </div>
 
-        <div class="partner-row">
-          <div class="partner-row-label">
-            <span class="partner-num">03</span>
-            <span class="page-eyebrow">Fabricators &amp; Build Teams</span>
-          </div>
-          <div class="partner-row-body">
-            <p>Physical builds set the stage. We add the digital layer: projection content, motion design, and interactive elements that make what you've built feel like more than a structure. We extend what your team does without adding to your production complexity.</p>
+        <div class="partner-type">
+          <span class="partner-num">03</span>
+          <div>
+            <h2 class="partner-type-title">DMCs and Event Production Companies</h2>
+            <p class="partner-type-body">Event producers compete on atmosphere as much as logistics. We work with producers at the pitch stage to design environments that answer the question every strong proposal needs to answer: what will this room actually feel like when the lights go down?</p>
           </div>
         </div>
 
+        <div class="partner-type">
+          <span class="partner-num">04</span>
+          <div>
+            <h2 class="partner-type-title">Fabricators and Build Teams</h2>
+            <p class="partner-type-body">Physical builds set the stage. We build the world that fills them. Whatever you construct, we make it move. The story it tells can change without changing the build itself.</p>
+          </div>
+        </div>
       </div>
 
-      <!-- ── PROOF SECTION ── -->
-      <div class="proof-section reveal">
-        <span class="page-eyebrow">What this looks like in practice</span>
-        <div class="proof-grid">
+      <!-- ── SCREENS PROOF: MINDBLOOM ── -->
+      <div class="mb-world-wrap reveal">
+        <div class="mb-world-label">
+          <span class="eyebrow">What this looks like on screens</span>
+        </div>
+        <div class="mb-world">
+          <div class="mb-intro">
+            <span class="eyebrow">Sample Product World</span>
+            <h2 class="mb-headline">Meet MindBloom</h2>
+            <p class="mb-bio">
+              MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
+            </p>
+            <p class="mb-partner-note">
+              This is the work a brand agency or digital studio adds to a client campaign when the brief calls for content that photography cannot produce and AI cannot match. One world build becomes the source for every screen the brand needs to show up on.
+            </p>
+          </div>
+          <div class="mb-grids">
+            <div class="mb-row mb-row-1">
+              <div class="mb-item mb-item-square">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom: couple at mountain overlook" />
+              </div>
+              <div class="mb-item mb-item-wide">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom: brand composition" />
+              </div>
+              <div class="mb-item mb-item-square">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom: three-can product lineup" />
+              </div>
+            </div>
+            <div class="mb-row mb-row-2">
+              <div class="mb-item mb-item-wide">
+                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-brushvid.mp4" autoplay muted loop playsinline></video>
+              </div>
+              <div class="mb-item mb-item-wide">
+                <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <!-- Mycopop reel: click-to-play -->
-          <div class="proof-item proof-reel">
-            <div class="proof-media">
-              <video playsinline preload="metadata"
-                poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster-2.png"
-                id="proof-video">
-                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
-              </video>
-              <button class="play-btn" id="play-btn" aria-label="Play reel">
-                <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
-                  <polygon points="24,17 48,30 24,43" fill="white"/>
-                </svg>
-              </button>
+      <!-- ── SPACES PROOF: MYCOPOP ── -->
+      <div class="myco-wrap reveal">
+        <span class="eyebrow">What this looks like in spaces</span>
+        <div class="myco-world">
+
+          <div class="myco-intro">
+            <span class="eyebrow">The Work</span>
+            <h2 class="myco-headline">Meet Mycopop</h2>
+            <p class="myco-bio">Mycopop Functional Energy activated at Culture Club in Nashville with a brief, five days, and a brand built on retro gaming aesthetics. The room needed to feel like the product. We mapped five surfaces and built a playable branded game wall. One hundred guests walked into a space that moved.</p>
+            <div class="myco-stats">
+              <div class="stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Days concept to event</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Surfaces mapped and live</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">100+</span>
+                <span class="stat-label">Guests in the room</span>
+              </div>
             </div>
           </div>
 
-          <!-- Central High building projection -->
-          <div class="proof-item">
-            <div class="proof-media">
-              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg"
-                alt="Imagine If Buildings Could Talk — projection event" />
+          <div class="myco-reel">
+            <video id="proof-video" playsinline preload="metadata"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+            </video>
+            <button class="play-btn" id="play-btn" aria-label="Play video">
+              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                <polygon points="24,17 48,30 24,43" fill="white"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="myco-process">
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-1c.png" alt="Content production" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">01</span>
+                <h3 class="myco-process-title">Content production</h3>
+                <p class="myco-process-body">We design and produce motion content from the brand's existing identity. Every asset is built for the specific surfaces it lands on.</p>
+              </div>
             </div>
-            <div class="proof-overlay">
-              <span class="proof-label">Projection Event</span>
-              <span class="proof-title">Imagine If Buildings Could Talk</span>
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Technical production" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">02</span>
+                <h3 class="myco-process-title">Technical production</h3>
+                <p class="myco-process-body">We model the space before content production begins. Throw distances, overlap zones, and geometry corrections are resolved before anything gets rendered.</p>
+              </div>
+            </div>
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="On-site execution" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">03</span>
+                <h3 class="myco-process-title">On-site execution</h3>
+                <p class="myco-process-body">We spec and source the hardware, manage load-in, run calibration and rehearsal, and execute on event night. You arrive to a room that's ready.</p>
+              </div>
             </div>
           </div>
 
         </div>
-        <p class="proof-caption">Built and live in five days: three mapped projection walls, a playable arcade wall, and a full panel backdrop.</p>
       </div>
 
-    <!-- ── HOW WE WORK ── -->
-      <div class="approach reveal">
-        <span class="page-eyebrow">How we work</span>
-        <p class="approach-body">We work white-label by default, which means your client relationship stays yours.</p>
-        <p class="approach-body">At the pitch stage, we help shape the visual concept, identify the technical path, and create enough clarity for the client to understand what they are approving.</p>
-        <p class="approach-body">Once the work is sold, we handle the production layer: content design, motion, projection geometry, hardware planning, vendor coordination, and on-site calibration.</p>
-        <p class="approach-body">Bring us in early or once the scope is set. Either entry point works.</p>
+      <!-- ── HOW WE WORK ── -->
+      <div class="how-section reveal">
+        <span class="eyebrow">How we work</span>
+        <p>We work white-label by default. Your client relationship stays yours. Our name does not need to appear on the work, the call, or the invoice.</p>
+        <p>At the pitch stage, we help shape the visual concept and create enough clarity for the client to understand what they are approving. Once the scope is sold, we handle the production layer end to end. Bring us in at the pitch or once the scope is set. Either works.</p>
+        <p>The earlier we're in, the stronger the concept holds together.</p>
       </div>
 
-      <!-- ── WHERE WE'RE USEFUL ── -->
-      <div class="useful-section reveal">
-        <span class="page-eyebrow">Where we're useful</span>
-        <ul class="useful-list">
-          <li class="useful-item">The idea is strong but the technical approach is still undefined</li>
-          <li class="useful-item">The pitch needs a visual concept clients can see before they approve it</li>
-          <li class="useful-item">A room, screen, or build needs a digital layer to feel complete</li>
-          <li class="useful-item">Your team needs specialist production capacity without adding to headcount</li>
-        </ul>
-      </div>
-
-      <!-- ── PARTNER CONFIDENCE ── -->
-      <div class="confidence-section reveal">
-        <span class="page-eyebrow">Common questions</span>
-        <div class="confidence-grid">
-          <div class="confidence-card">
-            <p class="confidence-q">Do you stay invisible to the client?</p>
-            <p class="confidence-a">Yes, when needed. Your client sees your team. Our name never has to appear.</p>
+      <!-- ── THREE MODELS ── -->
+      <div class="models-section reveal">
+        <div class="models-grid">
+          <div class="model-col">
+            <span class="model-label">Model 01</span>
+            <h3 class="model-title">White-Label</h3>
+            <p class="model-body">Higher Roads works behind the scenes. Your client sees your team. We deliver under your name. Standard for most partner relationships.</p>
           </div>
-          <div class="confidence-card">
-            <p class="confidence-q">Can you join pitch calls?</p>
-            <p class="confidence-a">Yes, under your team's lead. We follow your cues on how much to say and to whom.</p>
+          <div class="model-col">
+            <span class="model-label">Model 02</span>
+            <h3 class="model-title">Co-Branded</h3>
+            <p class="model-body">Both names on the work where the collaboration strengthens the pitch. Common on larger scopes where two specialist teams is part of the story.</p>
           </div>
-          <div class="confidence-card">
-            <p class="confidence-q">Can you spec hardware?</p>
-            <p class="confidence-a">Yes, or we work alongside your preferred AV team if one is already in place.</p>
-          </div>
-          <div class="confidence-card">
-            <p class="confidence-q">Can you work from an existing concept?</p>
-            <p class="confidence-a">Yes, but we'll flag technical gaps early so nothing surfaces as a problem during production.</p>
+          <div class="model-col">
+            <span class="model-label">Model 03</span>
+            <h3 class="model-title">Referral</h3>
+            <p class="model-body">You bring the lead. We carry the scope. You receive a producer fee. Used when the project is outside your lane but the relationship is yours to protect.</p>
           </div>
         </div>
       </div>
 
-      <!-- ── CTA CLOSER ── -->
-      <div class="cta-closer reveal">
-        <div class="cta-closer-text">
-          Working on something<br>that needs <em>this</em>?
+      <!-- ── WHERE WE FIT ── -->
+      <div class="qualify-block reveal">
+        <span class="eyebrow">Where this fits</span>
+        <div class="use-cases-grid">
+          <div class="use-case-row">
+            <span class="use-case-label">Brand activations</span>
+            <span class="use-case-outcome">A branded world mapped to the specific room your client is activating in, built from their existing identity.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Campaign content</span>
+            <span class="use-case-outcome">3D product environments and motion assets for brands that need content photography cannot produce before launch.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Product launches</span>
+            <span class="use-case-outcome">A physical environment that becomes the visual statement guests photograph, and screen content that shows the product at its best.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Venue installs</span>
+            <span class="use-case-outcome">Permanent or seasonal visual content that gives a space a recurring identity, and gives your agency a retainer-ready offer.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Trade show booths</span>
+            <span class="use-case-outcome">Motion-ready assets and projection content for built environments where standing still means getting passed.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Scope expansion</span>
+            <span class="use-case-outcome">A client asked for something your team doesn't build. We make it deliverable without you adding headcount or losing the relationship.</span>
+          </div>
         </div>
-        <a class="btn-cta" href="mailto:connect@higher-roads.com">
-          connect@higher-roads.com &rarr;
-        </a>
+
+        <div class="fit-pair">
+          <div class="fit-cell">
+            <span class="fit-label">Right fit</span>
+            <div class="fit-items">
+              <span class="fit-item">Agencies whose clients are asking for visual worlds they don't build in-house</span>
+              <span class="fit-item">Event producers who need a designed environment, not sourced AV</span>
+              <span class="fit-item">Fabricators whose builds need a digital layer to feel complete</span>
+              <span class="fit-item">Teams with tight timelines who need a partner that has done it under pressure</span>
+            </div>
+          </div>
+          <div class="fit-cell negative">
+            <span class="fit-label">Not a fit</span>
+            <div class="fit-items">
+              <span class="fit-item">Generic AV rental or equipment sourcing</span>
+              <span class="fit-item">Shops looking for overflow production at commodity rates</span>
+              <span class="fit-item">Agencies with established in-house immersive or CGI capability</span>
+              <span class="fit-item">Projects where the visual world isn't part of the brief</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- ── CAPABILITIES STRIP ── -->
-      <div class="capabilities">
-        <span class="capability-item">Projection Mapping</span>
-        <span class="capability-item">Motion Design</span>
-        <span class="capability-item">3D Animation</span>
-        <span class="capability-item">Immersive Content Production</span>
-        <span class="capability-item">Experiential Production</span>
-        <span class="capability-item">White-Label Production</span>
+      <!-- ── FAQ ── -->
+      <div class="faq-section reveal">
+        <span class="eyebrow">Common questions</span>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">Do you stay invisible to the client?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">Yes, when that's what you need. White-label is our default. Your client sees your team. Our name never has to appear on the work, the call, or the invoice.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">Can you join pitch calls or client meetings?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">Yes, under your team's lead. We follow your cues on how much to say and to whom. If the relationship benefits from our being visible, we can work that way too.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">Do you handle hardware and AV for projection installs?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">We spec the hardware and handle on-site calibration. If you already have a preferred AV team in place, we work alongside them. No problem either way.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">What's your typical timeline?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">It depends on scope. The Mycopop activation went from brief to live in five days. A 3D product world typically runs two to four weeks depending on asset complexity. Compressed timelines are something we know how to navigate. Tell us what you're working with.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">Do you work outside Nashville?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">Yes. We're based in Nashville and work with partners nationally. Screen-based work (motion and 3D) is location-independent. Physical installs are handled on a project-by-project basis.</p>
+          </div>
+        </div>
+
       </div>
+
+      <!-- ── CTA ── -->
+      <section class="cta-close reveal">
+        <p class="cta-close-text">Working on something that needs<br><em>a world behind it?</em></p>
+        <p class="cta-sub">Tell us about the brief. We'll tell you how we'd build it.</p>
+        <a href="mailto:connect@higher-roads.com" class="cta-email-link">connect@higher-roads.com →</a>
+      </section>
 
     </main>
 
     <footer>
-      <span class="footer-note">&copy; 2026 Higher Roads</span>
+      <span class="footer-note">© 2026 Higher Roads</span>
       <div class="theme-switcher">
         <span class="theme-label">Theme</span>
         <div class="theme-dots">
@@ -924,7 +1133,7 @@
   </div>
 
   <script>
-    // ── Hamburger ──
+    // Hamburger
     const navToggle = document.querySelector('.nav-toggle');
     const mobileNav = document.querySelector('.mobile-nav');
     navToggle.addEventListener('click', () => {
@@ -938,40 +1147,71 @@
       });
     });
 
-    // ── Theme switcher ──
-    document.querySelectorAll('.theme-dot').forEach(dot => {
+    // Theme switcher
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+    dots.forEach(dot => {
       dot.addEventListener('click', () => {
-        document.documentElement.setAttribute('data-theme', dot.dataset.t);
-        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
         dot.classList.add('active');
       });
     });
 
-    // ── Proof video play/pause ──
+    // Mycopop: click-to-play with audio
     const proofVideo = document.getElementById('proof-video');
     const playBtn    = document.getElementById('play-btn');
-
     if (proofVideo && playBtn) {
       playBtn.addEventListener('click', () => {
-        if (proofVideo.paused) {
-          proofVideo.play();
-          playBtn.classList.add('hidden');
+        const playPromise = proofVideo.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => { playBtn.classList.add('hidden'); })
+            .catch(() => {
+              proofVideo.muted = true;
+              proofVideo.play().then(() => {
+                proofVideo.muted = false;
+                playBtn.classList.add('hidden');
+              });
+            });
         }
       });
-
-      proofVideo.addEventListener('click', () => {
-        if (!proofVideo.paused) {
-          proofVideo.pause();
-          playBtn.classList.remove('hidden');
-        }
-      });
-
-      proofVideo.addEventListener('ended', () => {
+      proofVideo.addEventListener('pause', () => {
+        proofVideo.removeAttribute('controls');
         playBtn.classList.remove('hidden');
+      });
+      proofVideo.addEventListener('ended', () => {
+        proofVideo.removeAttribute('controls');
+        playBtn.classList.remove('hidden');
+      });
+      proofVideo.addEventListener('mouseenter', () => {
+        if (!proofVideo.paused) proofVideo.setAttribute('controls', '');
+      });
+      proofVideo.addEventListener('mouseleave', () => {
+        proofVideo.removeAttribute('controls');
       });
     }
 
-    // ── Scroll reveal ──
+    // FAQ accordion
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const item   = trigger.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-answer').style.maxHeight = null;
+          i.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
+    // Scroll reveal
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -980,9 +1220,7 @@
         }
       });
     }, { threshold: 0.06 });
-
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   </script>
-
 </body>
 </html>
