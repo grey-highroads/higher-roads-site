@@ -281,6 +281,10 @@
       pointer-events: auto;
     }
 
+    .trigger-panel-num {
+      display: none;
+    }
+
     .trigger-panel-text {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.5rem, 3vw, 2.2rem);
@@ -922,24 +926,35 @@
       .trigger-pin-sticky {
         position: relative;
         height: auto;
-        min-height: 80vh;
+        min-height: 0;
       }
       .trigger-bg { inset: 0; }
       .trigger-bg-video { transform: none !important; }
       .trigger-panels {
-        padding: 4rem 1.5rem;
+        padding: 3.5rem 1.5rem;
         justify-content: flex-start;
       }
+      .trigger-section-label { margin-bottom: 1.5rem; }
       .trigger-panel-stack { min-height: 0; }
       .trigger-panel {
         position: static;
         opacity: 1 !important;
         transform: none !important;
-        margin-bottom: 1.85rem;
+        margin-bottom: 0;
+        padding: 1.25rem 0;
+        border-top: 1px solid rgba(245,237,226,0.14);
         pointer-events: auto;
       }
-      .trigger-panel:last-child { margin-bottom: 0; }
-      .trigger-panel-text { font-size: 1.35rem; }
+      .trigger-panel:first-child { border-top: none; padding-top: 0; }
+      .trigger-panel:last-child { padding-bottom: 0; }
+      .trigger-panel-num {
+        display: block;
+        font-family: 'Rajdhani', sans-serif; font-weight: 600;
+        font-size: 0.62rem; letter-spacing: 0.18em;
+        color: var(--accent); opacity: 0.85;
+        margin-bottom: 0.6rem;
+      }
+      .trigger-panel-text { font-size: 1.08rem; line-height: 1.5; }
       .trigger-progress { display: none; }
 
       .positioning { padding: 2rem 1.5rem; }
@@ -1056,15 +1071,19 @@
             <span class="trigger-section-label">When partners bring us in</span>
             <div class="trigger-panel-stack">
               <div class="trigger-panel active" data-panel="0">
+                <span class="trigger-panel-num">01</span>
                 <p class="trigger-panel-text">A client asks for a branded room, screen package, projection moment, or product world.</p>
               </div>
               <div class="trigger-panel" data-panel="1">
+                <span class="trigger-panel-num">02</span>
                 <p class="trigger-panel-text">The concept has energy, but the visual production layer needs a specialist.</p>
               </div>
               <div class="trigger-panel" data-panel="2">
+                <span class="trigger-panel-num">03</span>
                 <p class="trigger-panel-text">Higher Roads plugs in behind your team to shape, build, and deliver the motion, 3D, and spatial content layer.</p>
               </div>
               <div class="trigger-panel" data-panel="3">
+                <span class="trigger-panel-num">04</span>
                 <p class="trigger-panel-text">Your team keeps the relationship. The client gets a more complete experience.</p>
               </div>
             </div>
