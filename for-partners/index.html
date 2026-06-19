@@ -68,7 +68,6 @@
       color: var(--white);
       font-family: 'Barlow', sans-serif;
       font-weight: 300;
-      overflow-x: hidden;
       scroll-behavior: smooth;
       transition: background-color 0.4s ease, color 0.4s ease;
     }
@@ -84,7 +83,7 @@
       content: '';
       position: fixed; top: 30%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 700px; height: 500px;
+      width: min(700px, 100vw); height: min(500px, 70vw);
       background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
       pointer-events: none; z-index: 0;
     }
@@ -195,7 +194,121 @@
     }
     .btn-primary:hover { background: var(--accent); color: var(--black); }
 
-    /* ── POSITIONING BAND ── */
+    .hero-secondary {
+      font-size: 0.82rem; line-height: 1.6;
+      color: var(--white); opacity: 0.42;
+      max-width: 480px; margin-top: 1rem;
+    }
+
+    /* ── PINNED SCROLL NARRATIVE (When partners bring us in) ── */
+    .trigger-pin-wrapper {
+      position: relative;
+      height: 400vh;
+    }
+
+    .trigger-pin-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .trigger-bg {
+      position: absolute;
+      inset: -6%;
+      z-index: 0;
+    }
+
+    .trigger-bg-video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: blur(1.5px) brightness(0.7) saturate(0.92);
+      transform: translateY(0%) scale(1.1);
+      will-change: transform;
+    }
+
+    .trigger-overlay {
+      position: absolute; inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(10,9,6,0.62) 0%, rgba(10,9,6,0.7) 55%, rgba(10,9,6,0.85) 100%);
+    }
+
+    .trigger-vignette {
+      position: absolute; inset: 0;
+      z-index: 1;
+      background: radial-gradient(ellipse at 38% 50%, transparent 25%, rgba(10,9,6,0.55) 100%);
+      pointer-events: none;
+    }
+
+    .trigger-panels {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 3rem;
+    }
+
+    .trigger-section-label {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.75rem;
+    }
+
+    .trigger-panel-stack {
+      position: relative;
+      min-height: 220px;
+      max-width: 680px;
+    }
+
+    .trigger-panel {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      pointer-events: none;
+    }
+    .trigger-panel.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .trigger-panel-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 500; line-height: 1.32;
+      color: var(--white);
+    }
+
+    .trigger-progress {
+      position: absolute;
+      bottom: 2.5rem; left: 3rem;
+      z-index: 2;
+      display: flex; gap: 0.6rem;
+    }
+
+    .trigger-dot {
+      width: 26px; height: 2px;
+      background: rgba(245,237,226,0.22);
+      transition: background 0.3s ease;
+    }
+    .trigger-dot.active { background: var(--accent); }
+
+    /* ── CARDS BLOCK (Three ways we plug in / How we show up) ── */
+    .cards-block {
+      padding: 4.5rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cards-block .models-grid { margin-top: 0.25rem; }
     .positioning {
       padding: 2.8rem 3rem;
       border-top: 1px solid var(--border);
@@ -242,6 +355,80 @@
 
     .positioning-col ul li:last-child { border-bottom: none; }
 
+    /* ── SPLITS FLOW (How the work splits — connected, not boxed) ── */
+    .splits-heading {
+      margin-bottom: 1.75rem;
+      display: block;
+    }
+
+    .splits-flow {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .splits-stage { flex: 1; padding: 0 2rem; }
+    .splits-stage:first-child { padding-left: 0; }
+    .splits-stage:last-child { padding-right: 0; }
+
+    .splits-stage p {
+      font-size: 0.88rem; line-height: 1.7;
+      color: var(--white); opacity: 0.65;
+    }
+
+    .splits-arrow {
+      flex-shrink: 0;
+      width: 32px;
+      padding-top: 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      opacity: 0.45;
+      font-size: 1.05rem;
+    }
+
+    /* ── CAPABILITY LIST (Three ways we plug in — editorial, image-led) ── */
+    .capability-list { display: flex; flex-direction: column; }
+
+    .capability-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 2rem;
+      align-items: center;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-sub);
+    }
+    .capability-row:first-child { border-top: none; padding-top: 0; }
+    .capability-row:last-child { padding-bottom: 0; }
+
+    .capability-thumb {
+      width: 130px; height: 130px;
+      overflow: hidden;
+      border: 1px solid var(--border-sub);
+      flex-shrink: 0;
+    }
+    .capability-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    .capability-num {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); display: block; margin-bottom: 0.6rem;
+    }
+
+    .capability-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 500;
+      color: var(--white); margin-bottom: 0.6rem;
+    }
+
+    .capability-body {
+      font-size: 0.88rem; line-height: 1.72;
+      color: var(--white); opacity: 0.6;
+    }
+
     /* ── PARTNER TYPES ── */
     .partner-types {
       padding: 4.5rem 3rem 0;
@@ -250,13 +437,25 @@
 
     .partner-type {
       display: grid;
-      grid-template-columns: 3rem 1fr;
+      grid-template-columns: 3rem 1fr 90px;
       gap: 1.5rem;
-      align-items: start;
+      align-items: center;
       padding: 2.25rem 0;
       border-top: 1px solid rgba(255,255,255,0.06);
     }
     .partner-type:first-of-type { border-top: none; }
+
+    .partner-thumb {
+      width: 90px; height: 90px;
+      overflow: hidden;
+      border: 1px solid var(--border-sub);
+      align-self: center;
+    }
+    .partner-thumb img,
+    .partner-thumb video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
 
     .partner-num {
       font-family: 'Rajdhani', sans-serif; font-weight: 600;
@@ -471,6 +670,26 @@
       color: var(--white); opacity: 0.58;
     }
 
+    .myco-translation {
+      padding: 1.75rem 2.8rem;
+      border-top: 1px solid rgba(232, 120, 42, 0.18);
+      font-size: 0.86rem; line-height: 1.8;
+      color: var(--white); opacity: 0.55;
+      font-style: italic;
+    }
+
+    .myco-tags {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem;
+      padding: 1.5rem 2.8rem 2.4rem;
+      border-top: 1px solid rgba(232, 120, 42, 0.12);
+    }
+
+    .myco-tag {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
     /* ── HOW WE WORK ── */
     .how-section {
       padding: 4.5rem 3rem;
@@ -532,7 +751,7 @@
     }
 
     .use-case-row {
-      display: grid; grid-template-columns: 200px 1fr;
+      display: grid; grid-template-columns: 220px 1fr;
       border-bottom: 1px solid var(--border);
     }
     .use-case-row:last-child { border-bottom: none; }
@@ -699,6 +918,30 @@
       .hero { padding: 4rem 1.5rem 3rem; }
       .hero h1 { font-size: 2.1rem; }
 
+      .trigger-pin-wrapper { height: auto; }
+      .trigger-pin-sticky {
+        position: relative;
+        height: auto;
+        min-height: 80vh;
+      }
+      .trigger-bg { inset: 0; }
+      .trigger-bg-video { transform: none !important; }
+      .trigger-panels {
+        padding: 4rem 1.5rem;
+        justify-content: flex-start;
+      }
+      .trigger-panel-stack { min-height: 0; }
+      .trigger-panel {
+        position: static;
+        opacity: 1 !important;
+        transform: none !important;
+        margin-bottom: 1.85rem;
+        pointer-events: auto;
+      }
+      .trigger-panel:last-child { margin-bottom: 0; }
+      .trigger-panel-text { font-size: 1.35rem; }
+      .trigger-progress { display: none; }
+
       .positioning { padding: 2rem 1.5rem; }
       .positioning-inner { grid-template-columns: 1fr; }
       .positioning-col {
@@ -708,8 +951,19 @@
       }
       .positioning-col:last-child { border-bottom: none; }
 
+      .splits-flow { flex-direction: column; }
+      .splits-stage { padding: 1.1rem 0; border-bottom: 1px solid var(--border); }
+      .splits-stage:first-child { padding-top: 0; }
+      .splits-stage:last-child { border-bottom: none; padding-bottom: 0; }
+      .splits-arrow { display: none; }
+
+      .cards-block { padding: 3.5rem 1.5rem; }
+      .capability-row { grid-template-columns: 70px 1fr; gap: 1.1rem; padding: 1.5rem 0; }
+      .capability-thumb { width: 70px; height: 70px; }
+
       .partner-types { padding: 3.5rem 1.5rem 0; }
       .partner-type { grid-template-columns: 2.5rem 1fr; gap: 1rem; }
+      .partner-thumb { display: none; }
 
       .mb-world-wrap { padding: 3rem 1.5rem; }
       .mb-world-label { padding: 0; }
@@ -725,12 +979,14 @@
       .myco-stats { gap: 1.5rem; flex-wrap: wrap; }
       .stat-value { font-size: 2rem; }
       .myco-process { grid-template-columns: 1fr; }
+      .myco-translation { padding: 1.5rem; }
+      .myco-tags { padding: 1.25rem 1.5rem 1.75rem; gap: 0.4rem 1rem; }
 
       .how-section { padding: 3.5rem 1.5rem; }
       .models-grid { grid-template-columns: 1fr; }
 
       .qualify-block { padding: 3.5rem 1.5rem; }
-      .use-case-row { grid-template-columns: 130px 1fr; }
+      .use-case-row { grid-template-columns: 140px 1fr; }
       .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
       .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
       .fit-pair { grid-template-columns: 1fr; }
@@ -778,80 +1034,128 @@
         <span class="eyebrow">For Partners</span>
         <h1>Your client just asked for something<br><em>you don't build in-house.</em></h1>
         <p class="hero-body">
-          Higher Roads is a Nashville-based creative studio building motion-driven visual worlds for screens and spaces. We work behind the scenes, under your name, as the specialist production layer that lets your team say yes.
+          Higher Roads is a Nashville-based creative studio for motion, 3D, and immersive visual production. We work behind the scenes, under your name, when a client needs screen content, spatial content, or a branded environment your team does not build in-house.
         </p>
-        <a href="mailto:connect@higher-roads.com" class="btn-primary">Start a partner conversation →</a>
+        <a href="mailto:connect@higher-roads.com" class="btn-primary">Send us the brief →</a>
+        <p class="hero-secondary">Decks, room photos, product files, loose ideas, and half-formed client asks are all fair game.</p>
       </section>
 
-      <!-- ── POSITIONING BAND ── -->
+      <!-- ── WHEN PARTNERS BRING US IN (pinned scroll narrative) ── -->
+      <div class="trigger-pin-wrapper" id="trigger-pin-wrapper">
+        <div class="trigger-pin-sticky">
+
+          <div class="trigger-bg">
+            <video class="trigger-bg-video" autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Tideform-partner.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="trigger-overlay"></div>
+          <div class="trigger-vignette"></div>
+
+          <div class="trigger-panels">
+            <span class="trigger-section-label">When partners bring us in</span>
+            <div class="trigger-panel-stack">
+              <div class="trigger-panel active" data-panel="0">
+                <p class="trigger-panel-text">A client asks for a branded room, screen package, projection moment, or product world.</p>
+              </div>
+              <div class="trigger-panel" data-panel="1">
+                <p class="trigger-panel-text">The concept has energy, but the visual production layer needs a specialist.</p>
+              </div>
+              <div class="trigger-panel" data-panel="2">
+                <p class="trigger-panel-text">Higher Roads plugs in behind your team to shape, build, and deliver the motion, 3D, and spatial content layer.</p>
+              </div>
+              <div class="trigger-panel" data-panel="3">
+                <p class="trigger-panel-text">Your team keeps the relationship. The client gets a more complete experience.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="trigger-progress">
+            <span class="trigger-dot active" data-dot="0"></span>
+            <span class="trigger-dot" data-dot="1"></span>
+            <span class="trigger-dot" data-dot="2"></span>
+            <span class="trigger-dot" data-dot="3"></span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── HOW THE WORK SPLITS ── -->
       <div class="positioning reveal">
-        <div class="positioning-inner">
-          <div class="positioning-col">
-            <span class="positioning-label">What your team brings</span>
-            <ul>
-              <li>Client relationships</li>
-              <li>Creative direction</li>
-              <li>Project management</li>
-              <li>Event logistics</li>
-              <li>The brief</li>
-            </ul>
+        <span class="eyebrow splits-heading">How the work splits</span>
+        <div class="splits-flow">
+          <div class="splits-stage">
+            <span class="positioning-label">Your team owns</span>
+            <p>The client relationship, creative lead, project context, budget ownership, approvals, and production role where applicable.</p>
           </div>
-          <div class="positioning-col">
-            <span class="positioning-label">What we build</span>
-            <ul>
-              <li>Visual worlds for screens</li>
-              <li>Visual worlds for spaces</li>
-              <li>3D product environments</li>
-              <li>Projection-mapped rooms</li>
-              <li>End-to-end production</li>
-            </ul>
+          <span class="splits-arrow">→</span>
+          <div class="splits-stage">
+            <span class="positioning-label">Higher Roads owns</span>
+            <p>The motion, 3D, projection, screen, and spatial content layer. We help translate the idea into visuals a client understands and production teams can execute.</p>
           </div>
-          <div class="positioning-col">
-            <span class="positioning-label">What your client gets</span>
-            <ul>
-              <li>Premium creative execution</li>
-              <li>Deliverables on deadline</li>
-              <li>Screens and spaces covered</li>
-              <li>Work they remember</li>
-              <li>Your name on it</li>
-            </ul>
+          <span class="splits-arrow">→</span>
+          <div class="splits-stage">
+            <span class="positioning-label">Your client gets</span>
+            <p>A more complete visual experience without forcing your team to hire, train, or manage a new specialty in-house.</p>
           </div>
         </div>
       </div>
 
-      <!-- ── PARTNER TYPES ── -->
-      <div class="partner-types reveal">
-        <span class="eyebrow">Who we work with</span>
-
-        <div class="partner-type">
-          <span class="partner-num">01</span>
-          <div>
-            <h2 class="partner-type-title">Digital and Interactive Agencies</h2>
-            <p class="partner-type-body">When a digital agency wins a brand activation or campaign that needs a physical world or artist-driven motion, we step in as the production layer. You handle the platform, the interaction design, and the client relationship. We build the world. For screens, for spaces, or both.</p>
+      <!-- ── THREE WAYS WE PLUG IN ── -->
+      <div class="cards-block reveal">
+        <span class="eyebrow">Three ways we plug in</span>
+        <div class="capability-list">
+          <div class="capability-row">
+            <div class="capability-thumb">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/RUX-trans-2.jpg" alt="Concept render used to sell a pitch before scope was approved" />
+            </div>
+            <div>
+              <span class="capability-num">Capability 01</span>
+              <h3 class="capability-title">Pitch Support</h3>
+              <p class="capability-body">We help shape the visual idea, build references, define the production path, and give your team enough detail to sell the scope with confidence.</p>
+            </div>
+          </div>
+          <div class="capability-row">
+            <div class="capability-thumb">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/champagne-poster.png" alt="CGI product still built from the brand's existing identity" />
+            </div>
+            <div>
+              <span class="capability-num">Capability 02</span>
+              <h3 class="capability-title">Screen World Production</h3>
+              <p class="capability-body">We build 3D product environments, motion loops, launch visuals, retail screen content, social assets, and campaign visuals from the brand's existing identity.</p>
+            </div>
+          </div>
+          <div class="capability-row">
+            <div class="capability-thumb">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Projection mapping covering a physical surface" />
+            </div>
+            <div>
+              <span class="capability-num">Capability 03</span>
+              <h3 class="capability-title">Spatial Visual Production</h3>
+              <p class="capability-body">We design and produce motion content for projection, LED, mapped surfaces, rooms, booths, and event environments, with technical planning and on-site calibration where needed.</p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="partner-type">
-          <span class="partner-num">02</span>
-          <div>
-            <h2 class="partner-type-title">Experiential and Brand Agencies</h2>
-            <p class="partner-type-body">When a creative brief calls for a visual world and your team doesn't build them in-house, we integrate as the specialist production layer. You stay in the client relationship. We deliver what the brief requires, under your name.</p>
+      <!-- ── HOW WE SHOW UP ── -->
+      <div class="cards-block reveal">
+        <span class="eyebrow">How we show up</span>
+        <div class="models-grid">
+          <div class="model-col">
+            <span class="model-label">Model 01</span>
+            <h3 class="model-title">White-Label</h3>
+            <p class="model-body">We work behind the scenes under your name. Your team owns the relationship. We support the visual production layer without stepping in front of the client.</p>
           </div>
-        </div>
-
-        <div class="partner-type">
-          <span class="partner-num">03</span>
-          <div>
-            <h2 class="partner-type-title">DMCs and Event Production Companies</h2>
-            <p class="partner-type-body">Event producers compete on atmosphere as much as logistics. We work with producers at the pitch stage to design environments that answer the question every strong proposal needs to answer: what will this room actually feel like when the lights go down?</p>
+          <div class="model-col">
+            <span class="model-label">Model 02</span>
+            <h3 class="model-title">Co-Branded</h3>
+            <p class="model-body">We join the project as a named specialist when extra credibility helps the pitch or delivery process.</p>
           </div>
-        </div>
-
-        <div class="partner-type">
-          <span class="partner-num">04</span>
-          <div>
-            <h2 class="partner-type-title">Fabricators and Build Teams</h2>
-            <p class="partner-type-body">Your fabricated build sets the stge. Our visual world brings it to life. Whatever you construct, we make it move. The story it tells can change without changing the build itself.</p>
+          <div class="model-col">
+            <span class="model-label">Model 03</span>
+            <h3 class="model-title">Referral</h3>
+            <p class="model-body">You introduce us directly when the project sits outside your scope, but still needs a trusted creative production partner.</p>
           </div>
         </div>
       </div>
@@ -863,10 +1167,13 @@
         </div>
         <div class="mb-world">
           <div class="mb-intro">
-            <span class="eyebrow">Sample Product World</span>
+            <span class="eyebrow">Spec Screen-Based Product World</span>
             <h2 class="mb-headline">Meet MindBloom</h2>
             <p class="mb-bio">
-              MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
+              MindBloom is a sample screen-based product world. It shows how a campaign, launch, or retail content system can move beyond isolated product renders into a reusable visual environment.
+            </p>
+            <p class="mb-partner-note">
+              This is the kind of system a brand agency or digital studio adds when a product campaign needs content beyond photography. One approved world gives the team a reusable source for launch films, paid social, retail screens, PDP visuals, and future SKU updates. Generic AI output usually struggles to hold product, environment, and brand consistency across a full content system.
             </p>
           </div>
           <div class="mb-grids">
@@ -931,6 +1238,8 @@
             </button>
           </div>
 
+          <p class="myco-translation">The work was not only the content. It was the translation between brand identity, room geometry, hardware, timing, and guest experience.</p>
+
           <div class="myco-process">
             <div class="myco-process-item">
               <div class="myco-process-img">
@@ -964,65 +1273,98 @@
             </div>
           </div>
 
+          <div class="myco-tags">
+            <span class="myco-tag">Content production</span>
+            <span class="myco-tag">Technical mapping</span>
+            <span class="myco-tag">Load-in</span>
+            <span class="myco-tag">Calibration</span>
+            <span class="myco-tag">Rehearsal</span>
+            <span class="myco-tag">Live execution</span>
+          </div>
+
         </div>
       </div>
 
-      <!-- ── HOW WE WORK ── -->
-      <div class="how-section reveal">
-        <span class="eyebrow">How we work</span>
-        <p>We work white-label by default. Your client relationship stays yours. Our name does not need to appear on the work, the call, or the invoice.</p>
-        <p>At the pitch stage, we help shape the visual concept and create enough clarity for the client to understand what they are approving. Once the scope is sold, we handle the production layer end to end. Bring us in at the pitch or once the scope is set. Either works.</p>
-        <p>The earlier we're in, the stronger the concept holds together.</p>
-      </div>
+      <!-- ── WHO WE WORK WITH ── -->
+      <div class="partner-types reveal">
+        <span class="eyebrow">Who we work with</span>
 
-      <!-- ── THREE MODELS ── -->
-      <div class="models-section reveal">
-        <div class="models-grid">
-          <div class="model-col">
-            <span class="model-label">Model 01</span>
-            <h3 class="model-title">White-Label</h3>
-            <p class="model-body">Higher Roads works behind the scenes. Your client sees your team. We deliver under your name. Standard for most partner relationships.</p>
+        <div class="partner-type">
+          <span class="partner-num">01</span>
+          <div>
+            <h2 class="partner-type-title">Digital and Interactive Agencies</h2>
+            <p class="partner-type-body">Bring us in when a screen-based campaign, product experience, or interactive build needs cinematic motion, 3D product content, or a physical activation layer.</p>
           </div>
-          <div class="model-col">
-            <span class="model-label">Model 02</span>
-            <h3 class="model-title">Co-Branded</h3>
-            <p class="model-body">Both names on the work where the collaboration strengthens the pitch. Common on larger scopes where two specialist teams is part of the story.</p>
+          <div class="partner-thumb">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switch-square" alt="Higher Roads CGI work sample" />
           </div>
-          <div class="model-col">
-            <span class="model-label">Model 03</span>
-            <h3 class="model-title">Referral</h3>
-            <p class="model-body">You bring the lead. We carry the scope. You receive a producer fee. Used when the project is outside your lane but the relationship is yours to protect.</p>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">02</span>
+          <div>
+            <h2 class="partner-type-title">Experiential and Brand Agencies</h2>
+            <p class="partner-type-body">Bring us in when the concept is strong, but the room, screens, or spatial content need a specialist visual production layer.</p>
+          </div>
+          <div class="partner-thumb">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/tideform-square" alt="Higher Roads CGI work sample" />
+          </div>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">03</span>
+          <div>
+            <h2 class="partner-type-title">DMCs and Event Producers</h2>
+            <p class="partner-type-body">Bring us in when the proposal needs atmosphere, motion, or branded environment design beyond logistics, entertainment, rentals, and run of show.</p>
+          </div>
+          <div class="partner-thumb">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Blazy-sm-vid.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">04</span>
+          <div>
+            <h2 class="partner-type-title">Fabricators and Build Teams</h2>
+            <p class="partner-type-body">Bring us in when the physical structure needs motion, projection, mapped content, or digital surfaces extending the build.</p>
+          </div>
+          <div class="partner-thumb">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Brightcell-vid.mp4" type="video/mp4" />
+            </video>
           </div>
         </div>
       </div>
 
-      <!-- ── WHERE WE FIT ── -->
+      <!-- ── COMMON PROJECT TRIGGERS ── -->
       <div class="qualify-block reveal">
-        <span class="eyebrow">Where this fits</span>
+        <span class="eyebrow">Common project triggers</span>
         <div class="use-cases-grid">
           <div class="use-case-row">
             <span class="use-case-label">Brand activations</span>
-            <span class="use-case-outcome">A branded world mapped to the specific room your client is activating in, built from their existing identity.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Campaign content</span>
-            <span class="use-case-outcome">3D product environments and motion assets for brands that need content photography cannot produce before launch.</span>
+            <span class="use-case-outcome">Your client wants the room to feel branded without turning the whole budget into scenic fabrication.</span>
           </div>
           <div class="use-case-row">
             <span class="use-case-label">Product launches</span>
-            <span class="use-case-outcome">A physical environment that becomes the visual statement guests photograph, and screen content that shows the product at its best.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Venue installs</span>
-            <span class="use-case-outcome">Permanent or seasonal visual content that gives a space a recurring identity, and gives your agency a retainer-ready offer.</span>
+            <span class="use-case-outcome">The product needs a cinematic screen and room presence before, during, and after launch.</span>
           </div>
           <div class="use-case-row">
             <span class="use-case-label">Trade show booths</span>
-            <span class="use-case-outcome">Motion-ready assets and projection content for built environments where standing still means getting passed.</span>
+            <span class="use-case-outcome">The build exists, but the booth needs motion and screen content strong enough to pull traffic.</span>
           </div>
           <div class="use-case-row">
-            <span class="use-case-label">Scope expansion</span>
-            <span class="use-case-outcome">A client asked for something your team doesn't build. We make it deliverable without you adding headcount or losing the relationship.</span>
+            <span class="use-case-label">Agency campaign extensions</span>
+            <span class="use-case-outcome">A campaign concept needs 3D product environments, motion loops, retail screens, or launch content.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Venue and hospitality installs</span>
+            <span class="use-case-outcome">A space needs seasonal or recurring visual identity without rebuilding the physical environment.</span>
+          </div>
+          <div class="use-case-row">
+            <span class="use-case-label">Fabrication add-ons</span>
+            <span class="use-case-outcome">A scenic build needs a digital layer so the story can change while the structure stays fixed.</span>
           </div>
         </div>
 
@@ -1034,6 +1376,7 @@
               <span class="fit-item">Event producers who need a designed environment, not sourced AV</span>
               <span class="fit-item">Fabricators whose builds need a digital layer to feel complete</span>
               <span class="fit-item">Teams with tight timelines who need a partner that has done it under pressure</span>
+              <span class="fit-item">You need a specialist visual layer, but your team still needs to own the client relationship</span>
             </div>
           </div>
           <div class="fit-cell negative">
@@ -1043,6 +1386,7 @@
               <span class="fit-item">Shops looking for overflow production at commodity rates</span>
               <span class="fit-item">Agencies with established in-house immersive or CGI capability</span>
               <span class="fit-item">Projects where the visual world isn't part of the brief</span>
+              <span class="fit-item">You need commodity AV rental, general event labor, or a vendor who only executes prebuilt files</span>
             </div>
           </div>
         </div>
@@ -1084,6 +1428,26 @@
 
         <div class="faq-item">
           <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">Do you replace our AV, scenic, or event production team?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">No. We own the visual content layer and the technical translation required to make it work in the room. When AV, scenic, lighting, or show production partners are already in place, we integrate with them.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
+            <span class="faq-question">Can you work from an existing concept or creative brief?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p class="faq-answer-inner">Yes. We can start from your concept, a client brief, or a reference direction. We'll flag any technical gaps early so nothing surfaces as a problem during production.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-trigger" aria-expanded="false">
             <span class="faq-question">What's your typical timeline?</span>
             <span class="faq-icon">+</span>
           </button>
@@ -1107,8 +1471,8 @@
       <!-- ── CTA ── -->
       <section class="cta-close reveal">
         <p class="cta-close-text">Working on something that needs<br><em>a world behind it?</em></p>
-        <p class="cta-sub">Tell us about the brief. We'll tell you how we'd build it.</p>
-        <a href="mailto:connect@higher-roads.com" class="cta-email-link">connect@higher-roads.com →</a>
+        <p class="cta-sub">Send us the brief, deck, room photos, product files, or rough client ask. We'll help identify what is possible, what is risky, and where Higher Roads fits.</p>
+        <a href="mailto:connect@higher-roads.com" class="cta-email-link">Start a partner conversation →</a>
       </section>
 
     </main>
@@ -1207,6 +1571,49 @@
         }
       });
     });
+
+    // Pinned scroll narrative: When partners bring us in
+    const pinWrapper = document.getElementById('trigger-pin-wrapper');
+    if (pinWrapper) {
+      const panels = pinWrapper.querySelectorAll('.trigger-panel');
+      const dots = pinWrapper.querySelectorAll('.trigger-dot');
+      const bgVideo = pinWrapper.querySelector('.trigger-bg-video');
+      const panelCount = panels.length;
+      const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+      let ticking = false;
+
+      function updateTriggerPin() {
+        if (isMobile()) { ticking = false; return; }
+
+        const rect = pinWrapper.getBoundingClientRect();
+        const scrollable = pinWrapper.offsetHeight - window.innerHeight;
+        let progress = scrollable > 0 ? (-rect.top) / scrollable : 0;
+        progress = Math.max(0, Math.min(1, progress));
+
+        const activeIndex = Math.min(panelCount - 1, Math.floor(progress * panelCount));
+
+        panels.forEach((panel, i) => panel.classList.toggle('active', i === activeIndex));
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
+
+        if (bgVideo) {
+          const translateY = progress * 10;
+          bgVideo.style.transform = `translateY(${translateY}%) scale(1.1)`;
+        }
+
+        ticking = false;
+      }
+
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateTriggerPin);
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', updateTriggerPin);
+      updateTriggerPin();
+    }
 
     // Scroll reveal
     const revealObserver = new IntersectionObserver((entries) => {
