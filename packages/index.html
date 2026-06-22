@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Higher Roads | Visual Product World Pricing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500&family=Playfair+Display:ital,wght@0,500;1,500&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0906;
+      --panel: rgba(10, 9, 6, 0.86);
+      --accent: #e8782a;
+      --accent-dim: rgba(232, 120, 42, 0.18);
+      --glow: rgba(232, 120, 42, 0.08);
+      --white: #f5f0ea;
+      --muted: #8f8574;
+      --border: rgba(255,255,255,0.09);
+    }
+    html[data-theme="neon"] { --accent:#f72585; --accent-dim:rgba(247,37,133,0.18); --glow:rgba(247,37,133,0.08); --black:#07050f; }
+    html[data-theme="ice"]  { --accent:#4fc3f7; --accent-dim:rgba(79,195,247,0.16);  --glow:rgba(79,195,247,0.08);  --black:#050810; }
+    html[data-theme="acid"] { --accent:#39ff14; --accent-dim:rgba(57,255,20,0.13);   --glow:rgba(57,255,20,0.07);   --black:#040a04; }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 20; pointer-events: none;
+      opacity: 0.16; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    }
+
+    body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 16%, var(--glow), transparent 34%),
+        radial-gradient(circle at 82% 22%, var(--accent-dim), transparent 24%),
+        radial-gradient(circle at 52% 88%, rgba(255,255,255,0.035), transparent 30%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .page-shell { position: relative; z-index: 2; }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 2.4rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,9,6,0.76);
+      backdrop-filter: blur(18px);
+    }
+    .logo {
+      font-family: 'Rajdhani', sans-serif; font-size: 1rem;
+      letter-spacing: 0.26em; text-transform: uppercase;
+    }
+    nav {
+      display: flex; align-items: center; gap: 1.4rem;
+      color: rgba(245,240,234,0.74);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.72rem;
+      font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── Labels ─────────────────────────────────────── */
+    .eyebrow, .page-label, .card-label, .mini-label {
+      color: var(--accent);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.72rem;
+      font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase;
+    }
+
+    /* ── Type ───────────────────────────────────────── */
+    h1, h2, h3 { margin: 0; font-family: 'Playfair Display', serif; font-weight: 500; line-height: 1.05; }
+
+    /* ── Intro ──────────────────────────────────────── */
+    .intro { padding: 5rem 7vw 2.8rem; border-bottom: 1px solid var(--border); }
+    .intro h1 {
+      max-width: 820px;
+      margin-top: 1rem;
+      font-size: clamp(2.2rem, 4.5vw, 4.2rem);
+      letter-spacing: -0.045em;
+      line-height: 1.0;
+    }
+    .intro p {
+      max-width: 580px; margin: 1.3rem 0 0;
+      color: rgba(245,240,234,0.68);
+      font-size: 1rem; line-height: 1.7;
+    }
+
+    /* ── Sections ───────────────────────────────────── */
+    .section { padding: 4.8rem 7vw; border-bottom: 1px solid var(--border); }
+    .section.compact { padding-top: 2.8rem; padding-bottom: 2.8rem; }
+
+    /* ── Package grid ───────────────────────────────── */
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px; border: 1px solid var(--border); background: var(--border);
+    }
+    .package-card {
+      position: relative;
+      display: flex; flex-direction: column;
+      padding: 1.8rem;
+      background: rgba(9,8,6,0.88);
+    }
+    .package-card.featured {
+      background: linear-gradient(180deg, var(--accent-dim), rgba(9,8,6,0.88) 22%), rgba(9,8,6,0.92);
+    }
+    .package-card.featured::before {
+      content: "Base package";
+      position: absolute; top: 1.25rem; right: 1.25rem;
+      padding: 0.3rem 0.5rem;
+      border: 1px solid rgba(245,240,234,0.2);
+      color: var(--accent);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .package-card h3 {
+      margin-top: 0.75rem;
+      font-size: clamp(1.4rem, 2vw, 1.9rem);
+      letter-spacing: -0.03em; line-height: 1.05;
+    }
+    .pkg-price {
+      margin-top: 0.85rem;
+      font-family: 'Rajdhani', sans-serif; font-size: 1.9rem;
+      font-weight: 600; letter-spacing: 0.03em; color: var(--white);
+    }
+    .pkg-price span {
+      display: block; margin-top: 0.2rem;
+      color: var(--muted); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .pkg-desc {
+      margin: 0.9rem 0 0;
+      color: rgba(245,240,234,0.62); font-size: 0.92rem; line-height: 1.6;
+    }
+
+    /* ── Spec grid ──────────────────────────────────── */
+    .spec-grid {
+      margin-top: 1.3rem; padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+      flex: 1;
+    }
+    .spec-row {
+      display: grid; grid-template-columns: 90px 1fr;
+      gap: 0.6rem; padding: 0.55rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.045);
+      align-items: baseline;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key {
+      color: var(--accent);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.6rem;
+      font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      line-height: 1.5;
+    }
+    .spec-val {
+      color: rgba(245,240,234,0.68); font-size: 0.88rem; line-height: 1.45;
+    }
+
+    /* ── Asset row ──────────────────────────────────── */
+    .asset-row {
+      display: grid; grid-template-columns: 0.76fr 1.24fr;
+      gap: 1px; border: 1px solid var(--border); background: var(--border);
+    }
+    .row-intro {
+      display: flex; min-height: 300px;
+      flex-direction: column; justify-content: space-between;
+      padding: 1.8rem; background: rgba(9,8,6,0.88);
+    }
+    .row-intro h2 {
+      max-width: 380px; margin-top: 0.9rem;
+      font-size: clamp(1.4rem, 2.2vw, 2.1rem);
+      letter-spacing: -0.03em; line-height: 1.1;
+    }
+    .row-intro p {
+      max-width: 400px;
+      color: rgba(245,240,234,0.62); font-size: 0.92rem; line-height: 1.6;
+    }
+    .asset-grid {
+      display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 1px; background: var(--border);
+    }
+    .asset-card {
+      display: flex; min-height: 300px;
+      flex-direction: column; justify-content: space-between;
+      padding: 1.2rem; background: rgba(9,8,6,0.9);
+    }
+    .visual-tile {
+      position: relative; height: 155px;
+      border: 1px solid rgba(245,240,234,0.13); overflow: hidden;
+      background:
+        radial-gradient(circle at 45% 26%, var(--accent-dim), transparent 35%),
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.36));
+    }
+    .visual-tile::before {
+      content: ""; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 54px);
+    }
+    .visual-tile.image-tile { background: rgba(9,8,6,0.9); }
+    .visual-tile.image-tile::before { display: none; }
+    .visual-tile.image-tile::after {
+      content: ""; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg, transparent 42%, rgba(0,0,0,0.44));
+      pointer-events: none;
+    }
+    .visual-tile.image-tile img {
+      width: 100%; height: 100%; display: block;
+      object-fit: cover;
+      filter: saturate(0.85) contrast(1.02) brightness(0.82);
+    }
+    .visual-tile.channel {
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(9,8,6,0.88);
+    }
+    .visual-tile.channel::before { display: none; }
+    .ch-diagram { display: flex; gap: 0.55rem; align-items: flex-end; }
+    .ch-block { border: 1px solid rgba(245,240,234,0.18); background: rgba(245,240,234,0.04); }
+
+    .asset-copy h3 {
+      margin-top: 0.9rem; font-size: 1.25rem;
+      line-height: 1.1; letter-spacing: -0.025em;
+    }
+    .asset-copy p {
+      margin: 0.6rem 0 0;
+      color: rgba(245,240,234,0.58); font-size: 0.88rem; line-height: 1.55;
+    }
+
+    /* ── CTA ────────────────────────────────────────── */
+    .cta {
+      min-height: 40vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 5rem 7vw;
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(circle at 65% 35%, var(--accent-dim), transparent 28%),
+        linear-gradient(180deg, transparent, rgba(0,0,0,0.22));
+    }
+    .cta h2 {
+      max-width: 760px; margin-top: 0.8rem;
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      letter-spacing: -0.04em; line-height: 1.0;
+    }
+    .cta p {
+      max-width: 520px; margin: 1.2rem 0 0;
+      color: rgba(245,240,234,0.68); font-size: 0.97rem; line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.8rem; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; padding: 0.8rem 1.3rem;
+      border: 1px solid rgba(245,240,234,0.25);
+      color: var(--white); background: transparent;
+      font-family: 'Rajdhani', sans-serif; font-size: 0.72rem;
+      font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      transition: border-color .2s, color .2s, background .2s; cursor: pointer;
+    }
+    .btn.primary { color: #100905; background: var(--accent); border-color: var(--accent); }
+    .btn:hover { color: var(--accent); border-color: var(--accent); }
+    .btn.primary:hover { color: #100905; background: var(--white); border-color: var(--white); }
+
+    /* ── Footer ─────────────────────────────────────── */
+    footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 2rem 2.4rem;
+      color: rgba(245,240,234,0.5);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .theme-switcher { display: flex; align-items: center; gap: 0.65rem; }
+    .dot { width: 13px; height: 13px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25); cursor: pointer; }
+    .dot.ember { background: #e8782a; }
+    .dot.neon  { background: #f72585; }
+    .dot.ice   { background: #4fc3f7; }
+    .dot.acid  { background: #39ff14; }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 1080px) {
+      .package-grid, .asset-row { grid-template-columns: 1fr; }
+      .asset-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 720px) {
+      header { padding: 1rem 1.25rem; }
+      nav { display: none; }
+      .intro, .section { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .intro { padding-top: 3.5rem; }
+      .section { padding-top: 3rem; }
+      .package-card.featured::before { position: static; display: inline-flex; margin-bottom: 0.8rem; }
+      .asset-grid { grid-template-columns: 1fr; }
+      .row-intro, .package-card, .asset-card { min-height: auto; }
+      .visual-tile { height: 140px; }
+      .cta { padding: 3.5rem 1.5rem; }
+      footer { flex-direction: column; align-items: flex-start; padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+
+  <header>
+    <a class="logo" href="#">Higher Roads</a>
+    <nav>
+      <a href="#pricing">Pricing</a>
+      <a href="#world">World Stills</a>
+      <a href="#proof">Proof Content</a>
+      <a href="#motion">Motion</a>
+      <a href="#exports">Channel Exports</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- Intro -->
+    <section class="intro">
+      <div class="eyebrow">Visual Product World</div>
+      <h1>World stills, proof content, and motion, built from one brand environment.</h1>
+      <p>A complete visual production system for brands that sell on more than one channel. Starting at $7,500 for one brand world and one SKU.</p>
+    </section>
+
+    <!-- Pricing -->
+    <section class="section compact" id="pricing">
+      <div class="package-grid">
+
+        <article class="package-card featured">
+          <div class="card-label">Base build</div>
+          <h3>Brand World + 1 SKU</h3>
+          <div class="pkg-price">$7,500<span>Starting package</span></div>
+          <p class="pkg-desc">One brand world, one SKU, complete channel coverage.</p>
+          <div class="spec-grid">
+            <div class="spec-row">
+              <span class="spec-key">World Stills</span>
+              <span class="spec-val">Brand world direction, hero scene, SKU treatment, PDP hero</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Proof Content</span>
+              <span class="spec-val">Three product education images, ingredient or benefit visual</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Motion</span>
+              <span class="spec-val">Three loops: product reveal, world atmosphere, product detail</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Exports</span>
+              <span class="spec-val">Channel folder, vertical / square / widescreen formats, placement guide</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="package-card">
+          <div class="card-label">SKU expansion</div>
+          <h3>Additional SKU</h3>
+          <div class="pkg-price">+$1,875<span>Per SKU after the first</span></div>
+          <p class="pkg-desc">Each additional SKU gets its own expression inside the established world.</p>
+          <div class="spec-grid">
+            <div class="spec-row">
+              <span class="spec-key">World Stills</span>
+              <span class="spec-val">SKU hero image, PDP image, SKU-specific selling angle</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Proof Content</span>
+              <span class="spec-val">One ingredient, benefit, or trust visual</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Motion</span>
+              <span class="spec-val">One motion loop</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Exports</span>
+              <span class="spec-val">Updated channel folder and usage map</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="package-card">
+          <div class="card-label">System build</div>
+          <h3>Brand World + SKU Family</h3>
+          <div class="pkg-price">From $16,500<span>Four or more SKUs</span></div>
+          <p class="pkg-desc">A coordinated visual system for the full product line.</p>
+          <div class="spec-grid">
+            <div class="spec-row">
+              <span class="spec-key">World Stills</span>
+              <span class="spec-val">Full SKU family with product hierarchy and benefit zone logic</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Proof Content</span>
+              <span class="spec-val">Expanded ecommerce library, A+ style panels, retail sell-in visuals</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Motion</span>
+              <span class="spec-val">Loops per SKU, trade show and screen loop adaptations</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-key">Exports</span>
+              <span class="spec-val">Full marketplace image system, paid social variants, SKU refresh roadmap</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- World Stills -->
+    <section class="section" id="world">
+      <div class="asset-row">
+        <div class="row-intro">
+          <div>
+            <div class="page-label">World Stills</div>
+            <h2>Product placed in a world, not on a backdrop.</h2>
+          </div>
+          <p>The brand world sets the environment, materials, and lighting. Everything built after it follows the same system.</p>
+        </div>
+        <div class="asset-grid">
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom brand composition" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Foundation</div>
+              <h3>Brand world direction</h3>
+              <p>The creative environment and visual rules that govern every asset in the system.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom hero scene" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Hero</div>
+              <h3>Hero product scene</h3>
+              <p>The primary image for homepage, launch page, email, and sales deck.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom SKU lineup" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Product</div>
+              <h3>SKU treatment</h3>
+              <p>A product-specific expression tied to flavor, benefit, or selling point.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Proof Content -->
+    <section class="section" id="proof">
+      <div class="asset-row">
+        <div class="row-intro">
+          <div>
+            <div class="page-label">Proof Content</div>
+            <h2>Claims-driven imagery, included in every package.</h2>
+          </div>
+          <p>These assets answer the buyer's purchase question before they ask it. They work on PDPs, marketplace galleries, email, and sales decks.</p>
+        </div>
+        <div class="asset-grid">
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom ingredient visual" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Ingredients</div>
+              <h3>Ingredient visual</h3>
+              <p>What is in the product and why it belongs there, rendered in the brand environment.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom education image" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Education</div>
+              <h3>Product education image</h3>
+              <p>Use occasion, function, or dosage made visual inside the brand world.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom trust panel" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Trust</div>
+              <h3>Claims and trust panel</h3>
+              <p>A specific claim, certification, or differentiator shown in brand visual language.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Motion -->
+    <section class="section" id="motion">
+      <div class="asset-row">
+        <div class="row-intro">
+          <div>
+            <div class="page-label">Motion</div>
+            <h2>Three motion loops in every build.</h2>
+          </div>
+          <p>Motion is the layer that separates a Higher Roads visual system from a static CGI production. Every package includes loops built from the brand environment.</p>
+        </div>
+        <div class="asset-grid">
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="MindBloom product reveal" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Reveal</div>
+              <h3>Product reveal loop</h3>
+              <p>Product-first motion for web headers, social posts, and paid media.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="MindBloom atmosphere loop" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Atmosphere</div>
+              <h3>World atmosphere loop</h3>
+              <p>A branded motion background for section breaks, email, and presentations.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile image-tile">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="MindBloom detail loop" loading="lazy">
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Detail</div>
+              <h3>Product detail loop</h3>
+              <p>Close motion for ingredients, texture, packaging, or function cues.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Channel Exports -->
+    <section class="section" id="exports">
+      <div class="asset-row">
+        <div class="row-intro">
+          <div>
+            <div class="page-label">Channel Exports</div>
+            <h2>Organized by channel and ready to place.</h2>
+          </div>
+          <p>World stills, proof content, and motion are exported for the platforms where they will actually live.</p>
+        </div>
+        <div class="asset-grid">
+          <article class="asset-card">
+            <div class="visual-tile channel">
+              <div class="ch-diagram">
+                <div class="ch-block" style="width:108px; height:46px;"></div>
+                <div class="ch-block" style="width:86px; height:34px; opacity:.5;"></div>
+              </div>
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">DTC / Shopify</div>
+              <h3>Site and ecommerce</h3>
+              <p>Homepage banner, PDP gallery, section imagery, and email crops for Shopify and common email platforms.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile channel">
+              <div class="ch-diagram">
+                <div class="ch-block" style="width:58px; height:58px;"></div>
+                <div class="ch-block" style="width:58px; height:58px; opacity:.55;"></div>
+                <div class="ch-block" style="width:58px; height:58px; opacity:.28;"></div>
+              </div>
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Marketplace</div>
+              <h3>Listings and retail</h3>
+              <p>Gallery images, A+ style panels, and benefit visuals for Amazon-style listings, retailer portals, and buyer decks.</p>
+            </div>
+          </article>
+          <article class="asset-card">
+            <div class="visual-tile channel">
+              <div class="ch-diagram" style="gap:.7rem; align-items:center;">
+                <div class="ch-block" style="width:27px; height:74px;"></div>
+                <div class="ch-block" style="width:52px; height:52px;"></div>
+                <div class="ch-block" style="width:27px; height:74px; opacity:.5;"></div>
+              </div>
+            </div>
+            <div class="asset-copy">
+              <div class="mini-label">Social and paid</div>
+              <h3>Social and paid media</h3>
+              <p>Square, vertical, and story crops from world stills and motion for Instagram, Meta ads, and digital display.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" id="contact">
+      <div class="page-label">Start a project</div>
+      <h2>Give the product a world customers can buy from.</h2>
+      <p>Starting at $7,500 for one brand world and one SKU. Additional SKUs at $1,875 each. System builds for four or more SKUs from $16,500.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="mailto:connect@higher-roads.com?subject=Visual%20Product%20World">Start a project</a>
+        <a class="btn" href="#pricing">See pricing</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div>&copy; 2026 Higher Roads</div>
+    <div class="theme-switcher" aria-label="Theme switcher">
+      <span>Theme</span>
+      <button class="dot ember" data-theme="ember" aria-label="Ember"></button>
+      <button class="dot neon"  data-theme="neon"  aria-label="Neon"></button>
+      <button class="dot ice"   data-theme="ice"   aria-label="Ice"></button>
+      <button class="dot acid"  data-theme="acid"  aria-label="Acid"></button>
+    </div>
+    <a href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+  </footer>
+
+</div>
+<script>
+  document.querySelectorAll('.dot').forEach(d =>
+    d.addEventListener('click', () =>
+      document.documentElement.setAttribute('data-theme', d.dataset.theme)));
+</script>
+</body>
+</html>
