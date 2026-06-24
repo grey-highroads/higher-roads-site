@@ -246,13 +246,13 @@
       background: #0a0906;
       flex-shrink: 0;
     }
-    .ct-image img {
+    .ct-image img, .ct-image video {
       width: 100%; height: 100%; display: block; object-fit: cover;
-      filter: saturate(0.82) contrast(1.02) brightness(0.76);
+      filter: saturate(0.92) contrast(1.0) brightness(0.92);
     }
     .ct-image::after {
       content: ''; position: absolute; inset: 0;
-      background: linear-gradient(180deg, transparent 40%, rgba(10,9,6,0.7));
+      background: linear-gradient(180deg, transparent 55%, rgba(10,9,6,0.28));
       pointer-events: none;
     }
     .ct-diagram {
@@ -397,7 +397,7 @@
 
       <div class="ct-card">
         <div class="ct-image">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="World stills" loading="lazy">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="World stills" loading="lazy">
         </div>
         <div class="ct-body">
           <span class="ct-label">World Stills</span>
@@ -418,7 +418,7 @@
 
       <div class="ct-card">
         <div class="ct-image">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Generated%20Image%20June%2021%2C%202026%20-%2010_08AM.jpg" alt="Proof content" loading="lazy">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="Proof content" loading="lazy">
         </div>
         <div class="ct-body">
           <span class="ct-label">Proof Content</span>
@@ -438,7 +438,9 @@
 
       <div class="ct-card">
         <div class="ct-image">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-couple.PNG" alt="Motion" loading="lazy">
+          <video autoplay muted loop playsinline>
+            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4">
+          </video>
         </div>
         <div class="ct-body">
           <span class="ct-label">Motion</span>
