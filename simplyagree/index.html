@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simply Agree — Bad Idea Concept Presentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --off-black: #111111;
+      --dark: #1a1a1a;
+      --mid: #2a2a2a;
+      --border: rgba(255,255,255,0.1);
+      --amber: #d4893a;
+      --amber-light: #e8a85a;
+      --white: #f5f2ee;
+      --muted: rgba(245,242,238,0.5);
+      --dim: rgba(245,242,238,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .nav-logo img {
+      height: 22px;
+      display: block;
+    }
+
+    nav .nav-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    nav .nav-dots {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--dim);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: var(--amber);
+    }
+
+    /* SLIDES */
+    .slide {
+      min-height: 100vh;
+      padding: 7rem 3rem 5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .slide-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* COVER */
+    .slide-cover {
+      text-align: center;
+      justify-content: center;
+    }
+
+    .slide-cover .slide-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cover-rule {
+      width: 48px;
+      height: 2px;
+      background: var(--amber);
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      line-height: 1.3;
+      margin-bottom: 1.5rem;
+    }
+
+    .cover-venue {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      color: var(--amber-light);
+      display: block;
+      margin-bottom: 2rem;
+    }
+
+    .cover-sub {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 0.95rem;
+      color: var(--muted);
+      text-align: center;
+      width: 100%;
+      display: block;
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+    /* SLIDE NUMBER */
+    .slide-num {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      color: var(--amber);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .slide-num::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--amber);
+      opacity: 0.5;
+    }
+
+    /* IMAGE GRID */
+    .img-grid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .img-cell {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      background: var(--dark);
+    }
+
+    .img-cell-wide {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      background: var(--dark);
+      margin-top: 0;
+    }
+
+    .img-cell img,
+    .img-cell-wide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .img-cell:hover img,
+    .img-cell-wide:hover img {
+      transform: scale(1.03);
+    }
+
+    /* SCOPE */
+    .scope-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+
+    .scope-item {
+      border: 1px solid var(--border);
+      background: var(--off-black);
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .scope-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--amber);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .scope-item:hover::before {
+      opacity: 1;
+    }
+
+    .scope-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .scope-item p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .scope-item strong {
+      color: var(--white);
+      font-weight: 400;
+    }
+
+    /* CONCEPT NOTE */
+    .concept-note {
+      border-left: 2px solid var(--amber);
+      background: rgba(212,137,58,0.06);
+      padding: 1.25rem 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .concept-note p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* FOOTER */
+    .slide-footer {
+      min-height: 40vh;
+      background: var(--off-black);
+      padding: 5rem 3rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-rule {
+      width: 48px;
+      height: 2px;
+      background: var(--amber);
+      margin: 1.5rem 0;
+    }
+
+    .slide-footer p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    .slide-footer .contact {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 2rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .slide { padding: 6rem 1.5rem 3rem; }
+      .img-grid-row { grid-template-columns: 1fr; }
+      .scope-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="../">
+      <img src="../images/HR-logo-horiz-white.png" alt="Higher Roads">
+    </a>
+    <span class="nav-title">Simply Agree &mdash; Bad Idea Concept Presentation</span>
+    <div class="nav-dots" id="dots"></div>
+  </nav>
+
+  <!-- SLIDE 1: COVER -->
+  <section class="slide slide-cover" data-slide="1">
+    <div class="slide-inner">
+      <div class="cover-rule"></div>
+      <span class="eyebrow">Concept Presentation</span>
+      <h1>Simply Agree + Higher Roads</h1>
+      <span class="cover-venue">at Bad Idea</span>
+      <p class="cover-sub">An event activation concept designed to guide the conversation.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: IMAGE GRID -->
+  <section class="slide" data-slide="2">
+    <div class="slide-inner">
+      <div class="slide-num">02</div>
+      <span class="eyebrow">Creative Direction</span>
+      <h2>The Concept</h2>
+
+      <!-- Row 1 -->
+      <div class="img-grid-row">
+        <div class="img-cell">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-1.PNG" alt="Concept render 1">
+        </div>
+        <div class="img-cell">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-2.PNG" alt="Concept render 2">
+        </div>
+        <div class="img-cell">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-3.PNG" alt="Concept render 3">
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="img-grid-row">
+        <div class="img-cell">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-4.PNG" alt="Concept render 4">
+        </div>
+        <div class="img-cell">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-5.PNG" alt="Concept render 5">
+        </div>
+        <div class="img-cell">
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-6.PNG" alt="Concept render 6">
+        </div>
+      </div>
+
+      <!-- Break text -->
+      <div style="text-align:center; padding: 3rem 0 2rem;">
+        <p style="font-family:'Playfair Display', serif; font-style:italic; font-weight:400; font-size:1.1rem; color:var(--muted);">...and just for fun. We can dream, right?</p>
+      </div>
+
+      <!-- Full width -->
+      <div class="img-cell-wide" style="margin-top:0.75rem;">
+        <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/SA-8.PNG" alt="Full environment render" style="object-fit:cover;">
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SLIDE 3: SCOPE -->
+  <section class="slide" data-slide="3">
+    <div class="slide-inner">
+      <div class="slide-num">03</div>
+      <span class="eyebrow">Implementation</span>
+      <h2>What Gets Built</h2>
+
+      <div class="scope-grid">
+        <div class="scope-item">
+          <span class="scope-label">Station Layout</span>
+          <p><strong>Four projection stations, symmetrically positioned</strong> throughout the space. Each station is independently mapped and operates as part of a unified environment rather than four separate displays.</p>
+        </div>
+        <div class="scope-item">
+          <span class="scope-label">Mapped Animation</span>
+          <p><strong>Animated visualizations built to the column geometry</strong> of the space. Each surface is traced and the content is authored to interact precisely with the physical architecture, not placed on top of it.</p>
+        </div>
+      </div>
+
+      <div class="concept-note">
+        <p>These renders reflect the agreed creative direction. We're presenting them here to align on visual language before production begins.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="slide-footer">
+    <div class="slide-inner">
+      <span class="eyebrow">Higher Roads</span>
+      <h2>Let's move forward.</h2>
+      <div class="footer-rule"></div>
+      <p>We're a creative studio that mashes up fine art with modern software to create unexpected visuals for screens and physical spaces.</p>
+      <p class="contact">higher-roads.com</p>
+    </div>
+  </footer>
+
+  <script>
+    const slides = document.querySelectorAll('[data-slide]');
+    const dotsContainer = document.getElementById('dots');
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.addEventListener('click', () => {
+        slides[i].scrollIntoView({ behavior: 'smooth' });
+      });
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(slides).indexOf(entry.target);
+          dots.forEach(d => d.classList.remove('active'));
+          if (dots[idx]) dots[idx].classList.add('active');
+        }
+      });
+    }, { threshold: 0.5 });
+
+    slides.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>
