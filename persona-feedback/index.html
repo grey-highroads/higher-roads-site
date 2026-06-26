@@ -108,7 +108,12 @@ textarea::placeholder { color: rgba(245,237,226,0.2); }
   </div>
 
   <div class="right-panel">
-    <div class="tabs-bar" id="tabsBar" style="display:none;"></div>
+    <div style="display:flex; align-items:stretch; border-bottom: 1px solid rgba(232,120,42,0.15); flex-shrink:0;">
+      <div class="tabs-bar" id="tabsBar" style="display:none; border-bottom:none; flex:1;"></div>
+      <div id="exportArea" style="display:none; align-items:center; padding: 0 16px; border-left: 1px solid rgba(232,120,42,0.1);">
+        <button onclick="exportResults()" style="background:none; border:1px solid rgba(232,120,42,0.3); color:rgba(245,237,226,0.55); font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.64rem; letter-spacing:0.2em; text-transform:uppercase; padding:5px 12px; border-radius:2px; cursor:pointer; transition:all 0.15s; white-space:nowrap;" onmouseover="this.style.borderColor='rgba(232,120,42,0.6)';this.style.color='rgba(245,237,226,0.85)'" onmouseout="this.style.borderColor='rgba(232,120,42,0.3)';this.style.color='rgba(245,237,226,0.55)'">Export .md</button>
+      </div>
+    </div>
     <div class="results-content" id="resultsContent">
       <div class="empty-state">Enter your API key, paste page content,<br>select personas, and run.</div>
     </div>
@@ -374,6 +379,7 @@ function renderResults() {
 
   const selected = Array.from(selectedPersonas);
   tabsBar.style.display = 'flex';
+  document.getElementById('exportArea').style.display = 'flex';
   tabsBar.innerHTML = selected.map(id => {
     const p = PERSONAS.find(x => x.id === id);
     const isLoading = loadingPersonas.has(id);
@@ -523,6 +529,57 @@ async function runFeedback() {
     const batch = ids.slice(i, i + 3);
     await Promise.allSettled(batch.map(id => runPersona(id)));
   }
+}
+
+function exportResults() {
+  const completed = PERSONAS.filter(p => results[p.id] && !loadingPersonas.has(p.id));
+  if (completed.length === 0) return;
+
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const contentSnippet = document.getElementById('pageContent').value.trim().slice(0, 120).replace(/\n/g, ' ');
+  const snippet = contentSnippet.length === 120 ? contentSnippet + '...' : contentSnippet;
+
+  let md = `# Higher Roads — Persona Feedback\n`;
+  md += `**Date:** ${date}\n`;
+  md += `**Page excerpt:** ${snippet}\n\n`;
+  md += `---\n\n`;
+
+  completed.forEach(persona => {
+    const parsed = parseResult(results[persona.id]);
+    md += `## ${persona.name}\n`;
+    md += `**Track:** ${persona.track === 'screens' ? 'For Screens' : 'For Spaces'} · **Risk lens:** ${persona.riskLens}\n\n`;
+
+    const order = ['first_impression', 'what_lands', 'confusing', 'risk', 'motion', 'objections', 'verdict'];
+    const labels = {
+      first_impression: 'First Impression',
+      what_lands: 'What Lands',
+      confusing: 'Confusing or Missing',
+      risk: 'Primary Risk Addressed?',
+      motion: 'Does Motion Matter Here?',
+      objections: 'Objections',
+      verdict: 'Verdict'
+    };
+
+    if (Object.keys(parsed).length > 0) {
+      order.forEach(key => {
+        if (parsed[key]) {
+          md += `### ${labels[key]}\n${parsed[key].content}\n\n`;
+        }
+      });
+    } else {
+      md += results[persona.id] + '\n\n';
+    }
+
+    md += `---\n\n`;
+  });
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `hr-persona-feedback-${new Date().toISOString().slice(0,10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 loadKey();
