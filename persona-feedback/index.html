@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Higher Roads — Persona Feedback Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Barlow', sans-serif; background: #0a0906; color: #f5ede2; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(232,120,42,0.25); border-radius: 2px; }
+.eyebrow { font-family: 'Rajdhani', sans-serif; font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: #e8782a; }
+.header { border-bottom: 1px solid rgba(232,120,42,0.15); padding: 16px 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
+.header-left {}
+.header-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 500; margin-top: 4px; }
+.api-key-area { display: flex; align-items: center; gap: 8px; }
+.api-key-input { background: #111009; border: 1px solid rgba(232,120,42,0.2); border-radius: 3px; color: rgba(245,237,226,0.7); font-family: 'Barlow', sans-serif; font-size: 0.7rem; font-weight: 300; padding: 6px 10px; width: 240px; outline: none; }
+.api-key-input:focus { border-color: rgba(232,120,42,0.4); }
+.api-key-input::placeholder { color: rgba(245,237,226,0.2); }
+.api-key-label { font-family: 'Rajdhani', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,237,226,0.3); }
+.main { display: flex; flex: 1; overflow: hidden; }
+.left-panel { width: 320px; flex-shrink: 0; border-right: 1px solid rgba(232,120,42,0.15); overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; }
+.right-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.track-label { font-family: 'Rajdhani', sans-serif; font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: #e8782a; }
+.select-all-btn { font-family: 'Rajdhani', sans-serif; font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; background: none; border: 1px solid rgba(232,120,42,0.25); color: rgba(245,237,226,0.45); padding: 3px 7px; border-radius: 2px; cursor: pointer; transition: all 0.15s; }
+.select-all-btn:hover { border-color: rgba(232,120,42,0.5); color: rgba(245,237,226,0.7); }
+.persona-card { padding: 10px 11px; background: #111009; border: 1px solid rgba(232,120,42,0.09); border-radius: 3px; cursor: pointer; transition: all 0.15s; display: flex; align-items: flex-start; gap: 9px; margin-bottom: 6px; }
+.persona-card.selected { background: rgba(232,120,42,0.07); border-color: rgba(232,120,42,0.28); }
+.persona-card:hover { border-color: rgba(232,120,42,0.2); }
+.checkbox { width: 13px; height: 13px; border-radius: 2px; border: 1px solid rgba(245,237,226,0.2); background: transparent; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.checkbox.checked { background: #e8782a; border-color: #e8782a; }
+.check-mark { color: #0a0906; font-size: 8px; font-weight: 700; line-height: 1; }
+.persona-name { font-family: 'Barlow', sans-serif; font-size: 0.72rem; font-weight: 400; color: rgba(245,237,226,0.65); margin-bottom: 2px; transition: color 0.15s; }
+.persona-card.selected .persona-name { color: #f5ede2; }
+.persona-risk { font-family: 'Barlow', sans-serif; font-size: 0.62rem; font-weight: 300; color: rgba(245,237,226,0.3); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.status-dot.loading { background: #e8782a; animation: pulse 0.7s ease-in-out infinite alternate; }
+.status-dot.done { background: rgba(232,120,42,0.45); }
+textarea { width: 100%; height: 130px; background: #111009; border: 1px solid rgba(232,120,42,0.15); border-radius: 3px; color: rgba(245,237,226,0.85); font-family: 'Barlow', sans-serif; font-size: 0.75rem; font-weight: 300; padding: 11px; resize: vertical; outline: none; transition: border-color 0.15s; }
+textarea:focus { border-color: rgba(232,120,42,0.35); }
+textarea::placeholder { color: rgba(245,237,226,0.2); }
+.char-count { font-size: 0.6rem; color: rgba(245,237,226,0.25); margin-top: 4px; }
+.run-btn { background: #e8782a; color: #0a0906; border: none; padding: 11px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all 0.15s; width: 100%; }
+.run-btn:hover:not(:disabled) { background: #f08a3a; }
+.run-btn:disabled { background: rgba(232,120,42,0.18); color: rgba(245,237,226,0.25); cursor: not-allowed; }
+.tabs-bar { border-bottom: 1px solid rgba(232,120,42,0.15); display: flex; overflow-x: auto; flex-shrink: 0; padding: 0 20px; }
+.tabs-bar::-webkit-scrollbar { height: 2px; }
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; color: rgba(245,237,226,0.45); padding: 12px 13px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.tab-btn.active { color: #e8782a; border-bottom-color: #e8782a; }
+.results-content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+.persona-header { margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid rgba(232,120,42,0.1); }
+.persona-header-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 500; margin-bottom: 8px; }
+.persona-meta { display: flex; gap: 14px; align-items: center; margin-bottom: 6px; }
+.meta-divider { width: 1px; height: 10px; background: rgba(245,237,226,0.12); }
+.meta-risk { font-family: 'Barlow', sans-serif; font-size: 0.68rem; color: rgba(245,237,226,0.4); font-weight: 300; }
+.persona-brief { font-family: 'Barlow', sans-serif; font-size: 0.72rem; color: rgba(245,237,226,0.4); font-weight: 300; font-style: italic; line-height: 1.55; }
+.feedback-block { padding: 16px 18px; background: #111009; border: 1px solid rgba(232,120,42,0.09); border-radius: 3px; margin-bottom: 12px; }
+.feedback-block.verdict { background: rgba(232,120,42,0.05); border-color: rgba(232,120,42,0.2); }
+.feedback-block.risk-block { border-left: 2px solid rgba(232,120,42,0.3); }
+.block-label { font-family: 'Rajdhani', sans-serif; font-size: 0.56rem; letter-spacing: 0.25em; text-transform: uppercase; color: #e8782a; margin-bottom: 7px; }
+.block-content { font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 300; color: rgba(245,237,226,0.8); line-height: 1.68; white-space: pre-wrap; }
+.empty-state { display: flex; align-items: center; justify-content: center; height: 100%; color: rgba(245,237,226,0.18); font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 0.82rem; text-align: center; padding: 40px; line-height: 1.8; }
+.loading-block { padding: 14px 16px; background: #111009; border: 1px solid rgba(232,120,42,0.09); border-radius: 3px; font-family: 'Barlow', sans-serif; font-size: 0.75rem; font-weight: 300; color: rgba(245,237,226,0.25); margin-bottom: 10px; animation: pulse 1.2s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: 0.3; } to { opacity: 0.6; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="eyebrow">Higher Roads</div>
+    <div class="header-title">Persona Feedback Tool</div>
+  </div>
+  <div class="api-key-area">
+    <div class="api-key-label">Claude API Key</div>
+    <input type="password" class="api-key-input" id="apiKey" placeholder="sk-ant-..." oninput="saveKey()" />
+  </div>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+    <div>
+      <div class="eyebrow" style="margin-bottom:10px;">Page Content</div>
+      <textarea id="pageContent" placeholder="Paste page copy or HTML here..."></textarea>
+      <div class="char-count" id="charCount"></div>
+    </div>
+
+    <div>
+      <div class="section-header">
+        <div class="track-label">For Screens</div>
+        <button class="select-all-btn" onclick="selectTrack('screens')">Select All</button>
+      </div>
+      <div id="screensPersonas"></div>
+    </div>
+
+    <div>
+      <div class="section-header">
+        <div class="track-label">For Spaces</div>
+        <button class="select-all-btn" onclick="selectTrack('spaces')">Select All</button>
+      </div>
+      <div id="spacesPersonas"></div>
+    </div>
+
+    <button class="run-btn" id="runBtn" disabled onclick="runFeedback()">Run Feedback</button>
+  </div>
+
+  <div class="right-panel">
+    <div class="tabs-bar" id="tabsBar" style="display:none;"></div>
+    <div class="results-content" id="resultsContent">
+      <div class="empty-state">Enter your API key, paste page content,<br>select personas, and run.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORKER = 'https://higher-roads-claude.grey-4fe.workers.dev/';
+const KEY_STORAGE = 'hr_claude_key';
+
+const PERSONAS = [
+  {
+    id: "pre_launch_founder", name: "Pre-Launch CPG Founder", track: "screens",
+    riskLens: "Launch delay",
+    brief: "Needs product to feel real before inventory exists. Cash-sensitive, time-pressured, self-directed.",
+    systemPrompt: `You are Maya, a founder running a functional beverage brand with $3M in revenue. You have spent 18 months developing a product now entering production. You have brand guidelines from a small branding studio, a Shopify site being built, and a retail meeting with a regional chain in 6 weeks. You do not have product samples yet. Your photographer said they need physical bottles to shoot.
+
+Your primary risk: Launch delay. If you do not have sales-ready assets in 4 to 6 weeks, the retail meeting fails, the DTC launch gets pushed, and your fundraising narrative falls apart.
+
+Your relationship with motion and 3D: You are not a production expert. You know what the assets need to do but not the technical difference between CGI and photography. You have seen competitors use polished 3D content and wondered how they did it without physical product.
+
+What you need the page to prove: That they understand launch timelines and can hit a hard date. That they have worked with brands at your stage, not just large CPG. That the output will work for your actual use cases: retailer decks, DTC hero images, paid social, Amazon prep. That the process is clear enough you can explain it to your co-founder. That the price is in a range you can justify before first revenue from this SKU.
+
+Do not assume you already want what they are selling. You are time-pressured, slightly overwhelmed, and cost-conscious. You will convert if the page makes you feel understood and removes risk from the decision.`
+  },
+  {
+    id: "growth_stage_marketer", name: "Growth-Stage Marketing Director", track: "screens",
+    riskLens: "Internal approval / brand inconsistency",
+    brief: "Manages multi-SKU brand at $15M-$50M. Needs vendor credibility she can sell internally. Cares about process and deliverable governance.",
+    systemPrompt: `You are Dana, Director of Marketing at a $28M natural food and beverage brand. You manage a team of 3, oversee brand, digital, trade, and ecommerce, and report to a CMO. You have 14 SKUs across 4 product lines with active retail presence in 3 regional chains and a national natural channel. A major packaging refresh is launching in Q1.
+
+Your primary risk: Internal approval and brand inconsistency. Your company has had bad experiences with vendors who delivered inconsistent work, missed deadlines, or required so many revision rounds that the process burned the team. You need a vendor recommendation you can defend to your CMO: clear scope, clear process, defined outputs, reasonable price.
+
+Your relationship with motion and 3D: You know motion matters for paid social. But your bigger problem is consistent assets across 14 SKUs that work across channels: retail, ecommerce, paid, email, trade. If a studio can help you build a scalable visual system, that matters more than any single beautiful deliverable.
+
+What you need the page to prove: A proven process with clear deliverable specs. Experience with multi-SKU brand visual systems. Defined revision rounds, approval workflow, timeline structure. Evidence they have worked with brands your size and complexity. That they will not need you to hold their hand at every step. A price structure that fits a real mid-market marketing budget.
+
+You are a professional buyer. Beautiful work alone will not impress you. You need operational confidence.`
+  },
+  {
+    id: "ecomm_channel_lead", name: "Ecommerce / Channel Marketing Lead", track: "screens",
+    riskLens: "Channel performance / asset utility",
+    brief: "Owns DTC, Amazon, paid social, retail media. Judges assets by channel utility and specs, not aesthetics.",
+    systemPrompt: `You are Jordan, Ecommerce and Channel Marketing Manager at a $20M supplement and wellness brand. You own DTC Shopify, Amazon, Instacart, paid social, and retail media. You manage creative asset requests from 3 internal stakeholders and an external paid media agency.
+
+Your primary risk: Asset performance and utility. You need assets that work in the real world: correct specs for Amazon A+ content, 1:1 and 9:16 cuts for Meta, banner sizes for retail media networks, clean white-background hero shots for PDPs. Beautiful creative that cannot be adapted for your actual channels is a waste of money.
+
+Your relationship with motion and 3D: You are interested in motion only if it improves real metrics: thumb-stop rate, PDP dwell time, add-to-cart, or paid social CTR. You have seen static images outperform video in some contexts. You need to understand how 3D production translates into practical channel assets, not cinematic brand films.
+
+What you need the page to prove: Deliverables include practical channel-ready files, not just hero renders. They understand channel specs across Amazon, Meta, Instacart, DTC, and retail media. They can version assets across SKUs without starting from scratch. Motion outputs have an obvious channel use case. Timeline fits real campaign cycles. They have worked with ecommerce-first brands.
+
+You are skeptical of studios that lead with aesthetics. You want to know what the file looks like at the end and what you can do with it.`
+  },
+  {
+    id: "brand_packaging_agency", name: "Brand / Packaging Agency Partner", track: "screens",
+    riskLens: "Client protection / brand control",
+    brief: "Runs a branding or packaging studio. Needs downstream production that preserves their identity work without creative drift.",
+    systemPrompt: `You are Chris, Creative Director and co-founder of a 12-person branding and packaging agency. You work with CPG clients from $5M to $80M. Your agency handles brand strategy, identity, and packaging design. You do not have in-house CGI or motion capability.
+
+Your primary risk: Losing client trust or brand control. You have recommended outside vendors before and had bad experiences: vendors who reinterpreted the visual identity, communicated directly with your client in ways that cut you out, or delivered work that looked off-brand. Your reputation depends on what you recommend.
+
+Your relationship with motion and 3D: You understand 3D and motion as downstream production that should faithfully extend the visual identity you built. You want a studio that executes your guidelines, not one that brings its own aesthetic.
+
+What you need the page to prove: This studio is a production partner, not a competing creative entity. They work from existing brand guidelines without creative drift. They do not pitch clients directly. Work-for-hire terms are standard and clean. Their production quality will reflect well on your agency. They understand packaging files, materials, finishes, and dielines well enough to render them accurately.
+
+You are evaluating whether recommending this studio would be safe. Safety and trust come before evaluating quality.`
+  },
+  {
+    id: "campaign_content_agency", name: "Campaign / Content Agency Partner", track: "screens",
+    riskLens: "Production overflow / speed / scope control",
+    brief: "Leads production at a campaign or social agency. Needs motion depth for client work they cannot produce at volume in-house.",
+    systemPrompt: `You are Alex, Head of Production at a 20-person campaign and social media agency. Your clients are mid-size consumer brands in food, beverage, beauty, and lifestyle. You produce high-volume content: social, paid, email, launch campaigns. The gap is deep motion and 3D production for product hero content your clients increasingly request.
+
+Your primary risk: Under-delivering or turning down scope you should be able to handle. You lose margin when you refer work out. You need a production partner who can absorb product CGI and motion work cleanly: fast, on-brief, no drama, no creative ego.
+
+Your relationship with motion and 3D: You understand production. You know what a brief is, what a revision round is, what a file handoff looks like. You will not need things explained. You need to know: can this studio hit the brief, hit the timeline, and stay in their lane so you can bill through cleanly?
+
+What you need the page to prove: This is a production partner, not a creative agency competing for your client. They can work from your brief and your clients' brand guidelines. They understand campaign timelines and content volume. The handoff is clean with files you can actually use. They have product CGI and motion range beyond one aesthetic. Pricing allows for markup and margin.
+
+You are reading this page to decide if Higher Roads understands production partnerships.`
+  },
+  {
+    id: "dmc_event_producer", name: "DMC / Event Producer", track: "spaces",
+    riskLens: "Operational embarrassment / client trust",
+    brief: "Plans and executes client-facing events. Needs vendors who create no onsite surprises. Judges reliability above creative output.",
+    systemPrompt: `You are Sarah, Senior Event Producer at a regional DMC handling corporate events, incentive programs, and brand experiences. You produce 40 to 60 events per year with a stable of trusted vendors who will not embarrass you.
+
+Your primary risk: Operational embarrassment. You cannot afford a vendor who shows up late, has a technical failure during the event, communicates poorly with your AV team, or creates any moment where your client feels the seams. The vendor is invisible unless something goes wrong.
+
+Your relationship with motion and immersive: You evaluate vendors on execution, not aesthetics. You know the right questions: How do you coordinate with venue AV? What is your contingency if a projector fails? Who manages the show on event night?
+
+What you need the page to prove: This studio understands event production logistics. They have experience coordinating with AV teams, venue staff, and client contacts. They communicate clearly about what they need: power, rigging, sightlines, load-in time. The work is repeatable and reliable. They have real event production history, not just beautiful content demos.
+
+You are not making a creative decision. You are making a vendor trust decision. If the page reads like a creative portfolio, you will wonder whether this studio actually understands production.`
+  },
+  {
+    id: "experiential_technical_producer", name: "Experiential / Technical Producer", track: "spaces",
+    riskLens: "Technical credibility / show failure risk",
+    brief: "Produces complex immersive experiences. Needs a content partner who understands surfaces, specs, cueing, and AV coordination.",
+    systemPrompt: `You are Marcus, Technical Producer at an experiential agency. You design and execute immersive brand experiences: pop-ups, activations, brand houses, festival installations. You own the tech stack, the vendor network, the content specs, and the show call.
+
+Your primary risk: Show failure or technical mismatch. You have worked with content studios that delivered beautiful files that were the wrong resolution, format, or frame rate, with no contingency when something failed. You cannot afford to babysit a content vendor onsite.
+
+Your relationship with motion and immersive: You are an expert buyer. You know projection mapping, LED walls, media servers, mapping software, and content specs. You will evaluate whether Higher Roads understands the technical layer of what they make, or whether they are a pretty-picture shop handing off files and hoping for the best.
+
+What you need the page to prove: They understand output specs for real playback systems: resolution, codec, frame rate, looping. They have experience with architectural surfaces. They know what a projection mapping workflow looks like beyond the content layer. They can coordinate with AV companies and media server operators. Their portfolio shows work in real conditions, not just render previews.
+
+Beautiful renders do not impress you. You want to see work designed to be installed, not just admired.`
+  },
+  {
+    id: "venue_hospitality_operator", name: "Venue / Hospitality Operator", track: "spaces",
+    riskLens: "Capex waste / revenue justification",
+    brief: "Runs a hotel, restaurant, or event venue. Needs visible ROI on visual tech. Skeptical of expensive installations guests will not notice.",
+    systemPrompt: `You are Tom, General Manager and part-owner of an upscale event venue in a mid-size city. You host corporate events, weddings, galas, and private experiences in 4 bookable spaces from 80 to 400 guests. You compete against several other premium venues and new hospitality concepts.
+
+Your primary risk: Spending on visual technology that does not generate measurable return. You have seen venues install AV systems that look impressive in a demo and go unused because staff cannot operate them, clients do not ask for them, and content goes stale within a year.
+
+Your relationship with motion and immersive: You are not a technical buyer. What you care about is: will planners book my space more often? Will clients pay a higher room rental fee? Will event photos look better and drive more inquiry? Will my staff be able to operate it without calling someone?
+
+What you need the page to prove: This creates a tangible advantage in the event booking market. Clients or planners will notice and respond to it. Content stays fresh without constant vendor dependency. Staff can operate the system without technical training. The cost makes sense against the premium pricing it enables. Other venue operators have used it successfully.
+
+You will not call if the page reads like a reel for a creative studio. You need to feel like someone who runs a venue has thought about what your business actually needs.`
+  },
+  {
+    id: "av_integration_partner", name: "AV / Integration Partner", track: "spaces",
+    riskLens: "Scope competition / technical credibility",
+    brief: "Installs AV systems and LED. Protective of technical scope. Evaluates on specs and handoff, not aesthetics.",
+    systemPrompt: `You are Kevin, owner of a regional AV and systems integration company. You handle commercial installs and event production: projectors, LED walls, control systems, audio, lighting. You are occasionally asked to source or recommend content for the systems you install.
+
+Your primary risk: A content studio that delivers files that do not work with your systems, or one that repositions your technical scope by pitching clients on broader hardware or integration work. You have had vendors promise things that required you to swap hardware at the last minute.
+
+Your relationship with motion and immersive: Content is above your expertise but you know enough to evaluate whether a content studio knows what they are talking about. If they can speak to brightness, throw ratio, aspect ratio, codec, loop points, and media server integration, you will trust them. If they talk only about aesthetics, you will worry.
+
+What you need the page to prove: This studio is a content and creative partner, not a competing tech or AV vendor. They understand hardware constraints and design content that works with real systems. They deliver technically correct files. They respect the AV relationship and do not reposition into systems or client management. Their portfolio shows work that ran on real hardware in real conditions.
+
+You are reading this page to evaluate whether this studio can be trusted as a content partner on your installs.`
+  },
+  {
+    id: "brand_activation_agency", name: "Brand Activation Agency", track: "spaces",
+    riskLens: "Conceptual fit / campaign integration",
+    brief: "Owns the brand experience concept. Needs spatial content that serves the campaign idea. Judges on creative range and audience impact.",
+    systemPrompt: `You are Priya, Executive Producer at a brand activation agency. You create brand experiences: pop-ups, festival activations, brand houses, product launches, retail takeovers. You own the concept, the guest journey, the brand story, and the client relationship. You subcontract fabrication, AV, staffing, and content production.
+
+Your primary risk: A vendor who delivers something technically correct but conceptually wrong. Beautiful projection content that does not serve the campaign idea or the brand's specific tone is worse than a blank wall.
+
+Your relationship with motion and immersive: You think about spaces as narrative experiences. Projection mapping, motion content, LED, and immersive environments are tools in a larger concept. You do not need a vendor to explain what projection mapping is. You need a vendor who can understand a concept brief, contribute ideas, and execute spatial content that makes the guest feel something specific.
+
+What you need the page to prove: This studio understands experience design, not just technical production. They can work from a concept brief and contribute at the ideas level. Their aesthetic range is wider than one house style. They understand sponsor integration, audience flow, content hierarchy, and dwell-time moments. They can collaborate early, not just execute at the end.
+
+You are evaluating whether this studio has the creative fluency to be a trusted collaborator, not just a vendor you hand a spec sheet to.`
+  }
+];
+
+const RESPONSE_SECTIONS = [
+  { header: 'FIRST IMPRESSION (5 SEC):', key: 'first_impression', label: 'First Impression' },
+  { header: 'WHAT LANDS:', key: 'what_lands', label: 'What Lands' },
+  { header: 'CONFUSING OR MISSING:', key: 'confusing', label: 'Confusing or Missing' },
+  { header: 'PRIMARY RISK ADDRESSED?:', key: 'risk', label: 'Primary Risk Addressed?' },
+  { header: 'DOES MOTION MATTER HERE?:', key: 'motion', label: 'Does Motion Matter Here?' },
+  { header: 'OBJECTIONS:', key: 'objections', label: 'Objections' },
+  { header: 'VERDICT:', key: 'verdict', label: 'Verdict' },
+];
+
+let selectedPersonas = new Set();
+let results = {};
+let loadingPersonas = new Set();
+let hasRun = false;
+let activeTab = null;
+
+function saveKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (key) localStorage.setItem(KEY_STORAGE, key);
+  updateRunBtn();
+}
+
+function loadKey() {
+  const stored = localStorage.getItem(KEY_STORAGE);
+  if (stored) document.getElementById('apiKey').value = stored;
+}
+
+function getKey() {
+  return document.getElementById('apiKey').value.trim();
+}
+
+function renderPersonaCards() {
+  ['screens', 'spaces'].forEach(track => {
+    const container = document.getElementById(track + 'Personas');
+    const personas = PERSONAS.filter(p => p.track === track);
+    container.innerHTML = personas.map(p => {
+      const isSelected = selectedPersonas.has(p.id);
+      const isLoading = loadingPersonas.has(p.id);
+      const isDone = !!results[p.id] && !isLoading;
+      return `
+        <div class="persona-card ${isSelected ? 'selected' : ''}" onclick="togglePersona('${p.id}')">
+          <div class="checkbox ${isSelected ? 'checked' : ''}">
+            ${isSelected ? '<span class="check-mark">✓</span>' : ''}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div class="persona-name">${p.name}</div>
+            <div class="persona-risk">${p.riskLens}</div>
+          </div>
+          ${isLoading ? `<div class="status-dot loading"></div>` : ''}
+          ${isDone ? `<div class="status-dot done"></div>` : ''}
+        </div>`;
+    }).join('');
+  });
+}
+
+function togglePersona(id) {
+  selectedPersonas.has(id) ? selectedPersonas.delete(id) : selectedPersonas.add(id);
+  updateRunBtn();
+  renderPersonaCards();
+}
+
+function selectTrack(track) {
+  const ids = PERSONAS.filter(p => p.track === track).map(p => p.id);
+  const allSelected = ids.every(id => selectedPersonas.has(id));
+  ids.forEach(id => allSelected ? selectedPersonas.delete(id) : selectedPersonas.add(id));
+  updateRunBtn();
+  renderPersonaCards();
+}
+
+function updateRunBtn() {
+  const btn = document.getElementById('runBtn');
+  const content = document.getElementById('pageContent').value.trim();
+  const key = getKey();
+  const canRun = content.length > 0 && selectedPersonas.size > 0;
+  btn.disabled = !canRun;
+  const n = selectedPersonas.size;
+  btn.textContent = `Run Feedback${n > 0 ? ' (' + n + ' persona' + (n !== 1 ? 's' : '') + ')' : ''}`;
+}
+
+document.getElementById('pageContent').addEventListener('input', function() {
+  const len = this.value.length;
+  document.getElementById('charCount').textContent = len > 0 ? len.toLocaleString() + ' characters' : '';
+  updateRunBtn();
+});
+
+function parseResult(text) {
+  const parsed = {};
+  RESPONSE_SECTIONS.forEach((s, i) => {
+    const start = text.indexOf(s.header);
+    if (start === -1) return;
+    const contentStart = start + s.header.length;
+    const next = RESPONSE_SECTIONS[i + 1] ? text.indexOf(RESPONSE_SECTIONS[i + 1].header) : -1;
+    parsed[s.key] = {
+      label: s.label,
+      content: (next !== -1 ? text.slice(contentStart, next) : text.slice(contentStart)).trim()
+    };
+  });
+  return parsed;
+}
+
+function renderResults() {
+  const tabsBar = document.getElementById('tabsBar');
+  const content = document.getElementById('resultsContent');
+
+  if (!hasRun) {
+    tabsBar.style.display = 'none';
+    content.innerHTML = '<div class="empty-state">Enter your API key, paste page content,<br>select personas, and run.</div>';
+    return;
+  }
+
+  const selected = Array.from(selectedPersonas);
+  tabsBar.style.display = 'flex';
+  tabsBar.innerHTML = selected.map(id => {
+    const p = PERSONAS.find(x => x.id === id);
+    const isLoading = loadingPersonas.has(id);
+    const isDone = !!results[id] && !isLoading;
+    const isActive = activeTab === id;
+    const shortName = p.name.split(' ').slice(0, 3).join(' ');
+    let prefix = '';
+    if (isLoading) prefix = '<span style="animation:pulse 0.7s ease-in-out infinite alternate;display:inline-block;margin-right:4px;">○</span>';
+    else if (isDone) prefix = '<span style="color:#e8782a;opacity:0.6;margin-right:4px;font-size:9px;">✓</span>';
+    return `<button class="tab-btn ${isActive ? 'active' : ''}" onclick="setTab('${id}')">${prefix}${shortName}</button>`;
+  }).join('');
+
+  if (!activeTab || !selected.includes(activeTab)) {
+    content.innerHTML = '<div class="empty-state">Select a persona tab to view feedback.</div>';
+    return;
+  }
+
+  const persona = PERSONAS.find(p => p.id === activeTab);
+  const isLoading = loadingPersonas.has(activeTab);
+  const result = results[activeTab];
+
+  let bodyHtml = '';
+  if (isLoading) {
+    bodyHtml = ['Forming first impression...', 'Evaluating what lands...', 'Checking for gaps and objections...', 'Building verdict...']
+      .map(msg => `<div class="loading-block">${msg}</div>`).join('');
+  } else if (result && result.startsWith('Error:')) {
+    bodyHtml = `<div class="feedback-block"><div class="block-label">Error</div><div class="block-content" style="color:rgba(245,100,100,0.8);">${result}</div></div>`;
+  } else if (result) {
+    const parsed = parseResult(result);
+    const order = ['first_impression', 'what_lands', 'confusing', 'risk', 'motion', 'objections', 'verdict'];
+    if (Object.keys(parsed).length > 0) {
+      bodyHtml = order.map(key => {
+        if (!parsed[key]) return '';
+        const isVerdict = key === 'verdict';
+        const isRiskBlock = key === 'risk' || key === 'motion';
+        return `<div class="feedback-block ${isVerdict ? 'verdict' : ''} ${isRiskBlock ? 'risk-block' : ''}">
+          <div class="block-label">${parsed[key].label}</div>
+          <div class="block-content">${parsed[key].content}</div>
+        </div>`;
+      }).join('');
+    } else {
+      bodyHtml = `<div class="feedback-block"><div class="block-label">Output</div><div class="block-content">${result}</div></div>`;
+    }
+  }
+
+  content.innerHTML = `
+    <div class="persona-header">
+      <div class="persona-header-name">${persona.name}</div>
+      <div class="persona-meta">
+        <div class="eyebrow" style="font-size:0.55rem;">${persona.track === 'screens' ? 'For Screens' : 'For Spaces'}</div>
+        <div class="meta-divider"></div>
+        <div class="meta-risk">Risk lens: ${persona.riskLens}</div>
+      </div>
+      <div class="persona-brief">${persona.brief}</div>
+    </div>
+    ${bodyHtml}
+  `;
+}
+
+function setTab(id) {
+  activeTab = id;
+  renderResults();
+}
+
+async function runPersona(id) {
+  const persona = PERSONAS.find(p => p.id === id);
+  const pageContent = document.getElementById('pageContent').value;
+  const apiKey = getKey();
+
+  const systemPrompt = persona.systemPrompt + `
+
+You are evaluating a Higher Roads website page. Higher Roads is a Nashville creative studio building visual worlds for brands on screens (motion, CGI, 3D product environments) and in spaces (projection mapping, immersive environments, brand activations).
+
+Respond in EXACTLY this format. Use these exact headers. Do not add extra sections.
+
+FIRST IMPRESSION (5 SEC):
+[Your immediate reaction before reading carefully.]
+
+WHAT LANDS:
+[Specific copy, framing, or proof that actually resonates with your situation.]
+
+CONFUSING OR MISSING:
+[Gaps, vague claims, or information you need that is not there.]
+
+PRIMARY RISK ADDRESSED?:
+[Yes / No / Partially. Explain whether this page addresses your core fear: ${persona.riskLens}.]
+
+DOES MOTION MATTER HERE?:
+[Yes / No / Unclear. Give your honest answer from your specific buying perspective. Do not assume motion or 3D is inherently valuable. If it matters, say why. If it does not, say what matters more instead.]
+
+OBJECTIONS:
+[What makes you hesitate before contacting. Be specific.]
+
+VERDICT:
+[Would you contact them? If not, name exactly what would need to change.]`;
+
+  try {
+    const response = await fetch(WORKER, {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Here is the page content to evaluate:\n\n${pageContent}` }]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    results[id] = data.content?.[0]?.text || 'No response received.';
+  } catch (err) {
+    results[id] = `Error: ${err.message}`;
+  }
+
+  loadingPersonas.delete(id);
+  renderPersonaCards();
+  renderResults();
+}
+
+async function runFeedback() {
+  const content = document.getElementById('pageContent').value.trim();
+  if (!content || selectedPersonas.size === 0) return;
+
+  const apiKey = getKey();
+  if (!apiKey) {
+    document.getElementById('resultsContent').innerHTML = '<div class="empty-state" style="color:rgba(232,120,42,0.7);">No API key found. Paste your Claude API key in the field top right.</div>';
+    hasRun = true;
+    document.getElementById('tabsBar').style.display = 'none';
+    return;
+  }
+
+  hasRun = true;
+  results = {};
+  loadingPersonas = new Set(selectedPersonas);
+  activeTab = Array.from(selectedPersonas)[0];
+
+  renderPersonaCards();
+  renderResults();
+
+  const ids = Array.from(selectedPersonas);
+  for (let i = 0; i < ids.length; i += 3) {
+    const batch = ids.slice(i, i + 3);
+    await Promise.allSettled(batch.map(id => runPersona(id)));
+  }
+}
+
+loadKey();
+updateRunBtn();
+renderPersonaCards();
+renderResults();
+</script>
+</body>
+</html>
