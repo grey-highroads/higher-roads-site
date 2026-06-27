@@ -25,16 +25,19 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root, [data-theme="ember"] {
-      --black:      #0a0906;
-      --dark:       #181510;
-      --dark-card:  #111009;
-      --accent:     #e8782a;
-      --accent-dim: #a04f18;
-      --glow:       rgba(232, 120, 42, 0.07);
-      --white:      #f5ede2;
-      --muted:      #6b6057;
-      --border:     rgba(232, 120, 42, 0.18);
-      --border-sub: rgba(232, 120, 42, 0.09);
+      --black:        #0a0906;
+      --ink:          #1a1410;
+      --cream:        #f5ede2;
+      --dark:         #181510;
+      --dark-card:    #111009;
+      --accent:       #e8782a;
+      --accent-dim:   #a04f18;
+      --glow:         rgba(232, 120, 42, 0.07);
+      --white:        #f5ede2;
+      --muted:        #6b6057;
+      --border:       rgba(232, 120, 42, 0.18);
+      --border-sub:   rgba(232, 120, 42, 0.09);
+      --border-light: rgba(26, 20, 16, 0.11);
     }
     [data-theme="neon-noir"] {
       --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
@@ -86,7 +89,7 @@
     }
 
     .page {
-      position: relative; z-index: 1;
+      position: relative;
       min-height: 100vh;
       display: flex; flex-direction: column;
     }
@@ -194,17 +197,19 @@
     .btn-primary:hover { background: var(--accent); color: var(--black); }
 
     /* ── HERO IMAGE BREAK ── */
-    .hero-image-break {
+    .vpw-bg-video {
+      position: absolute;
+      inset: 0;
       width: 100%;
-      line-height: 0;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.58;
+      animation: vpwKenBurns 18s ease-in-out infinite alternate;
     }
-
-    .hero-image-break img,
-.hero-image-break video {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+    @keyframes vpwKenBurns {
+      from { transform: scale(1.0); }
+      to   { transform: scale(1.07); }
+    }
 
     /* ── POSITIONING BAND ── */
     .positioning {
@@ -509,19 +514,129 @@
       border-left-color: rgba(107, 96, 87, 0.25);
     }
 
-    /* ── WHAT THIS SOLVES ── */
-    .what-this-solves {
-      padding: 4rem 3rem;
+    /* ── VPW SCROLL NARRATIVE ── */
+    .vpw-story {
+      position: relative;
+      min-height: 420vh;
+      flex-shrink: 0;
       border-top: 1px solid var(--border);
-      max-width: 700px;
+      z-index: 50;
+    }
+    .vpw-sticky {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      background: #060503;
+    }
+    .vpw-sticky.is-fixed {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; z-index: 50;
+    }
+    .vpw-sticky.is-pinned-bottom {
+      position: absolute;
+      bottom: 0; left: 0; width: 100%;
+    }
+    .vpw-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to right,
+        rgba(6,5,3,0.62) 0%,
+        rgba(6,5,3,0.45) 28%,
+        rgba(6,5,3,0.22) 52%,
+        rgba(6,5,3,0.06) 75%,
+        rgba(6,5,3,0.01) 100%);
+    }
+    .vpw-text-layer {
+      position: absolute; inset: 0;
+      padding: 0 3.5rem;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .vpw-eyebrow-fixed {
+      position: absolute;
+      top: 2.2rem; left: 3.5rem;
+      opacity: 0.55;
+    }
+    .vpw-beat {
+      position: absolute;
+      top: 50%;
+      left: 3.5rem;
+      transform: translateY(calc(-50% + 18px));
+      max-width: 72vw;
+      opacity: 0;
+      transition: opacity 0.55s ease, transform 0.58s ease;
+      pointer-events: none;
+    }
+    .vpw-beat.active {
+      transform: translateY(-50%);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Scale-in for key beats */
+    #b0, #b5, #b9 {
+      transform: translateY(calc(-50% + 18px)) scale(0.95);
+      transition: opacity 0.6s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #b0.active, #b5.active, #b9.active {
+      transform: translateY(-50%) scale(1);
+    }
+    /* Blur dissolve for b4 */
+    #b4 {
+      filter: blur(10px);
+      transition: opacity 0.7s ease, transform 0.7s ease, filter 0.75s ease;
+    }
+    #b4.active { filter: blur(0px); }
+
+    /* Inline emphasis */
+    .vpw-line em, .vpw-beat em { font-style: italic; }
+    .vpw-hi { color: var(--accent); }
+
+    /* Three voices */
+    .vpw-narrative {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.72;
+    }
+    .vpw-pressure {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.08;
+    }
+    .vpw-pivot {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      line-height: 1.18;
     }
 
-    .what-this-solves p {
-      font-size: 1rem; line-height: 1.85;
-      color: var(--white); opacity: 0.65;
+    /* Size scale — cinematic */
+    .vpw-sm  { font-size: clamp(1.05rem, 1.8vw,  1.3rem);  }
+    .vpw-md  { font-size: clamp(1.35rem, 2.2vw,  1.75rem); }
+    .vpw-lg  { font-size: clamp(2.0rem,  3.4vw,  2.8rem);  }
+    .vpw-xl  { font-size: clamp(2.9rem,  5.0vw,  4.2rem);  }
+    .vpw-2xl { font-size: clamp(3.8rem,  6.2vw,  5.6rem);  }
+
+    .vpw-progress {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 1px;
+      background: var(--accent);
+      width: 0%; z-index: 3;
+      opacity: 0.45;
+    }
+    @media (max-width: 768px) {
+      .vpw-text-layer, .vpw-eyebrow-fixed { padding-left: 1.5rem; left: 1.5rem; }
+      .vpw-beat { left: 1.5rem; max-width: 92vw; }
+      .vpw-xl  { font-size: clamp(2.2rem, 8vw, 3.2rem); }
+      .vpw-2xl { font-size: clamp(2.8rem, 9vw, 4.2rem); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .vpw-beat, .vpw-sline { transition: none !important; animation: none !important; }
     }
 
-    .what-this-solves p + p { margin-top: 0.8rem; }
+
+
 
     /* ── CTA CLOSE ── */
     .cta-close {
@@ -632,12 +747,127 @@
 
     .lead-form button:hover { opacity: 0.85; }
 
+    /* ── CONTENT TYPES ── */
+    .content-types {
+      background: var(--cream);
+      color: var(--ink);
+      padding: 4rem 3rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .content-types h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      color: var(--ink); margin-bottom: 0.6rem;
+    }
+    .content-types .sub {
+      font-size: 0.95rem; color: rgba(26,20,16,0.55);
+      max-width: 480px; margin-bottom: 2.8rem; line-height: 1.7;
+    }
+    .content-types .eyebrow { color: var(--accent); }
+    .ct-grid {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border-light);
+      background: var(--border-light);
+    }
+    .ct-card {
+      background: var(--ink);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .ct-image {
+      position: relative; height: 200px; overflow: hidden;
+      background: #0a0906; flex-shrink: 0;
+    }
+    .ct-image img, .ct-image video {
+      width: 100%; height: 100%; display: block; object-fit: cover;
+      filter: saturate(0.92) contrast(1.0) brightness(0.92);
+    }
+    .ct-image::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(10,9,6,0.28));
+      pointer-events: none;
+    }
+    .ct-diagram {
+      height: 200px; display: flex;
+      align-items: center; justify-content: center;
+      background: #0f0d0a; flex-shrink: 0;
+    }
+    .ct-diagram-inner { display: flex; gap: 0.55rem; align-items: flex-end; }
+    .ct-block { border: 1px solid rgba(232,120,42,0.25); background: rgba(232,120,42,0.05); }
+    .ct-body { padding: 1.4rem 1.5rem; flex: 1; }
+    .ct-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.5rem;
+    }
+    .ct-title {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: 1.1rem; color: var(--white);
+      line-height: 1.2; margin-bottom: 1rem;
+    }
+    .ct-icon-row {
+      display: flex; gap: 0.6rem; align-items: center;
+      margin: 0.75rem 0 0.9rem;
+    }
+    .ct-icon-sm {
+      width: 16px; height: 16px;
+      color: var(--accent); opacity: 0.9; flex-shrink: 0;
+    }
+    .ct-items {
+      list-style: none;
+      display: flex; flex-direction: column;
+    }
+    .ct-items li {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(245,240,234,0.55);
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(245,240,234,0.06);
+    }
+    .ct-items li:last-child { border-bottom: none; }
+    .cta-icon-bar {
+      background: var(--cream);
+      border-top: 1px solid var(--border-light);
+    }
+    .cta-icon-bar .del-grid { border: none; }
+    .del-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border-light);
+      background: var(--border-light);
+    }
+    .del-item {
+      padding: 1.6rem 1.1rem;
+      background: var(--cream);
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.6rem;
+      text-align: center;
+    }
+    .del-icon {
+      width: 26px; height: 26px;
+      color: var(--accent); flex-shrink: 0;
+    }
+    .del-name {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.68rem;
+      font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink); line-height: 1.3; text-align: center;
+    }
+    .del-desc {
+      font-size: 0.78rem; color: rgba(26,20,16,0.55);
+      line-height: 1.55; text-align: center;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       header { padding: 1.5rem; }
       nav.nav-links { display: none; }
       .nav-toggle { display: flex; }
 
+      .ct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .del-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .content-types { padding: 3rem 1.5rem; }
       .hero { padding: 4rem 1.5rem 3rem; }
       .hero h1 { font-size: 2.1rem; }
 
@@ -714,18 +944,83 @@
         <span class="eyebrow">For Product Brands</span>
         <h1>In markets full of noise,<br><em>be the signal.</em></h1>
         <p class="hero-body">
-Find and connect with your best customers by showing them a world they want to live in. 
+Your brand has an identity. Your product needs a world that moves.
         </p>
         <a href="#contact" class="btn-primary">Build the product world →</a>
       </section>
 
     
 
-     <!-- ── HERO IMAGE BREAK ── -->
-<div class="hero-image-break">
-  <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" autoplay muted loop playsinline></video>
-</div>
-  <!-- ── POSITIONING BAND ── -->
+     <!-- ── VPW SCROLL NARRATIVE (GSAP) ── -->
+      <div id="vpwStory" class="vpw-story">
+        <div id="vpwSticky" class="vpw-sticky">
+
+        <!-- 4 simultaneous brand worlds — the brand already speaking -->
+        <video class="vpw-bg-video"
+          src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4"
+          autoplay muted loop playsinline></video>
+
+        <div class="vpw-overlay"></div>
+
+        <div class="vpw-text-layer">
+
+          <!-- b0: Opening — Playfair xl, "already speaking" italic accent -->
+          <div class="vpw-beat" id="b0">
+            <p class="vpw-pivot vpw-xl" style="color:var(--white);">Before anyone reads the label,<br>the brand is <em><span class="vpw-hi">already speaking.</span></em></p>
+          </div>
+
+          <!-- b1: Who it's for — Barlow lg, accent on the destination -->
+          <div class="vpw-beat" id="b1">
+            <p class="vpw-narrative vpw-lg" style="color:var(--white);">It tells people <span class="vpw-hi">who this is for.</span></p>
+          </div>
+
+          <!-- b2: Who they become — Playfair italic lg -->
+          <div class="vpw-beat" id="b2">
+            <p class="vpw-pivot vpw-lg" style="color:var(--white); font-style:italic;">Shows them who they <span class="vpw-hi">want to become.</span></p>
+          </div>
+
+          <!-- b3: Best brands — Rajdhani xl, the one declarative punch -->
+          <div class="vpw-beat" id="b3">
+            <p class="vpw-pressure vpw-xl" style="color:var(--white);">The best brands<br><em style="font-style:normal;">do more than look good.</em></p>
+          </div>
+
+          <!-- b4: Feel seen — Playfair xl, blur dissolve, "feel seen" accent -->
+          <div class="vpw-beat" id="b4">
+            <p class="vpw-pivot vpw-xl" style="color:var(--white);">They make a customer <span class="vpw-hi"><em>feel seen</em></span><br>before a word gets read.</p>
+          </div>
+
+          <!-- b5: VPW — Playfair xl, scale in, VPW in accent -->
+          <div class="vpw-beat" id="b5">
+            <p class="vpw-pivot vpw-xl" style="color:var(--white);">A <span class="vpw-hi">Visual Product World</span><br>gives that signal shape.</p>
+          </div>
+
+          <!-- b6: Environment + language — Barlow lg, "visual language" italic -->
+          <div class="vpw-beat" id="b6">
+            <p class="vpw-narrative vpw-lg" style="color:var(--white);">A shared environment,<br><em>a visual language.</em></p>
+          </div>
+
+          <!-- b7: Belief system — Playfair lg, "belief system" accent -->
+          <div class="vpw-beat" id="b7">
+            <p class="vpw-pivot vpw-lg" style="color:var(--white);">A place where the product, the customer,<br>and the <span class="vpw-hi">belief system</span> meet.</p>
+          </div>
+
+          <!-- b8: Bridge — Barlow md, drops before climax, "reminds" italic -->
+          <div class="vpw-beat" id="b8">
+            <p class="vpw-narrative vpw-md" style="color:var(--white);">So every launch, SKU, screen, and space<br><em>reminds your customers.</em></p>
+          </div>
+
+          <!-- b9: Climax — Playfair 2xl italic, "for us." in accent -->
+          <div class="vpw-beat" id="b9">
+            <p class="vpw-pivot vpw-2xl" style="color:var(--white); font-style:italic;">This was made<br><span class="vpw-hi">for us.</span></p>
+          </div>
+
+        </div>
+
+        <div class="vpw-progress" id="vpwProgress"></div>
+
+        </div><!-- /.vpw-sticky -->
+      </div><!-- /.vpw-story -->
+
       <div class="positioning reveal">
         <div class="positioning-inner">
           <div class="positioning-col">
@@ -742,12 +1037,7 @@ Find and connect with your best customers by showing them a world they want to l
           </div>
         </div>
       </div>
-      <!-- ── REUSE ECONOMICS ── -->
-      <div class="what-this-solves reveal">
-        <span class="eyebrow">Why it works this way</span>
-        <p>Early on, one-off content gets the job done. As the brand grows, it starts creating drag. Every new SKU, retailer, launch, and channel needs another set of assets. The brand ends up rebuilding the same visual foundation over and over.</p>
-        <p>A Visual Product World replaces that cycle. One build becomes the source for product imagery, motion, launch content, retail materials, and every future update.</p>
-      </div>
+
 
       <!-- ── OFFER ── -->
       <section class="offer reveal">
@@ -756,7 +1046,7 @@ Find and connect with your best customers by showing them a world they want to l
         <span class="offer-tag">A three-dimensional world built from your brand identity, designed to move, owned by you.</span>
 
         <p class="offer-body">
-          We work from your brand's existing identity: the guidelines, values, and visual direction already established. From that, we build the environment where your product actually lives. The world is built for motion first. Stills, campaign loops, and channel assets all come from it. You own the master files.
+          We work from your existing identity: guidelines, values, packaging files, and visual direction. From there, we build the environment where your product lives. The world is built for motion first. Stills, campaign loops, and channel assets come from the same source. You own the master files.
         </p>
 
         <!-- Three-column flow -->
@@ -785,19 +1075,161 @@ Find and connect with your best customers by showing them a world they want to l
               <span class="flow-item">The world asset: master files, owned by you</span>
               <span class="flow-item">2–4 motion loops for paid, social, and PDP</span>
               <span class="flow-item">A stills set for ecommerce, retail, and Amazon</span>
-              <span class="flow-item">A production source for everything that follows</span>
+              <span class="flow-item">A master build that comes back to the table for new SKUs, campaigns, and updates</span>
             </div>
           </div>
         </div>
+
+       <!-- ── WHAT WE BUILD ── -->
+      <section class="content-types reveal" id="what-we-build">
+        <span class="eyebrow">What we build</span>
+        <h2>One visual world, assets for every touchpoint</h2>
+        <p class="sub">Every build produces world stills, motion, proof content, and channel exports from a single production process.</p>
+
+        <div class="ct-grid">
+
+          <div class="ct-card">
+            <div class="ct-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-Comp.PNG" alt="World stills" loading="lazy">
+            </div>
+            <div class="ct-body">
+              <span class="ct-label">World Stills</span>
+              <div class="ct-title">Product placed in a world, not on a backdrop.</div>
+              <div class="ct-icon-row">
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9l4.5-4.5L12 9l4-5 5 9H3z"/></svg>
+              </div>
+              <ul class="ct-items">
+                <li>Brand world direction</li>
+                <li>Hero product scene</li>
+                <li>SKU treatment</li>
+                <li>PDP hero image</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ct-card">
+            <div class="ct-image">
+              <video autoplay muted loop playsinline>
+                <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="ct-body">
+              <span class="ct-label">Motion</span>
+              <div class="ct-title">Three motion loops in every build.</div>
+              <div class="ct-icon-row">
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>
+              </div>
+              <ul class="ct-items">
+                <li>Product reveal loop</li>
+                <li>World atmosphere loop</li>
+                <li>Product detail loop</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ct-card">
+            <div class="ct-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Generated%20Image%20June%2021%2C%202026%20-%2010_08AM.jpg" alt="Proof content" loading="lazy">
+            </div>
+            <div class="ct-body">
+              <span class="ct-label">Proof Content</span>
+              <div class="ct-title">Claims-driven imagery, in every package.</div>
+              <div class="ct-icon-row">
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22l8-8"/><path d="M20 4c-4.5 0-9 4.5-9 9s4.5-2 4.5 2-2 5-6 5"/><circle cx="17.5" cy="6.5" r="2.5"/></svg>
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              </div>
+              <ul class="ct-items">
+                <li>Ingredient visual</li>
+                <li>Product education image</li>
+                <li>Claims and trust panel</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ct-card">
+            <div class="ct-diagram">
+              <div class="ct-diagram-inner">
+                <div class="ct-block" style="width:28px;height:78px;"></div>
+                <div>
+                  <div class="ct-block" style="width:64px;height:46px;margin-bottom:6px;"></div>
+                  <div class="ct-block" style="width:64px;height:46px;opacity:.55;"></div>
+                </div>
+                <div class="ct-block" style="width:52px;height:52px;opacity:.7;align-self:center;"></div>
+              </div>
+            </div>
+            <div class="ct-body">
+              <span class="ct-label">Channel Exports</span>
+              <div class="ct-title">Organized by channel and ready to place.</div>
+              <div class="ct-icon-row">
+                <svg class="ct-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              </div>
+              <ul class="ct-items">
+                <li>DTC / Shopify</li>
+                <li>Marketplace and retail</li>
+                <li>Social and paid media</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="cta-icon-bar">
+          <div class="del-grid">
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <div class="del-name">Hero product<br>scene</div>
+              <div class="del-desc">The primary image for homepage, PDP, email, and sales deck.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              <div class="del-name">Brand world<br>direction</div>
+              <div class="del-desc">The creative environment and visual rules that govern every asset in the system.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9l4.5-4.5L12 9l4-5 5 9H3z"/></svg>
+              <div class="del-name">SKU<br>treatment</div>
+              <div class="del-desc">A product-specific expression tied to flavor, benefit, or selling point.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>
+              <div class="del-name">Motion<br>loops</div>
+              <div class="del-desc">Product reveal, atmosphere, and detail loops ready for web, social, and paid media.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22l8-8"/><path d="M20 4c-4.5 0-9 4.5-9 9s4.5-2 4.5 2-2 5-6 5"/><circle cx="17.5" cy="6.5" r="2.5"/></svg>
+              <div class="del-name">Ingredient<br>visual</div>
+              <div class="del-desc">What's in the product and why it belongs there, shown in the brand environment.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
+              <div class="del-name">Product education<br>image</div>
+              <div class="del-desc">Use occasion, function, or dosage made visual inside the brand world.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              <div class="del-name">Claims and<br>trust panel</div>
+              <div class="del-desc">A specific claim, certification, or differentiator shown in brand visual language.</div>
+            </div>
+            <div class="del-item">
+              <svg class="del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              <div class="del-name">Channel<br>exports</div>
+              <div class="del-desc">Organized by platform: Shopify, marketplace, social, and paid. Named and ready to place.</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
        <!-- ── MINDBLOOM CALLOUT CARD ── -->
         <div class="mb-world-wrap reveal">
           <div class="mb-world">
             <div class="mb-intro">
-              <span class="eyebrow">Sample Product World</span>
+              <span class="eyebrow">Sample Build</span>
               <h2 class="mb-headline">Meet MindBloom</h2>
               <p class="mb-bio">
-                MindBloom is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
+                MindBloom is a demonstration build showing how a Visual Product World works across motion, stills, and channel assets. The brand is a functional beverage line built on adaptogens, nootropics, and electrolytes for people who care more about long-term health than quick fixes. The brand's visual world is deep forest green and aged gold, drawn from rugged outdoor landscapes and the conviction that the best things take time. The visual challenge: make a wellness beverage feel as grounded and purposeful as the philosophy behind it.
               </p>
             </div>
             <div class="mb-grids">
@@ -845,10 +1277,10 @@ Find and connect with your best customers by showing them a world they want to l
         <div class="mb-world-wrap reveal">
           <div class="mb-world">
             <div class="mb-intro">
-              <span class="eyebrow">Creative Showcase</span>
+              <span class="eyebrow">The Craft Behind the Build</span>
               <h2 class="mb-headline">Jailhouse Brewing</h2>
               <p class="mb-bio">
-                Jailhouse Brewing makes craft beer out of a converted jailhouse in Hampton, Georgia. The brief called for a visual identity that matched the place: weathered, specific, and built on character. Jonathan Richter designed and illustrated the complete label system, each beer earning its own persona drawn from the mythology of the building. The Justice Series took it further with a 12-foot charcoal rendering of judge, jury, jailer, and executioner, produced for the Solitary Confinement release.
+                A Visual Product World has depth because it is built by people who work at this level. Jonathan Richter developed the complete visual identity for Jailhouse Brewing, a craft brewery operating out of a converted jailhouse in Hampton, Georgia. The brief called for imagery with the weight of the place: weathered, specific, and rooted in the building's own mythology. He designed and illustrated the full label system, each beer earning its own persona from the character of the building. The Justice Series went further: judge, jury, jailer, and executioner, rendered at 12 feet in charcoal for the Solitary Confinement release.
               </p>
             </div>
             <div class="mb-grids">
@@ -962,7 +1394,7 @@ Find and connect with your best customers by showing them a world they want to l
       <!-- ── CONTACT FORM ── -->
       <section id="contact" class="cta-close reveal">
         <p class="cta-close-text">
-          It's time to expand<br><em>your brand</em>
+          Build the world your brand<br><em>runs on.</em>
         </p>
         <p class="cta-sub">Let's build the product world your team can use for launch, retail, ecommerce, paid media, and every SKU that comes next.</p>
         <form
@@ -1029,6 +1461,51 @@ Find and connect with your best customers by showing them a world they want to l
     }, { threshold: 0.06 });
 
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    // ── VPW SCROLL NARRATIVE ──
+    (function () {
+      var story  = document.getElementById('vpwStory');
+      if (!story) return;
+      var sticky      = document.getElementById('vpwSticky');
+      var vpwProgress = document.getElementById('vpwProgress');
+      var beats       = Array.prototype.slice.call(story.querySelectorAll('.vpw-beat'));
+      var beatCount   = beats.length;
+      var activeBeat  = -1;
+
+      function onScroll() {
+        var rect        = story.getBoundingClientRect();
+        var vh          = window.innerHeight;
+        var totalScroll = story.offsetHeight - vh;
+        if (totalScroll <= 0) return;
+
+        // JS-driven pin
+        if (rect.top > 0) {
+          sticky.classList.remove('is-fixed', 'is-pinned-bottom');
+        } else if (rect.bottom < vh) {
+          sticky.classList.remove('is-fixed');
+          sticky.classList.add('is-pinned-bottom');
+        } else {
+          sticky.classList.add('is-fixed');
+          sticky.classList.remove('is-pinned-bottom');
+        }
+
+        var progress = Math.max(0, Math.min(1, -rect.top / totalScroll));
+        if (vpwProgress) vpwProgress.style.width = (progress * 100) + '%';
+
+        // Activate current beat; last beat stays active at end
+        var idx = Math.min(beatCount - 1, Math.floor(progress * beatCount));
+        if (idx !== activeBeat) {
+          if (activeBeat >= 0) beats[activeBeat].classList.remove('active');
+          beats[idx].classList.add('active');
+          activeBeat = idx;
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      onScroll();
+    })();
+
+
   </script>
 
 </body>
