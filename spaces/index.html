@@ -362,76 +362,87 @@
     }
 
     /* ── USE CASES ── */
-    .use-cases {
-      padding: 4.5rem 3rem 0;
+    /* ── LOWER PAGE MODULES ── */
+    .lower-section {
+      padding: 4rem 3rem;
       border-top: 1px solid var(--border);
     }
-
-    .use-cases-grid {
-      border: 1px solid var(--border);
-      margin-bottom: 0;
+    .lower-section-header { margin-bottom: 2.5rem; }
+    .lower-section-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; max-width: 640px;
     }
-
-    .use-case-row {
-      display: grid; grid-template-columns: 180px 1fr;
-      border-bottom: 1px solid var(--border);
+    .lower-section-header .sub {
+      font-size: 0.95rem; line-height: 1.7;
+      color: var(--white); opacity: 0.58;
+      max-width: 540px; margin-top: 0.6rem;
     }
-    .use-case-row:last-child { border-bottom: none; }
-
-    .use-case-label {
-      background: var(--dark-card);
-      padding: 0.85rem 1.1rem;
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--accent);
-      display: flex; align-items: center;
-      border-right: 1px solid var(--border);
+    .where-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border); border: 1px solid var(--border);
     }
-
-    .use-case-outcome {
-      padding: 0.85rem 1.2rem;
-      font-size: 0.87rem; line-height: 1.65;
-      color: var(--white); opacity: 0.62;
-      display: flex; align-items: center;
+    .where-card { background: var(--dark-card); padding: 1.8rem 2rem; }
+    .where-card-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.6rem;
     }
-
-    /* ── FIT PAIR ── */
-    .fit-pair {
-      margin-top: 2.5rem;
-      margin-bottom: 0;
+    .where-card-desc {
+      font-size: 0.92rem; line-height: 1.65;
+      color: var(--white); opacity: 0.65;
+    }
+    .fit-editorial {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+    }
+    .fit-col-head {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-style: italic; font-size: 1rem;
+      color: var(--white); opacity: 0.72;
+      display: block; margin-bottom: 1.2rem;
+    }
+    .fit-col-negative .fit-col-head { opacity: 0.4; }
+    .fit-row {
+      display: flex; gap: 0.85rem; align-items: flex-start;
+      padding: 0.7rem 0; border-bottom: 1px solid var(--border-sub);
+      font-size: 0.92rem; line-height: 1.55;
+      color: var(--white); opacity: 0.72;
+    }
+    .fit-col-negative .fit-row { opacity: 0.38; }
+    .fit-row:last-child { border-bottom: none; }
+    .fit-marker {
+      flex-shrink: 0; width: 12px; height: 12px; margin-top: 3px;
+      border-radius: 50%; border: 1px solid var(--accent); opacity: 0.65;
+    }
+    .fit-col-negative .fit-marker { border-color: var(--muted); opacity: 0.35; }
+    .scope-inner {
       display: grid; grid-template-columns: 1fr 1fr;
-      border: 1px solid var(--border);
+      gap: 4rem; align-items: start;
     }
-
-    .fit-cell { padding: 1.4rem 1.6rem; }
-    .fit-cell:first-child { border-right: 1px solid var(--border); }
-
-    .fit-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
-      display: block; margin-bottom: 0.55rem;
+    .scope-left h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; margin-bottom: 0.9rem;
     }
-    .fit-cell:first-child .fit-label { color: var(--accent); }
-    .fit-cell.negative .fit-label    { color: var(--muted); }
-
-    .fit-items {
-      display: flex; flex-direction: column; gap: 0.55rem;
+    .scope-left p {
+      font-size: 0.92rem; line-height: 1.7;
+      color: var(--white); opacity: 0.58;
     }
-
-    .fit-item {
-      font-size: 0.85rem; line-height: 1.6;
+    .scope-cards {
+      display: flex; flex-direction: column;
+      gap: 1px; border: 1px solid var(--border); background: var(--border);
+    }
+    .scope-card { background: var(--dark-card); padding: 1.6rem 1.8rem; }
+    .scope-card-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.65rem;
+    }
+    .scope-card p {
+      font-size: 0.92rem; line-height: 1.65;
       color: var(--white); opacity: 0.62;
-      padding-left: 0.9rem;
-      border-left: 1px solid var(--border-sub);
-    }
-    .fit-cell.negative .fit-item {
-      border-left-color: rgba(107, 96, 87, 0.25);
-    }
-
-    /* Wrapper for use-cases + fit so they sit flush */
-    .qualify-block {
-      padding: 4.5rem 3rem;
-      border-top: 1px solid var(--border);
     }
 
     /* ── CONTACT ── */
@@ -553,12 +564,10 @@
       .stat-value { font-size: 2rem; }
       .myco-process { grid-template-columns: 1fr; }
 
-      .qualify-block { padding: 3.5rem 1.5rem; }
-      .use-case-row  { grid-template-columns: 120px 1fr; }
-      .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
-      .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
-      .fit-pair { grid-template-columns: 1fr; }
-      .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+      .lower-section { padding: 3rem 1.5rem; }
+      .where-grid { grid-template-columns: 1fr; }
+      .fit-editorial { grid-template-columns: 1fr; gap: 2.5rem; }
+      .scope-inner { grid-template-columns: 1fr; gap: 2rem; }
 
       .cta-close { padding: 4rem 1.5rem 5rem; }
 
@@ -703,58 +712,84 @@
         </div>
       </div>
 
-      <!-- ── USE CASES + FIT (single padded block) ── -->
-      <div class="qualify-block reveal">
-
-        <span class="eyebrow">Where This Fits</span>
-        <div class="use-cases-grid">
-          <div class="use-case-row">
-            <span class="use-case-label">Brand activations</span>
-            <span class="use-case-outcome">A branded environment mapped to the specific room you're activating in, built from your existing identity.</span>
+      <!-- ── WHERE IT SHOWS UP ── -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Where it shows up</span>
+          <h2>Built for the rooms where the brand has to do more than decorate.</h2>
+          <p class="sub">Projection-mapped environments and spatial content for activations, venues, and events with a deliberate visual ambition.</p>
+        </div>
+        <div class="where-grid">
+          <div class="where-card">
+            <span class="where-card-label">Brand Activations</span>
+            <p class="where-card-desc">A branded environment mapped to the specific room, built from your existing identity.</p>
           </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Venue installs</span>
-            <span class="use-case-outcome">Permanent or seasonal visual content that gives the space a recurring identity guests come back for.</span>
+          <div class="where-card">
+            <span class="where-card-label">Venue Installs</span>
+            <p class="where-card-desc">Permanent or seasonal visual content that gives the space a recurring identity guests return for.</p>
           </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Music venues</span>
-            <span class="use-case-outcome">Content systems that shift with your programming without requiring a full production rebuild each time.</span>
+          <div class="where-card">
+            <span class="where-card-label">Music Venues</span>
+            <p class="where-card-desc">Content systems that shift with your programming without requiring a full rebuild each time.</p>
           </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Agency projects</span>
-            <span class="use-case-outcome">White-label production behind your creative direction. We handle the technical and execution layer.</span>
+          <div class="where-card">
+            <span class="where-card-label">Agency Projects</span>
+            <p class="where-card-desc">White-label production behind your creative direction. We handle the technical and execution layer.</p>
           </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Product launches</span>
-            <span class="use-case-outcome">A physical environment that becomes the visual statement guests photograph.</span>
+          <div class="where-card">
+            <span class="where-card-label">Product Launches</span>
+            <p class="where-card-desc">A physical environment that becomes the visual statement guests photograph.</p>
           </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Recurring events</span>
-            <span class="use-case-outcome">Content built once and refreshed efficiently as the programming evolves.</span>
+          <div class="where-card">
+            <span class="where-card-label">Recurring Events</span>
+            <p class="where-card-desc">Content built once and refreshed efficiently as the programming evolves.</p>
           </div>
         </div>
+      </div>
 
-        <div class="fit-pair">
-          <div class="fit-cell">
-            <span class="fit-label">Right fit</span>
-            <div class="fit-items">
-              <span class="fit-item">Venues and events with a deliberate visual ambition</span>
-              <span class="fit-item">Brands looking to own a physical activation moment</span>
-              <span class="fit-item">Experiential agencies who need a production partner behind their creative direction</span>
-              <span class="fit-item">Event producers building a designed environment, not sourcing AV</span>
-            </div>
+      <!-- ── FIT ── -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Fit</span>
+          <h2>For clients who treat the room as part of the work.</h2>
+        </div>
+        <div class="fit-editorial">
+          <div class="fit-col">
+            <span class="fit-col-head">A strong fit when</span>
+            <div class="fit-row"><span class="fit-marker"></span><span>The venue or event has a deliberate visual ambition.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>You want to own a physical activation moment, not just fill a room.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>You're an experiential agency that needs a production partner behind your creative direction.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>You're building a designed environment, not sourcing AV.</span></div>
           </div>
-          <div class="fit-cell negative">
-            <span class="fit-label">Not a fit</span>
-            <div class="fit-items">
-              <span class="fit-item">Generic AV rental or equipment sourcing</span>
-              <span class="fit-item">Basic event lighting without environmental content</span>
-              <span class="fit-item">Field marketing and sampling activations</span>
-              <span class="fit-item">Events where space design isn't part of the brief</span>
+          <div class="fit-col fit-col-negative">
+            <span class="fit-col-head">Probably not the right fit when</span>
+            <div class="fit-row"><span class="fit-marker"></span><span>The brief is generic AV rental or equipment sourcing.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>The project is basic event lighting without environmental content.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>Field marketing or sampling activations without spatial design.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>Events where what the room feels like isn't part of the brief.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCOPE ── -->
+      <div class="lower-section reveal">
+        <div class="scope-inner">
+          <div class="scope-left">
+            <span class="eyebrow">Scope</span>
+            <h2>Scoped around the room, the content, and the production need.</h2>
+            <p>Spatial builds are scoped around surface count, content complexity, mapping requirements, and whether installation support is part of the engagement.</p>
+          </div>
+          <div class="scope-cards">
+            <div class="scope-card">
+              <span class="scope-card-label">Pricing</span>
+              <p>Content-only activations typically begin in the mid four figures. Full spatial builds with technical commissioning and installation support are scoped as production partnerships.</p>
+            </div>
+            <div class="scope-card">
+              <span class="scope-card-label">Timeline</span>
+              <p>Most builds begin with site survey and spatial planning, then move into content development, mapping, and technical commissioning. Timing depends on surface complexity, content volume, and installation access.</p>
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- ── CONTACT ── -->
