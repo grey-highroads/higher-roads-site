@@ -435,83 +435,97 @@
       border-left: 1px solid var(--border-sub);
     }
 
-    /* ── USE CASES ── */
-    .use-cases {
-      padding: 0;
+    /* ── LOWER PAGE MODULES ── */
+    .lower-section {
+      padding: 4rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+    .lower-section-header { margin-bottom: 2.5rem; }
+    .lower-section-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; max-width: 640px;
+    }
+    .lower-section-header .sub {
+      font-size: 0.95rem; line-height: 1.7;
+      color: var(--white); opacity: 0.58;
+      max-width: 540px; margin-top: 0.6rem;
     }
 
-    .use-cases-eyebrow {
-      display: block;
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 1rem;
-    }
-
-    .use-cases-grid {
-      border: 1px solid var(--border);
-    }
-
-    .use-case-row {
-      display: grid; grid-template-columns: 180px 1fr;
-      border-bottom: 1px solid var(--border);
-    }
-    .use-case-row:last-child { border-bottom: none; }
-
-    .use-case-label {
-      background: var(--dark-card);
-      padding: 0.85rem 1.1rem;
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--accent);
-      display: flex; align-items: center;
-      border-right: 1px solid var(--border);
-    }
-
-    .use-case-outcome {
-      padding: 0.85rem 1.2rem;
-      font-size: 0.87rem; line-height: 1.65;
-      color: var(--white); opacity: 0.62;
-      display: flex; align-items: center;
-    }
-
-    /* ── FIT PAIR ── */
-    .fit-pair {
-      margin-top: 2.5rem;
+    /* WHERE GRID */
+    .where-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
       border: 1px solid var(--border);
     }
-
-    .fit-cell {
-      padding: 1.4rem 1.6rem;
+    .where-card { background: var(--dark-card); padding: 1.8rem 2rem; }
+    .where-card-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.6rem;
+    }
+    .where-card-desc {
+      font-size: 0.92rem; line-height: 1.65;
+      color: var(--white); opacity: 0.65;
     }
 
-    .fit-cell:first-child {
-      border-right: 1px solid var(--border);
+    /* FIT EDITORIAL */
+    .fit-editorial {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
     }
-
-    .fit-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
-      display: block; margin-bottom: 0.55rem;
+    .fit-col-head {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-style: italic; font-size: 1rem;
+      color: var(--white); opacity: 0.72;
+      display: block; margin-bottom: 1.2rem;
     }
-
-    .fit-cell:first-child .fit-label { color: var(--accent); }
-    .fit-cell.negative .fit-label { color: var(--muted); }
-
-    .fit-items {
-      display: flex; flex-direction: column; gap: 0.55rem;
+    .fit-col-negative .fit-col-head { opacity: 0.4; }
+    .fit-row {
+      display: flex; gap: 0.85rem; align-items: flex-start;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border-sub);
+      font-size: 0.92rem; line-height: 1.55;
+      color: var(--white); opacity: 0.72;
     }
+    .fit-col-negative .fit-row { opacity: 0.38; }
+    .fit-row:last-child { border-bottom: none; }
+    .fit-marker {
+      flex-shrink: 0; width: 12px; height: 12px; margin-top: 3px;
+      border-radius: 50%; border: 1px solid var(--accent); opacity: 0.65;
+    }
+    .fit-col-negative .fit-marker { border-color: var(--muted); opacity: 0.35; }
 
-    .fit-item {
-      font-size: 0.85rem; line-height: 1.6;
+    /* SCOPE BAND */
+    .scope-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: start;
+    }
+    .scope-left h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; margin-bottom: 0.9rem;
+    }
+    .scope-left p {
+      font-size: 0.92rem; line-height: 1.7;
+      color: var(--white); opacity: 0.58;
+    }
+    .scope-cards {
+      display: flex; flex-direction: column;
+      gap: 1px; border: 1px solid var(--border); background: var(--border);
+    }
+    .scope-card { background: var(--dark-card); padding: 1.6rem 1.8rem; }
+    .scope-card-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.65rem;
+    }
+    .scope-card p {
+      font-size: 0.92rem; line-height: 1.65;
       color: var(--white); opacity: 0.62;
-      padding-left: 0.9rem;
-      border-left: 1px solid var(--border-sub);
-    }
-
-    .fit-cell.negative .fit-item {
-      border-left-color: rgba(107, 96, 87, 0.25);
     }
 
     /* ── VPW SCROLL NARRATIVE ── */
@@ -865,6 +879,10 @@
       nav.nav-links { display: none; }
       .nav-toggle { display: flex; }
 
+      .where-grid { grid-template-columns: 1fr; }
+      .fit-editorial { grid-template-columns: 1fr; gap: 2.5rem; }
+      .scope-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .lower-section { padding: 3rem 1.5rem; }
       .ct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .del-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .content-types { padding: 3rem 1.5rem; }
@@ -1025,11 +1043,11 @@ Your brand has an identity. Your product needs a world that moves.
         <div class="positioning-inner">
           <div class="positioning-col">
             <span class="positioning-label">What your brand brings</span>
-            <p>Your ethos, story, and direction. The visual identity and aspirations that define who you are.</p>
+            <p>Your ethos, story, and direction. The visual identity and aspirations that define who you are. That work is done.</p>
           </div>
           <div class="positioning-col">
             <span class="positioning-label">What we build</span>
-            <p>The Visual Product World: a three-dimensional environment that moves, shaped from your existing identity into content across every touchpoint.</p>
+            <p>The Visual Product World: a three-dimensional environment that moves, shaped from your existing identity into content across commerce, campaigns, and retail.</p>
           </div>
           <div class="positioning-col">
             <span class="positioning-label">What your team runs</span>
@@ -1043,10 +1061,10 @@ Your brand has an identity. Your product needs a world that moves.
       <section class="offer reveal">
         <span class="eyebrow">The offer</span>
         <p class="offer-name">Visual Product World</p>
-        <span class="offer-tag">A three-dimensional enviornment built from your brand identity and belief system.</span>
+        <span class="offer-tag">A three-dimensional world built from your brand identity, designed to move, owned by you.</span>
 
         <p class="offer-body">
-          We work from your existing identity: guidelines, values, packaging files, and visual direction. From there, we build the environment where your product lives.
+          We work from your existing identity: guidelines, values, packaging files, and visual direction. From there, we build the environment where your product lives. The world is built for motion first. Stills, campaign loops, and channel assets come from the same source. You own the master files.
         </p>
 
         <!-- Three-column flow -->
@@ -1324,61 +1342,82 @@ Your brand has an identity. Your product needs a world that moves.
           </div>
         </div>
 
-        <!-- ── USE CASES ── -->
-        <span class="eyebrow">Where it shows up</span>
-        <p class="offer-body">
-          One Visual Product World build supports the full range of channels where product brands need to show up consistently.
-        </p>
-
-        <div class="use-cases">
-          <span class="use-cases-eyebrow">Where the assets work</span>
-          <div class="use-cases-grid">
-            <div class="use-case-row">
-              <span class="use-case-label">Ecommerce and PDPs</span>
-              <span class="use-case-outcome">Product stills, detail crops, and motion loops for product pages and marketplace listings.</span>
+        <!-- ── WHERE IT SHOWS UP ── -->
+        <div class="lower-section reveal">
+          <div class="lower-section-header">
+            <span class="eyebrow">Where it shows up</span>
+            <h2>A shared visual foundation for the places your product has to perform.</h2>
+            <p class="sub">A Visual Product World gives product brands a consistent source for launches, ecommerce, social, retail, and in-person selling moments.</p>
+          </div>
+          <div class="where-grid">
+            <div class="where-card">
+              <span class="where-card-label">Ecommerce + PDPs</span>
+              <p class="where-card-desc">Product stills, detail crops, and motion loops for product pages.</p>
             </div>
-            <div class="use-case-row">
-              <span class="use-case-label">Amazon and marketplaces</span>
-              <span class="use-case-outcome">Consistent SKU imagery, feature graphics, and clean product visuals across every listing.</span>
+            <div class="where-card">
+              <span class="where-card-label">Paid + Organic Social</span>
+              <p class="where-card-desc">Short loops, product reveals, and campaign visuals for platform formats.</p>
             </div>
-            <div class="use-case-row">
-              <span class="use-case-label">Paid and organic social</span>
-              <span class="use-case-outcome">Short loops, product reveals, motion backgrounds, and campaign visuals for every platform format.</span>
+            <div class="where-card">
+              <span class="where-card-label">Marketplaces</span>
+              <p class="where-card-desc">Consistent SKU imagery and feature visuals across listings.</p>
             </div>
-            <div class="use-case-row">
-              <span class="use-case-label">Retail sell-in</span>
-              <span class="use-case-outcome">Presentation-ready visuals for buyer decks, distributor conversations, and launch planning.</span>
+            <div class="where-card">
+              <span class="where-card-label">Retail Sell-In</span>
+              <p class="where-card-desc">Presentation-ready visuals for buyer decks and distributor conversations.</p>
             </div>
-            <div class="use-case-row">
-              <span class="use-case-label">Trade shows and events</span>
-              <span class="use-case-outcome">Motion-ready assets for screens, booth displays, and in-person sales moments.</span>
+            <div class="where-card">
+              <span class="where-card-label">Trade Shows + Events</span>
+              <p class="where-card-desc">Motion-ready assets for screens, booths, and in-person sales moments.</p>
             </div>
-            <div class="use-case-row">
-              <span class="use-case-label">Future SKU updates</span>
-              <span class="use-case-outcome">New flavors, packaging changes, and line extensions render from the same visual foundation.</span>
+            <div class="where-card">
+              <span class="where-card-label">SKU Extensions</span>
+              <p class="where-card-desc">New flavors and packaging updates start from the same visual foundation.</p>
             </div>
           </div>
         </div>
 
-        <div class="fit-pair">
-          <div class="fit-cell">
-            <span class="fit-label">Good fit when</span>
-            <div class="fit-items">
-              <span class="fit-item">Your product identity and packaging are mostly settled</span>
-              <span class="fit-item">You need assets across more than one channel</span>
-              <span class="fit-item">You have a launch, retail, ecommerce, or SKU expansion need</span>
-              <span class="fit-item">You want a reusable system instead of one-off content</span>
-              <span class="fit-item">Your current visuals make the product feel less credible than it is</span>
+        <!-- ── FIT ── -->
+        <div class="lower-section reveal">
+          <div class="lower-section-header">
+            <span class="eyebrow">Fit</span>
+            <h2>Built for brands with enough foundation to move.</h2>
+          </div>
+          <div class="fit-editorial">
+            <div class="fit-col">
+              <span class="fit-col-head">A strong fit when</span>
+              <div class="fit-row"><span class="fit-marker"></span><span>Your product identity and packaging are mostly settled.</span></div>
+              <div class="fit-row"><span class="fit-marker"></span><span>You need assets across more than one channel.</span></div>
+              <div class="fit-row"><span class="fit-marker"></span><span>You have a launch, retail, ecommerce, or SKU expansion ahead.</span></div>
+              <div class="fit-row"><span class="fit-marker"></span><span>Your current visuals make the product feel less credible than it is.</span></div>
+            </div>
+            <div class="fit-col fit-col-negative">
+              <span class="fit-col-head">Probably not the right fit when</span>
+              <div class="fit-row"><span class="fit-marker"></span><span>The product, packaging, or core identity is still unresolved.</span></div>
+              <div class="fit-row"><span class="fit-marker"></span><span>You only need a basic product photo.</span></div>
+              <div class="fit-row"><span class="fit-marker"></span><span>There is no clear channel plan for the assets.</span></div>
+              <div class="fit-row"><span class="fit-marker"></span><span>The budget only supports one-off content.</span></div>
             </div>
           </div>
-          <div class="fit-cell negative">
-            <span class="fit-label">Not a fit when</span>
-            <div class="fit-items">
-              <span class="fit-item">The product, packaging, or core identity is still unresolved</span>
-              <span class="fit-item">You only need a basic product photo</span>
-              <span class="fit-item">You want a single asset without a broader channel plan</span>
-              <span class="fit-item">The budget only supports one-off content</span>
-              <span class="fit-item">There is no clear channel plan for the assets</span>
+        </div>
+
+        <!-- ── SCOPE ── -->
+        <div class="lower-section reveal">
+          <div class="scope-inner">
+            <div class="scope-left">
+              <span class="eyebrow">Scope</span>
+              <h2>Scoped around the product system, not a fixed asset menu.</h2>
+              <p>Visual Product World builds are scoped around SKU count, motion complexity, channel outputs, and how much brand foundation already exists.</p>
+            </div>
+            <div class="scope-cards">
+              <div class="scope-card">
+                <span class="scope-card-label">Pricing</span>
+                <p>Focused builds start in the low five figures. Larger SKU systems and campaign worlds are scoped as broader production engagements.</p>
+              </div>
+              <div class="scope-card">
+                <span class="scope-card-label">Timeline</span>
+                <p>Most builds begin with strategy and art direction, then move into visual development, motion production, and final channel exports. Timing depends on SKU count, feedback cycles, and output needs.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1396,7 +1435,7 @@ Your brand has an identity. Your product needs a world that moves.
         <p class="cta-close-text">
           Build the world your brand<br><em>runs on.</em>
         </p>
-        <p class="cta-sub">Let's build the product world your team can use for launch, retail, ecommerce, paid media, and every SKU that comes next.</p>
+        <p class="cta-sub">Let's build the product world your team can use for launch, retail, ecommerce, paid media, and the next SKU story.</p>
         <form
           class="lead-form"
           action="https://formspree.io/f/xrerprnv"
@@ -1405,7 +1444,7 @@ Your brand has an identity. Your product needs a world that moves.
           <input type="text" name="name" placeholder="Your name" required />
           <input type="email" name="email" placeholder="Your email" required />
           <textarea name="message" placeholder="What are you working on?" rows="5"></textarea>
-          <button type="submit">Start a product world build</button>
+          <button type="submit">Start a Build</button>
         </form>
       </section>
 
