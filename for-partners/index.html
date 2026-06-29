@@ -869,6 +869,129 @@
     }
 
     /* ── CTA CLOSE ── */
+    /* ── LOWER SECTIONS (shared pattern with /screens/ and /spaces/) ── */
+    .lower-section {
+      padding: 4rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+    .lower-section-header { margin-bottom: 2.5rem; }
+    .lower-section-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; max-width: 640px;
+    }
+    .lower-section-header .sub {
+      font-size: 0.95rem; line-height: 1.7;
+      color: var(--white); opacity: 0.58;
+      max-width: 540px; margin-top: 0.6rem;
+    }
+
+    .where-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .where-card { background: var(--dark-card); padding: 1.8rem 2rem; }
+    .where-card-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.6rem;
+    }
+    .where-card-desc {
+      font-size: 0.92rem; line-height: 1.65;
+      color: var(--white); opacity: 0.65;
+    }
+
+    .fit-editorial {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+    }
+    .fit-col-head {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-style: italic; font-size: 1rem;
+      color: var(--white); opacity: 0.72;
+      display: block; margin-bottom: 1.2rem;
+    }
+    .fit-col-negative .fit-col-head { opacity: 0.4; }
+    .fit-row {
+      display: flex; gap: 0.85rem; align-items: flex-start;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border-sub);
+      font-size: 0.92rem; line-height: 1.55;
+      color: var(--white); opacity: 0.72;
+    }
+    .fit-col-negative .fit-row { opacity: 0.38; }
+    .fit-row:last-child { border-bottom: none; }
+    .fit-marker {
+      flex-shrink: 0; width: 12px; height: 12px; margin-top: 3px;
+      border-radius: 50%; border: 1px solid var(--accent); opacity: 0.65;
+    }
+    .fit-col-negative .fit-marker { border-color: var(--muted); opacity: 0.35; }
+
+    .scope-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: start;
+    }
+    .scope-left h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; margin-bottom: 0.9rem;
+    }
+    .scope-left p {
+      font-size: 0.92rem; line-height: 1.7;
+      color: var(--white); opacity: 0.58;
+    }
+    .scope-cards {
+      display: flex; flex-direction: column;
+      gap: 1px; border: 1px solid var(--border); background: var(--border);
+    }
+    .scope-card { background: var(--dark-card); padding: 1.6rem 1.8rem; }
+    .scope-card-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.62rem;
+      font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 0.65rem;
+    }
+    .scope-card p {
+      font-size: 0.92rem; line-height: 1.65;
+      color: var(--white); opacity: 0.62;
+    }
+
+    /* ── CONTACT FORM ── */
+    .lead-form {
+      width: 100%; max-width: 560px;
+      display: flex; flex-direction: column;
+      gap: 0.9rem; margin-top: 2.2rem;
+    }
+    .lead-form input,
+    .lead-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--white);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem; font-weight: 300;
+      outline: none; transition: border-color 0.2s;
+    }
+    .lead-form input:focus,
+    .lead-form textarea:focus { border-color: var(--accent); }
+    .lead-form input::placeholder,
+    .lead-form textarea::placeholder { color: var(--muted); }
+    .lead-form textarea { min-height: 160px; resize: vertical; }
+    .lead-form button {
+      align-self: flex-start;
+      background: var(--accent); color: var(--black);
+      border: none; padding: 0.85rem 2rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .lead-form button:hover { opacity: 0.85; }
+
     .cta-close {
       padding: 5rem 3rem 6rem;
       border-top: 1px solid var(--border);
@@ -1022,12 +1145,10 @@
       .how-section { padding: 3.5rem 1.5rem; }
       .models-grid { grid-template-columns: 1fr; }
 
-      .qualify-block { padding: 3.5rem 1.5rem; }
-      .use-case-row { grid-template-columns: 140px 1fr; }
-      .use-case-label { font-size: 0.65rem; padding: 0.7rem 0.8rem; }
-      .use-case-outcome { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
-      .fit-pair { grid-template-columns: 1fr; }
-      .fit-cell:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+      .lower-section { padding: 3rem 1.5rem; }
+      .where-grid { grid-template-columns: 1fr; }
+      .fit-editorial { grid-template-columns: 1fr; gap: 2.5rem; }
+      .scope-inner { grid-template-columns: 1fr; gap: 2rem; }
 
       .faq-section { padding: 3.5rem 1.5rem; }
       .cta-close { padding: 4rem 1.5rem 5rem; }
@@ -1118,6 +1239,105 @@
             <span class="trigger-dot" data-dot="3"></span>
           </div>
 
+        </div>
+      </div>
+
+      <!-- ── WHERE WE SHOW UP ── -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Where we show up</span>
+          <h2>The moments partners bring us in.</h2>
+          <p class="sub">Higher Roads plugs into activations, campaigns, and builds that need a specialist visual production layer your team doesn't carry in-house.</p>
+        </div>
+        <div class="where-grid">
+          <div class="where-card">
+            <span class="where-card-label">Brand Activations</span>
+            <p class="where-card-desc">Your client wants branded room presence without scenic fabrication dominating the budget.</p>
+          </div>
+          <div class="where-card">
+            <span class="where-card-label">Product Launches</span>
+            <p class="where-card-desc">The product needs cinematic screen presence before, during, and after the launch moment.</p>
+          </div>
+          <div class="where-card">
+            <span class="where-card-label">Identity Handoffs</span>
+            <p class="where-card-desc">The identity is approved. We extend it into motion and 3D content before photography begins.</p>
+          </div>
+          <div class="where-card">
+            <span class="where-card-label">Trade Show Booths</span>
+            <p class="where-card-desc">The structure is built, but the screens need motion strong enough to pull traffic.</p>
+          </div>
+          <div class="where-card">
+            <span class="where-card-label">Campaign Extensions</span>
+            <p class="where-card-desc">A concept needs 3D environments, motion loops, or launch content beyond what's in-house.</p>
+          </div>
+          <div class="where-card">
+            <span class="where-card-label">Venue and Hospitality</span>
+            <p class="where-card-desc">A space needs recurring visual identity without rebuilding the physical environment each time.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── WHO WE WORK WITH ── -->
+      <div class="partner-types reveal">
+        <span class="eyebrow">Who we work with</span>
+
+        <div class="partner-type">
+          <span class="partner-num">01</span>
+          <div>
+            <h2 class="partner-type-title">Digital and Interactive Agencies</h2>
+            <p class="partner-type-body">Bring us in when a screen-based campaign, product experience, or interactive build needs cinematic motion, 3D product content, or a physical activation layer.</p>
+          </div>
+          <div class="partner-thumb">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switch-square" alt="Higher Roads CGI work sample" />
+          </div>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">02</span>
+          <div>
+            <h2 class="partner-type-title">Experiential and Brand Agencies</h2>
+            <p class="partner-type-body">Bring us in when the concept is strong, but the room, screens, or spatial content need a specialist visual production layer.</p>
+          </div>
+          <div class="partner-thumb">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/tideform-square" alt="Higher Roads CGI work sample" />
+          </div>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">03</span>
+          <div>
+            <h2 class="partner-type-title">DMCs and Event Producers</h2>
+            <p class="partner-type-body">Bring us in when the proposal needs atmosphere, motion, or branded environment design beyond logistics, entertainment, rentals, and run of show.</p>
+          </div>
+          <div class="partner-thumb">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Blazy-sm-vid.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">04</span>
+          <div>
+            <h2 class="partner-type-title">Fabricators and Build Teams</h2>
+            <p class="partner-type-body">Bring us in when the physical structure needs motion, projection, mapped content, or digital surfaces extending the build.</p>
+          </div>
+          <div class="partner-thumb">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Brightcell-vid.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+
+        <div class="partner-type">
+          <span class="partner-num">05</span>
+          <div>
+            <h2 class="partner-type-title">Branding and Packaging Studios</h2>
+            <p class="partner-type-body">Bring us in when a brand identity or packaging system is approved and the client needs motion content before the campaign launches. We take the design language your team built and extend it into a screen-ready product world: launch films, retail screens, paid social, and PDP imagery from a single approved build.</p>
+          </div>
+          <div class="partner-thumb">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="3D product world built from brand identity" />
+          </div>
         </div>
       </div>
 
@@ -1345,124 +1565,46 @@
         </div>
       </div>
 
-      <!-- ── WHO WE WORK WITH ── -->
-      <div class="partner-types reveal">
-        <span class="eyebrow">Who we work with</span>
-
-        <div class="partner-type">
-          <span class="partner-num">01</span>
-          <div>
-            <h2 class="partner-type-title">Digital and Interactive Agencies</h2>
-            <p class="partner-type-body">Bring us in when a screen-based campaign, product experience, or interactive build needs cinematic motion, 3D product content, or a physical activation layer.</p>
-          </div>
-          <div class="partner-thumb">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switch-square" alt="Higher Roads CGI work sample" />
-          </div>
+      <!-- ── FIT ── -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Fit</span>
+          <h2>For partners who need a specialist layer behind their work.</h2>
         </div>
-
-        <div class="partner-type">
-          <span class="partner-num">02</span>
-          <div>
-            <h2 class="partner-type-title">Experiential and Brand Agencies</h2>
-            <p class="partner-type-body">Bring us in when the concept is strong, but the room, screens, or spatial content need a specialist visual production layer.</p>
+        <div class="fit-editorial">
+          <div class="fit-col">
+            <span class="fit-col-head">A strong fit when</span>
+            <div class="fit-row"><span class="fit-marker"></span><span>Your clients are asking for visual worlds you don't build in-house.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>A branding or packaging client needs motion before photography exists.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>The brief calls for a designed environment, not sourced AV.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>Your team needs to own the client relationship while we handle production.</span></div>
           </div>
-          <div class="partner-thumb">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/tideform-square" alt="Higher Roads CGI work sample" />
-          </div>
-        </div>
-
-        <div class="partner-type">
-          <span class="partner-num">03</span>
-          <div>
-            <h2 class="partner-type-title">DMCs and Event Producers</h2>
-            <p class="partner-type-body">Bring us in when the proposal needs atmosphere, motion, or branded environment design beyond logistics, entertainment, rentals, and run of show.</p>
-          </div>
-          <div class="partner-thumb">
-            <video autoplay muted loop playsinline preload="metadata">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Blazy-sm-vid.mp4" type="video/mp4" />
-            </video>
-          </div>
-        </div>
-
-        <div class="partner-type">
-          <span class="partner-num">04</span>
-          <div>
-            <h2 class="partner-type-title">Fabricators and Build Teams</h2>
-            <p class="partner-type-body">Bring us in when the physical structure needs motion, projection, mapped content, or digital surfaces extending the build.</p>
-          </div>
-          <div class="partner-thumb">
-            <video autoplay muted loop playsinline preload="metadata">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Brightcell-vid.mp4" type="video/mp4" />
-            </video>
-          </div>
-        </div>
-
-        <div class="partner-type">
-          <span class="partner-num">05</span>
-          <div>
-            <h2 class="partner-type-title">Branding and Packaging Studios</h2>
-            <p class="partner-type-body">Bring us in when a brand identity or packaging system is approved and the client needs motion content before the campaign launches. We take the design language your team built and extend it into a screen-ready product world: launch films, retail screens, paid social, and PDP imagery from a single approved build.</p>
-          </div>
-          <div class="partner-thumb">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-3Cans.PNG" alt="3D product world built from brand identity" />
+          <div class="fit-col fit-col-negative">
+            <span class="fit-col-head">Probably not the right fit when</span>
+            <div class="fit-row"><span class="fit-marker"></span><span>The brief is generic AV rental or equipment sourcing.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>You're looking for overflow production at commodity rates.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>You have established in-house immersive or CGI capability.</span></div>
+            <div class="fit-row"><span class="fit-marker"></span><span>The visual world isn't part of the brief.</span></div>
           </div>
         </div>
       </div>
 
-      <!-- ── COMMON PROJECT TRIGGERS ── -->
-      <div class="qualify-block reveal">
-        <span class="eyebrow">Common project triggers</span>
-        <div class="use-cases-grid">
-          <div class="use-case-row">
-            <span class="use-case-label">Brand activations</span>
-            <span class="use-case-outcome">Your client wants the room to feel branded without turning the whole budget into scenic fabrication.</span>
+      <!-- ── SCOPE ── -->
+      <div class="lower-section reveal">
+        <div class="scope-inner">
+          <div class="scope-left">
+            <span class="eyebrow">Scope</span>
+            <h2>Structured around the brief, not a fixed service menu.</h2>
+            <p>Partner engagements are scoped by project type, delivery timeline, and how much creative direction we're taking versus receiving from your team.</p>
           </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Product launches</span>
-            <span class="use-case-outcome">The product needs a cinematic screen and room presence before, during, and after launch.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Brand identity handoffs</span>
-            <span class="use-case-outcome">The identity is approved and the client needs a motion-capable content system before photography and campaign production begin.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Trade show booths</span>
-            <span class="use-case-outcome">The build exists, but the booth needs motion and screen content strong enough to pull traffic.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Agency campaign extensions</span>
-            <span class="use-case-outcome">A campaign concept needs 3D product environments, motion loops, retail screens, or launch content.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Venue and hospitality installs</span>
-            <span class="use-case-outcome">A space needs seasonal or recurring visual identity without rebuilding the physical environment.</span>
-          </div>
-          <div class="use-case-row">
-            <span class="use-case-label">Fabrication add-ons</span>
-            <span class="use-case-outcome">A scenic build needs a digital layer so the story can change while the structure stays fixed.</span>
-          </div>
-        </div>
-
-        <div class="fit-pair">
-          <div class="fit-cell">
-            <span class="fit-label">Right fit</span>
-            <div class="fit-items">
-              <span class="fit-item">Agencies whose clients are asking for visual worlds they don't build in-house</span>
-              <span class="fit-item">Branding and packaging studios whose clients need motion before photography exists</span>
-              <span class="fit-item">Event producers who need a designed environment, not sourced AV</span>
-              <span class="fit-item">Fabricators whose builds need a digital layer to feel complete</span>
-              <span class="fit-item">Teams with tight timelines who need a partner that has done it under pressure</span>
-              <span class="fit-item">You need a specialist visual layer, but your team still needs to own the client relationship</span>
+          <div class="scope-cards">
+            <div class="scope-card">
+              <span class="scope-card-label">How it works</span>
+              <p>White-label is the default. Your client sees your team. We work to your brief, your timeline, and your deliverable spec. Billing structure is always your call.</p>
             </div>
-          </div>
-          <div class="fit-cell negative">
-            <span class="fit-label">Not a fit</span>
-            <div class="fit-items">
-              <span class="fit-item">Generic AV rental or equipment sourcing</span>
-              <span class="fit-item">Shops looking for overflow production at commodity rates</span>
-              <span class="fit-item">Agencies with established in-house immersive or CGI capability</span>
-              <span class="fit-item">Projects where the visual world isn't part of the brief</span>
-              <span class="fit-item">You need commodity AV rental, general event labor, or a vendor who only executes prebuilt files</span>
+            <div class="scope-card">
+              <span class="scope-card-label">Getting started</span>
+              <p>Send us the brief, deck, or rough client ask. We'll scope the work, flag any risks early, and come back with a timeline and production approach.</p>
             </div>
           </div>
         </div>
@@ -1545,10 +1687,19 @@
       </div>
 
       <!-- ── CTA ── -->
-      <section class="cta-close reveal">
+      <section id="contact" class="cta-close reveal">
         <p class="cta-close-text">Working on something that needs<br><em>a world behind it?</em></p>
-        <p class="cta-sub">Send us the brief, deck, brand guidelines, packaging files, product files, or rough client ask. We'll help identify what is possible, what is risky, and where Higher Roads fits.</p>
-        <a href="mailto:connect@higher-roads.com" class="cta-email-link">Start a partner conversation →</a>
+        <p class="cta-sub">Send us the brief, deck, or rough client ask. We'll help you identify where Higher Roads fits and come back with a scope and approach.</p>
+        <form
+          class="lead-form"
+          action="https://formspree.io/f/xrerprnv"
+          method="POST"
+        >
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="email" name="email" placeholder="Your email" required />
+          <textarea name="message" placeholder="Tell us about the project or client brief." rows="5"></textarea>
+          <button type="submit">Start a partner conversation</button>
+        </form>
       </section>
 
     </main>
