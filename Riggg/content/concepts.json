@@ -1,0 +1,101 @@
+{
+  "produce": {
+    "id": "produce",
+    "label": "Produce",
+    "machineName": "Conversation Intake Engine",
+    "eyebrow": "Machine 01",
+    "summary": "Captures raw expert conversations before they degrade into messy source files.",
+    "whatEnters": "Expert sessions, recordings, audio signals, camera feeds, overlays, and production notes.",
+    "whatHappens": "The machine stabilizes the source material with recording standards, scene controls, audio checks, and backup capture.",
+    "whatComesOut": "Clean source media that the rest of the factory can package, publish, measure, and preserve.",
+    "bullets": [
+      "Recording workflow",
+      "Scene switching",
+      "Audio monitoring",
+      "Backup capture"
+    ],
+    "repoPaths": [
+      "FRAMEWORK.md",
+      "produce/real-time-production/obs-production-standard.md"
+    ]
+  },
+  "package": {
+    "id": "package",
+    "label": "Package",
+    "machineName": "Asset Packaging Line",
+    "eyebrow": "Machine 02",
+    "summary": "Turns one source session into audience-ready media assets.",
+    "whatEnters": "Clean source recordings, transcripts, key moments, guest context, and topic notes.",
+    "whatHappens": "The machine cuts, labels, titles, describes, formats, and polishes the raw session into channel-ready pieces.",
+    "whatComesOut": "Titles, descriptions, clips, reels, thumbnails, chapters, quote cards, and guest assets.",
+    "bullets": [
+      "Title press",
+      "Description printer",
+      "Clip cutter",
+      "Thumbnail polisher"
+    ],
+    "repoPaths": [
+      "package/titles/top-performing-title-styles.md",
+      "package/descriptions/rss-feed-description-patterns.md"
+    ]
+  },
+  "publish": {
+    "id": "publish",
+    "label": "Publish",
+    "machineName": "Channel Launch Dock",
+    "eyebrow": "Machine 03",
+    "summary": "Sends packaged assets into channels while the owned website stays the canonical home.",
+    "whatEnters": "Finished content assets, release copy, channel variants, links, and publishing checklists.",
+    "whatHappens": "The machine routes each asset to the right destination and keeps the durable version anchored in owned space.",
+    "whatComesOut": "Website pages, RSS items, YouTube videos, LinkedIn posts, emails, premieres, and simulcast replays.",
+    "bullets": [
+      "Website home",
+      "RSS feed",
+      "YouTube",
+      "LinkedIn and email"
+    ],
+    "repoPaths": [
+      "publish/website/canonical-episode-page.md",
+      "publish/live-premieres/simulcast-standard.md"
+    ]
+  },
+  "prove": {
+    "id": "prove",
+    "label": "Prove",
+    "machineName": "Proof and Score Lab",
+    "eyebrow": "Machine 04",
+    "summary": "Measures what shipped and turns performance into factory feedback.",
+    "whatEnters": "Published assets, analytics, engagement signals, conversions, benchmarks, and evidence notes.",
+    "whatHappens": "The machine scores usefulness, repeatability, evidence level, and production fit.",
+    "whatComesOut": "Scorecards, evidence labels, benchmark checks, pattern improvements, and feedback signals.",
+    "bullets": [
+      "Scorecard",
+      "Evidence label",
+      "Benchmark check",
+      "Feedback signal"
+    ],
+    "repoPaths": [
+      "SCORING.md",
+      "EVIDENCE.md"
+    ]
+  },
+  "preserve": {
+    "id": "preserve",
+    "label": "Preserve",
+    "machineName": "Content Memory Archive",
+    "eyebrow": "Machine 05",
+    "summary": "Stores knowledge so every session can feed the next one.",
+    "whatEnters": "Transcripts, speaker labels, timestamps, metadata, tags, assets, and topic relationships.",
+    "whatHappens": "The machine indexes, tags, connects, and retrieves knowledge across the archive.",
+    "whatComesOut": "Searchable memory, reusable insights, vector retrieval, content libraries, and compounding knowledge.",
+    "bullets": [
+      "Transcript vault",
+      "Topic tags",
+      "Vector memory",
+      "Search retrieval"
+    ],
+    "repoPaths": [
+      "preserve/vector-memory/content-memory-standard.md"
+    ]
+  }
+}
