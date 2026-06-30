@@ -1,20 +1,49 @@
 {
+  "overview": {
+    "id": "overview",
+    "label": "Overview",
+    "sceneTitle": "Riggg Factory",
+    "machineName": "Owned Media Factory Map",
+    "kicker": "Start here",
+    "summary": "A bright factory map for exploring the Owned Media Index. Pick a machine, inspect its patterns, and save useful cards.",
+    "buttons": [
+      "Produce",
+      "Package",
+      "Publish",
+      "Prove",
+      "Preserve"
+    ],
+    "sources": [
+      "Owned Media Index",
+      "Factory operating model"
+    ]
+  },
   "produce": {
     "id": "produce",
     "label": "Produce",
-    "machineName": "Conversation Intake Engine",
-    "eyebrow": "Machine 01",
-    "summary": "Captures raw expert conversations before they degrade into messy source files.",
-    "whatEnters": "Expert sessions, recordings, audio signals, camera feeds, overlays, and production notes.",
-    "whatHappens": "The machine stabilizes the source material with recording standards, scene controls, audio checks, and backup capture.",
-    "whatComesOut": "Clean source media for packaging, publishing, measurement, and preservation.",
-    "bullets": [
-      "Recording workflow",
-      "Scene switching",
-      "Audio monitoring",
-      "Backup capture"
+    "sceneTitle": "Conversation Intake Engine",
+    "machineName": "Produce",
+    "kicker": "Capture the source",
+    "summary": "Captures raw expert conversations before they degrade into scattered files.",
+    "buttons": [
+      "OBS Standard",
+      "Audio Setup",
+      "Scene Controls",
+      "Backup Recording"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "OBS Production Standard",
+        "score": 4,
+        "evidence": "Practitioner observation",
+        "type": "Standard",
+        "whatItIs": "A repeatable live production setup for recording, overlays, scenes, audio, and backup capture.",
+        "qualityBar": "Clean audio, clear visuals, stable scenes, and a usable backup recording.",
+        "prompt": "Turn this recording workflow into a reusable production checklist for a recurring owned media show.",
+        "source": "produce/real-time-production/obs-production-standard.md"
+      }
+    ],
+    "sources": [
       "FRAMEWORK.md",
       "produce/real-time-production/obs-production-standard.md"
     ]
@@ -22,19 +51,40 @@
   "package": {
     "id": "package",
     "label": "Package",
-    "machineName": "Asset Packaging Line",
-    "eyebrow": "Machine 02",
-    "summary": "Turns one source session into audience-ready media assets.",
-    "whatEnters": "Clean source recordings, transcripts, key moments, guest context, and topic notes.",
-    "whatHappens": "The machine cuts, labels, titles, describes, formats, and polishes the raw session into channel-ready pieces.",
-    "whatComesOut": "Titles, descriptions, clips, reels, thumbnails, chapters, quote cards, and guest assets.",
-    "bullets": [
-      "Title press",
-      "Description printer",
-      "Clip cutter",
-      "Thumbnail polisher"
+    "sceneTitle": "Asset Packaging Line",
+    "machineName": "Package",
+    "kicker": "Turn sessions into assets",
+    "summary": "Transforms source sessions into titles, descriptions, clips, thumbnails, chapters, quotes, and guest assets.",
+    "buttons": [
+      "Titles",
+      "Descriptions",
+      "Clips",
+      "Thumbnails",
+      "Quote Cards"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Guest Story Arc",
+        "score": 4,
+        "evidence": "Practitioner observation",
+        "type": "Pattern",
+        "whatItIs": "A description pattern that frames the guest\u2019s story, the lesson, and the application for the audience.",
+        "qualityBar": "The description should make the guest relevant, name the tension, and promise a usable takeaway.",
+        "prompt": "Write an episode description using Guest Story Arc: guest context, tension, lesson, and audience application.",
+        "source": "patterns/package/descriptions/guest-story-arc"
+      },
+      {
+        "title": "Top Performing Title Styles",
+        "score": 4,
+        "evidence": "Pattern-backed",
+        "type": "Pattern library",
+        "whatItIs": "A title framework for turning a topic into a clear reason to click.",
+        "qualityBar": "The title should signal the audience, the topic, and the reason it matters.",
+        "prompt": "Generate 10 title options using curiosity, contrarian, benefit-driven, and how-to structures.",
+        "source": "package/titles/top-performing-title-styles.md"
+      }
+    ],
+    "sources": [
       "package/titles/top-performing-title-styles.md",
       "package/descriptions/rss-feed-description-patterns.md"
     ]
@@ -42,19 +92,31 @@
   "publish": {
     "id": "publish",
     "label": "Publish",
-    "machineName": "Channel Launch Dock",
-    "eyebrow": "Machine 03",
-    "summary": "Sends packaged assets into channels while the owned website stays the canonical home.",
-    "whatEnters": "Finished content assets, release copy, channel variants, links, and publishing checklists.",
-    "whatHappens": "The machine routes each asset to the right destination and keeps the durable version anchored in owned space.",
-    "whatComesOut": "Website pages, RSS items, YouTube videos, LinkedIn posts, emails, premieres, and simulcast replays.",
-    "bullets": [
-      "Website home",
-      "RSS feed",
+    "sceneTitle": "Channel Launch Dock",
+    "machineName": "Publish",
+    "kicker": "Route to the right places",
+    "summary": "Moves packaged assets into channels while the owned website remains the canonical home.",
+    "buttons": [
+      "Website",
+      "RSS",
       "YouTube",
-      "LinkedIn and email"
+      "LinkedIn",
+      "Email",
+      "Simulcast"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Canonical Episode Page",
+        "score": 5,
+        "evidence": "Workflow standard",
+        "type": "Standard",
+        "whatItIs": "A durable owned page that gives each episode, webinar, or session a stable home.",
+        "qualityBar": "The page should contain the core asset, summary, transcript or notes, guest context, links, and conversion path.",
+        "prompt": "Create a canonical episode page outline with hero, summary, key moments, guest context, transcript, related links, and CTA.",
+        "source": "publish/website/canonical-episode-page.md"
+      }
+    ],
+    "sources": [
       "publish/website/canonical-episode-page.md",
       "publish/live-premieres/simulcast-standard.md"
     ]
@@ -62,19 +124,30 @@
   "prove": {
     "id": "prove",
     "label": "Prove",
-    "machineName": "Proof and Score Lab",
-    "eyebrow": "Machine 04",
-    "summary": "Measures what shipped and turns performance into factory feedback.",
-    "whatEnters": "Published assets, analytics, engagement signals, conversions, benchmarks, and evidence notes.",
-    "whatHappens": "The machine scores usefulness, repeatability, evidence level, and production fit.",
-    "whatComesOut": "Scorecards, evidence labels, benchmark checks, pattern improvements, and feedback signals.",
-    "bullets": [
-      "Scorecard",
-      "Evidence label",
-      "Benchmark check",
-      "Feedback signal"
+    "sceneTitle": "Proof and Score Lab",
+    "machineName": "Prove",
+    "kicker": "Measure what matters",
+    "summary": "Scores patterns, checks evidence, and turns performance back into system learning.",
+    "buttons": [
+      "Score",
+      "Evidence",
+      "Benchmarks",
+      "Attribution",
+      "Conversion"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Pattern Scoring",
+        "score": 5,
+        "evidence": "System standard",
+        "type": "Scoring model",
+        "whatItIs": "A way to rank patterns by usefulness, repeatability, evidence, and fit for real production.",
+        "qualityBar": "A high score should mean the pattern is useful, repeatable, evidence-informed, and practical.",
+        "prompt": "Score this owned media pattern from 1 to 5 using usefulness, evidence, repeatability, and production fit.",
+        "source": "SCORING.md"
+      }
+    ],
+    "sources": [
       "SCORING.md",
       "EVIDENCE.md"
     ]
@@ -82,19 +155,30 @@
   "preserve": {
     "id": "preserve",
     "label": "Preserve",
-    "machineName": "Content Memory Archive",
-    "eyebrow": "Machine 05",
-    "summary": "Stores knowledge so every session can feed the next one.",
-    "whatEnters": "Transcripts, speaker labels, timestamps, metadata, tags, assets, and topic relationships.",
-    "whatHappens": "The machine indexes, tags, connects, and retrieves knowledge across the archive.",
-    "whatComesOut": "Searchable memory, reusable insights, vector retrieval, content libraries, and compounding knowledge.",
-    "bullets": [
-      "Transcript vault",
-      "Topic tags",
-      "Vector memory",
-      "Search retrieval"
+    "sceneTitle": "Content Memory Archive",
+    "machineName": "Preserve",
+    "kicker": "Make it compound",
+    "summary": "Stores transcripts, tags, speaker labels, metadata, and retrieval paths so every session feeds the next one.",
+    "buttons": [
+      "Transcripts",
+      "Tags",
+      "Vectors",
+      "Search",
+      "Reusable Memory"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Content Memory Standard",
+        "score": 5,
+        "evidence": "System standard",
+        "type": "Standard",
+        "whatItIs": "A structured way to preserve sessions so the archive becomes searchable and reusable.",
+        "qualityBar": "Saved content should include clean transcripts, speaker labels, timestamps, metadata, tags, access rules, and retrieval paths.",
+        "prompt": "Convert this session into a content memory entry with transcript metadata, speaker labels, topic tags, and retrieval notes.",
+        "source": "preserve/vector-memory/content-memory-standard.md"
+      }
+    ],
+    "sources": [
       "preserve/vector-memory/content-memory-standard.md"
     ]
   }

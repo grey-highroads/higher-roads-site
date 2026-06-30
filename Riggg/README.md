@@ -1,30 +1,43 @@
-# Riggg Factory Scene POC v4.1
+# Riggg Factory POC v5
 
-This fixes v4 by embedding concept data directly in `main.js` as fallback.
+This version moves away from the dark image overlay and toward a bright, branded, whimsical factory browser.
 
-Clicks work even if `content/concepts.json` fails to load.
+## What this proves
 
-## Run on GitHub Pages
+- Bright Riggg palette based on the supplied brand guidelines
+- Logo-safe placeholder area for the official Riggg mark
+- Factory world built from interface elements, not an image overlay
+- Machine scenes: Overview, Produce, Package, Publish, Prove, Preserve
+- Workstation drawer with index-style pattern cards
+- Pattern inspector with score, evidence, quality bar, prompt, and source
+- Save cards to a saved brief
+- Copy prompt or copy saved brief
 
-Upload these files and folders to the repo root:
+## Brand note
 
-assets/
-content/
+The header uses a wordmark placeholder and an R icon placeholder. Replace these with the official Riggg logo SVG or PNG when available.
+
+Suggested location:
+
+assets/riggg-logo.svg
+
+Then update the `.brand` markup in index.html.
+
+## File structure
+
 index.html
+styles.css
 main.js
 README.md
-styles.css
+content/
+  concepts.json
+assets/
+  place official logo assets here
 
-Then enable GitHub Pages from main branch root.
+## Deploy
 
-## Local preview
+Upload the contents of this folder to GitHub Pages or into the Higher Roads site route.
 
-Double-clicking index.html should work because concept data is embedded.
+Suggested Higher Roads route:
 
-For the full JSON override test, run:
-
-python3 -m http.server 8000
-
-Then open:
-
-http://localhost:8000
+labs/riggg-factory/

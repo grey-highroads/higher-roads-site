@@ -1,20 +1,49 @@
 const fallbackConcepts = {
+  "overview": {
+    "id": "overview",
+    "label": "Overview",
+    "sceneTitle": "Riggg Factory",
+    "machineName": "Owned Media Factory Map",
+    "kicker": "Start here",
+    "summary": "A bright factory map for exploring the Owned Media Index. Pick a machine, inspect its patterns, and save useful cards.",
+    "buttons": [
+      "Produce",
+      "Package",
+      "Publish",
+      "Prove",
+      "Preserve"
+    ],
+    "sources": [
+      "Owned Media Index",
+      "Factory operating model"
+    ]
+  },
   "produce": {
     "id": "produce",
     "label": "Produce",
-    "machineName": "Conversation Intake Engine",
-    "eyebrow": "Machine 01",
-    "summary": "Captures raw expert conversations before they degrade into messy source files.",
-    "whatEnters": "Expert sessions, recordings, audio signals, camera feeds, overlays, and production notes.",
-    "whatHappens": "The machine stabilizes the source material with recording standards, scene controls, audio checks, and backup capture.",
-    "whatComesOut": "Clean source media for packaging, publishing, measurement, and preservation.",
-    "bullets": [
-      "Recording workflow",
-      "Scene switching",
-      "Audio monitoring",
-      "Backup capture"
+    "sceneTitle": "Conversation Intake Engine",
+    "machineName": "Produce",
+    "kicker": "Capture the source",
+    "summary": "Captures raw expert conversations before they degrade into scattered files.",
+    "buttons": [
+      "OBS Standard",
+      "Audio Setup",
+      "Scene Controls",
+      "Backup Recording"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "OBS Production Standard",
+        "score": 4,
+        "evidence": "Practitioner observation",
+        "type": "Standard",
+        "whatItIs": "A repeatable live production setup for recording, overlays, scenes, audio, and backup capture.",
+        "qualityBar": "Clean audio, clear visuals, stable scenes, and a usable backup recording.",
+        "prompt": "Turn this recording workflow into a reusable production checklist for a recurring owned media show.",
+        "source": "produce/real-time-production/obs-production-standard.md"
+      }
+    ],
+    "sources": [
       "FRAMEWORK.md",
       "produce/real-time-production/obs-production-standard.md"
     ]
@@ -22,19 +51,40 @@ const fallbackConcepts = {
   "package": {
     "id": "package",
     "label": "Package",
-    "machineName": "Asset Packaging Line",
-    "eyebrow": "Machine 02",
-    "summary": "Turns one source session into audience-ready media assets.",
-    "whatEnters": "Clean source recordings, transcripts, key moments, guest context, and topic notes.",
-    "whatHappens": "The machine cuts, labels, titles, describes, formats, and polishes the raw session into channel-ready pieces.",
-    "whatComesOut": "Titles, descriptions, clips, reels, thumbnails, chapters, quote cards, and guest assets.",
-    "bullets": [
-      "Title press",
-      "Description printer",
-      "Clip cutter",
-      "Thumbnail polisher"
+    "sceneTitle": "Asset Packaging Line",
+    "machineName": "Package",
+    "kicker": "Turn sessions into assets",
+    "summary": "Transforms source sessions into titles, descriptions, clips, thumbnails, chapters, quotes, and guest assets.",
+    "buttons": [
+      "Titles",
+      "Descriptions",
+      "Clips",
+      "Thumbnails",
+      "Quote Cards"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Guest Story Arc",
+        "score": 4,
+        "evidence": "Practitioner observation",
+        "type": "Pattern",
+        "whatItIs": "A description pattern that frames the guest\u2019s story, the lesson, and the application for the audience.",
+        "qualityBar": "The description should make the guest relevant, name the tension, and promise a usable takeaway.",
+        "prompt": "Write an episode description using Guest Story Arc: guest context, tension, lesson, and audience application.",
+        "source": "patterns/package/descriptions/guest-story-arc"
+      },
+      {
+        "title": "Top Performing Title Styles",
+        "score": 4,
+        "evidence": "Pattern-backed",
+        "type": "Pattern library",
+        "whatItIs": "A title framework for turning a topic into a clear reason to click.",
+        "qualityBar": "The title should signal the audience, the topic, and the reason it matters.",
+        "prompt": "Generate 10 title options using curiosity, contrarian, benefit-driven, and how-to structures.",
+        "source": "package/titles/top-performing-title-styles.md"
+      }
+    ],
+    "sources": [
       "package/titles/top-performing-title-styles.md",
       "package/descriptions/rss-feed-description-patterns.md"
     ]
@@ -42,19 +92,31 @@ const fallbackConcepts = {
   "publish": {
     "id": "publish",
     "label": "Publish",
-    "machineName": "Channel Launch Dock",
-    "eyebrow": "Machine 03",
-    "summary": "Sends packaged assets into channels while the owned website stays the canonical home.",
-    "whatEnters": "Finished content assets, release copy, channel variants, links, and publishing checklists.",
-    "whatHappens": "The machine routes each asset to the right destination and keeps the durable version anchored in owned space.",
-    "whatComesOut": "Website pages, RSS items, YouTube videos, LinkedIn posts, emails, premieres, and simulcast replays.",
-    "bullets": [
-      "Website home",
-      "RSS feed",
+    "sceneTitle": "Channel Launch Dock",
+    "machineName": "Publish",
+    "kicker": "Route to the right places",
+    "summary": "Moves packaged assets into channels while the owned website remains the canonical home.",
+    "buttons": [
+      "Website",
+      "RSS",
       "YouTube",
-      "LinkedIn and email"
+      "LinkedIn",
+      "Email",
+      "Simulcast"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Canonical Episode Page",
+        "score": 5,
+        "evidence": "Workflow standard",
+        "type": "Standard",
+        "whatItIs": "A durable owned page that gives each episode, webinar, or session a stable home.",
+        "qualityBar": "The page should contain the core asset, summary, transcript or notes, guest context, links, and conversion path.",
+        "prompt": "Create a canonical episode page outline with hero, summary, key moments, guest context, transcript, related links, and CTA.",
+        "source": "publish/website/canonical-episode-page.md"
+      }
+    ],
+    "sources": [
       "publish/website/canonical-episode-page.md",
       "publish/live-premieres/simulcast-standard.md"
     ]
@@ -62,19 +124,30 @@ const fallbackConcepts = {
   "prove": {
     "id": "prove",
     "label": "Prove",
-    "machineName": "Proof and Score Lab",
-    "eyebrow": "Machine 04",
-    "summary": "Measures what shipped and turns performance into factory feedback.",
-    "whatEnters": "Published assets, analytics, engagement signals, conversions, benchmarks, and evidence notes.",
-    "whatHappens": "The machine scores usefulness, repeatability, evidence level, and production fit.",
-    "whatComesOut": "Scorecards, evidence labels, benchmark checks, pattern improvements, and feedback signals.",
-    "bullets": [
-      "Scorecard",
-      "Evidence label",
-      "Benchmark check",
-      "Feedback signal"
+    "sceneTitle": "Proof and Score Lab",
+    "machineName": "Prove",
+    "kicker": "Measure what matters",
+    "summary": "Scores patterns, checks evidence, and turns performance back into system learning.",
+    "buttons": [
+      "Score",
+      "Evidence",
+      "Benchmarks",
+      "Attribution",
+      "Conversion"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Pattern Scoring",
+        "score": 5,
+        "evidence": "System standard",
+        "type": "Scoring model",
+        "whatItIs": "A way to rank patterns by usefulness, repeatability, evidence, and fit for real production.",
+        "qualityBar": "A high score should mean the pattern is useful, repeatable, evidence-informed, and practical.",
+        "prompt": "Score this owned media pattern from 1 to 5 using usefulness, evidence, repeatability, and production fit.",
+        "source": "SCORING.md"
+      }
+    ],
+    "sources": [
       "SCORING.md",
       "EVIDENCE.md"
     ]
@@ -82,196 +155,220 @@ const fallbackConcepts = {
   "preserve": {
     "id": "preserve",
     "label": "Preserve",
-    "machineName": "Content Memory Archive",
-    "eyebrow": "Machine 05",
-    "summary": "Stores knowledge so every session can feed the next one.",
-    "whatEnters": "Transcripts, speaker labels, timestamps, metadata, tags, assets, and topic relationships.",
-    "whatHappens": "The machine indexes, tags, connects, and retrieves knowledge across the archive.",
-    "whatComesOut": "Searchable memory, reusable insights, vector retrieval, content libraries, and compounding knowledge.",
-    "bullets": [
-      "Transcript vault",
-      "Topic tags",
-      "Vector memory",
-      "Search retrieval"
+    "sceneTitle": "Content Memory Archive",
+    "machineName": "Preserve",
+    "kicker": "Make it compound",
+    "summary": "Stores transcripts, tags, speaker labels, metadata, and retrieval paths so every session feeds the next one.",
+    "buttons": [
+      "Transcripts",
+      "Tags",
+      "Vectors",
+      "Search",
+      "Reusable Memory"
     ],
-    "repoPaths": [
+    "patterns": [
+      {
+        "title": "Content Memory Standard",
+        "score": 5,
+        "evidence": "System standard",
+        "type": "Standard",
+        "whatItIs": "A structured way to preserve sessions so the archive becomes searchable and reusable.",
+        "qualityBar": "Saved content should include clean transcripts, speaker labels, timestamps, metadata, tags, access rules, and retrieval paths.",
+        "prompt": "Convert this session into a content memory entry with transcript metadata, speaker labels, topic tags, and retrieval notes.",
+        "source": "preserve/vector-memory/content-memory-standard.md"
+      }
+    ],
+    "sources": [
       "preserve/vector-memory/content-memory-standard.md"
     ]
   }
 };
 
-const overview = {
-  id: "overview",
-  label: "Overview",
-  machineName: "Choose a machine",
-  eyebrow: "Factory overview",
-  summary: "The factory map is the overview. Each machine opens a focused scene and a reusable concept card.",
-  whatEnters: "Raw expert conversations and source media.",
-  whatHappens: "The factory turns source material into owned media assets.",
-  whatComesOut: "Published assets, measured results, and reusable memory.",
-  bullets: ["Factory map", "Scene switching", "Reusable cards", "Saved concept tray"],
-  repoPaths: ["Owned Media Index"]
-};
-
 let concepts = fallbackConcepts;
-let activeConcept = overview;
+let currentScene = "overview";
+let currentPattern = null;
 let saved = [];
 
-const stage = document.querySelector("#stage");
-const hotspots = [...document.querySelectorAll(".hotspot")];
-const navButtons = [...document.querySelectorAll(".nav button")];
+const app = document.querySelector(".app");
+const navButtons = [...document.querySelectorAll("[data-scene]")].filter(el => el.tagName === "BUTTON");
+const topNavButtons = [...document.querySelectorAll(".topnav button")];
+const machines = [...document.querySelectorAll(".machine")];
 
-const fields = {
-  eyebrow: document.querySelector("#eyebrow"),
-  title: document.querySelector("#title"),
+const el = {
+  kicker: document.querySelector("#kicker"),
+  sceneTitle: document.querySelector("#scene-title"),
+  machineName: document.querySelector("#machine-name"),
   summary: document.querySelector("#summary"),
-  enters: document.querySelector("#enters"),
-  happens: document.querySelector("#happens"),
-  comesout: document.querySelector("#comesout"),
-  chips: document.querySelector("#chips"),
-  paths: document.querySelector("#paths"),
-  count: document.querySelector("#count"),
+  buttonBank: document.querySelector("#button-bank"),
+  sources: document.querySelector("#sources"),
+  drawerTitle: document.querySelector("#drawer-title"),
+  patternGrid: document.querySelector("#pattern-grid"),
+  backOverview: document.querySelector("#back-overview"),
+  inspector: document.querySelector("#inspector"),
+  closeInspector: document.querySelector("#close-inspector"),
+  inspectType: document.querySelector("#inspect-type"),
+  inspectTitle: document.querySelector("#inspect-title"),
+  inspectScore: document.querySelector("#inspect-score"),
+  inspectEvidence: document.querySelector("#inspect-evidence"),
+  inspectWhat: document.querySelector("#inspect-what"),
+  inspectQuality: document.querySelector("#inspect-quality"),
+  inspectPrompt: document.querySelector("#inspect-prompt"),
+  inspectSource: document.querySelector("#inspect-source"),
+  saveCard: document.querySelector("#save-card"),
+  copyPrompt: document.querySelector("#copy-prompt"),
+  saved: document.querySelector("#saved"),
+  savedCount: document.querySelector("#saved-count"),
   savedList: document.querySelector("#saved-list"),
-  toast: document.querySelector("#toast"),
-  savedDrawer: document.querySelector(".saved")
-};
-
-const saveButton = document.querySelector("#save");
-const copyButton = document.querySelector("#copy");
-const copySavedButton = document.querySelector("#copy-saved");
-const clearButton = document.querySelector("#clear");
-
-const glow = {
-  overview: ["50%", "50%"],
-  produce: ["16%", "37%"],
-  package: ["49%", "38%"],
-  publish: ["78%", "42%"],
-  prove: ["29%", "77%"],
-  preserve: ["62%", "75%"]
+  copyBrief: document.querySelector("#copy-brief"),
+  clearSaved: document.querySelector("#clear-saved"),
+  toast: document.querySelector("#toast")
 };
 
 function toast(message) {
-  fields.toast.textContent = message;
-  fields.toast.classList.add("show");
+  el.toast.textContent = message;
+  el.toast.classList.add("show");
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => fields.toast.classList.remove("show"), 1800);
+  toast.timer = setTimeout(() => el.toast.classList.remove("show"), 1800);
 }
 
-function setButtons(id) {
-  navButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.concept === id));
-  hotspots.forEach(btn => btn.classList.toggle("active", btn.dataset.concept === id));
-}
+function renderScene(sceneId) {
+  const scene = concepts[sceneId] || concepts.overview;
+  currentScene = sceneId;
+  app.dataset.scene = sceneId;
 
-function render(concept) {
-  activeConcept = concept;
-  const id = concept.id;
-  stage.dataset.scene = id;
-  const [x, y] = glow[id] || glow.overview;
-  stage.style.setProperty("--gx", x);
-  stage.style.setProperty("--gy", y);
-  setButtons(id);
+  topNavButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.scene === sceneId));
+  machines.forEach(btn => btn.classList.toggle("active", btn.dataset.scene === sceneId));
 
-  fields.eyebrow.textContent = concept.eyebrow;
-  fields.title.textContent = concept.machineName;
-  fields.summary.textContent = concept.summary;
-  fields.enters.textContent = concept.whatEnters;
-  fields.happens.textContent = concept.whatHappens;
-  fields.comesout.textContent = concept.whatComesOut;
-  fields.chips.innerHTML = concept.bullets.map(item => `<li>${item}</li>`).join("");
-  fields.paths.innerHTML = concept.repoPaths.map(item => `<li>${item}</li>`).join("");
+  el.kicker.textContent = scene.kicker;
+  el.sceneTitle.textContent = scene.sceneTitle;
+  el.machineName.textContent = scene.machineName;
+  el.summary.textContent = scene.summary;
 
-  const disabled = id === "overview";
-  saveButton.disabled = disabled;
-  copyButton.disabled = disabled;
-}
+  el.buttonBank.innerHTML = (scene.buttons || []).map(label => `<button type="button">${label}</button>`).join("");
+  el.sources.innerHTML = (scene.sources || []).map(source => `<li>${source}</li>`).join("");
 
-function showConcept(id) {
-  if (id === "overview") {
-    render(overview);
-    return;
+  el.drawerTitle.textContent = sceneId === "overview" ? "Choose a workstation" : `${scene.label} pattern cards`;
+
+  const patterns = scene.patterns || [];
+  if (!patterns.length) {
+    el.patternGrid.innerHTML = `
+      <article class="pattern-card">
+        <h3>Pick a machine</h3>
+        <p>The drawer will fill with pattern cards, source links, scores, evidence, and reusable prompts.</p>
+        <div class="meta-row"><span>Factory map</span><span>Overview</span></div>
+      </article>
+    `;
+  } else {
+    el.patternGrid.innerHTML = patterns.map((pattern, index) => `
+      <article class="pattern-card">
+        <h3>${pattern.title}</h3>
+        <p>${pattern.whatItIs}</p>
+        <div class="meta-row">
+          <span>Score ${pattern.score}</span>
+          <span>${pattern.evidence}</span>
+          <span>${pattern.type}</span>
+        </div>
+        <button type="button" data-pattern-index="${index}">Inspect card</button>
+      </article>
+    `).join("");
   }
-  if (!concepts[id]) {
-    toast("Concept missing.");
-    return;
+
+  el.patternGrid.querySelectorAll("[data-pattern-index]").forEach(btn => {
+    btn.addEventListener("click", () => openPattern(patterns[Number(btn.dataset.patternIndex)]));
+  });
+
+  if (sceneId !== "overview") {
+    toast(`${scene.label} workstation loaded.`);
   }
-  render(concepts[id]);
 }
 
-function textFor(concept) {
-  return `${concept.label}: ${concept.machineName}
-
-Summary:
-${concept.summary}
-
-What enters:
-${concept.whatEnters}
-
-What happens:
-${concept.whatHappens}
-
-What comes out:
-${concept.whatComesOut}
-
-Key parts:
-${concept.bullets.map(item => "- " + item).join("\n")}
-
-Repo basis:
-${concept.repoPaths.map(item => "- " + item).join("\n")}`;
+function openPattern(pattern) {
+  currentPattern = pattern;
+  el.inspectType.textContent = pattern.type;
+  el.inspectTitle.textContent = pattern.title;
+  el.inspectScore.textContent = `Score ${pattern.score}`;
+  el.inspectEvidence.textContent = pattern.evidence;
+  el.inspectWhat.textContent = pattern.whatItIs;
+  el.inspectQuality.textContent = pattern.qualityBar;
+  el.inspectPrompt.textContent = pattern.prompt;
+  el.inspectSource.textContent = `Source: ${pattern.source}`;
+  el.inspector.classList.add("open");
 }
 
-async function copyText(text, msg) {
+function cardToText(pattern) {
+  return `${pattern.title}
+
+Type: ${pattern.type}
+Score: ${pattern.score}
+Evidence: ${pattern.evidence}
+Source: ${pattern.source}
+
+What it is:
+${pattern.whatItIs}
+
+Quality bar:
+${pattern.qualityBar}
+
+Prompt template:
+${pattern.prompt}`;
+}
+
+async function copyText(text, message) {
   try {
     await navigator.clipboard.writeText(text);
-    toast(msg);
+    toast(message);
   } catch (error) {
     toast("Copy failed in this browser.");
   }
 }
 
-function saveConcept() {
-  if (activeConcept.id === "overview") return;
-  if (!saved.some(item => item.id === activeConcept.id)) {
-    saved.push(activeConcept);
+function saveCurrentCard() {
+  if (!currentPattern) {
+    toast("Inspect a pattern first.");
+    return;
+  }
+  if (!saved.some(item => item.title === currentPattern.title)) {
+    saved.push(currentPattern);
     renderSaved();
-    fields.savedDrawer.classList.add("open");
-    toast(`${activeConcept.label} saved.`);
+    el.saved.classList.add("open");
+    toast(`${currentPattern.title} saved.`);
   } else {
-    toast(`${activeConcept.label} already saved.`);
+    toast("This card is already saved.");
   }
 }
 
 function renderSaved() {
-  fields.count.textContent = saved.length;
-  fields.savedList.innerHTML = saved.map(item => `<li>${item.label}: ${item.machineName}</li>`).join("");
+  el.savedCount.textContent = saved.length;
+  el.savedList.innerHTML = saved.map(item => `<li>${item.title} · Score ${item.score}</li>`).join("");
 }
 
-function copySaved() {
+function copyBrief() {
   if (!saved.length) {
-    toast("Save at least one concept first.");
+    toast("Save at least one card first.");
     return;
   }
-  copyText("Riggg Factory Saved Concepts\n\n" + saved.map(textFor).join("\n\n---\n\n"), "Saved brief copied.");
+  copyText("Riggg Factory Saved Brief\n\n" + saved.map(cardToText).join("\n\n---\n\n"), "Saved brief copied.");
 }
 
-hotspots.forEach(btn => btn.addEventListener("click", () => showConcept(btn.dataset.concept)));
-navButtons.forEach(btn => btn.addEventListener("click", () => showConcept(btn.dataset.concept)));
-saveButton.addEventListener("click", saveConcept);
-copyButton.addEventListener("click", () => copyText(textFor(activeConcept), "Concept card copied."));
-copySavedButton.addEventListener("click", copySaved);
-clearButton.addEventListener("click", () => {
+navButtons.forEach(btn => btn.addEventListener("click", () => renderScene(btn.dataset.scene)));
+el.backOverview.addEventListener("click", () => renderScene("overview"));
+el.closeInspector.addEventListener("click", () => el.inspector.classList.remove("open"));
+el.saveCard.addEventListener("click", saveCurrentCard);
+el.copyPrompt.addEventListener("click", () => currentPattern ? copyText(currentPattern.prompt, "Prompt copied.") : toast("Inspect a pattern first."));
+el.copyBrief.addEventListener("click", copyBrief);
+el.clearSaved.addEventListener("click", () => {
   saved = [];
   renderSaved();
-  toast("Saved tray cleared.");
+  toast("Saved brief cleared.");
 });
 
 fetch("content/concepts.json", { cache: "no-store" })
   .then(res => res.ok ? res.json() : Promise.reject())
   .then(data => {
     concepts = data;
-    toast("Concept JSON loaded.");
+    renderScene("overview");
   })
   .catch(() => {
     concepts = fallbackConcepts;
-    toast("Using embedded concept data.");
-  })
-  .finally(() => render(overview));
+    renderScene("overview");
+  });

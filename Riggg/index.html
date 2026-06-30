@@ -3,70 +3,151 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Riggg Factory Scene POC</title>
+  <title>Riggg Factory v5</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="experience">
-    <section class="stage" id="stage" data-scene="overview">
-      <img src="assets/factory-bg.png" alt="Riggg owned media factory" class="stage__image">
-      <div class="hero-card">
-        <p>Riggg Factory</p>
-        <h1>Owned media becomes a working system.</h1>
-        <span>Click a machine to change scenes, inspect the concept, and save cards.</span>
+  <main class="app" data-scene="overview">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">R</div>
+        <div>
+          <strong>RIGGG</strong>
+          <span>Owned Media Factory</span>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Factory scenes">
+        <button data-scene="overview" class="active">Overview</button>
+        <button data-scene="produce">Produce</button>
+        <button data-scene="package">Package</button>
+        <button data-scene="publish">Publish</button>
+        <button data-scene="prove">Prove</button>
+        <button data-scene="preserve">Preserve</button>
+      </nav>
+    </header>
+
+    <section class="world">
+      <div class="sky"></div>
+      <div class="factory" id="factory">
+        <button class="machine machine--produce" data-scene="produce">
+          <span class="machine-roof"></span>
+          <span class="machine-body">
+            <i class="icon">●</i>
+            <b>Produce</b>
+            <small>Intake</small>
+          </span>
+        </button>
+
+        <button class="machine machine--package" data-scene="package">
+          <span class="machine-stack"></span>
+          <span class="machine-body">
+            <i class="icon">▦</i>
+            <b>Package</b>
+            <small>Assets</small>
+          </span>
+        </button>
+
+        <button class="machine machine--publish" data-scene="publish">
+          <span class="launch-tube"></span>
+          <span class="machine-body">
+            <i class="icon">➤</i>
+            <b>Publish</b>
+            <small>Channels</small>
+          </span>
+        </button>
+
+        <button class="machine machine--prove" data-scene="prove">
+          <span class="machine-gauge">5</span>
+          <span class="machine-body">
+            <i class="icon">✓</i>
+            <b>Prove</b>
+            <small>Score</small>
+          </span>
+        </button>
+
+        <button class="machine machine--preserve" data-scene="preserve">
+          <span class="archive-orb"></span>
+          <span class="machine-body">
+            <i class="icon">◎</i>
+            <b>Preserve</b>
+            <small>Memory</small>
+          </span>
+        </button>
+
+        <div class="pipe pipe--one"></div>
+        <div class="pipe pipe--two"></div>
+        <div class="conveyor">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="gnome gnome--one"><span></span></div>
+        <div class="gnome gnome--two"><span></span></div>
+        <div class="gnome gnome--three"><span></span></div>
       </div>
 
-      <button class="hotspot hotspot--produce" data-concept="produce"><span></span><b>Produce</b></button>
-      <button class="hotspot hotspot--package" data-concept="package"><span></span><b>Package</b></button>
-      <button class="hotspot hotspot--publish" data-concept="publish"><span></span><b>Publish</b></button>
-      <button class="hotspot hotspot--prove" data-concept="prove"><span></span><b>Prove</b></button>
-      <button class="hotspot hotspot--preserve" data-concept="preserve"><span></span><b>Preserve</b></button>
+      <aside class="scene-card">
+        <p id="kicker">Start here</p>
+        <h1 id="scene-title">Riggg Factory</h1>
+        <h2 id="machine-name">Owned Media Factory Map</h2>
+        <p id="summary">A bright factory map for exploring the Owned Media Index. Pick a machine, inspect its patterns, and save useful cards.</p>
 
-      <nav class="nav">
-        <button data-concept="overview" class="active">Overview</button>
-        <button data-concept="produce">Produce</button>
-        <button data-concept="package">Package</button>
-        <button data-concept="publish">Publish</button>
-        <button data-concept="prove">Prove</button>
-        <button data-concept="preserve">Preserve</button>
-      </nav>
+        <div class="button-bank" id="button-bank"></div>
+
+        <div class="source-list">
+          <strong>Sources</strong>
+          <ul id="sources"></ul>
+        </div>
+      </aside>
     </section>
 
-    <aside class="panel">
-      <p id="eyebrow">Factory overview</p>
-      <h2 id="title">Choose a machine</h2>
-      <p id="summary">The factory map is the overview. Each machine opens a focused scene and a reusable concept card.</p>
-
-      <div class="cards">
-        <section><h3>What enters</h3><p id="enters">Raw expert conversations and source media.</p></section>
-        <section><h3>What happens</h3><p id="happens">The factory turns source material into owned media assets.</p></section>
-        <section><h3>What comes out</h3><p id="comesout">Published assets, measured results, and reusable memory.</p></section>
+    <section class="workbench">
+      <div class="workbench-head">
+        <div>
+          <p>Workstation drawer</p>
+          <h2 id="drawer-title">Overview cards</h2>
+        </div>
+        <button id="back-overview">Back to overview</button>
       </div>
 
-      <ul id="chips" class="chips"></ul>
+      <div class="pattern-grid" id="pattern-grid"></div>
+    </section>
 
-      <div class="repo">
-        <h3>Repo basis</h3>
-        <ul id="paths"></ul>
+    <aside class="inspector" id="inspector" aria-live="polite">
+      <button class="close" id="close-inspector">Close</button>
+      <p id="inspect-type">Pattern</p>
+      <h2 id="inspect-title">Select a card</h2>
+      <div class="score-row">
+        <span id="inspect-score">Score 0</span>
+        <span id="inspect-evidence">Evidence</span>
       </div>
-
+      <h3>What it is</h3>
+      <p id="inspect-what">Choose a pattern card from a workstation drawer.</p>
+      <h3>Quality bar</h3>
+      <p id="inspect-quality">The detail appears here.</p>
+      <h3>Prompt template</h3>
+      <pre id="inspect-prompt"></pre>
+      <p class="source-path" id="inspect-source"></p>
       <div class="actions">
-        <button id="save" disabled>Save this concept</button>
-        <button id="copy" disabled>Copy card</button>
+        <button id="save-card">Save card</button>
+        <button id="copy-prompt">Copy prompt</button>
       </div>
     </aside>
 
-    <aside class="saved">
-      <div class="saved-head"><h2>Saved concepts</h2><strong id="count">0</strong></div>
+    <aside class="saved" id="saved">
+      <div class="saved-head">
+        <strong>Saved brief</strong>
+        <span id="saved-count">0</span>
+      </div>
       <ul id="saved-list"></ul>
       <div class="actions">
-        <button id="copy-saved">Copy saved brief</button>
-        <button id="clear">Clear</button>
+        <button id="copy-brief">Copy brief</button>
+        <button id="clear-saved">Clear</button>
       </div>
     </aside>
 
-    <div id="toast" class="toast"></div>
+    <div class="toast" id="toast"></div>
   </main>
+
   <script src="main.js"></script>
 </body>
 </html>
