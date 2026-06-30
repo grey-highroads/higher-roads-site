@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Riggg Factory Interactive POC</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="factory" aria-label="Riggg owned media factory interactive proof of concept">
+    <img src="assets/factory-bg.png" alt="Riggg owned media factory" class="factory__image" />
+
+    <div class="ambient ambient--one"></div>
+    <div class="ambient ambient--two"></div>
+    <div class="ambient ambient--three"></div>
+
+    <div class="workflow" aria-hidden="true">
+      <span class="workflow__packet packet-a"></span>
+      <span class="workflow__packet packet-b"></span>
+      <span class="workflow__packet packet-c"></span>
+    </div>
+
+    <button class="hotspot hotspot--produce" aria-label="Open Produce machine" aria-expanded="false" data-stage="produce">
+      <span class="hotspot__pulse"></span>
+      <span class="hotspot__label">Produce</span>
+    </button>
+
+    <button class="hotspot hotspot--package" aria-label="Open Package machine" aria-expanded="false" data-stage="package">
+      <span class="hotspot__pulse"></span>
+      <span class="hotspot__label">Package</span>
+    </button>
+
+    <button class="hotspot hotspot--publish" aria-label="Open Publish machine" aria-expanded="false" data-stage="publish">
+      <span class="hotspot__pulse"></span>
+      <span class="hotspot__label">Publish</span>
+    </button>
+
+    <button class="hotspot hotspot--prove" aria-label="Open Prove machine" aria-expanded="false" data-stage="prove">
+      <span class="hotspot__pulse"></span>
+      <span class="hotspot__label">Prove</span>
+    </button>
+
+    <button class="hotspot hotspot--preserve" aria-label="Open Preserve machine" aria-expanded="false" data-stage="preserve">
+      <span class="hotspot__pulse"></span>
+      <span class="hotspot__label">Preserve</span>
+    </button>
+
+    <button class="control control--run" type="button">
+      Run factory loop
+    </button>
+
+    <button class="control control--panic" type="button">
+      Gnome scramble
+    </button>
+
+    <section class="panel" id="stage-panel" aria-live="polite">
+      <p class="eyebrow" id="panel-eyebrow">Machine 01</p>
+      <h1 id="panel-title">Produce</h1>
+      <p id="panel-body">
+        Select a workstation to inspect the machine.
+      </p>
+      <div class="meter" aria-label="Machine activity meter">
+        <span class="meter__fill" id="meter-fill"></span>
+      </div>
+      <ul class="panel__list" id="panel-list"></ul>
+      <button class="panel__close" type="button">Close</button>
+    </section>
+
+    <aside class="score-card" aria-label="Factory score">
+      <p class="score-card__label">Factory score</p>
+      <div class="score-card__dial">
+        <span id="score-number">0</span>
+      </div>
+      <p id="score-caption">Idle</p>
+    </aside>
+
+    <div class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
