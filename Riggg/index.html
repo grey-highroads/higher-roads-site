@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Riggg Factory Interactive POC</title>
+  <title>Riggg Factory Fetching POC</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="factory" aria-label="Riggg owned media factory interactive proof of concept">
+  <main class="factory" aria-label="Riggg owned media factory fetching proof of concept">
     <img src="assets/factory-bg.png" alt="Riggg owned media factory" class="factory__image" />
 
-    <div class="ambient ambient--one"></div>
-    <div class="ambient ambient--two"></div>
-    <div class="ambient ambient--three"></div>
+    <div class="status-bar">
+      <span class="status-dot" id="manifest-dot"></span>
+      <span id="manifest-status">Using fallback content</span>
+    </div>
 
     <div class="workflow" aria-hidden="true">
       <span class="workflow__packet packet-a"></span>
@@ -49,20 +50,35 @@
       Run factory loop
     </button>
 
-    <button class="control control--panic" type="button">
-      Gnome scramble
+    <button class="control control--cache" type="button">
+      Show cache
     </button>
 
     <section class="panel" id="stage-panel" aria-live="polite">
-      <p class="eyebrow" id="panel-eyebrow">Machine 01</p>
-      <h1 id="panel-title">Produce</h1>
+      <p class="eyebrow" id="panel-eyebrow">Factory machine</p>
+      <h1 id="panel-title">Select a machine</h1>
       <p id="panel-body">
-        Select a workstation to inspect the machine.
+        The factory loads a small manifest first, then fetches detail content only when a workstation is selected.
       </p>
+
+      <div class="loading-row" id="loading-row">
+        <span class="spinner"></span>
+        <span>Fetching machine detail...</span>
+      </div>
+
       <div class="meter" aria-label="Machine activity meter">
         <span class="meter__fill" id="meter-fill"></span>
       </div>
+
       <ul class="panel__list" id="panel-list"></ul>
+
+      <div class="repo-box" id="repo-box">
+        <p class="repo-box__title">Repo source paths</p>
+        <ul id="repo-paths"></ul>
+      </div>
+
+      <p class="repo-note" id="repo-note"></p>
+
       <button class="panel__close" type="button">Close</button>
     </section>
 

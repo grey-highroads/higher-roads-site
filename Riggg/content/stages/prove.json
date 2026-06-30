@@ -1,0 +1,14 @@
+{
+  "id": "prove",
+  "machineName": "Proof and Score Lab",
+  "stageName": "Prove",
+  "summary": "This machine inspects what shipped. It scores patterns, checks evidence, and sends performance feedback back into the factory.",
+  "bullets": [
+    "Scorecard",
+    "Evidence label",
+    "Benchmark check",
+    "Feedback signal"
+  ],
+  "activity": 93,
+  "repoNotes": "In the live architecture, this detail file could be generated from SCORING.md, EVIDENCE.md, and benchmark entries."
+}

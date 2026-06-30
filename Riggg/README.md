@@ -1,25 +1,39 @@
-# Riggg Factory Browser POC v2
+# Riggg Factory Fetching POC v3
 
-A browser proof of concept for turning the Riggg factory render into an interactive explainer.
+This version proves the fetching architecture discussed for the Riggg Factory interactive demo.
 
-## What changed in v2
+## What this proves
 
-- Five clickable machine hotspots
-- Different content for Produce, Package, Publish, Prove, and Preserve
-- A factory loop button
-- Animated workflow packets moving through the factory
-- A score card that updates per stage
-- A machine activity meter inside the info panel
-- Hover feedback on hotspots
-- A gnome scramble button for a playful interaction
-- Ambient glow overlays
-- Escape key closes the panel
+- The page renders immediately with fallback content.
+- A small manifest loads on page open.
+- Machine detail is fetched only when a workstation gets clicked.
+- Detail JSON is cached in memory after the first click.
+- If fetching fails, fallback content keeps the demo working.
+- The next likely station can be prefetched quietly after a click.
+
+## File structure
+
+```text
+index.html
+styles.css
+main.js
+assets/
+  factory-bg.png
+content/
+  factory-manifest.json
+  stages/
+    produce.json
+    package.json
+    publish.json
+    prove.json
+    preserve.json
+```
 
 ## Run locally
 
-Open `index.html` in a browser.
+Because this version uses `fetch()`, open it through a local server instead of double-clicking `index.html`.
 
-For a local server:
+From inside this folder:
 
 ```bash
 python3 -m http.server 8000
@@ -31,25 +45,31 @@ Then open:
 http://localhost:8000
 ```
 
-## Files
-
-- `index.html`: page structure and controls
-- `styles.css`: layout, hotspots, panels, motion, responsive behavior
-- `main.js`: click states, workflow sequence, score updates
-- `assets/factory-bg.png`: Riggg factory render
-
 ## Demo script
 
-1. Open the page.
-2. Click Produce and show the machine panel.
-3. Click Package, Publish, Prove, and Preserve to show how each station explains the repo.
-4. Click Run factory loop to show the whole workflow.
-5. Click Gnome scramble as a playful proof of animation logic.
+1. Load the page.
+2. Watch the status pill change from fallback to fresh manifest.
+3. Click Produce.
+4. The panel opens with fallback/loading content, then swaps to fetched detail.
+5. Click Produce again.
+6. The panel loads from memory cache.
+7. Click Show cache.
+8. Click Run factory loop to trigger all machine detail loads.
 
-## Next steps
+## Architecture decision
 
-- Replace circular hotspots with SVG hit regions matching the actual machines.
-- Add sound effects for switches, tubes, and score stamps.
-- Split the render into layers for parallax.
-- Add small looped sprite animations for gnomes, gauges, lights, and conveyor belts.
-- Move stage content into a JSON file for easier editing.
+This POC uses local JSON files instead of pulling directly from GitHub raw URLs.
+
+For production, the same pattern stays intact:
+
+- Page load fetches a small manifest.
+- Click fetches only the selected station detail.
+- Fallback copy stays embedded in JavaScript.
+- Loaded detail stays cached in memory.
+- A GitHub Action or build script can regenerate the JSON from the live repo daily.
+
+## Why not fetch the full repo on page load?
+
+The repo changes often, but the viewer only needs the visible factory map at first. Fetching every obscure concept would add network cost and parsing work for content the viewer might never open.
+
+The manifest plus lazy-detail pattern keeps the page fresh without making the first load heavy.

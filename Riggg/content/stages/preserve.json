@@ -1,0 +1,14 @@
+{
+  "id": "preserve",
+  "machineName": "Content Memory Archive",
+  "stageName": "Preserve",
+  "summary": "This machine stores knowledge so every session can feed the next one. It gives the factory memory.",
+  "bullets": [
+    "Transcript vault",
+    "Topic tags",
+    "Vector memory",
+    "Search retrieval"
+  ],
+  "activity": 100,
+  "repoNotes": "In the live architecture, this detail file could be generated from preservation standards and memory patterns."
+}

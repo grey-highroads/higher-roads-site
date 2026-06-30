@@ -1,0 +1,14 @@
+{
+  "id": "publish",
+  "machineName": "Channel Launch Dock",
+  "stageName": "Publish",
+  "summary": "This machine sends packaged assets into the right channel while keeping the website as the canonical owned home.",
+  "bullets": [
+    "Website home",
+    "RSS feed",
+    "YouTube",
+    "LinkedIn and email"
+  ],
+  "activity": 67,
+  "repoNotes": "In the live architecture, this detail file could be generated from publish standards and channel playbooks."
+}

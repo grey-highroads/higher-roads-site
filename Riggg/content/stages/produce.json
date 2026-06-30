@@ -1,0 +1,14 @@
+{
+  "id": "produce",
+  "machineName": "Conversation Intake Engine",
+  "stageName": "Produce",
+  "summary": "This machine captures raw expert conversations before they degrade into messy source files. It turns recording decisions into production standards.",
+  "bullets": [
+    "Recording workflow",
+    "Scene switching",
+    "Audio monitoring",
+    "Backup capture"
+  ],
+  "activity": 74,
+  "repoNotes": "In the live architecture, this detail file could be generated from FRAMEWORK.md plus selected Produce-stage markdown files."
+}

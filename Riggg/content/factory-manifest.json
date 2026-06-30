@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0",
+  "source": "local POC manifest, designed to be replaced by generated repo manifest",
+  "updatedAt": "2026-06-29",
+  "stages": [
+    {
+      "id": "produce",
+      "stageName": "Produce",
+      "machineName": "Conversation Intake Engine",
+      "shortSummary": "Captures raw expert sessions with production-ready audio, video, scene, overlay, and backup standards.",
+      "score": 1,
+      "evidenceLevel": "practitioner observation",
+      "detailUrl": "content/stages/produce.json",
+      "repoPaths": [
+        "FRAMEWORK.md",
+        "produce/real-time-production/obs-production-standard.md"
+      ]
+    },
+    {
+      "id": "package",
+      "stageName": "Package",
+      "machineName": "Asset Packaging Line",
+      "shortSummary": "Turns sessions into titles, descriptions, clips, thumbnails, quote cards, chapters, and reusable assets.",
+      "score": 2,
+      "evidenceLevel": "pattern-backed",
+      "detailUrl": "content/stages/package.json",
+      "repoPaths": [
+        "package/titles/top-performing-title-styles.md",
+        "package/descriptions/rss-feed-description-patterns.md"
+      ]
+    },
+    {
+      "id": "publish",
+      "stageName": "Publish",
+      "machineName": "Channel Launch Dock",
+      "shortSummary": "Moves finished assets to website, RSS, YouTube, LinkedIn, email, live premieres, and simulcast destinations.",
+      "score": 3,
+      "evidenceLevel": "workflow standard",
+      "detailUrl": "content/stages/publish.json",
+      "repoPaths": [
+        "publish/website/canonical-episode-page.md",
+        "publish/live-premieres/simulcast-standard.md"
+      ]
+    },
+    {
+      "id": "prove",
+      "stageName": "Prove",
+      "machineName": "Proof and Score Lab",
+      "shortSummary": "Checks reach, engagement, conversion, attribution, evidence level, and production fit.",
+      "score": 4,
+      "evidenceLevel": "benchmark-backed",
+      "detailUrl": "content/stages/prove.json",
+      "repoPaths": [
+        "SCORING.md",
+        "EVIDENCE.md"
+      ]
+    },
+    {
+      "id": "preserve",
+      "stageName": "Preserve",
+      "machineName": "Content Memory Archive",
+      "shortSummary": "Stores transcripts, speaker labels, timestamps, tags, metadata, vectors, and retrieval paths.",
+      "score": 5,
+      "evidenceLevel": "system standard",
+      "detailUrl": "content/stages/preserve.json",
+      "repoPaths": [
+        "preserve/vector-memory/content-memory-standard.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "package",
+  "machineName": "Asset Packaging Line",
+  "stageName": "Package",
+  "summary": "This machine breaks one source session into audience-ready assets: title, description, clips, thumbnails, chapters, pull quotes, and guest materials.",
+  "bullets": [
+    "Title press",
+    "Description printer",
+    "Clip cutter",
+    "Thumbnail polisher"
+  ],
+  "activity": 88,
+  "repoNotes": "In the live architecture, this detail file could be generated from Package-stage pattern files."
+}
