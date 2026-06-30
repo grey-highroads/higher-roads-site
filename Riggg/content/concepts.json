@@ -7,7 +7,7 @@
     "summary": "Captures raw expert conversations before they degrade into messy source files.",
     "whatEnters": "Expert sessions, recordings, audio signals, camera feeds, overlays, and production notes.",
     "whatHappens": "The machine stabilizes the source material with recording standards, scene controls, audio checks, and backup capture.",
-    "whatComesOut": "Clean source media that the rest of the factory can package, publish, measure, and preserve.",
+    "whatComesOut": "Clean source media for packaging, publishing, measurement, and preservation.",
     "bullets": [
       "Recording workflow",
       "Scene switching",

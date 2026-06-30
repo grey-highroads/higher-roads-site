@@ -1,1 +1,72 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Riggg Factory Scene POC</title><link rel="stylesheet" href="styles.css"/></head><body><main class="experience"><section class="stage" id="stage" data-scene="overview"><img src="assets/factory-bg.png" alt="Riggg owned media factory overview" class="stage__image"/><div class="scene-card"><p>Riggg Factory</p><h1>Owned media becomes a working system.</h1><span>Choose a machine to shift from the factory map into a focused concept scene.</span></div><button class="hotspot hotspot--produce" data-concept="produce"><i></i><b>Produce</b></button><button class="hotspot hotspot--package" data-concept="package"><i></i><b>Package</b></button><button class="hotspot hotspot--publish" data-concept="publish"><i></i><b>Publish</b></button><button class="hotspot hotspot--prove" data-concept="prove"><i></i><b>Prove</b></button><button class="hotspot hotspot--preserve" data-concept="preserve"><i></i><b>Preserve</b></button><nav class="machine-nav"><button data-concept="overview" class="is-active">Overview</button><button data-concept="produce">Produce</button><button data-concept="package">Package</button><button data-concept="publish">Publish</button><button data-concept="prove">Prove</button><button data-concept="preserve">Preserve</button></nav></section><aside class="detail-panel"><p class="eyebrow" id="panel-eyebrow">Factory overview</p><h2 id="panel-title">Choose a machine</h2><p id="panel-summary">The factory map is the overview. Each machine opens a focused scene and a reusable concept card.</p><div class="detail-grid"><div><h3>What enters</h3><p id="what-enters">Raw expert conversations and source media.</p></div><div><h3>What happens</h3><p id="what-happens">The factory turns source material into owned media assets.</p></div><div><h3>What comes out</h3><p id="what-comes-out">Published assets, measured results, and reusable memory.</p></div></div><ul class="chip-list" id="chip-list"></ul><div class="repo-box"><p>Repo basis</p><ul id="repo-paths"></ul></div><div class="actions"><button id="save-concept">Save this concept</button><button id="copy-current">Copy card</button></div></aside><aside class="saved-drawer" id="saved-drawer"><div class="saved-drawer__header"><div><p class="eyebrow">Saved</p><h2>Concept tray</h2></div><span id="saved-count">0</span></div><ul id="saved-list"></ul><div class="actions"><button id="copy-saved">Copy saved brief</button><button id="clear-saved">Clear</button></div></aside><div class="toast"></div></main><script src="main.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riggg Factory Scene POC</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="experience">
+    <section class="stage" id="stage" data-scene="overview">
+      <img src="assets/factory-bg.png" alt="Riggg owned media factory" class="stage__image">
+      <div class="hero-card">
+        <p>Riggg Factory</p>
+        <h1>Owned media becomes a working system.</h1>
+        <span>Click a machine to change scenes, inspect the concept, and save cards.</span>
+      </div>
+
+      <button class="hotspot hotspot--produce" data-concept="produce"><span></span><b>Produce</b></button>
+      <button class="hotspot hotspot--package" data-concept="package"><span></span><b>Package</b></button>
+      <button class="hotspot hotspot--publish" data-concept="publish"><span></span><b>Publish</b></button>
+      <button class="hotspot hotspot--prove" data-concept="prove"><span></span><b>Prove</b></button>
+      <button class="hotspot hotspot--preserve" data-concept="preserve"><span></span><b>Preserve</b></button>
+
+      <nav class="nav">
+        <button data-concept="overview" class="active">Overview</button>
+        <button data-concept="produce">Produce</button>
+        <button data-concept="package">Package</button>
+        <button data-concept="publish">Publish</button>
+        <button data-concept="prove">Prove</button>
+        <button data-concept="preserve">Preserve</button>
+      </nav>
+    </section>
+
+    <aside class="panel">
+      <p id="eyebrow">Factory overview</p>
+      <h2 id="title">Choose a machine</h2>
+      <p id="summary">The factory map is the overview. Each machine opens a focused scene and a reusable concept card.</p>
+
+      <div class="cards">
+        <section><h3>What enters</h3><p id="enters">Raw expert conversations and source media.</p></section>
+        <section><h3>What happens</h3><p id="happens">The factory turns source material into owned media assets.</p></section>
+        <section><h3>What comes out</h3><p id="comesout">Published assets, measured results, and reusable memory.</p></section>
+      </div>
+
+      <ul id="chips" class="chips"></ul>
+
+      <div class="repo">
+        <h3>Repo basis</h3>
+        <ul id="paths"></ul>
+      </div>
+
+      <div class="actions">
+        <button id="save" disabled>Save this concept</button>
+        <button id="copy" disabled>Copy card</button>
+      </div>
+    </aside>
+
+    <aside class="saved">
+      <div class="saved-head"><h2>Saved concepts</h2><strong id="count">0</strong></div>
+      <ul id="saved-list"></ul>
+      <div class="actions">
+        <button id="copy-saved">Copy saved brief</button>
+        <button id="clear">Clear</button>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast"></div>
+  </main>
+  <script src="main.js"></script>
+</body>
+</html>

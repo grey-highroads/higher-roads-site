@@ -1,25 +1,12 @@
-# Riggg Factory Scene POC v4
+# Riggg Factory Scene POC v4.1
 
-This version proves the next UX direction.
+This fixes v4 by embedding concept data directly in `main.js` as fallback.
 
-What it proves:
+Clicks work even if `content/concepts.json` fails to load.
 
-- The factory image works as an overview map.
-- Clicking a concept changes the visual scene by zooming and reframing the factory.
-- Each concept updates a reusable card.
-- Users save concepts to a tray.
-- Users copy the current card or a saved brief.
-- Content lives in static JSON served with the page.
+## Run on GitHub Pages
 
-Run locally with:
-
-python3 -m http.server 8000
-
-Then open:
-
-http://localhost:8000
-
-Deploy by uploading these to GitHub Pages or a Higher Roads route:
+Upload these files and folders to the repo root:
 
 assets/
 content/
@@ -28,10 +15,16 @@ main.js
 README.md
 styles.css
 
-Suggested Higher Roads path:
+Then enable GitHub Pages from main branch root.
 
-labs/riggg-factory/
+## Local preview
 
-Next production step:
+Double-clicking index.html should work because concept data is embedded.
 
-Replace the zoomed single-image detail scenes with five dedicated scene renders for Produce, Package, Publish, Prove, and Preserve.
+For the full JSON override test, run:
+
+python3 -m http.server 8000
+
+Then open:
+
+http://localhost:8000
