@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scope & Quote Builder — Higher Roads</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="../images/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #e8782a;
+    --accent-dim: #c9621e;
+    --bg: #0a0906;
+    --surface: #161412;
+    --surface2: #1e1b18;
+    --border: #2a2620;
+    --text: #e8e2d9;
+    --text-dim: #c7c1b6;
+    --muted: #6b6258;
+    --success: #4caf7d;
+    --error: #e05252;
+    --info: #5b9bd5;
+    --warn: #d9a441;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* LOCK */
+  #lock-screen {
+    position: fixed; inset: 0; background: var(--bg); z-index: 100;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+  }
+  .lock-logo { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .lock-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 40px 48px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+  .lock-box h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 24px; }
+  .lock-label { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); align-self: flex-start; }
+  #lock-error { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: var(--error); min-height: 16px; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 60px; background: rgba(10,9,6,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 17.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+  .nav-label { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); }
+  .nav-lock-btn { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: pointer; transition: color 0.2s; }
+  .nav-lock-btn:hover { color: var(--text); }
+
+  /* MAIN */
+  #app { display: none; padding-top: 80px; padding-bottom: 140px; max-width: 920px; margin: 0 auto; padding-left: 32px; padding-right: 32px; position: relative; z-index: 1; }
+  .page-eyebrow { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .page-title { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 32px; margin-bottom: 10px; }
+  .page-sub { font-size: 15.5px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; max-width: 640px; }
+
+  /* TOKEN BAR */
+  .token-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+  .token-pill { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--bg); background: var(--muted); padding: 3px 8px; border-radius: 3px; white-space: nowrap; }
+  .token-bar input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: monospace; font-size: 13px; }
+  .token-bar input::placeholder { color: var(--muted); }
+  .token-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background 0.3s; }
+  .token-dot.live { background: var(--success); }
+
+  /* FORM */
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 26px 28px; margin-bottom: 16px; }
+  .section-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--bg); font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 13px; margin-right: 10px; flex-shrink: 0; }
+  .form-section-label { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+  .form-section-sub { font-size: 13.5px; color: var(--text-dim); margin-bottom: 18px; padding-left: 32px; line-height: 1.5; }
+  .internal-note { background: var(--surface2); border-left: 3px solid var(--warn); border-radius: 4px; padding: 10px 14px; font-size: 13.5px; color: var(--text); margin-bottom: 16px; line-height: 1.55; }
+  .internal-note strong { color: var(--warn); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.hidden { display: none; }
+
+  label { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+  label .req-star { color: var(--accent); }
+
+  input[type="text"], input[type="email"], input[type="number"], input[type="date"], select, textarea {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 10px 12px;
+    color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15.5px; font-weight: 300; outline: none;
+    transition: border-color 0.2s; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6258' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  select option { background: var(--surface2); }
+  select.flaggable:has(option[value="TBD"]:checked) { border-color: var(--warn); }
+  textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+  textarea.tall { min-height: 110px; }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+  .checkbox-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); }
+  .checkbox-row label { text-transform: none; letter-spacing: normal; font-size: 13.5px; color: var(--text); font-weight: 400; }
+
+  /* PRICING TABLE */
+  .price-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 10px; }
+  .price-row.equip-row { grid-template-columns: 2fr 1fr 1fr 1fr auto; }
+  .price-row.travel-row { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .btn-remove-row { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 5px; width: 34px; height: 38px; cursor: pointer; font-size: 17.5px; }
+  .btn-remove-row:hover { color: var(--error); border-color: var(--error); }
+  .btn-add-row { background: var(--surface2); border: 1px dashed var(--border); color: var(--text-dim); border-radius: 5px; padding: 8px 14px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; }
+  .btn-add-row:hover { color: var(--accent); border-color: var(--accent); }
+
+  .price-summary { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; margin-top: 18px; }
+  .price-line { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--text-dim); }
+  .price-line.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 10px; font-size: 17.5px; color: var(--text); font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+  .price-line.total .val { color: var(--accent); }
+  .price-scenario-label { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin: 14px 0 6px; }
+  .market-check { font-size: 12.5px; color: var(--text-dim); margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); line-height: 1.6; }
+
+  /* CHECKLIST */
+  .checklist-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; }
+  .checklist-item span { font-size: 14px; line-height: 1.5; }
+
+  /* OPEN ITEMS PANEL */
+  #openItemsPanel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; background: rgba(10,9,6,0.97); border-top: 1px solid var(--border); backdrop-filter: blur(8px); max-height: 40vh; overflow-y: auto; transform: translateY(calc(100% - 44px)); transition: transform 0.25s ease; }
+  #openItemsPanel.expanded { transform: translateY(0); }
+  .open-items-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 28px; cursor: pointer; }
+  .open-items-title { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+  .open-items-count { background: var(--warn); color: var(--bg); border-radius: 10px; padding: 1px 9px; font-size: 12px; }
+  .open-items-count.zero { background: var(--success); }
+  .open-items-list { padding: 0 28px 18px; max-width: 920px; margin: 0 auto; }
+  .open-item-row { font-size: 14px; color: var(--text); padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+  .open-item-row::before { content: '—'; color: var(--warn); }
+  .open-items-empty { font-size: 14px; color: var(--success); padding: 10px 0; }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .btn-push, .btn-summary { flex: 1; min-width: 200px; background: var(--accent); border: none; border-radius: 5px; padding: 14px 24px; color: #0a0906; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .btn-summary { background: var(--info); }
+  .btn-push:hover { background: var(--accent-dim); }
+  .btn-summary:hover { filter: brightness(0.9); }
+  .btn-push:active, .btn-summary:active { transform: scale(0.98); }
+  .btn-push:disabled, .btn-summary:disabled { background: var(--border); color: var(--text-dim); cursor: not-allowed; transform: none; }
+  .btn-clear { background: transparent; border: 1px solid var(--border); border-radius: 5px; padding: 14px 22px; color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+  .btn-clear:hover { border-color: var(--text); color: var(--text); }
+  .btn-primary { width: 100%; background: var(--accent); border: none; border-radius: 5px; padding: 13px 20px; color: #0a0906; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--accent-dim); }
+
+  /* SUMMARY OUTPUT */
+  #summaryCard { display: none; }
+  #summaryText { white-space: pre-wrap; font-family: 'Barlow', sans-serif; font-size: 14.5px; line-height: 1.7; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 20px; max-height: 480px; overflow-y: auto; }
+  .summary-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-small { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 9px 16px; color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+  .btn-small:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* SPINNER */
+  .spinner { width: 13px; height: 13px; border: 2px solid rgba(10,9,6,0.25); border-top-color: #0a0906; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+  .spinner.light { border-color: rgba(232,120,42,0.25); border-top-color: var(--accent); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 22px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.12em; transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 200; white-space: nowrap; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--error); color: var(--error); }
+
+  @media (max-width: 640px) {
+    #app { padding-left: 16px; padding-right: 16px; }
+    nav { padding: 0 16px; }
+    .form-card { padding: 18px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .price-row, .price-row.equip-row, .price-row.travel-row { grid-template-columns: 1fr; }
+    .lock-box { padding: 28px 24px; }
+    .open-items-bar, .open-items-list { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <span class="lock-logo">Higher Roads</span>
+  <div class="lock-box">
+    <h2>Team Access</h2>
+    <div style="width:100%;display:flex;flex-direction:column;gap:8px;">
+      <span class="lock-label">Password</span>
+      <input type="password" id="lock-input" placeholder="Enter password" autocomplete="current-password"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px 14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:16.5px;font-weight:300;outline:none;width:100%;" />
+    </div>
+    <div id="lock-error"></div>
+    <button class="btn-primary" onclick="unlock()">Enter</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="../">Higher Roads</a>
+  <span class="nav-label">Scope &amp; Quote Builder</span>
+  <button class="nav-lock-btn" onclick="lock()">Lock</button>
+</nav>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="page-eyebrow">Spaces / Business Development</div>
+  <h1 class="page-title">Activation Scope &amp; Quote Builder</h1>
+  <p class="page-sub">Walks every project through the same pre-scoping framework before a number goes on paper. Anything left unanswered shows up in the Open Items panel at the bottom, not in the client's inbox.</p>
+
+  <!-- Token bars -->
+  <div class="token-bar">
+    <span class="token-pill">Notion</span>
+    <input type="password" id="tokenInput" placeholder="secret_ or ntn_ token (saved in browser)" autocomplete="off" />
+    <div class="token-dot" id="tokenDot"></div>
+  </div>
+  <div class="token-bar">
+    <span class="token-pill" style="background:var(--info);">Claude</span>
+    <input type="password" id="claudeToken" placeholder="Anthropic API key (saved in browser)" autocomplete="off" />
+    <div class="token-dot" id="claudeDot"></div>
+  </div>
+
+  <!-- SECTION 0: PROJECT & RELATIONSHIP -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">0</span>Project &amp; Relationship</div>
+    <div class="form-section-sub">Who this is for and how it's routed.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Project Name <span class="req-star">*</span></label>
+        <input type="text" id="projectName" class="required-flag" data-label="Project name" placeholder="e.g. Starcatcher Box Truck Tour" />
+      </div>
+      <div class="field">
+        <label>Client / Brand</label>
+        <input type="text" id="clientBrand" placeholder="e.g. Southern Made client brand" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Relationship Type</label>
+        <select id="relationshipType" class="flaggable" onchange="toggleField('partnerName','Through Partner',this.value)">
+          <option value="Direct to Brand">Direct to Brand</option>
+          <option value="Through Partner">Through Partner</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field" id="partnerNameField">
+        <label>Partner Name</label>
+        <input type="text" id="partnerName" placeholder="e.g. Southern Made" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Contact Name</label>
+        <input type="text" id="contactName" placeholder="Primary point of contact" />
+      </div>
+      <div class="field">
+        <label>Contact Email</label>
+        <input type="email" id="contactEmail" placeholder="name@company.com" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Timeline (Green Light → First Activation)</label>
+        <input type="text" id="timeline" placeholder="e.g. 5-day turnaround from approval" />
+      </div>
+      <div class="field">
+        <label>Quote Status</label>
+        <select id="quoteStatus">
+          <option value="Draft">Draft</option>
+          <option value="Ready for Review">Ready for Review</option>
+          <option value="Sent">Sent</option>
+          <option value="Won">Won</option>
+          <option value="Lost">Lost</option>
+          <option value="On Hold">On Hold</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Budget Context</label>
+      <textarea id="budgetContext" placeholder="Not to anchor our number, but to know if the conversation is worth having."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 1: FORMAT & ENVIRONMENT -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">1</span>Format &amp; Environment</div>
+    <div class="form-section-sub">Determines the fundamental technical approach before any content or hardware conversation makes sense.</div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Structure Category</label>
+        <select id="structureCategory" class="flaggable" onchange="onFormatChange()">
+          <option value="Temporary / Fabricated Structure">Temporary / Fabricated Structure</option>
+          <option value="Mobile / Vehicle-Based">Mobile / Vehicle-Based</option>
+          <option value="Existing Venue / Room">Existing Venue / Room</option>
+          <option value="Other">Other</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Specific Format</label>
+        <input type="text" id="format" placeholder="e.g. dome, tent, box truck, shipping container, ballroom" />
+      </div>
+      <div class="field">
+        <label>Environment</label>
+        <select id="environment" class="flaggable" onchange="toggleField('outdoorTimeOfDay','Outdoor',this.value); toggleField('outdoorTimeOfDayMixed','Mixed',this.value); toggleWeatherFields()">
+          <option value="Indoor">Indoor</option>
+          <option value="Outdoor">Outdoor</option>
+          <option value="Mixed">Mixed</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field" id="outdoorTimeOfDayField">
+        <label>If Outdoor, Time of Day</label>
+        <input type="text" id="outdoorTimeOfDay" placeholder="Full daylight requires light-seal engineering" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Structure Owner</label>
+        <select id="structureOwner" class="flaggable">
+          <option value="Higher Roads scope">Higher Roads scope</option>
+          <option value="Client or separate vendor">Client or separate vendor</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Confirmed Interior Dimensions <span class="req-star">*</span></label>
+        <input type="text" id="interiorDimensions" class="required-flag" data-label="Confirmed interior dimensions" placeholder="Do not estimate projector count without real measurements" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Structure Type</label>
+        <select id="structureType" class="flaggable">
+          <option value="Purpose-built for projection">Purpose-built for projection</option>
+          <option value="Adapting existing space">Adapting existing space</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Structure / Conversion In Our Scope? <span class="req-star">*</span></label>
+        <select id="structureScopeDecision" class="flaggable">
+          <option value="In our scope">In our scope</option>
+          <option value="Explicitly excluded">Explicitly excluded</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Requires Fabrication/Conversion Before Use?</label>
+        <select id="structureConversionNeeded" class="flaggable" onchange="toggleField('structureConversionNotes','Yes',this.value)">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="N/A">N/A</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field hidden" id="structureConversionNotesField">
+        <label>Conversion Status / Notes</label>
+        <input type="text" id="structureConversionNotes" placeholder="e.g. done, in progress, not started, who owns it" />
+      </div>
+    </div>
+    <div class="grid-2 hidden" id="weatherContingencyRow">
+      <div class="field">
+        <label>Rain Plan / Backup Date</label>
+        <input type="text" id="rainPlan" />
+      </div>
+      <div class="field">
+        <label>Wind Limits / Structural Constraints</label>
+        <input type="text" id="windLimits" />
+      </div>
+    </div>
+    <div class="internal-note"><strong>Internal decision required:</strong> confirm whether structure/conversion is in scope or explicitly excluded before a number goes out.</div>
+  </div>
+
+  <!-- SECTION 2: EXPERIENCE DESIGN & CONTENT SCOPE -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">2</span>Experience Design &amp; Content Scope</div>
+    <div class="form-section-sub">What the creative team is actually building and how long it takes.</div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Discrete Beats / Scenes <span class="req-star">*</span></label>
+      <textarea id="experienceBeats" class="required-flag tall" data-label="Experience beats/scenes mapped" placeholder="Map every beat before touching the content estimate."></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Client-Supplied Content?</label>
+        <select id="clientSuppliedContent" class="flaggable" onchange="toggleField('clientContentDetails','Yes',this.value); toggleField('clientContentDetails','Partial',this.value)">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="Partial">Partial</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field hidden" id="clientContentDetailsField">
+        <label>Format &amp; Delivery Specs</label>
+        <input type="text" id="clientContentDetails" placeholder="Confirm format and delivery timeline" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Content Changes Per Visitor?</label>
+        <select id="personalizationPerVisitor" class="flaggable" onchange="togglePersonalizationSection()">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Experience Duration (Entry to Exit)</label>
+        <input type="text" id="experienceDuration" placeholder="e.g. 4 minutes" />
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Intended Emotional Arc</label>
+      <textarea id="emotionalArc" placeholder="Determines whether content needs to be cinematic-grade or functional-grade"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Audio In Our Scope?</label>
+        <select id="audioInScope" class="flaggable">
+          <option value="Yes">Yes</option>
+          <option value="No, handled separately">No, handled separately</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Synced Physical Props / Elements?</label>
+        <select id="syncedProps" class="flaggable" onchange="toggleField('syncedPropsDetails','Yes',this.value)">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="field hidden" id="syncedPropsDetailsField" style="margin-bottom:14px;">
+      <label>Sync Points (Each Is a Technical Integration)</label>
+      <textarea id="syncedPropsDetails" placeholder="List each sync point — not just a content decision"></textarea>
+    </div>
+    <div class="field">
+      <label>Where Client-Supplied Content Ends / Our Scope Begins <span class="req-star">*</span></label>
+      <textarea id="contentScopeBoundary" class="required-flag" data-label="Content scope boundary confirmed"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 3: INTERACTIVITY -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">3</span>Interactivity &amp; Trigger Logic</div>
+    <div class="form-section-sub">Highest-risk area for scope creep. Ask whether the interactivity needs to be real or just needs to feel real.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Passive or Interactive?</label>
+        <select id="interactivityType" class="flaggable" onchange="toggleInteractiveFields()">
+          <option value="Passive">Passive (visitor watches)</option>
+          <option value="Interactive">Interactive (visitor triggers something)</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field hidden" id="interactivityModeField">
+        <label>Scripted or Genuinely Responsive?</label>
+        <select id="interactivityMode">
+          <option value="Scripted / presence-based">Scripted / presence-based</option>
+          <option value="Genuinely responsive">Genuinely responsive (reads real-time visitor behavior)</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="field hidden" id="triggerMapField" style="margin-bottom:14px;">
+      <label>Trigger Map (Every Scene Transition) <span class="req-star">*</span></label>
+      <textarea id="triggerMap" class="required-flag tall" data-label="Trigger map for every scene transition"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field hidden" id="triggerSourceField">
+        <label>What Fires Each Trigger?</label>
+        <select id="triggerSource">
+          <option value="Presence sensor">Presence sensor</option>
+          <option value="Operator button">Operator button</option>
+          <option value="Timed sequence">Timed sequence</option>
+          <option value="Gesture recognition">Gesture recognition</option>
+          <option value="Other">Other</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Gesture / Motion Tracking Involved?</label>
+        <select id="gestureTracking" class="flaggable" onchange="toggleField('gestureSpecOwner','Yes',this.value)">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field hidden" id="gestureSpecOwnerField">
+        <label>Who Is Speccing / Building That System?</label>
+        <input type="text" id="gestureSpecOwner" placeholder="Different discipline from media production and pricing" />
+      </div>
+      <div class="field">
+        <label>Staffed Operator or Unattended?</label>
+        <select id="staffedOperator" class="flaggable">
+          <option value="Staffed">Staffed</option>
+          <option value="Unattended">Unattended</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Run-Throughs Per Day</label>
+      <input type="text" id="runsPerDay" placeholder="High throughput favors simpler trigger logic" />
+    </div>
+    <div class="internal-note"><strong>Higher Roads take:</strong> gesture tracking adds calibration burden, failure risk, and cost. Scripted presence-sensor logic with well-paced media achieves the same perceived responsiveness at a fraction of the risk.</div>
+  </div>
+
+  <!-- SECTION 4: PERSONALIZATION (conditional) -->
+  <div class="form-card hidden" id="personalizationSection">
+    <div class="form-section-label"><span class="section-num">4</span>Personalization &amp; Real-Time Systems</div>
+    <div class="form-section-sub">Any element that changes per visitor is a systems integration project, not pre-rendered media.</div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>What Changes Per Visitor and How</label>
+      <textarea id="personalizationInput" placeholder="Name, choice, selection, physical response?"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Who Captures the Input</label>
+        <input type="text" id="inputCaptureOwner" />
+      </div>
+      <div class="field">
+        <label>Who Owns the Intake System</label>
+        <input type="text" id="intakeSystemOwner" placeholder="Tablet, kiosk, app" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Who Owns Session Handling</label>
+        <input type="text" id="sessionHandlingOwner" placeholder="Right data follows the right visitor" />
+      </div>
+      <div class="field">
+        <label>Who Owns the Real-Time Render</label>
+        <input type="text" id="realTimeRenderOwner" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Moderation Required?</label>
+        <select id="moderationRequired" class="flaggable">
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Could Personalization Happen at Photo Output Instead of Live?</label>
+        <select id="photoOutputAlternative" class="flaggable">
+          <option value="Yes, viable">Yes, viable — dramatically simpler</option>
+          <option value="No, must be live">No, must be live</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="internal-note"><strong>Internal rule:</strong> do not scope or price the real-time rendering layer without a joint session with the technical team responsible for intake and session handling.</div>
+  </div>
+
+  <!-- SECTION 5: PHOTO & MEDIA CAPTURE -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">5</span>Photo &amp; Media Capture</div>
+    <div class="form-section-sub">Frequently mentioned as a deliverable, rarely fully scoped upfront.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Photo/Video Capture Part of the Experience?</label>
+        <select id="captureInExperience" class="flaggable" onchange="toggleCaptureFields()">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field hidden" id="cameraOwnerField">
+        <label>Who Owns the Camera/Capture Hardware</label>
+        <input type="text" id="cameraOwner" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field hidden" id="shutterTriggerField">
+        <label>Shutter Trigger Mechanism</label>
+        <input type="text" id="shutterTrigger" placeholder="Do not invent a mechanism without confirming it" />
+      </div>
+      <div class="field hidden" id="shutterVerifiedField">
+        <div class="checkbox-row" style="margin-top:22px;">
+          <input type="checkbox" id="shutterTriggerVerified" />
+          <label for="shutterTriggerVerified">Verified with whoever is building the trigger system</label>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2 hidden" id="captureExtraFields">
+      <div class="field">
+        <label>Lighting for Photo Moment In Our Scope?</label>
+        <select id="captureLightingScope">
+          <option value="In our scope">In our scope</option>
+          <option value="Separate">Separate</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Scope: Capture Only or Extends to Delivery?</label>
+        <select id="captureScopeExtent">
+          <option value="Capture moment only">Capture moment only</option>
+          <option value="Extends to delivery">Extends to delivery</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="field hidden" id="fileDestinationField">
+      <label>What Happens to the File After Capture</label>
+      <input type="text" id="fileDestination" placeholder="Printed on-site, texted, uploaded to kiosk, handed to vendor?" />
+    </div>
+    <div class="internal-note"><strong>Higher Roads take:</strong> never describe a specific camera trigger mechanism to a client without flagging it as assumed if it hasn't been verified by whoever is actually building it.</div>
+  </div>
+
+  <!-- SECTION 6: HARDWARE -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">6</span>Hardware</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Display Technology</label>
+        <select id="displayTech" class="flaggable">
+          <option value="Projection">Projection</option>
+          <option value="LED">LED</option>
+          <option value="Screen">Screen</option>
+          <option value="Mixed">Mixed</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Mounting Approach</label>
+        <input type="text" id="mountingApproach" placeholder="Central ceiling mount vs. wall-mounted flat surface" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Projector Count (If Applicable)</label>
+        <input type="text" id="projectorCount" placeholder="Do not estimate without confirmed dimensions" />
+      </div>
+      <div class="field">
+        <div class="checkbox-row" style="margin-top:22px;">
+          <input type="checkbox" id="projectorCountConfirmed" />
+          <label for="projectorCountConfirmed">Confirmed by technical lead, not assumed</label>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Media Server / Compute / Networking Needs</label>
+        <textarea id="mediaServerNeeds"></textarea>
+      </div>
+      <div class="field">
+        <label>Sensor Hardware Needed for Trigger System</label>
+        <textarea id="sensorHardware"></textarea>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Power Requirements</label>
+        <input type="text" id="powerRequirements" placeholder="Amperage needed, circuits, generator required" />
+      </div>
+      <div class="field">
+        <label>Who Provides Power</label>
+        <select id="powerProvider" class="flaggable">
+          <option value="Venue / client">Venue / client</option>
+          <option value="Higher Roads (generator)">Higher Roads (generator)</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Audio Hardware In Our Scope?</label>
+        <select id="audioHardwareInScope" class="flaggable">
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Rent or Buy?</label>
+        <select id="rentOrBuy" class="flaggable" onchange="onRentBuyChange()">
+          <option value="Rent">Rent</option>
+          <option value="Buy / Own">Buy / Own</option>
+          <option value="Mixed">Mixed</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="field hidden" id="capitalAuthField">
+      <div class="checkbox-row">
+        <input type="checkbox" id="capitalAuthConfirmed" />
+        <label for="capitalAuthConfirmed">Capital authorization confirmed by team (not committed to without alignment)</label>
+      </div>
+    </div>
+    <div class="internal-note"><strong>Rent vs. buy:</strong> single event, rental may be fine. Multi-stop tour, purchase is almost always better — owned gear travels with the installation and the cost is fixed regardless of stop count. Purchase is a capital authorization decision, not a pricing decision.</div>
+  </div>
+
+  <!-- SECTION 7: SAFETY & COMPLIANCE -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">7</span>Safety &amp; Compliance</div>
+    <div class="form-section-sub">Rarely surfaces until it blocks load-in. Worth a decision either way rather than a silent gap.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Fire Marshal Sign-Off Required?</label>
+        <select id="fireMarshalRequired" class="flaggable">
+          <option value="No">No</option>
+          <option value="Yes">Yes, especially if haze/fog is used</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Accessibility / ADA Considerations</label>
+        <input type="text" id="adaConsiderations" placeholder="Entry width, ramp, seating, sensory considerations for public-facing activation" />
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Electrical Certification Required?</label>
+        <select id="electricalCertRequired" class="flaggable">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Haze / Fog / Atmospheric Effects Used?</label>
+        <select id="hazeUsed" class="flaggable">
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8: INSTALLATION, CALIBRATION, EXECUTION -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">8</span>Installation, Calibration &amp; Execution</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Installation Days Needed</label>
+        <input type="text" id="installDays" />
+      </div>
+      <div class="field">
+        <label>Off-Site Prep Possible?</label>
+        <select id="offsitePrep" class="flaggable">
+          <option value="No, on-site only">No, on-site only</option>
+          <option value="Yes, meaningful off-site prep">Yes, meaningful off-site prep</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Calibration Requirements</label>
+      <textarea id="calibrationRequirements" placeholder="Surface mapping, sensor placement, content alignment"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>On-Site During Event</label>
+        <select id="onsiteStaffing" class="flaggable">
+          <option value="Operator">Operator</option>
+          <option value="Technician">Technician</option>
+          <option value="Unattended">Unattended</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Who Owns Strike</label>
+        <input type="text" id="strikeOwner" />
+      </div>
+    </div>
+    <div class="field" id="multiLocationRecalField">
+      <label>Multi-Location Recalibration Notes</label>
+      <textarea id="multiLocationRecalNote" placeholder="Installation does not survive transit intact — budget full recalibration at each new location"></textarea>
+    </div>
+    <div class="internal-note"><strong>Higher Roads take:</strong> on-site calibration and technical integration are the same work by the same people in sequence. Price as one implementation block, not two separate lines.</div>
+  </div>
+
+  <!-- SECTION 9: DURATION & TOUR STRUCTURE -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">9</span>Duration &amp; Tour Structure</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Duration Type</label>
+        <select id="durationType" class="flaggable" onchange="onDurationChange()">
+          <option value="Single Event">Single Event</option>
+          <option value="Multi-Day, Single Location">Multi-Day, Single Location</option>
+          <option value="Tour / Multi-Location">Tour / Multi-Location</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Number of Locations / Stops</label>
+        <input type="number" id="locationsCount" min="1" value="1" oninput="syncStopsFromLocations()" />
+      </div>
+    </div>
+    <div class="grid-2 hidden" id="tourFieldsRow">
+      <div class="field">
+        <label>Markets</label>
+        <input type="text" id="markets" placeholder="Travel, logistics, recalibration cost vary by market" />
+      </div>
+      <div class="field">
+        <label>Stops Per City (If Touring)</label>
+        <input type="text" id="stopsPerCity" />
+      </div>
+    </div>
+    <div class="field hidden" id="freightShippingField" style="margin-bottom:14px;">
+      <label>Freight / Equipment Shipping Between Stops</label>
+      <input type="text" id="freightShipping" placeholder="Separate from per-diem travel — equipment doesn't move itself" />
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Expected Daily Throughput</label>
+        <input type="text" id="dailyThroughput" placeholder="Visitors per hour, hours of operation" />
+      </div>
+      <div class="field">
+        <label>Budget Conversation Scope</label>
+        <select id="budgetConversationScope" class="flaggable">
+          <option value="Single event only">Single event only</option>
+          <option value="Full run">Full run</option>
+          <option value="Both, quoted separately">Both, quoted separately</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+    </div>
+    <div class="internal-note"><strong>Higher Roads take:</strong> content cost does not repeat across locations. Implementation labor does. Equipment cost scales with duration regardless of rent or own. Always quote single-event and full-run as separate scenarios.</div>
+  </div>
+
+  <!-- SECTION 10: SCOPE BOUNDARIES -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">10</span>Scope Boundaries &amp; Third-Party Dependencies</div>
+    <div class="form-section-sub">Scope ambiguity is where margin goes to die.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Explicitly In Our Scope <span class="req-star">*</span></label>
+        <textarea id="inScope" class="required-flag" data-label="In-scope items defined"></textarea>
+      </div>
+      <div class="field">
+        <label>Explicitly Not In Our Scope <span class="req-star">*</span></label>
+        <textarea id="outOfScope" class="required-flag" data-label="Out-of-scope items defined"></textarea>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Other Vendors Involved &amp; Who Owns Each Relationship</label>
+      <textarea id="otherVendors"></textarea>
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Third-Party Dependencies Affecting Timeline</label>
+      <textarea id="thirdPartyDependencies" placeholder="Client-supplied content, structure completion, outside engineering"></textarea>
+    </div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Intake / Visitor Flow Owner</label>
+        <input type="text" id="intakeFlowOwner" />
+      </div>
+      <div class="field">
+        <label>Photo Delivery Owner</label>
+        <input type="text" id="photoDeliveryOwner" />
+      </div>
+      <div class="field">
+        <label>Prop / Hardware Owner</label>
+        <input type="text" id="propHardwareOwner" placeholder="Orb, wristband, etc." />
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Content Ownership After Engagement</label>
+        <select id="contentOwnership" class="flaggable">
+          <option value="Higher Roads retains ownership, client licensed to use">Higher Roads retains ownership, client licensed to use</option>
+          <option value="Client owns final assets outright">Client owns final assets outright</option>
+          <option value="TBD">TBD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Included Creative Revision Rounds</label>
+        <input type="text" id="revisionRounds" placeholder="e.g. 2 rounds included, additional rounds are change orders" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Payment Terms / Deposit Structure</label>
+      <input type="text" id="paymentTerms" placeholder="Optional — may belong in the SOW rather than the scope itself" />
+    </div>
+  </div>
+
+  <!-- SECTION 11: PRICING -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">11</span>Pricing — Cost-Plus Calculator</div>
+    <div class="form-section-sub">Built from real labor hours and a margin target, not market comps. Content is one-time; implementation and travel scale with stops.</div>
+
+    <div class="form-section-label" style="font-size:12px;color:var(--text-dim);margin-top:6px;">Labor</div>
+    <div class="price-row">
+      <div class="field"><label>Creative / Content — Total Hours, One-Time</label><input type="number" id="contentHours" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Rate $/hr</label><input type="number" id="contentRate" value="150" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Cost</label><input type="text" id="contentCostDisplay" disabled /></div>
+      <div class="field"><label>&nbsp;</label><span style="font-size:12px;color:var(--text-dim);padding-top:8px;">One-time</span></div>
+      <div></div>
+    </div>
+    <div class="price-row">
+      <div class="field"><label>Technical Install — Hours Per Stop</label><input type="number" id="installHours" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Rate $/hr</label><input type="number" id="installRate" value="150" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Cost / Stop</label><input type="text" id="installCostDisplay" disabled /></div>
+      <div class="field"><label>&nbsp;</label><span style="font-size:12px;color:var(--text-dim);padding-top:8px;">Scales per stop</span></div>
+      <div></div>
+    </div>
+    <div class="price-row">
+      <div class="field"><label>Systems / Media Platform — Hours Per Stop</label><input type="number" id="platformHours" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Rate $/hr</label><input type="number" id="platformRate" value="150" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Cost / Stop</label><input type="text" id="platformCostDisplay" disabled /></div>
+      <div class="field"><label>&nbsp;</label><span style="font-size:12px;color:var(--text-dim);padding-top:8px;">Scales per stop</span></div>
+      <div></div>
+    </div>
+    <div class="price-row">
+      <div class="field"><label>Custom Labor Line (Optional)</label><input type="text" id="customLaborDesc" placeholder="Description" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Hours</label><input type="number" id="customLaborHours" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Rate $/hr</label><input type="number" id="customLaborRate" value="150" oninput="recalcPricing()" /></div>
+      <div class="field">
+        <label>Scales?</label>
+        <select id="customLaborScales" onchange="recalcPricing()">
+          <option value="one-time">One-time</option>
+          <option value="per-stop">Per stop</option>
+        </select>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="grid-2" style="margin-top:6px;">
+      <div class="field">
+        <label>Gross Margin Target %</label>
+        <input type="number" id="marginTarget" value="70" oninput="recalcPricing()" />
+      </div>
+      <div class="field">
+        <label>Billable Stops for This Pricing Run</label>
+        <input type="number" id="pricingStops" min="1" value="1" oninput="recalcPricing()" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="form-section-label" style="font-size:12px;color:var(--text-dim);">Equipment (Pass-Through, Near-Cost)</div>
+    <div id="equipRows"></div>
+    <button type="button" class="btn-add-row" onclick="addEquipRow()">+ Add Equipment Line</button>
+
+    <div class="divider"></div>
+    <div class="form-section-label" style="font-size:12px;color:var(--text-dim);">Travel (Pass-Through, Per Stop by Default)</div>
+    <div class="price-row travel-row">
+      <div class="field"><label>People</label><input type="number" id="travelPeople" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Days</label><input type="number" id="travelDays" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Per Diem $/Person/Day</label><input type="number" id="travelPerDiem" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Hard Costs (Flights, Hotel)</label><input type="number" id="travelHardCosts" value="0" oninput="recalcPricing()" /></div>
+    </div>
+    <div class="checkbox-row" style="margin-top:6px;">
+      <input type="checkbox" id="travelScalesPerStop" checked onchange="recalcPricing()" />
+      <label for="travelScalesPerStop">Travel cost scales per stop</label>
+    </div>
+
+    <div class="price-summary" id="priceSummary"></div>
+
+    <div class="market-check">
+      <strong>External sanity check only (not used in the calculation above):</strong> the internal Rate Reference lists market-rate ranges by line item (content production, technical setup, interactive elements, equipment). Use it to sense-check the number above against comparable past work, not to generate it.
+    </div>
+  </div>
+
+  <!-- SECTION 12: PRE-QUOTE CHECKLIST -->
+  <div class="form-card">
+    <div class="form-section-label"><span class="section-num">12</span>Internal Pre-Quote Checklist</div>
+    <div class="form-section-sub">Before any number leaves the studio.</div>
+    <div id="checklist"></div>
+  </div>
+
+  <!-- SUMMARY OUTPUT -->
+  <div class="form-card" id="summaryCard">
+    <div class="form-section-label">Partner-Facing Summary</div>
+    <div id="summaryText"></div>
+    <div class="summary-actions">
+      <button class="btn-small" onclick="copySummary()">Copy to Clipboard</button>
+      <button class="btn-small" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn-clear" onclick="clearForm()">Clear</button>
+    <button class="btn-summary" id="summaryBtn" onclick="generateSummary()">
+      <span id="summaryBtnText">Generate Partner Summary</span>
+      <span class="spinner light" id="summarySpinner"></span>
+    </button>
+    <button class="btn-push" id="pushBtn" onclick="pushToNotion()">
+      <span id="btnText">Push to Notion</span>
+      <span class="spinner" id="pushSpinner"></span>
+    </button>
+  </div>
+
+</div>
+
+<!-- OPEN ITEMS PANEL -->
+<div id="openItemsPanel">
+  <div class="open-items-bar" onclick="document.getElementById('openItemsPanel').classList.toggle('expanded')">
+    <span class="open-items-title">Open Items &amp; Assumptions <span class="open-items-count zero" id="openItemsCount">0</span></span>
+    <span style="font-size:12px;color:var(--text-dim);font-family:'Rajdhani',sans-serif;letter-spacing:0.1em;text-transform:uppercase;">Click to expand</span>
+  </div>
+  <div class="open-items-list" id="openItemsList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // CONFIG
+  const PASS         = 'givememoney!';
+  const DATABASE_ID  = ''; // TODO: paste the "Spaces Scope & Quotes" Notion database ID here once created
+  const WORKER_URL   = 'https://higher-roads-notion.grey-4fe.workers.dev/';
+  const CLAUDE_WORKER= 'https://higher-roads-claude.grey-4fe.workers.dev/';
+  const SESSION_KEY  = 'hr_quotebuilder_auth';
+  const NOTION_KEY   = 'hr_notion_token';
+  const CLAUDE_KEY   = 'hr_claude_key';
+
+  // ---------- LOCK ----------
+  function checkSession() { if (sessionStorage.getItem(SESSION_KEY) === '1') showApp(); }
+  function unlock() {
+    const input = document.getElementById('lock-input');
+    if (input.value === PASS) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.getElementById('lock-error').textContent = '';
+      showApp();
+    } else {
+      document.getElementById('lock-error').textContent = 'Incorrect password.';
+      input.value = ''; input.focus();
+    }
+  }
+  function lock() {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('lock-input').value = '';
+  }
+  function showApp() {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadTokens();
+    buildChecklist();
+    addEquipRow();
+    recalcPricing();
+    toggleWeatherFields();
+    scanOpenItems();
+  }
+  document.getElementById('lock-input').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+  // ---------- TOKENS ----------
+  function isValidNotion(v) { return (v.startsWith('secret_') || v.startsWith('ntn_')) && v.length > 20; }
+  function isValidClaude(v) { return v.startsWith('sk-ant-') && v.length > 20; }
+  function loadTokens() {
+    const n = localStorage.getItem(NOTION_KEY);
+    const c = localStorage.getItem(CLAUDE_KEY);
+    if (n) { document.getElementById('tokenInput').value = n; updateDot('tokenDot', isValidNotion(n)); }
+    if (c) { document.getElementById('claudeToken').value = c; updateDot('claudeDot', isValidClaude(c)); }
+  }
+  function updateDot(id, valid) { document.getElementById(id).classList.toggle('live', valid); }
+  document.addEventListener('DOMContentLoaded', () => {
+    checkSession();
+    document.getElementById('tokenInput').addEventListener('input', e => {
+      const v = e.target.value.trim();
+      updateDot('tokenDot', isValidNotion(v));
+      if (isValidNotion(v)) localStorage.setItem(NOTION_KEY, v);
+    });
+    document.getElementById('claudeToken').addEventListener('input', e => {
+      const v = e.target.value.trim();
+      updateDot('claudeDot', isValidClaude(v));
+      if (isValidClaude(v)) localStorage.setItem(CLAUDE_KEY, v);
+    });
+    // live-scan open items on any input change
+    document.getElementById('app').addEventListener('input', debounce(scanOpenItems, 400));
+    document.getElementById('app').addEventListener('change', debounce(scanOpenItems, 100));
+  });
+
+  function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  // ---------- HELPERS ----------
+  function fv(id) { const el = document.getElementById(id); return el ? (el.value || '').trim() : ''; }
+  function nv(id) { return parseFloat(fv(id)) || 0; }
+  function isChecked(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+  function setField(id, val) { const el = document.getElementById(id); if (el && val) el.value = val; }
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 4500);
+  }
+  function toggleField(fieldId, matchVal, currentVal) {
+    const wrap = document.getElementById(fieldId + 'Field');
+    if (wrap) wrap.classList.toggle('hidden', currentVal !== matchVal);
+  }
+
+  // ---------- CONDITIONAL FIELD LOGIC ----------
+  function onFormatChange() {
+    // structure category no longer drives hardcoded per-format fields;
+    // fabrication/conversion is captured generically below regardless of category.
+  }
+  function toggleWeatherFields() {
+    const env = fv('environment');
+    document.getElementById('weatherContingencyRow').classList.toggle('hidden', env !== 'Outdoor' && env !== 'Mixed');
+  }
+  function togglePersonalizationSection() {
+    document.getElementById('personalizationSection').classList.toggle('hidden', fv('personalizationPerVisitor') !== 'Yes');
+  }
+  function toggleInteractiveFields() {
+    const isInteractive = fv('interactivityType') === 'Interactive';
+    ['interactivityModeField','triggerMapField','triggerSourceField'].forEach(id => {
+      document.getElementById(id).classList.toggle('hidden', !isInteractive);
+    });
+  }
+  function toggleCaptureFields() {
+    const yes = fv('captureInExperience') === 'Yes';
+    ['cameraOwnerField','shutterTriggerField','shutterVerifiedField','captureExtraFields','fileDestinationField'].forEach(id => {
+      document.getElementById(id).classList.toggle('hidden', !yes);
+    });
+  }
+  function onRentBuyChange() {
+    const buy = fv('rentOrBuy') === 'Buy / Own' || fv('rentOrBuy') === 'Mixed';
+    const isTour = fv('durationType') === 'Tour / Multi-Location';
+    document.getElementById('capitalAuthField').classList.toggle('hidden', !(buy && isTour));
+  }
+  function onDurationChange() {
+    const isTour = fv('durationType') === 'Tour / Multi-Location';
+    document.getElementById('tourFieldsRow').classList.toggle('hidden', !isTour);
+    document.getElementById('freightShippingField').classList.toggle('hidden', !isTour);
+    onRentBuyChange();
+  }
+  function syncStopsFromLocations() {
+    const loc = nv('locationsCount') || 1;
+    document.getElementById('pricingStops').value = loc;
+    recalcPricing();
+  }
+
+  // ---------- EQUIPMENT ROWS ----------
+  let equipRowCount = 0;
+  function addEquipRow() {
+    equipRowCount++;
+    const id = 'equip' + equipRowCount;
+    const row = document.createElement('div');
+    row.className = 'price-row equip-row';
+    row.id = id;
+    row.innerHTML = `
+      <div class="field"><label>Description</label><input type="text" id="${id}_desc" placeholder="e.g. Projector rental, 4 units" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Cost ($)</label><input type="number" id="${id}_cost" value="0" oninput="recalcPricing()" /></div>
+      <div class="field"><label>Handling Markup %</label><input type="number" id="${id}_markup" value="0" oninput="recalcPricing()" /></div>
+      <div class="field">
+        <label>Scales?</label>
+        <select id="${id}_scales" onchange="recalcPricing()">
+          <option value="per-stop">Per stop</option>
+          <option value="one-time">One-time</option>
+        </select>
+      </div>
+      <button type="button" class="btn-remove-row" onclick="removeRow('${id}')">×</button>
+    `;
+    document.getElementById('equipRows').appendChild(row);
+  }
+  function removeRow(id) { const el = document.getElementById(id); if (el) el.remove(); recalcPricing(); }
+
+  // ---------- PRICING ----------
+  function recalcPricing() {
+    const margin = Math.min(Math.max(nv('marginTarget'), 0), 95) / 100;
+    const stops = Math.max(nv('pricingStops') || 1, 1);
+
+    const contentCost = nv('contentHours') * nv('contentRate');
+    const installCostPerStop = nv('installHours') * nv('installRate');
+    const platformCostPerStop = nv('platformHours') * nv('platformRate');
+    const customHours = nv('customLaborHours');
+    const customRate = nv('customLaborRate');
+    const customCost = customHours * customRate;
+    const customScalesPerStop = fv('customLaborScales') === 'per-stop';
+
+    document.getElementById('contentCostDisplay').value = '$' + contentCost.toLocaleString();
+    document.getElementById('installCostDisplay').value = '$' + installCostPerStop.toLocaleString();
+    document.getElementById('platformCostDisplay').value = '$' + platformCostPerStop.toLocaleString();
+
+    // equipment
+    let equipOneTime = 0, equipPerStop = 0;
+    document.querySelectorAll('#equipRows .price-row').forEach(row => {
+      const id = row.id;
+      const cost = parseFloat(document.getElementById(id + '_cost')?.value) || 0;
+      const markup = parseFloat(document.getElementById(id + '_markup')?.value) || 0;
+      const scales = document.getElementById(id + '_scales')?.value;
+      const line = cost * (1 + markup / 100);
+      if (scales === 'per-stop') equipPerStop += line; else equipOneTime += line;
+    });
+
+    // travel
+    const travelPerStop = (nv('travelPeople') * nv('travelDays') * nv('travelPerDiem')) + nv('travelHardCosts');
+    const travelScales = isChecked('travelScalesPerStop');
+
+    function scenario(numStops) {
+      const laborCost = contentCost
+        + numStops * (installCostPerStop + platformCostPerStop)
+        + (customScalesPerStop ? numStops * customCost : customCost);
+      const laborBillable = margin < 1 ? laborCost / (1 - margin) : laborCost;
+      const equip = equipOneTime + numStops * equipPerStop;
+      const travel = travelScales ? numStops * travelPerStop : travelPerStop;
+      return { laborCost, laborBillable, equip, travel, total: laborBillable + equip + travel };
+    }
+
+    const single = scenario(1);
+    const fullRun = scenario(stops);
+    window._pricingResult = { single, fullRun, stops, margin: margin * 100 };
+
+    const summary = document.getElementById('priceSummary');
+    let html = '';
+    html += `<div class="price-scenario-label">Single-Event</div>`;
+    html += `<div class="price-line"><span>Labor cost</span><span>$${single.laborCost.toLocaleString()}</span></div>`;
+    html += `<div class="price-line"><span>Labor billable (at ${(margin*100).toFixed(0)}% margin)</span><span>$${Math.round(single.laborBillable).toLocaleString()}</span></div>`;
+    html += `<div class="price-line"><span>Equipment pass-through</span><span>$${Math.round(single.equip).toLocaleString()}</span></div>`;
+    html += `<div class="price-line"><span>Travel pass-through</span><span>$${Math.round(single.travel).toLocaleString()}</span></div>`;
+    html += `<div class="price-line total"><span>Single-Event Total</span><span class="val">$${Math.round(single.total).toLocaleString()}</span></div>`;
+
+    if (stops > 1) {
+      html += `<div class="price-scenario-label">Full Run (${stops} stops)</div>`;
+      html += `<div class="price-line"><span>Labor cost</span><span>$${Math.round(fullRun.laborCost).toLocaleString()}</span></div>`;
+      html += `<div class="price-line"><span>Labor billable (at ${(margin*100).toFixed(0)}% margin)</span><span>$${Math.round(fullRun.laborBillable).toLocaleString()}</span></div>`;
+      html += `<div class="price-line"><span>Equipment pass-through</span><span>$${Math.round(fullRun.equip).toLocaleString()}</span></div>`;
+      html += `<div class="price-line"><span>Travel pass-through</span><span>$${Math.round(fullRun.travel).toLocaleString()}</span></div>`;
+      html += `<div class="price-line total"><span>Full-Run Total</span><span class="val">$${Math.round(fullRun.total).toLocaleString()}</span></div>`;
+    }
+    summary.innerHTML = html;
+  }
+
+  // ---------- CHECKLIST ----------
+  const CHECKLIST_ITEMS = [
+    'Real interior dimensions confirmed, not assumed',
+    "Content hours estimated from actual scope, not from external benchmarks",
+    "Implementation hours estimated, covering all phases from prep through strike",
+    'Equipment spec confirmed by the technical lead, not assumed',
+    'All technical mechanisms described to the client are either verified or explicitly flagged as assumed',
+    'Scope boundaries clearly defined and exclusions listed',
+    'Single-event vs. full-run priced separately if duration is in play',
+    'Capital authorization confirmed if equipment purchase is part of the model',
+    'Partner markup accounted for in how the number is structured',
+    'Open Items panel reviewed and resolved or knowingly accepted'
+  ];
+  function buildChecklist() {
+    const wrap = document.getElementById('checklist');
+    wrap.innerHTML = CHECKLIST_ITEMS.map((label, i) => `
+      <div class="checklist-item">
+        <input type="checkbox" id="check${i}" />
+        <span>${label}</span>
+      </div>
+    `).join('');
+  }
+
+  // ---------- OPEN ITEMS / ASSUMPTIONS SCAN ----------
+  function scanOpenItems() {
+    const items = [];
+    document.querySelectorAll('select.flaggable').forEach(el => {
+      // skip hidden/conditional fields
+      if (el.closest('.hidden')) return;
+      if (el.value === 'TBD') {
+        const label = el.previousElementSibling?.textContent?.replace('*','').trim() || el.id;
+        items.push(label);
+      }
+    });
+    document.querySelectorAll('.required-flag').forEach(el => {
+      if (el.closest('.hidden')) return;
+      if (!el.value.trim()) items.push(el.dataset.label || el.id);
+    });
+    // special assumption checks
+    if (!document.getElementById('shutterTriggerField').classList.contains('hidden')) {
+      if (fv('shutterTrigger') && !isChecked('shutterTriggerVerified')) {
+        items.push('Camera shutter trigger described but not yet verified with whoever builds the trigger system');
+      }
+    }
+    if (fv('projectorCount') && !isChecked('projectorCountConfirmed')) {
+      items.push('Projector count entered but not yet confirmed by the technical lead');
+    }
+    if (!document.getElementById('capitalAuthField').classList.contains('hidden') && !isChecked('capitalAuthConfirmed')) {
+      items.push('Equipment purchase implied by rent/buy + tour, but capital authorization not yet confirmed');
+    }
+    if (fv('interactivityType') === 'Interactive' && fv('interactivityMode') === 'TBD') {
+      items.push('Interactive experience selected but scripted vs. genuinely responsive not yet decided');
+    }
+
+    const panel = document.getElementById('openItemsList');
+    const countEl = document.getElementById('openItemsCount');
+    countEl.textContent = items.length;
+    countEl.classList.toggle('zero', items.length === 0);
+    panel.innerHTML = items.length
+      ? items.map(i => `<div class="open-item-row">${i}</div>`).join('')
+      : `<div class="open-items-empty">No open items detected. Doesn't mean it's ready — review the checklist too.</div>`;
+    return items;
+  }
+
+  // ---------- SECTION METADATA FOR EXPORT ----------
+  const SECTIONS = [
+    { title: 'Project & Relationship', fields: [
+      ['projectName','Project Name'],['clientBrand','Client / Brand'],['relationshipType','Relationship Type'],
+      ['partnerName','Partner'],['contactName','Contact'],['contactEmail','Contact Email'],
+      ['timeline','Timeline'],['budgetContext','Budget Context']
+    ]},
+    { title: 'Format & Environment', fields: [
+      ['structureCategory','Structure Category'],['format','Specific Format'],['environment','Environment'],['outdoorTimeOfDay','Time of Day'],
+      ['structureOwner','Structure Owner'],['interiorDimensions','Interior Dimensions'],
+      ['structureType','Structure Type'],['structureScopeDecision','Structure/Conversion Scope'],
+      ['structureConversionNeeded','Requires Fabrication/Conversion'],['structureConversionNotes','Conversion Notes'],
+      ['rainPlan','Rain Plan / Backup Date'],['windLimits','Wind Limits / Structural Constraints']
+    ]},
+    { title: 'Experience Design & Content Scope', fields: [
+      ['experienceBeats','Beats / Scenes'],['clientSuppliedContent','Client-Supplied Content'],
+      ['clientContentDetails','Client Content Format/Delivery'],['personalizationPerVisitor','Personalization Per Visitor'],
+      ['emotionalArc','Emotional Arc'],['experienceDuration','Experience Duration'],['audioInScope','Audio In Scope'],
+      ['syncedProps','Synced Props'],['syncedPropsDetails','Sync Points'],['contentScopeBoundary','Content Scope Boundary']
+    ]},
+    { title: 'Interactivity & Trigger Logic', fields: [
+      ['interactivityType','Interactivity Type'],['interactivityMode','Interactivity Mode'],['triggerMap','Trigger Map'],
+      ['triggerSource','Trigger Source'],['gestureTracking','Gesture Tracking'],['gestureSpecOwner','Gesture Spec Owner'],
+      ['staffedOperator','Staffed Operator'],['runsPerDay','Runs Per Day']
+    ]},
+    { title: 'Personalization & Real-Time Systems', fields: [
+      ['personalizationInput','What Changes Per Visitor'],['inputCaptureOwner','Input Capture Owner'],
+      ['intakeSystemOwner','Intake System Owner'],['sessionHandlingOwner','Session Handling Owner'],
+      ['realTimeRenderOwner','Real-Time Render Owner'],['moderationRequired','Moderation Required'],
+      ['photoOutputAlternative','Photo-Output Alternative']
+    ]},
+    { title: 'Photo & Media Capture', fields: [
+      ['captureInExperience','Capture In Experience'],['cameraOwner','Camera Owner'],['shutterTrigger','Shutter Trigger'],
+      ['captureLightingScope','Lighting Scope'],['captureScopeExtent','Capture Scope Extent'],['fileDestination','File Destination']
+    ]},
+    { title: 'Hardware', fields: [
+      ['displayTech','Display Technology'],['mountingApproach','Mounting Approach'],['projectorCount','Projector Count'],
+      ['mediaServerNeeds','Media Server / Compute'],['sensorHardware','Sensor Hardware'],
+      ['powerRequirements','Power Requirements'],['powerProvider','Power Provider'],
+      ['audioHardwareInScope','Audio Hardware In Scope'],['rentOrBuy','Rent or Buy']
+    ]},
+    { title: 'Safety & Compliance', fields: [
+      ['fireMarshalRequired','Fire Marshal Sign-Off'],['adaConsiderations','Accessibility / ADA'],
+      ['electricalCertRequired','Electrical Certification'],['hazeUsed','Haze / Fog Used']
+    ]},
+    { title: 'Installation, Calibration & Execution', fields: [
+      ['installDays','Install Days'],['offsitePrep','Off-Site Prep'],['calibrationRequirements','Calibration Requirements'],
+      ['onsiteStaffing','On-Site Staffing'],['strikeOwner','Strike Owner'],['multiLocationRecalNote','Multi-Location Recal Notes']
+    ]},
+    { title: 'Duration & Tour Structure', fields: [
+      ['durationType','Duration Type'],['locationsCount','Locations'],['markets','Markets'],['stopsPerCity','Stops Per City'],
+      ['freightShipping','Freight / Shipping'],['dailyThroughput','Daily Throughput'],['budgetConversationScope','Budget Conversation Scope']
+    ]},
+    { title: 'Scope Boundaries & Third-Party Dependencies', fields: [
+      ['inScope','In Scope'],['outOfScope','Out of Scope'],['otherVendors','Other Vendors'],
+      ['thirdPartyDependencies','Third-Party Dependencies'],['intakeFlowOwner','Intake/Flow Owner'],
+      ['photoDeliveryOwner','Photo Delivery Owner'],['propHardwareOwner','Prop/Hardware Owner'],
+      ['contentOwnership','Content Ownership'],['revisionRounds','Included Revision Rounds'],['paymentTerms','Payment Terms']
+    ]}
+  ];
+
+  function compileSectionText(section) {
+    const lines = [];
+    section.fields.forEach(([id, label]) => {
+      const v = fv(id);
+      if (v && v !== 'TBD') lines.push(`${label}: ${v}`);
+    });
+    return lines.join('\n');
+  }
+
+  function compileFullIntake() {
+    return SECTIONS.map(s => ({ title: s.title, text: compileSectionText(s) })).filter(s => s.text);
+  }
+
+  // ---------- CLEAR ----------
+  function clearForm() {
+    document.querySelectorAll('#app input[type="text"], #app input[type="email"], #app input[type="number"], #app input[type="date"], #app textarea').forEach(el => {
+      if (el.id.startsWith('equip')) return;
+      el.value = el.type === 'number' ? (el.id.includes('Rate') ? '150' : (el.id === 'locationsCount' || el.id === 'pricingStops' ? '1' : '0')) : '';
+    });
+    document.querySelectorAll('#app select').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('#app input[type="checkbox"]').forEach(el => el.checked = false);
+    document.getElementById('equipRows').innerHTML = '';
+    equipRowCount = 0; addEquipRow();
+    document.getElementById('marginTarget').value = 70;
+    document.getElementById('travelScalesPerStop').checked = true;
+    document.getElementById('summaryCard').style.display = 'none';
+    onFormatChange(); toggleWeatherFields(); togglePersonalizationSection(); toggleInteractiveFields(); toggleCaptureFields(); onDurationChange();
+    recalcPricing(); scanOpenItems();
+    showToast('Form cleared', 'success');
+  }
+
+  // ---------- GENERATE PARTNER SUMMARY (Claude-assisted rewrite only, no invention) ----------
+  async function generateSummary() {
+    const claudeKey = fv('claudeToken') || localStorage.getItem(CLAUDE_KEY) || '';
+    if (!isValidClaude(claudeKey)) { showToast('Add your Anthropic API key first', 'error'); return; }
+    if (!fv('projectName')) { showToast('Project name is required', 'error'); return; }
+
+    setSummaryLoading(true);
+    const sections = compileFullIntake();
+    const openItems = scanOpenItems();
+    recalcPricing();
+    const p = window._pricingResult;
+
+    const pricingText = p ? `Single-Event Total: $${Math.round(p.single.total).toLocaleString()}` +
+      (p.stops > 1 ? `\nFull-Run Total (${p.stops} stops): $${Math.round(p.fullRun.total).toLocaleString()}` : '') : '';
+
+    const systemPrompt = `You are drafting a partner-facing scope and quote summary for Higher Roads, a Nashville motion design and immersive activation studio. You will be given structured intake data already entered by the Higher Roads team. Your ONLY job is to rewrite it into clean, professional prose organized by section.
+
+Strict rules:
+- Never invent, infer, or embellish any fact not explicitly present in the provided data.
+- If a section has no data, omit it entirely. Do not write placeholder text.
+- If a field is TBD or missing and appears in the "open items" list provided, you may note it as "to be confirmed" but do not guess an answer.
+- No em dashes anywhere.
+- No "It's not X, it's Y" constructions. No fragment stacks. No rhetorical over-explanation.
+- Plain, direct, peer-to-peer tone. No puffery, no buzzwords, no salesy language.
+- Structure: Project Overview, then a short paragraph per relevant section, then Pricing, then Open Items to Confirm (if any).
+- This is a working document for a partner or client, not internal notes. Do not include internal-only pricing rationale (margin percentage, internal hourly rates) — present only the final total(s).`;
+
+    const userContent = `Project: ${fv('projectName')}\nClient/Brand: ${fv('clientBrand')}\nPartner: ${fv('partnerName')}\n\nSECTION DATA:\n` +
+      sections.map(s => `## ${s.title}\n${s.text}`).join('\n\n') +
+      `\n\nPRICING (present only totals, no internal rate/margin detail):\n${pricingText}\n\nOPEN ITEMS TO CONFIRM:\n${openItems.length ? openItems.join('\n') : 'None currently flagged.'}`;
+
+    try {
+      const res = await fetch(CLAUDE_WORKER, {
+        method: 'POST',
+        headers: { 'x-api-key': claudeKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1800,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userContent }]
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('API error: ' + (data.error?.message || 'unknown'), 'error'); setSummaryLoading(false); return; }
+      const text = data.content?.find(b => b.type === 'text')?.text?.trim() || '';
+      document.getElementById('summaryText').textContent = text;
+      document.getElementById('summaryCard').style.display = 'block';
+      document.getElementById('summaryCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showToast('Summary generated. Review before sending.', 'success');
+    } catch (err) {
+      showToast('Network error generating summary', 'error');
+      console.error(err);
+    }
+    setSummaryLoading(false);
+  }
+  function setSummaryLoading(on) {
+    document.getElementById('summaryBtn').disabled = on;
+    document.getElementById('summaryBtnText').style.display = on ? 'none' : 'inline';
+    document.getElementById('summarySpinner').style.display = on ? 'inline-block' : 'none';
+  }
+  function copySummary() {
+    const text = document.getElementById('summaryText').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard', 'success'))
+      .catch(() => showToast('Copy failed, select text manually', 'error'));
+  }
+
+  // ---------- PUSH TO NOTION ----------
+  async function pushToNotion() {
+    const token = fv('tokenInput') || localStorage.getItem(NOTION_KEY) || '';
+    const projectName = fv('projectName');
+
+    if (!DATABASE_ID) { showToast('No Notion database configured yet — see setup notes', 'error'); return; }
+    if (!isValidNotion(token)) { showToast('Add your Notion token first', 'error'); return; }
+    if (!projectName) { showToast('Project name is required', 'error'); return; }
+
+    setPushLoading(true);
+    recalcPricing();
+    const p = window._pricingResult;
+    const openItems = scanOpenItems();
+
+    const children = [];
+    const addHeading = text => children.push({ object: 'block', type: 'heading_3', heading_3: { rich_text: [{ type: 'text', text: { content: text } }] } });
+    const addParagraph = text => { if (!text) return; children.push({ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: text.slice(0, 1900) } }] } }); };
+    const addTodo = text => { if (!text) return; children.push({ object: 'block', type: 'to_do', to_do: { rich_text: [{ type: 'text', text: { content: text } }], checked: false } }); };
+
+    compileFullIntake().forEach(s => { addHeading(s.title); addParagraph(s.text); });
+
+    addHeading('Pricing');
+    let pricingLines = `Single-Event Total: $${Math.round(p.single.total).toLocaleString()}`;
+    if (p.stops > 1) pricingLines += `\nFull-Run Total (${p.stops} stops): $${Math.round(p.fullRun.total).toLocaleString()}`;
+    pricingLines += `\nGross margin target: ${p.margin.toFixed(0)}%`;
+    addParagraph(pricingLines);
+
+    if (openItems.length) {
+      addHeading('Open Items to Confirm');
+      openItems.forEach(item => addTodo(item));
+    }
+
+    const summaryText = document.getElementById('summaryText').textContent;
+    if (summaryText) { addHeading('Partner-Facing Summary (Generated)'); addParagraph(summaryText); }
+
+    const properties = {
+      'Name': { title: [{ text: { content: `${fv('clientBrand') ? fv('clientBrand') + ' — ' : ''}${projectName}` } }] },
+      'Status': { select: { name: fv('quoteStatus') || 'Draft' } },
+      'Relationship Type': { select: { name: fv('relationshipType') } },
+      'Format': { select: { name: fv('format') } },
+      'Environment': { select: { name: fv('environment') } },
+      'Duration Type': { select: { name: fv('durationType') } },
+      'Interactivity': { select: { name: fv('interactivityType') } },
+      'Personalization': { checkbox: fv('personalizationPerVisitor') === 'Yes' },
+      'Photo Capture': { checkbox: fv('captureInExperience') === 'Yes' },
+      'Locations': { number: nv('locationsCount') || 1 },
+      'Gross Margin Target': { number: p.margin },
+      'Single-Event Total': { number: Math.round(p.single.total) },
+      'Quote Date': { date: { start: new Date().toISOString().slice(0, 10) } }
+    };
+    if (fv('partnerName')) properties['Partner'] = { rich_text: [{ text: { content: fv('partnerName') } }] };
+    if (p.stops > 1) properties['Full-Run Total'] = { number: Math.round(p.fullRun.total) };
+    properties['Owner'] = { rich_text: [{ text: { content: 'Grey' } }] };
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28' },
+        body: JSON.stringify({ parent: { database_id: DATABASE_ID }, properties, children: children.slice(0, 100) })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`"${projectName}" added to Notion`, 'success');
+      } else {
+        const msg = data.message || 'Push failed';
+        showToast(msg.length > 65 ? msg.slice(0, 65) + '...' : msg, 'error');
+        console.error(data);
+      }
+    } catch (err) {
+      showToast('Network error — check connection', 'error');
+      console.error(err);
+    }
+    setPushLoading(false);
+  }
+  function setPushLoading(on) {
+    document.getElementById('pushBtn').disabled = on;
+    document.getElementById('btnText').style.display = on ? 'none' : 'inline';
+    document.getElementById('pushSpinner').style.display = on ? 'inline-block' : 'none';
+  }
+</script>
+</body>
+</html>
