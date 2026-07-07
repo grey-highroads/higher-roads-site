@@ -222,6 +222,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
       <button class="pkgbtn" id="copyPkg" type="button">Copy package</button>
       <button class="pkgbtn" id="dlMd" type="button">Download .md</button>
       <button class="pkgbtn" id="dlJson" type="button">Download .json</button>
+      <button class="pkgbtn" id="renderPreview" type="button" hidden>Render preview</button>
     </div>
     <pre id="handoffBody"></pre>
   </section>
@@ -403,6 +404,7 @@ const CANDS=[
    endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
    (8.1), are not yet proven and must be checked against live brands. */
 const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/'; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
+const ENABLE_RENDER = false; // keep false until the Worker has a render provider and RENDER_API_KEY secret
 
 function mockPreviewData(){
   return {
@@ -530,27 +532,36 @@ function buildHandoff(){
     chosen_direction:dir.scene_name
   };
 }
-cta.addEventListener('click',async()=>{
+cta.addEventListener('click',()=>{
   if(!canProceed()) return;
   CURRENT_PKG=buildRenderPackage(buildHandoff());
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
-  if(!PREVIEW_ENDPOINT){
-    // demo mode: no render backend, show the package so the flow is still visible
-    handoffBody.textContent=CURRENT_MD; handoff.classList.add('on'); handoff.scrollIntoView({behavior:'smooth',block:'nearest'}); return;
-  }
-  // live: send the composite variant to the render path, composite the real product, show it
-  const composite=CURRENT_PKG.variants.find(v=>v.render_path==='composite')||CURRENT_PKG.variants[0];
-  const productUrl=(assets.find(a=>a.asset_id===selectedAssetId)||{}).name;
-  document.getElementById('loadingLine').textContent='Generating your preview';
-  showView('loading');
-  try{
-    const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl }) });
-    if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render '+res.status+(t?': '+t.slice(0,160):'')); }
-    const data=await res.json();
-    await compositeAndShow(data);
-    showView('result');
-  }catch(err){ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); }
+  handoffBody.textContent=CURRENT_MD;
+  handoff.classList.add('on');
+  handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
+
+const renderPreviewBtn=document.getElementById('renderPreview');
+if(renderPreviewBtn){
+  renderPreviewBtn.hidden = !ENABLE_RENDER;
+  renderPreviewBtn.addEventListener('click',async()=>{
+    if(!CURRENT_PKG || !canProceed()) return;
+    const composite=CURRENT_PKG.variants.find(v=>v.render_path==='composite')||CURRENT_PKG.variants[0];
+    const productUrl=(assets.find(a=>a.asset_id===selectedAssetId)||{}).name;
+    document.getElementById('loadingLine').textContent='Generating your preview';
+    showView('loading');
+    try{
+      const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl }) });
+      if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render '+res.status+(t?': '+t.slice(0,160):'')); }
+      const data=await res.json();
+      await compositeAndShow(data);
+      showView('result');
+    }catch(err){
+      document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
+      showView('error');
+    }
+  });
+}
 
 function loadImg(src){ return new Promise((resolve,reject)=>{ const im=new Image(); im.onload=()=>resolve(im); im.onerror=()=>reject(new Error('image load failed')); im.src=src; }); }
 function drawCover(ctx,img,W,H){ const ir=img.width/img.height, cr=W/H; let w,h; if(ir>cr){ h=H; w=H*ir; } else { w=W; h=W/ir; } ctx.drawImage(img,(W-w)/2,(H-h)/2,w,h); }
