@@ -222,6 +222,8 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
       <button class="pkgbtn" id="copyPkg" type="button">Copy package</button>
       <button class="pkgbtn" id="dlMd" type="button">Download .md</button>
       <button class="pkgbtn" id="dlJson" type="button">Download .json</button>
+      <button class="pkgbtn" id="manualComposite" type="button">Composite test</button>
+      <input type="file" id="worldInput" accept="image/*" hidden>
       <button class="pkgbtn" id="renderPreview" type="button" hidden>Render preview</button>
     </div>
     <pre id="handoffBody"></pre>
@@ -289,10 +291,18 @@ function buildLockedProductAsset(parsed){
   const asset_type='packaging';
   const asset_role=defaultAssetRole(asset_type);
   const lock_status=defaultLockStatus(asset_role);
+  const image=parsed.image||{};
+  const sourceUrl=image.source_image_url||'';
+  const assetUrl=image.asset_url||image.r2_url||'';
   return {
     asset_id:'a'+(++assetIdCounter), bucket:'packaging',
-    name:(parsed.image&&parsed.image.source_image_url)||parsed.product.name||'product',
-    base64:(parsed.image&&parsed.image.base64)||'', mediaType:(parsed.image&&parsed.image.media_type)||'image/jpeg',
+    name:sourceUrl||assetUrl||parsed.product.name||'product',
+    source_image_url:sourceUrl,
+    asset_url:assetUrl,
+    source_asset_id:image.asset_id||'',
+    base64:image.base64||image.image_b64||image.b64||'',
+    mediaType:image.media_type||image.mediaType||'image/jpeg',
+    width:image.width||null, height:image.height||null,
     asset_name:(parsed.product.name||'Product').slice(0,120),
     asset_type, asset_role, lock_status,
     preserve_elements:defaultPreserveElements(asset_type,lock_status),
@@ -415,7 +425,7 @@ function buildRenderPackage(h){
   return {
     meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
     fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
-    locked_asset:{asset_id:_c(la.asset_id),asset_name:_c(la.asset_name),asset_type:_c(la.asset_type)||'packaging',lock_status:_c(la.lock_status)||'locked',image_ref:_c(la.image_ref)||_c(la.source_image_url)||'(attach the locked product image file)'},
+    locked_asset:{asset_id:_c(la.asset_id),asset_name:_c(la.asset_name),asset_type:_c(la.asset_type)||'packaging',lock_status:_c(la.lock_status)||'locked',image_ref:_c(la.image_ref)||_c(la.asset_url)||_c(la.source_image_url)||'(attach the locked product image file)',source_image_url:_c(la.source_image_url),asset_url:_c(la.asset_url),media_type:_c(la.media_type)||_c(la.mediaType),has_image_data:!!_c(la.image_data)||!!_c(la.base64),image_data:_c(la.image_data)||(_c(la.base64)?('data:'+(_c(la.media_type)||_c(la.mediaType)||'image/png')+';base64,'+_c(la.base64)):'')},
     scene_brief:{world_description:_c(sd.world_description),product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),composition:_c(sd.composition),lighting:_c(sd.lighting),props:_l(sd.props)},
     placement_spec:buildPlacementSpec(h),
     prompts:{positive:_posReference(h),negative:_dedupe(neg).join(', ')},
@@ -434,7 +444,7 @@ function renderPackageMarkdown(p){
   L.push('');L.push('## 1. Fidelity contract (non-negotiable)');L.push(p.fidelity_contract.statement);
   if(p.fidelity_contract.preserve.length)L.push('Preserve exactly: '+p.fidelity_contract.preserve.join(', ')+'.');
   p.fidelity_contract.rules.forEach(r=>L.push('- '+r));
-  L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);
+  L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);if(p.locked_asset.has_image_data)L.push('Attached asset: included in JSON package as image_data');if(p.locked_asset.media_type)L.push('Media type: '+p.locked_asset.media_type);
   L.push('');L.push('## 3. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);L.push('Placement: '+p.scene_brief.product_placement_intent);
   if(p.scene_brief.composition)L.push('Composition: '+p.scene_brief.composition);
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
@@ -567,7 +577,15 @@ function renderCandidates(){
 }
 function pick(i){
   const c=DATA.candidates[i];
-  selectProduct({ product:DATA.factual, image:{ base64:'', media_type:'image/png', source_image_url:c.source_image_url } });
+  selectProduct({ product:DATA.factual, image:{
+    base64:c.image_b64||c.base64||c.b64||'',
+    media_type:c.media_type||c.mediaType||'image/png',
+    source_image_url:c.source_image_url||'',
+    asset_url:c.asset_url||c.r2_url||'',
+    asset_id:c.asset_id||'',
+    width:c.width||null,
+    height:c.height||null
+  } });
   [...grid.children].forEach((el,idx)=>el.setAttribute('aria-pressed', idx===i?'true':'false'));
   protect.classList.add('on');
   refresh();
@@ -601,7 +619,7 @@ function buildHandoff(){
   const dir = v.confidence==='low' ? [v.primary,...(v.alternates||[])][chosenDirection] : v.primary;
   return {
     mode:getOverallMode(),
-    locked_asset:{ asset_id:a.asset_id, asset_name:a.asset_name, asset_type:a.asset_type, lock_status:a.lock_status, preserve_elements:a.preserve_elements, image_ref:a.name },
+    locked_asset:{ asset_id:a.asset_id, asset_name:a.asset_name, asset_type:a.asset_type, lock_status:a.lock_status, preserve_elements:a.preserve_elements, image_ref:a.asset_url||a.source_image_url||a.name, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'', media_type:a.mediaType||'', base64:a.base64||'' },
     intake_expressive:v.intake_expressive,
     scene_direction:v.scene_direction,
     confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
@@ -624,11 +642,12 @@ if(renderPreviewBtn){
   renderPreviewBtn.addEventListener('click',async()=>{
     if(!CURRENT_PKG || !canProceed()) return;
     const composite=CURRENT_PKG.variants.find(v=>v.render_path==='composite')||CURRENT_PKG.variants[0];
-    const productUrl=(assets.find(a=>a.asset_id===selectedAssetId)||{}).name;
+    const selected=selectedProductAsset()||{};
+    const productUrl=selected.asset_url||selected.source_image_url||selected.name||'';
     document.getElementById('loadingLine').textContent='Generating your preview';
     showView('loading');
     try{
-      const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl, placement:CURRENT_PKG.placement_spec }) });
+      const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl, product_image_b64:selected.base64||'', product_media_type:selected.mediaType||'', placement:CURRENT_PKG.placement_spec }) });
       if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render '+res.status+(t?': '+t.slice(0,160):'')); }
       const data=await res.json();
       await compositeAndShow(data);
@@ -640,18 +659,56 @@ if(renderPreviewBtn){
   });
 }
 
-function loadImg(src){ return new Promise((resolve,reject)=>{ const im=new Image(); im.onload=()=>resolve(im); im.onerror=()=>reject(new Error('image load failed')); im.src=src; }); }
+function selectedProductAsset(){ return assets.find(a=>a.asset_id===selectedAssetId)||null; }
+function dataUrlFromB64(mediaType,b64){ return 'data:'+(mediaType||'image/png')+';base64,'+b64; }
+function productImageSrcFromAsset(a){
+  if(!a) return '';
+  if(a.base64) return dataUrlFromB64(a.mediaType||'image/png',a.base64);
+  return a.asset_url||a.source_image_url||a.name||'';
+}
+function imageSourceFromPayload(payload){
+  if(!payload) return '';
+  if(typeof payload==='string') return payload;
+  if(payload.data_url) return payload.data_url;
+  if(payload.b64) return dataUrlFromB64(payload.media_type||'image/png',payload.b64);
+  if(payload.url) return payload.url;
+  return '';
+}
+function loadImg(src){
+  return new Promise((resolve,reject)=>{
+    const im=new Image();
+    im.crossOrigin='anonymous';
+    im.onload=()=>resolve(im);
+    im.onerror=()=>reject(new Error('image load failed: '+String(src).slice(0,80)));
+    im.src=src;
+  });
+}
 function drawCover(ctx,img,W,H){ const ir=img.width/img.height, cr=W/H; let w,h; if(ir>cr){ h=H; w=H*ir; } else { w=W; h=W/ir; } ctx.drawImage(img,(W-w)/2,(H-h)/2,w,h); }
+function normalizePlacement(p){
+  const fallback={cx:0.38,cy:0.62,scale:0.32};
+  const out=Object.assign({},fallback,p||{});
+  if(out.width_pct && !out.scale) out.scale=out.width_pct;
+  if(!out.scale && out.width_pct) out.scale=out.width_pct;
+  out.cx=Number(out.cx)||fallback.cx;
+  out.cy=Number(out.cy)||fallback.cy;
+  out.scale=Number(out.scale||out.width_pct)||fallback.scale;
+  return out;
+}
 async function compositeAndShow(data){
   const canvas=document.getElementById('resultCanvas'); const ctx=canvas.getContext('2d');
-  const world=await loadImg('data:'+data.world_image.media_type+';base64,'+data.world_image.b64);
-  const prod=await loadImg('data:'+data.product_image.media_type+';base64,'+data.product_image.b64);
+  const worldSrc=imageSourceFromPayload(data.world_image||data.world||data.background_image);
+  const selected=selectedProductAsset();
+  const productSrc=imageSourceFromPayload(data.product_image)||productImageSrcFromAsset(selected);
+  if(!worldSrc) throw new Error('No world image supplied for compositing');
+  if(!productSrc) throw new Error('No locked product image supplied for compositing');
+  const world=await loadImg(worldSrc);
+  const prod=await loadImg(productSrc);
   const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
   drawCover(ctx,world,W,H);
-  const p=data.placement||{cx:0.5,cy:0.66,scale:0.42};
+  const p=normalizePlacement(data.placement||CURRENT_PKG&&CURRENT_PKG.placement_spec);
   const tw=W*p.scale, th=tw*(prod.height/prod.width);
   const x=W*p.cx-tw/2, y=H*p.cy-th/2;
-  ctx.save(); ctx.globalAlpha=0.35; ctx.filter='blur(14px)'; ctx.fillStyle='#000';
+  ctx.save(); ctx.globalAlpha=0.32; ctx.filter='blur(14px)'; ctx.fillStyle='#000';
   ctx.beginPath(); ctx.ellipse(W*p.cx, y+th*0.99, tw*0.42, th*0.07, 0,0,Math.PI*2); ctx.fill(); ctx.restore();
   ctx.drawImage(prod, x, y, tw, th);
 }
@@ -669,6 +726,28 @@ document.getElementById('dlJson').addEventListener('click',()=>{ if(CURRENT_PKG)
 document.getElementById('dlImg').addEventListener('click',()=>{ try{ const a=document.createElement('a'); a.href=document.getElementById('resultCanvas').toDataURL('image/png'); a.download='preview.png'; a.click(); }catch(e){} });
 document.getElementById('copyPkg2').addEventListener('click',e=>{ if(!CURRENT_MD) return; if(navigator.clipboard) navigator.clipboard.writeText(CURRENT_MD); e.target.textContent='Copied'; setTimeout(()=>e.target.textContent='Copy package',1400); });
 document.getElementById('startOver2').addEventListener('click',()=>showView('entry'));
+const manualCompositeBtn=document.getElementById('manualComposite');
+const worldInput=document.getElementById('worldInput');
+if(manualCompositeBtn && worldInput){
+  manualCompositeBtn.addEventListener('click',()=>{
+    if(!CURRENT_PKG){ cta.click(); }
+    worldInput.click();
+  });
+  worldInput.addEventListener('change',e=>{
+    const f=e.target.files&&e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=async()=>{
+      try{
+        await compositeAndShow({ world_image:{ data_url:String(r.result) }, placement:CURRENT_PKG&&CURRENT_PKG.placement_spec });
+        showView('result');
+      }catch(err){
+        document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
+        showView('error');
+      }
+    };
+    r.readAsDataURL(f);
+  });
+}
 
 // upload fallback -> same injection path
 document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
