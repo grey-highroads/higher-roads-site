@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product World Preview</title>
+<meta name="description" content="Pick your product and we build the world around it, with your packaging kept exactly as it is.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#f5ede2; --accent:#e8782a; --dark-card:#111009;
+  --border:rgba(232,120,42,0.18); --muted:#6b6057; --bg:#0d0c07;
+  --accent-soft:rgba(232,120,42,0.10); --accent-line:rgba(232,120,42,0.45);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--white);
+  font-family:'Barlow',system-ui,sans-serif; font-weight:300;
+  line-height:1.5; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px; margin:0 auto; padding:48px 24px 96px}
+.brandbar{display:flex; align-items:center; gap:12px; margin-bottom:56px}
+.brandbar .mark{font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:.22em; font-size:13px; color:var(--white)}
+.brandbar .dot{width:5px; height:5px; border-radius:50%; background:var(--accent)}
+.brandbar .ctx{font-family:'Rajdhani',sans-serif; font-weight:500; letter-spacing:.22em; font-size:12px; color:var(--muted); text-transform:uppercase}
+
+.eyebrow{font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:.24em; font-size:12px; text-transform:uppercase; color:var(--accent); margin:0 0 14px}
+h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5vw,46px); line-height:1.08; margin:0 0 16px; letter-spacing:-.01em}
+.sub{font-size:clamp(15px,2vw,17px); color:var(--white); opacity:.7; max-width:56ch; margin:0 0 40px}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px}
+.cand{
+  position:relative; padding:0; border:1px solid var(--border); border-radius:14px;
+  background:var(--dark-card); cursor:pointer; overflow:hidden; text-align:left;
+  transition:border-color .18s ease, transform .18s ease; color:inherit; font:inherit;
+}
+.cand:hover{border-color:var(--accent-line); transform:translateY(-2px)}
+.cand:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.cand img{display:block; width:100%; aspect-ratio:1/1; object-fit:cover; background:#1a180f}
+.cand .cap{padding:11px 13px; font-size:13px; color:var(--white); opacity:.55}
+.cand[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.cand[aria-pressed="true"] .cap{opacity:.9}
+.lockmark{
+  position:absolute; top:10px; right:10px; display:none; align-items:center; gap:6px;
+  background:var(--accent); color:#1a1305; font-family:'Rajdhani',sans-serif; font-weight:700;
+  letter-spacing:.08em; font-size:11px; text-transform:uppercase; padding:5px 9px; border-radius:8px;
+}
+.cand[aria-pressed="true"] .lockmark{display:inline-flex}
+.lockmark svg{width:12px; height:12px}
+
+.protect{
+  display:none; margin:20px 0 0; padding:14px 16px; border:1px solid var(--border);
+  border-left:2px solid var(--accent); border-radius:10px; background:rgba(232,120,42,0.05);
+  font-size:14px; color:var(--white); opacity:.85;
+}
+.protect.on{display:block}
+.protect b{font-weight:500}
+
+.fallback{margin:22px 0 0}
+.linkbtn{
+  background:none; border:none; padding:0; cursor:pointer; color:var(--accent);
+  font-family:'Barlow',sans-serif; font-size:14px; text-decoration:underline; text-underline-offset:3px;
+}
+.linkbtn:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+.directions{display:none; margin:56px 0 0}
+.directions.on{display:block}
+.dgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-top:8px}
+.dir{
+  padding:18px; border:1px solid var(--border); border-radius:14px; background:var(--dark-card);
+  cursor:pointer; text-align:left; color:inherit; font:inherit; transition:border-color .18s ease;
+}
+.dir:hover{border-color:var(--accent-line)}
+.dir:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.dir[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.dir .dname{font-family:'Playfair Display',serif; font-size:19px; margin:0 0 7px}
+.dir .dworld{font-size:14px; color:var(--white); opacity:.65; margin:0}
+
+.footer-cta{margin:56px 0 0; display:flex; align-items:center; gap:20px; flex-wrap:wrap}
+.cta{
+  font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:.06em; font-size:15px;
+  text-transform:uppercase; padding:15px 30px; border-radius:11px; border:none; cursor:pointer;
+  background:var(--accent); color:#1a1305; transition:opacity .18s ease, transform .18s ease;
+}
+.cta:hover:not(:disabled){transform:translateY(-1px)}
+.cta:disabled{opacity:.32; cursor:not-allowed}
+.cta:focus-visible{outline:2px solid var(--white); outline-offset:3px}
+.hint{font-size:13px; color:var(--muted)}
+
+.handoff{
+  display:none; margin:40px 0 0; padding:22px; border:1px dashed var(--border); border-radius:14px;
+  background:rgba(255,255,255,0.015);
+}
+.handoff.on{display:block}
+.handoff h2{font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:.12em; text-transform:uppercase; font-size:13px; color:var(--accent); margin:0 0 12px}
+.handoff p{font-size:14px; opacity:.7; margin:0 0 14px}
+.pkgbtns{display:flex; gap:10px; flex-wrap:wrap; margin:0 0 16px}
+.pkgbtn{
+  font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:.06em; font-size:12px;
+  text-transform:uppercase; padding:9px 15px; border-radius:9px; cursor:pointer;
+  background:none; border:1px solid var(--accent-line); color:var(--white);
+}
+.pkgbtn:hover{background:var(--accent-soft)}
+.pkgbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.handoff pre{
+  margin:0; padding:16px; background:#080703; border:1px solid var(--border); border-radius:10px;
+  font-family:ui-monospace,Menlo,monospace; font-size:12.5px; line-height:1.5; color:#d9cfbf;
+  overflow-x:auto; white-space:pre-wrap; word-break:break-word;
+}
+
+.demobanner{
+  margin:0 0 32px; padding:12px 16px; border:1px solid var(--accent-line); border-radius:10px;
+  background:var(--accent-soft); font-size:13.5px; color:var(--white); opacity:.9;
+}
+.entryform{max-width:560px; margin-top:8px}
+.fieldlabel{
+  display:block; font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; font-size:12px; color:var(--white); opacity:.75; margin:18px 0 7px;
+}
+.fieldlabel .opt{color:var(--muted); font-weight:500; text-transform:none; letter-spacing:.02em}
+.urlinput{
+  width:100%; padding:14px 15px; border-radius:11px; border:1px solid var(--border);
+  background:#0a0905; color:var(--white); font-family:'Barlow',sans-serif; font-size:15px;
+}
+.urlinput::placeholder{color:var(--muted)}
+.urlinput:focus{outline:none; border-color:var(--accent)}
+.urlinput:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+#generateBtn{margin-top:24px}
+.entryhint{font-size:13px; color:var(--accent); margin:14px 0 0; min-height:18px}
+#loadingLine::after{content:'...'; animation:dots 1.4s steps(4,end) infinite; }
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+@media (prefers-reduced-motion:reduce){ #loadingLine::after{content:'...'; animation:none} }
+.devbar{
+  margin-top:64px; padding-top:20px; border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; font-size:12px; color:var(--muted);
+  font-family:'Rajdhani',sans-serif; letter-spacing:.06em;
+}
+.devbar button{
+  background:none; border:1px solid var(--border); color:var(--muted); border-radius:7px;
+  padding:6px 11px; cursor:pointer; font:inherit; letter-spacing:.06em;
+}
+.devbar button:hover{border-color:var(--accent-line); color:var(--white)}
+
+@media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+@media (max-width:520px){ .wrap{padding:32px 18px 72px} .brandbar{margin-bottom:40px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar">
+    <span class="mark">HIGHER ROADS</span><span class="dot"></span>
+    <span class="ctx">Product World Preview</span>
+  </div>
+
+  <div class="demobanner" id="demoBanner" hidden>Demo mode: no parser backend is connected, so this shows sample data so you can see the full flow end to end. Connect the parser Worker for real results.</div>
+
+  <section id="entryView">
+    <p class="eyebrow">Product World Preview</p>
+    <h1>Paste your product. See it in a world built for your brand.</h1>
+    <p class="sub">Drop a link to your product page. We read your product and your brand, then build a scene around your real packaging without ever redrawing it.</p>
+    <div class="entryform">
+      <label class="fieldlabel" for="productUrl">Product page URL</label>
+      <input class="urlinput" id="productUrl" type="url" inputmode="url" placeholder="https://yourbrand.com/products/your-product" autocomplete="off">
+      <label class="fieldlabel" for="homeUrl">Homepage URL <span class="opt">optional, sharpens the brand read</span></label>
+      <input class="urlinput" id="homeUrl" type="url" inputmode="url" placeholder="https://yourbrand.com" autocomplete="off">
+      <div id="keyRow" hidden>
+        <label class="fieldlabel" for="apiKey">Anthropic API key <span class="opt">used only for the brand read, same as the Builder</span></label>
+        <input class="urlinput" id="apiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
+      </div>
+      <button class="cta" id="generateBtn" type="button">Generate preview</button>
+      <p class="entryhint" id="entryHint"></p>
+    </div>
+  </section>
+
+  <section id="loadingView" hidden>
+    <p class="eyebrow">Reading your brand</p>
+    <h1 id="loadingLine">Fetching your product</h1>
+    <p class="sub">This takes a few seconds. We pull your product image and read your site copy.</p>
+  </section>
+
+  <section id="errorView" hidden>
+    <p class="eyebrow">Something got in the way</p>
+    <h1 id="errorLine">We could not read that page</h1>
+    <p class="sub" id="errorDetail"></p>
+    <button class="cta" id="errorBack" type="button">Try another URL</button>
+  </section>
+
+  <section id="pickView" hidden>
+  <p class="eyebrow">Your product</p>
+  <h1>Which one do you want to bring to life?</h1>
+  <p class="sub" id="sub">We pulled these from your site. Pick your product and we build the world around it, with your packaging kept exactly as it is.</p>
+
+  <div class="grid" id="grid" role="group" aria-label="Product candidates"></div>
+
+  <div class="protect" id="protect">
+    <b>Packaging locked.</b> We will not redraw, retype, or recolor this. The world gets generated around it and your real product is composited in untouched.
+  </div>
+
+  <div class="fallback">
+    <button class="linkbtn" id="uploadBtn">Don't see it? Upload your product</button>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+  </div>
+
+  <section class="directions" id="directions" aria-label="Choose a direction">
+    <p class="eyebrow">Your brand reads a couple of ways</p>
+    <h1 style="font-size:clamp(24px,4vw,32px)">Pick the direction</h1>
+    <div class="dgrid" id="dgrid"></div>
+  </section>
+
+  <div class="footer-cta">
+    <button class="cta" id="cta" disabled>Bring it to life</button>
+    <span class="hint" id="ctaHint">Pick your product to continue.</span>
+  </div>
+
+  <section class="handoff" id="handoff" aria-live="polite">
+    <h2>Render package</h2>
+    <p>This is the complete package to test across render engines. It is engine-agnostic and wired to no renderer. Copy or download it, run the same locked product through each engine, then score with the rubric.</p>
+    <div class="pkgbtns">
+      <button class="pkgbtn" id="copyPkg" type="button">Copy package</button>
+      <button class="pkgbtn" id="dlMd" type="button">Download .md</button>
+      <button class="pkgbtn" id="dlJson" type="button">Download .json</button>
+    </div>
+    <pre id="handoffBody"></pre>
+  </section>
+
+    <button class="linkbtn" id="startOver" type="button" style="margin-top:28px">Start over with a new URL</button>
+  </section>
+
+  <div class="devbar">
+    <span>DEV</span>
+    <button id="toggleConf">Toggle brand confidence (now: HIGH)</button>
+    <span id="modeReadout">mode: none</span>
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+   MIRRORED LOGIC. This standalone Preview page mirrors, verbatim, three things
+   from the live Builder and step-1b module:
+     - the asset cascade (index.html 665-710)
+     - getOverallMode (index.html 1082-1092)
+     - buildLockedProductAsset (inject-locked-product.js)
+   This is the ONE mirrored copy that exists for the Preview. The durable fix is a
+   shared builder-core.js that both index.html and this page import. That extraction
+   touches the live Builder, so it is a deliberate follow-up, not done here.
+   [REASONED] mirroring is safe today because these functions are pure and stable;
+   the risk is drift if the Builder changes them. Keep in sync until the shared
+   module lands.
+   ========================================================================== */
+
+// --- cascade (verbatim) ---
+function defaultAssetRole(t){const m={logo:'source_of_truth',packaging:'source_of_truth',dieline:'source_of_truth',product_photo:'source_of_truth',product_render:'source_of_truth',brand_guideline:'source_of_truth',color_palette:'source_of_truth',typography:'source_of_truth',claim_hierarchy:'source_of_truth',moodboard:'world_influence',other:'world_influence',competitor_reference:'competitor_reference',avoid_reference:'avoid_reference'};return m[t]||'world_influence';}
+function defaultLockStatus(r){const m={source_of_truth:'locked',editable_asset:'editable',world_influence:'inspiration_only',competitor_reference:'avoid',avoid_reference:'avoid'};return m[r]||'inspiration_only';}
+function defaultPreserveElements(t,l){if(l!=='locked'&&l!=='partially_editable')return[];const m={logo:['logo shape','logo typography','logo color'],packaging:l==='locked'?['can format','label hierarchy','pack proportions','color palette']:['pack proportions'],dieline:['pack proportions','label hierarchy'],product_photo:['product shape','color palette'],product_render:['product shape'],brand_guideline:['color palette','logo typography','logo color'],color_palette:['color palette'],typography:['logo typography'],claim_hierarchy:['claims']};return m[t]||[];}
+function defaultEditableElements(t,l){if(l!=='partially_editable'&&l!=='editable')return[];const m={packaging:['label layout','surface finish','color accents','composition'],dieline:['label layout','surface finish'],product_render:['lighting','materials','surface finish','environment']};return m[t]||['background world','lighting','composition'];}
+
+// --- state + mode (verbatim) ---
+let assets=[]; let assetIdCounter=0;
+function getOverallMode(){
+  if(!assets.length) return 'world_exploration';
+  const meaningful=assets.filter(a=>['locked','partially_editable','editable'].includes(a.lock_status));
+  if(!meaningful.length) return 'world_exploration';
+  const statuses=new Set(meaningful.map(a=>a.lock_status));
+  if(statuses.size>1) return 'mixed';
+  const s=[...statuses][0];
+  if(s==='locked'||s==='partially_editable') return 'product_accurate';
+  if(s==='editable') return 'brand_evolution';
+  return 'world_exploration';
+}
+
+// --- 1b injection (mirrored) ---
+function buildLockedProductAsset(parsed){
+  const asset_type='packaging';
+  const asset_role=defaultAssetRole(asset_type);
+  const lock_status=defaultLockStatus(asset_role);
+  return {
+    asset_id:'a'+(++assetIdCounter), bucket:'packaging',
+    name:(parsed.image&&parsed.image.source_image_url)||parsed.product.name||'product',
+    base64:(parsed.image&&parsed.image.base64)||'', mediaType:(parsed.image&&parsed.image.media_type)||'image/jpeg',
+    asset_name:(parsed.product.name||'Product').slice(0,120),
+    asset_type, asset_role, lock_status,
+    preserve_elements:defaultPreserveElements(asset_type,lock_status),
+    editable_elements:defaultEditableElements(asset_type,lock_status),
+    forbidden_changes:'', prompt_instruction:'', analysis_summary:'', expanded:false,
+    __pwp_product:true
+  };
+}
+
+/* --- Step 4 render-package exporter (mirrored from render-package.js). Engine-agnostic,
+   no renderer integration. render_path is a test label, not a gate. --- */
+const FIDELITY_NEGATIVES=['redrawn packaging','retyped label','altered label hierarchy','distorted pack proportions','recolored packaging','generated or fake product','warped logo','invented text on label'];
+const RUBRIC_CRITERIA=[
+  {key:'label_fidelity',label:'Label fidelity',ask:'Is the label the real one, not redrawn or retyped?'},
+  {key:'proportions',label:'Pack proportions',ask:'Are the product proportions unchanged?'},
+  {key:'color_accuracy',label:'Color accuracy',ask:'Are the brand and packaging colors correct?'},
+  {key:'world_match',label:'World match',ask:'Does the environment match the scene brief?'},
+  {key:'placement_realism',label:'Placement realism',ask:'Does the product sit believably in light, shadow, and scale?'},
+  {key:'negative_adherence',label:'Negative adherence',ask:'Are excluded elements actually absent (people, forbidden colors, stay-away looks)?'},
+  {key:'shippable',label:'Shippable',ask:'Would you show this to a founder as a preview?'}
+];
+const _c=s=>String(s==null?'':s).trim();
+const _l=a=>Array.isArray(a)?a.map(_c).filter(Boolean):(a?[_c(a)]:[]);
+const _s=a=>_l(a).join(', ');
+function assembleBrandNegatives(h){
+  const sd=h.scene_direction||{}, ix=h.intake_expressive||{}, parts=[];
+  if(Array.isArray(sd.avoid)&&sd.avoid.length) parts.push(..._l(sd.avoid));
+  if(ix.visual_territory&&_l(ix.visual_territory.stay_away_from).length) parts.push(..._l(ix.visual_territory.stay_away_from));
+  if(ix.sensory&&_c(ix.sensory.forbidden_colors)) parts.push(_c(ix.sensory.forbidden_colors));
+  if(ix.brand_state&&_l(ix.brand_state.avoid_states).length) parts.push(..._l(ix.brand_state.avoid_states).map(s=>s.toLowerCase()));
+  return [...new Set(parts)];
+}
+function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=ix.sensory||{},b=[];
+  if(_c(bs.make_people_feel))b.push('mood: '+_c(bs.make_people_feel));
+  if(_l(bs.core_adjectives).length)b.push('tone: '+_s(bs.core_adjectives));
+  if(_c(vt.ownable))b.push('ownable: '+_c(vt.ownable));
+  if(_c(sn.color_palette))b.push('palette: '+_c(sn.color_palette));
+  if(_l(sn.textures_and_materials).length)b.push('materials: '+_s(sn.textures_and_materials));
+  return b.join('; ');}
+function _posComposite(h){const sd=h.scene_direction||{};return [_c(sd.world_description),_c(sd.composition)&&'composition: '+_c(sd.composition),_c(sd.lighting)&&'lighting: '+_c(sd.lighting),_l(sd.props).length&&'props: '+_s(sd.props),_flavor(h.intake_expressive||{}),'leave a clear product-shaped placement area in the lower third','do not draw any product, can, bottle, or label in the scene'].filter(Boolean).join('. ');}
+function _posReference(h){const sd=h.scene_direction||{};return [_c(sd.world_description),_c(sd.product_placement_intent),_c(sd.composition)&&'composition: '+_c(sd.composition),_c(sd.lighting)&&'lighting: '+_c(sd.lighting),_l(sd.props).length&&'props: '+_s(sd.props),_flavor(h.intake_expressive||{}),'place the referenced product exactly as supplied, with label hierarchy and pack proportions unchanged'].filter(Boolean).join('. ');}
+function buildRenderPackage(h){
+  if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
+  const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h)];
+  return {
+    meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
+    fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
+    locked_asset:{asset_id:_c(la.asset_id),asset_name:_c(la.asset_name),asset_type:_c(la.asset_type)||'packaging',lock_status:_c(la.lock_status)||'locked',image_ref:_c(la.image_ref)||_c(la.source_image_url)||'(attach the locked product image file)'},
+    scene_brief:{world_description:_c(sd.world_description),product_placement_intent:_c(sd.product_placement_intent),composition:_c(sd.composition),lighting:_c(sd.lighting),props:_l(sd.props)},
+    prompts:{positive:_posReference(h),negative:neg.join(', ')},
+    variants:[
+      {render_path:'composite',label:'Composite: generate a product-free world, then composite the locked product in',instructions:'Generate the environment only, with an empty product-shaped placement area. Composite the supplied locked product image into that area afterward. Best when the engine cannot preserve packaging reliably.',positive:_posComposite(h),negative:neg.join(', ')},
+      {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:_posReference(h),negative:neg.join(', ')}
+    ],
+    confidence_notes:{score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]},
+    test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Label fidelity, proportions, and color accuracy are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
+  };
+}
+function renderPackageMarkdown(p){
+  const L=[];
+  L.push('# Render package: '+p.meta.product_name);
+  L.push('Mode '+p.meta.mode+' \u00b7 Direction "'+p.meta.chosen_direction+'" \u00b7 Recommended path: '+p.meta.render_path_recommendation+' (a test label, not a requirement)');
+  L.push('');L.push('## 1. Fidelity contract (non-negotiable)');L.push(p.fidelity_contract.statement);
+  if(p.fidelity_contract.preserve.length)L.push('Preserve exactly: '+p.fidelity_contract.preserve.join(', ')+'.');
+  p.fidelity_contract.rules.forEach(r=>L.push('- '+r));
+  L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);
+  L.push('');L.push('## 3. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);L.push('Placement: '+p.scene_brief.product_placement_intent);
+  if(p.scene_brief.composition)L.push('Composition: '+p.scene_brief.composition);
+  if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
+  if(p.scene_brief.props.length)L.push('Props: '+p.scene_brief.props.join(', '));
+  L.push('');L.push('## 4. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);
+  L.push('');L.push('## 5. Variants to test');
+  p.variants.forEach((v,i)=>{L.push('### 5.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
+  L.push('## 6. Confidence notes');L.push('Read confidence: '+p.confidence_notes.score);
+  if(p.confidence_notes.agreement_notes.length)L.push('Agreement: '+p.confidence_notes.agreement_notes.join('; '));
+  if(p.confidence_notes.conflicts.length)L.push('Conflicts: '+p.confidence_notes.conflicts.join('; '));
+  if(p.confidence_notes.alternates.length){L.push('Alternate directions available:');p.confidence_notes.alternates.forEach(a=>L.push('- '+a.scene_name+': '+a.world_description+(a.why?' ('+a.why+')':'')));}
+  L.push('');L.push('## 7. Manual test rubric');L.push(p.test_rubric.instructions);L.push('Scale: '+p.test_rubric.scale);L.push('');
+  L.push('| Criterion | What to check | Engine A | Engine B | Engine C |');L.push('| --- | --- | --- | --- | --- |');
+  p.test_rubric.criteria.forEach(c=>L.push('| '+c.label+' | '+c.ask+' |  |  |  |'));
+  return L.join('\n');
+}
+
+/* ============================================================================
+   MOCK preview data. fetchPreviewData() returns this shape in demo mode; the deployed
+   Worker (parser + vibes) returns the same shape live. Candidate images are synthetic
+   SVGs (no third-party assets): one real product plus junk the parser returns, so the
+   human tap filters it (Section 7).
+   ========================================================================== */
+function svg(bg,label,shape){
+  const s=`<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'>
+    <rect width='300' height='300' fill='${bg}'/>${shape}
+    <text x='150' y='280' font-family='monospace' font-size='13' fill='#8a7f70' text-anchor='middle'>${label}</text></svg>`;
+  return 'data:image/svg+xml,'+encodeURIComponent(s);
+}
+const CANDS=[
+  { source_image_url:svg('#14120a',"product","<rect x='118' y='70' width='64' height='150' rx='10' fill='#e8782a'/><rect x='118' y='108' width='64' height='40' fill='#f5ede2'/>"), label:'product hero' },
+  { source_image_url:svg('#0f0e08',"nutrition","<rect x='70' y='55' width='160' height='180' fill='#1d1b12' stroke='#3a352a'/><line x1='85' y1='90' x2='215' y2='90' stroke='#5a5344'/><line x1='85' y1='120' x2='215' y2='120' stroke='#5a5344'/><line x1='85' y1='150' x2='215' y2='150' stroke='#5a5344'/>"), label:'nutrition panel' },
+  { source_image_url:svg('#0f0e08',"claims","<circle cx='150' cy='115' r='52' fill='none' stroke='#4a4335' stroke-width='3'/><text x='150' y='122' font-family='monospace' font-size='15' fill='#6b6057' text-anchor='middle'>USDA</text>"), label:'claims card' },
+  { source_image_url:svg('#141009',"lifestyle","<circle cx='150' cy='120' r='70' fill='#241c10'/><circle cx='125' cy='105' r='22' fill='#3a2c18'/>"), label:'lifestyle shot' },
+];
+/* ---- data layer ----
+   [VERIFIED] a browser cannot fetch arbitrary brand URLs directly (CORS), so the
+   parse + brand read run server-side. Point PREVIEW_ENDPOINT at that deployed Worker
+   to go live. Empty string means demo mode: sample data, labeled in the UI. The Worker
+   must return the same shape mockPreviewData() returns.
+   [ASSUMED, verify when deployed] the combined endpoint wraps the tested step-1 parser
+   and step-2 vibes pipeline. Those modules are built and unit-tested; the deployed
+   endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
+   (8.1), are not yet proven and must be checked against live brands. */
+const PREVIEW_ENDPOINT = ''; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
+
+function mockPreviewData(){
+  return {
+    brand:'your site',
+    factual:{ name:'Grapefruit Sparkling', category:'THC Beverage', flavor_sku:'CS-GRP-12', price:{amount:'24.00',currency:'USD'} },
+    candidates:CANDS,
+    vibes:{
+      confidence:DEV_CONF,
+      primary:{ scene_name:'Golden patio', world_description:'A sun-worn patio at golden hour, warm low light, ceramic and linen, a calm social ritual.' },
+      alternates:[
+        { scene_name:'Cool minimal studio', world_description:'A quiet studio in soft daylight, pale stone, restraint and clarity over warmth.', why:'Your packaging reads cooler than your copy.' }
+      ],
+      intake_expressive:{
+        brand_state:{ make_people_feel:'easygoing', core_adjectives:['warm','unbothered'], avoid_states:['clinical','no people'] },
+        visual_territory:{ closest_to:['sun-worn resort'], stay_away_from:['neon','pharmacy'], ownable:'golden-hour patio light' },
+        sensory:{ color_palette:'sunset amber', textures_and_materials:['linen','ceramic'], forbidden_colors:'clinical white, hazard green' },
+        competitive:{ admires:'Cutwater', avoid_resembling:'dispensary brands' },
+        assets:{ brand_intent:'a calm social ritual' }
+      },
+      scene_direction:{
+        scene_name:'Golden patio',
+        world_description:'A sun-worn patio at golden hour with a deliberate product-shaped placement area and no generated cans or labels.',
+        product_placement_intent:'Real product centered in the lower third, hero scale, slight low angle, sharp focus.',
+        composition:'Centered hero with generous negative space, retail-preview use.',
+        lighting:'Warm low sun, long soft shadows, amber temperature.',
+        props:['linen','ceramic','stone'],
+        avoid:['people','neon','pharmacy cues','generated labels','fake products'],
+        claim_rules:['THC-infused'],
+        render_path:'composite'
+      }
+    }
+  };
+}
+
+async function fetchPreviewData(productUrl, homeUrl, apiKey){
+  if(!PREVIEW_ENDPOINT){
+    await new Promise(r=>setTimeout(r,700)); // demo only: let the loading state render
+    return { demo:true, data:mockPreviewData() };
+  }
+  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ product_url:productUrl, home_url:homeUrl, api_key:apiKey }) });
+  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Parser returned '+res.status+(t?': '+t.slice(0,140):'')); }
+  const payload=await res.json();
+  if(!payload||!Array.isArray(payload.candidates)||!payload.candidates.length) throw new Error('No product image was found on that page. Try the direct product URL, or upload the image after this.');
+  return { demo:false, data:payload };
+}
+
+// --- pick controller (mirrors pick-state.js) ---
+let DEV_CONF='high';
+let selectedAssetId=null, chosenDirection=null, DATA=null;
+
+function removeProduct(){ for(let i=assets.length-1;i>=0;i--) if(assets[i].__pwp_product) assets.splice(i,1); }
+function selectProduct(parsed){
+  removeProduct();
+  const a=buildLockedProductAsset(parsed); assets.push(a);
+  const mode=getOverallMode();
+  if(mode!=='product_accurate'){ removeProduct(); throw new Error('not product_accurate: '+mode); }
+  selectedAssetId=a.asset_id; return a;
+}
+function canProceed(){ return !!selectedAssetId && chosenDirection!=null; }
+
+// --- render ---
+const grid=document.getElementById('grid');
+const dgrid=document.getElementById('dgrid');
+const protect=document.getElementById('protect');
+const directions=document.getElementById('directions');
+const cta=document.getElementById('cta');
+const ctaHint=document.getElementById('ctaHint');
+const handoff=document.getElementById('handoff');
+const handoffBody=document.getElementById('handoffBody');
+const modeReadout=document.getElementById('modeReadout');
+
+function lockSvg(){ return "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5'><rect x='5' y='11' width='14' height='9' rx='2'/><path d='M8 11V8a4 4 0 0 1 8 0v3'/></svg>"; }
+
+function renderCandidates(){
+  grid.innerHTML='';
+  DATA.candidates.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='cand'; b.type='button'; b.setAttribute('aria-pressed','false');
+    b.innerHTML=`<span class="lockmark">${lockSvg()}Locked</span><img src="${c.source_image_url}" alt="Candidate image ${i+1}"><span class="cap">${c.label}</span>`;
+    b.addEventListener('click',()=>pick(i));
+    grid.appendChild(b);
+  });
+}
+function pick(i){
+  const c=DATA.candidates[i];
+  selectProduct({ product:DATA.factual, image:{ base64:'', media_type:'image/png', source_image_url:c.source_image_url } });
+  [...grid.children].forEach((el,idx)=>el.setAttribute('aria-pressed', idx===i?'true':'false'));
+  protect.classList.add('on');
+  refresh();
+}
+function renderDirections(){
+  const v=DATA.vibes;
+  if(v.confidence!=='low'){ directions.classList.remove('on'); chosenDirection=0; return; }
+  directions.classList.add('on');
+  const list=[v.primary, ...(v.alternates||[])];
+  dgrid.innerHTML='';
+  list.forEach((d,i)=>{
+    const b=document.createElement('button');
+    b.className='dir'; b.type='button'; b.setAttribute('aria-pressed','false');
+    b.innerHTML=`<p class="dname">${d.scene_name}</p><p class="dworld">${d.world_description}</p>`;
+    b.addEventListener('click',()=>{ chosenDirection=i; [...dgrid.children].forEach((el,idx)=>el.setAttribute('aria-pressed',idx===i?'true':'false')); refresh(); });
+    dgrid.appendChild(b);
+  });
+}
+function refresh(){
+  modeReadout.textContent='mode: '+getOverallMode();
+  const ok=canProceed();
+  cta.disabled=!ok;
+  if(!selectedAssetId){ ctaHint.textContent='Pick your product to continue.'; }
+  else if(chosenDirection==null){ ctaHint.textContent='Pick a direction to continue.'; }
+  else{ ctaHint.textContent='Your packaging stays exactly as it is.'; }
+}
+let CURRENT_PKG=null, CURRENT_MD='';
+function buildHandoff(){
+  const a=assets.find(x=>x.asset_id===selectedAssetId);
+  const v=DATA.vibes;
+  const dir = v.confidence==='low' ? [v.primary,...(v.alternates||[])][chosenDirection] : v.primary;
+  return {
+    mode:getOverallMode(),
+    locked_asset:{ asset_id:a.asset_id, asset_name:a.asset_name, asset_type:a.asset_type, lock_status:a.lock_status, preserve_elements:a.preserve_elements, image_ref:a.name },
+    intake_expressive:v.intake_expressive,
+    scene_direction:v.scene_direction,
+    confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
+    alternates:v.confidence==='low'?v.alternates:[],
+    chosen_direction:dir.scene_name
+  };
+}
+cta.addEventListener('click',()=>{
+  if(!canProceed()) return;
+  CURRENT_PKG=buildRenderPackage(buildHandoff());
+  CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
+  handoffBody.textContent=CURRENT_MD;
+  handoff.classList.add('on');
+  handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+function download(name,content,type){
+  const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob);
+  const el=document.createElement('a'); el.href=url; el.download=name; el.click(); URL.revokeObjectURL(url);
+}
+document.getElementById('copyPkg').addEventListener('click',e=>{
+  if(!CURRENT_MD) return;
+  if(navigator.clipboard) navigator.clipboard.writeText(CURRENT_MD);
+  e.target.textContent='Copied'; setTimeout(()=>e.target.textContent='Copy package',1400);
+});
+document.getElementById('dlMd').addEventListener('click',()=>{ if(CURRENT_MD) download('render-package.md',CURRENT_MD,'text/markdown'); });
+document.getElementById('dlJson').addEventListener('click',()=>{ if(CURRENT_PKG) download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json'); });
+
+// upload fallback -> same injection path
+document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    selectProduct({ product:DATA.factual, image:{ base64:String(r.result).split(',')[1]||'', media_type:f.type||'image/jpeg', source_image_url:f.name } });
+    [...grid.children].forEach(el=>el.setAttribute('aria-pressed','false'));
+    protect.classList.add('on'); refresh();
+  };
+  r.readAsDataURL(f);
+});
+
+// dev: toggle confidence to see both flows (demo affordance)
+document.getElementById('toggleConf').addEventListener('click',e=>{
+  DEV_CONF = DEV_CONF==='high'?'low':'high';
+  e.target.textContent='Toggle brand confidence (now: '+DEV_CONF.toUpperCase()+')';
+  if(DATA){ DATA.vibes.confidence=DEV_CONF; chosenDirection=null; renderDirections(); refresh(); }
+});
+
+// ---- view state machine ----
+const VIEWS=['entryView','loadingView','errorView','pickView'];
+function showView(name){ VIEWS.forEach(v=>{ document.getElementById(v).hidden=(v!==name); }); }
+
+function renderPick(){
+  assets=[]; assetIdCounter=0; selectedAssetId=null; chosenDirection=null;
+  document.getElementById('sub').textContent='We pulled these from '+(DATA.brand||'your site')+'. Pick your product and we build the world around it, with your packaging kept exactly as it is.';
+  protect.classList.remove('on'); handoff.classList.remove('on');
+  renderCandidates(); renderDirections(); refresh();
+}
+
+function validUrl(u){ try{ const x=new URL(u); return x.protocol==='http:'||x.protocol==='https:'; }catch{ return false; } }
+
+// guarded key persistence (localStorage works on the deployed page; guarded so the
+// in-chat preview never throws). For an internal testing tool this mirrors the Builder.
+// [ASSUMED, verify before public] a public self-serve version must move the key to a
+// Worker secret instead of collecting it in the browser.
+const KEY_STORE='pwp_anthropic_key';
+function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ return ''; } }
+function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
+
+async function generate(){
+  const productUrl=document.getElementById('productUrl').value.trim();
+  const homeUrl=document.getElementById('homeUrl').value.trim();
+  const hint=document.getElementById('entryHint');
+  if(!validUrl(productUrl)){ hint.textContent='Enter a valid product page URL, starting with https://'; return; }
+  let apiKey='';
+  if(PREVIEW_ENDPOINT){
+    apiKey=document.getElementById('apiKey').value.trim()||readKey();
+    if(!apiKey){ hint.textContent='Add your Anthropic API key to run the brand read.'; return; }
+    saveKey(apiKey);
+  }
+  hint.textContent=''; showView('loading');
+  try{
+    const { data }=await fetchPreviewData(productUrl, homeUrl, apiKey);
+    DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
+    renderPick(); showView('pick');
+  }catch(err){
+    document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
+    showView('error');
+  }
+}
+document.getElementById('generateBtn').addEventListener('click',generate);
+document.getElementById('productUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+document.getElementById('homeUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+document.getElementById('errorBack').addEventListener('click',()=>showView('entry'));
+document.getElementById('startOver').addEventListener('click',()=>{ handoff.classList.remove('on'); showView('entry'); });
+
+// honest demo banner from the first screen when no backend is configured
+document.getElementById('demoBanner').hidden = !!PREVIEW_ENDPOINT;
+document.getElementById('keyRow').hidden = !PREVIEW_ENDPOINT;
+if(PREVIEW_ENDPOINT){ const k=readKey(); if(k) document.getElementById('apiKey').value=k; }
+showView('entry');
+</script>
+</body>
+</html>
