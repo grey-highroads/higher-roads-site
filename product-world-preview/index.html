@@ -493,6 +493,9 @@ const CANDS=[
    endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
    (8.1), are not yet proven and must be checked against live brands. */
 const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/'; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
+// Edits sizes output to the input image aspect, so we hand the model a landscape
+// input. Keep these in sync with the Worker's OPENAI_IMAGE_SIZE.
+const RENDER_W = 1536, RENDER_H = 1024;
 const ENABLE_RENDER = true; // Worker has renderer adapter enabled
 
 function mockPreviewData(){
@@ -726,14 +729,28 @@ async function downloadRenderBundleFiles(){
   download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json');
   setTimeout(()=>downloadLockedProductImage().catch(err=>{ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); }),250);
 }
+async function padProductToLandscapeBlob(a, W, H){
+  // Place the real product on a landscape canvas so the edit endpoint returns
+  // landscape. The white margin is space the model fills with the scene; the
+  // product pixels are untouched, so packaging is still preserved.
+  const src=productImageSrcFromAsset(a);
+  if(!src) throw new Error('No product image to pad');
+  const img=await loadImg(src);
+  const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+  const targetH=H*0.72, scale=targetH/img.height, targetW=img.width*scale;
+  const x=(W-targetW)/2, y=(H-targetH)/2 + H*0.04;
+  ctx.drawImage(img, x, y, targetW, targetH);
+  return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('canvas toBlob failed')),'image/png'));
+}
 async function submitRenderBundle(){
   const a=await ensureSelectedProductImageData();
   await rebuildCurrentPackage();
-  const blob=lockedProductBlobFromAsset(a);
-  const ext=extensionForMediaType(a.mediaType||blob.type);
+  const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H);
   const form=new FormData();
   form.append('request_json', JSON.stringify(CURRENT_PKG));
-  form.append('locked_product_image', blob, 'locked-product.'+ext);
+  form.append('locked_product_image', blob, 'locked-product.png');
   document.getElementById('loadingLine').textContent='Sending render bundle';
   showView('loading');
   try{
