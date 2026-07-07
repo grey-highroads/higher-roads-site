@@ -222,6 +222,8 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
       <button class="pkgbtn" id="copyPkg" type="button">Copy package</button>
       <button class="pkgbtn" id="dlMd" type="button">Download .md</button>
       <button class="pkgbtn" id="dlJson" type="button">Download .json</button>
+      <button class="pkgbtn" id="dlProduct" type="button">Download product image</button>
+      <button class="pkgbtn" id="dlBundle" type="button">Download bundle files</button>
       <button class="pkgbtn" id="manualComposite" type="button">Composite test</button>
       <input type="file" id="worldInput" accept="image/*" hidden>
       <button class="pkgbtn" id="renderPreview" type="button" hidden>Render preview</button>
@@ -627,8 +629,9 @@ function buildHandoff(){
     chosen_direction:dir.scene_name
   };
 }
-cta.addEventListener('click',()=>{
+cta.addEventListener('click',async()=>{
   if(!canProceed()) return;
+  try{ await ensureSelectedProductImageData({silent:true}); }catch(e){ console.warn('locked product image was not materialized', e); }
   CURRENT_PKG=buildRenderPackage(buildHandoff());
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
   handoffBody.textContent=CURRENT_MD;
@@ -641,25 +644,112 @@ if(renderPreviewBtn){
   renderPreviewBtn.hidden = !ENABLE_RENDER;
   renderPreviewBtn.addEventListener('click',async()=>{
     if(!CURRENT_PKG || !canProceed()) return;
-    const composite=CURRENT_PKG.variants.find(v=>v.render_path==='composite')||CURRENT_PKG.variants[0];
-    const selected=selectedProductAsset()||{};
-    const productUrl=selected.asset_url||selected.source_image_url||selected.name||'';
-    document.getElementById('loadingLine').textContent='Generating your preview';
-    showView('loading');
-    try{
-      const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl, product_image_b64:selected.base64||'', product_media_type:selected.mediaType||'', placement:CURRENT_PKG.placement_spec }) });
-      if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render '+res.status+(t?': '+t.slice(0,160):'')); }
-      const data=await res.json();
-      await compositeAndShow(data);
-      showView('result');
-    }catch(err){
-      document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
-      showView('error');
-    }
+    await submitRenderBundle();
   });
 }
 
 function selectedProductAsset(){ return assets.find(a=>a.asset_id===selectedAssetId)||null; }
+function dataUrlToBlob(dataUrl){
+  const parts=String(dataUrl||'').split(',');
+  const meta=parts[0]||'';
+  const b64=parts[1]||'';
+  const media=(meta.match(/data:([^;]+)/)||[])[1]||'application/octet-stream';
+  const bin=atob(b64);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new Blob([bytes],{type:media});
+}
+function blobToDataUrl(blob){ return new Promise((resolve,reject)=>{ const r=new FileReader(); r.onload=()=>resolve(String(r.result||'')); r.onerror=()=>reject(r.error||new Error('blob read failed')); r.readAsDataURL(blob); }); }
+function extensionForMediaType(mt){ const m=String(mt||'').toLowerCase(); if(m.includes('png')) return 'png'; if(m.includes('webp')) return 'webp'; if(m.includes('jpeg')||m.includes('jpg')) return 'jpg'; return 'png'; }
+async function materializeViaWorker(a){
+  if(!PREVIEW_ENDPOINT) throw new Error('No Worker endpoint configured for asset materialization');
+  const imageUrl=a.asset_url||a.source_image_url||a.name||'';
+  if(!imageUrl) throw new Error('No source image URL to materialize');
+  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'materialize_asset', image_url:imageUrl, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'' }) });
+  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Asset materialize '+res.status+(t?': '+t.slice(0,160):'')); }
+  return await res.json();
+}
+async function materializeViaBrowser(a){
+  const imageUrl=a.asset_url||a.source_image_url||a.name||'';
+  if(!imageUrl) throw new Error('No source image URL to fetch');
+  const res=await fetch(imageUrl,{mode:'cors'});
+  if(!res.ok) throw new Error('Image fetch '+res.status);
+  const blob=await res.blob();
+  const dataUrl=await blobToDataUrl(blob);
+  return { image_b64:dataUrl.split(',')[1]||'', media_type:blob.type||a.mediaType||'image/png' };
+}
+async function ensureSelectedProductImageData(opts){
+  const options=opts||{};
+  const a=selectedProductAsset();
+  if(!a) throw new Error('Pick a product first');
+  if(a.base64) return a;
+  let payload=null;
+  try{ payload=await materializeViaWorker(a); }
+  catch(workerErr){
+    if(!options.silent) console.warn(workerErr);
+    try{ payload=await materializeViaBrowser(a); }
+    catch(browserErr){
+      if(!options.silent) console.warn(browserErr);
+      throw new Error('The selected product image is still only a URL. Update the Worker to return image_b64 for candidates or support action:"materialize_asset".');
+    }
+  }
+  const b64=payload.image_b64||payload.base64||payload.b64||'';
+  if(!b64) throw new Error('Materialized asset response did not include image_b64');
+  a.base64=b64;
+  a.mediaType=payload.media_type||payload.mediaType||a.mediaType||'image/png';
+  a.width=payload.width||a.width||null;
+  a.height=payload.height||a.height||null;
+  a.asset_url=payload.asset_url||payload.r2_url||a.asset_url||'';
+  a.source_asset_id=payload.asset_id||a.source_asset_id||'';
+  return a;
+}
+function lockedProductBlobFromAsset(a){
+  if(!a||!a.base64) throw new Error('No locked product image data available');
+  return dataUrlToBlob(dataUrlFromB64(a.mediaType||'image/png',a.base64));
+}
+async function rebuildCurrentPackage(){
+  CURRENT_PKG=buildRenderPackage(buildHandoff());
+  CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
+  if(handoffBody) handoffBody.textContent=CURRENT_MD;
+  return CURRENT_PKG;
+}
+async function downloadLockedProductImage(){
+  const a=await ensureSelectedProductImageData();
+  const blob=lockedProductBlobFromAsset(a);
+  const ext=extensionForMediaType(a.mediaType||blob.type);
+  const url=URL.createObjectURL(blob);
+  const el=document.createElement('a'); el.href=url; el.download='locked-product.'+ext; el.click(); URL.revokeObjectURL(url);
+}
+async function downloadRenderBundleFiles(){
+  const a=await ensureSelectedProductImageData();
+  await rebuildCurrentPackage();
+  download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json');
+  setTimeout(()=>downloadLockedProductImage().catch(err=>{ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); }),250);
+}
+async function submitRenderBundle(){
+  const a=await ensureSelectedProductImageData();
+  await rebuildCurrentPackage();
+  const blob=lockedProductBlobFromAsset(a);
+  const ext=extensionForMediaType(a.mediaType||blob.type);
+  const form=new FormData();
+  form.append('request_json', JSON.stringify(CURRENT_PKG));
+  form.append('locked_product_image', blob, 'locked-product.'+ext);
+  document.getElementById('loadingLine').textContent='Sending render bundle';
+  showView('loading');
+  try{
+    const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', body:form });
+    if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render bundle '+res.status+(t?': '+t.slice(0,180):'')); }
+    const data=await res.json();
+    if(data.world_image||data.world||data.background_image){ await compositeAndShow(data); showView('result'); return; }
+    if(data.image||data.final_image||data.preview_image){ await compositeAndShow({ world_image:data.image||data.final_image||data.preview_image, product_image:{ b64:a.base64, media_type:a.mediaType }, placement:CURRENT_PKG.placement_spec }); showView('result'); return; }
+    handoffBody.textContent=JSON.stringify(data,null,2);
+    handoff.classList.add('on');
+    showView('pick');
+  }catch(err){
+    document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
+    showView('error');
+  }
+}
 function dataUrlFromB64(mediaType,b64){ return 'data:'+(mediaType||'image/png')+';base64,'+b64; }
 function productImageSrcFromAsset(a){
   if(!a) return '';
@@ -722,15 +812,20 @@ document.getElementById('copyPkg').addEventListener('click',e=>{
   e.target.textContent='Copied'; setTimeout(()=>e.target.textContent='Copy package',1400);
 });
 document.getElementById('dlMd').addEventListener('click',()=>{ if(CURRENT_MD) download('render-package.md',CURRENT_MD,'text/markdown'); });
-document.getElementById('dlJson').addEventListener('click',()=>{ if(CURRENT_PKG) download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json'); });
+document.getElementById('dlJson').addEventListener('click',async()=>{ if(!CURRENT_PKG) await rebuildCurrentPackage(); download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json'); });
+const dlProductBtn=document.getElementById('dlProduct');
+if(dlProductBtn){ dlProductBtn.addEventListener('click',()=>downloadLockedProductImage().catch(err=>{ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); })); }
+const dlBundleBtn=document.getElementById('dlBundle');
+if(dlBundleBtn){ dlBundleBtn.addEventListener('click',()=>downloadRenderBundleFiles().catch(err=>{ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); })); }
 document.getElementById('dlImg').addEventListener('click',()=>{ try{ const a=document.createElement('a'); a.href=document.getElementById('resultCanvas').toDataURL('image/png'); a.download='preview.png'; a.click(); }catch(e){} });
 document.getElementById('copyPkg2').addEventListener('click',e=>{ if(!CURRENT_MD) return; if(navigator.clipboard) navigator.clipboard.writeText(CURRENT_MD); e.target.textContent='Copied'; setTimeout(()=>e.target.textContent='Copy package',1400); });
 document.getElementById('startOver2').addEventListener('click',()=>showView('entry'));
 const manualCompositeBtn=document.getElementById('manualComposite');
 const worldInput=document.getElementById('worldInput');
 if(manualCompositeBtn && worldInput){
-  manualCompositeBtn.addEventListener('click',()=>{
+  manualCompositeBtn.addEventListener('click',async()=>{
     if(!CURRENT_PKG){ cta.click(); }
+    try{ await ensureSelectedProductImageData({silent:true}); await rebuildCurrentPackage(); }catch(e){ console.warn('manual composite will use URL fallback', e); }
     worldInput.click();
   });
   worldInput.addEventListener('change',e=>{
