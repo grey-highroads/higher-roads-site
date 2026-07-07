@@ -317,13 +317,45 @@ const RUBRIC_CRITERIA=[
 const _c=s=>String(s==null?'':s).trim();
 const _l=a=>Array.isArray(a)?a.map(_c).filter(Boolean):(a?[_c(a)]:[]);
 const _s=a=>_l(a).join(', ');
+function _dedupe(arr){return [...new Set(_l(arr).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean))];}
+function _cleanText(s){
+  return _c(s)
+    .replace(/\s+/g,' ')
+    .replace(/\.{2,}/g,'.')
+    .replace(/\s+([,.])/g,'$1')
+    .trim();
+}
+function _sentences(s){
+  return _cleanText(s).split(/(?<=[.!?])\s+/).map(_cleanText).filter(Boolean);
+}
+function _stripProductFreeLines(s){
+  return _sentences(s).filter(x=>{
+    const t=x.toLowerCase();
+    return !(t.includes('no product packaging')||t.includes('no generated')||t.includes('clear placement area')||t.includes('product-shaped placement'));
+  }).join(' ');
+}
+function _firstSentences(s,n){return _sentences(s).slice(0,n).join(' ');}
+function _sentenceJoin(parts){
+  return _l(parts).map(_cleanText).filter(Boolean).join('. ').replace(/\.{2,}/g,'.');
+}
+function sanitizeProductPlacement(s){
+  return _cleanText(s)
+    .replace(/cap beside it or slightly ajar/gi,'closed cap exactly as supplied')
+    .replace(/cap slightly ajar/gi,'closed cap exactly as supplied')
+    .replace(/cap beside it/gi,'closed cap exactly as supplied')
+    .replace(/open cap/gi,'closed cap exactly as supplied')
+    .replace(/opened jar/gi,'closed jar exactly as supplied')
+    .replace(/open jar/gi,'closed jar exactly as supplied')
+    .replace(/showing the inside/gi,'visible only as supplied in the locked product image')
+    .replace(/gummies inside are visible/gi,'gummies are visible only if visible in the locked product image');
+}
 function assembleBrandNegatives(h){
   const sd=h.scene_direction||{}, ix=h.intake_expressive||{}, parts=[];
   if(Array.isArray(sd.avoid)&&sd.avoid.length) parts.push(..._l(sd.avoid));
   if(ix.visual_territory&&_l(ix.visual_territory.stay_away_from).length) parts.push(..._l(ix.visual_territory.stay_away_from));
   if(ix.sensory&&_c(ix.sensory.forbidden_colors)) parts.push(_c(ix.sensory.forbidden_colors));
   if(ix.brand_state&&_l(ix.brand_state.avoid_states).length) parts.push(..._l(ix.brand_state.avoid_states).map(s=>s.toLowerCase()));
-  return [...new Set(parts)];
+  return _dedupe(parts);
 }
 function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=ix.sensory||{},b=[];
   if(_c(bs.make_people_feel))b.push('mood: '+_c(bs.make_people_feel));
@@ -332,8 +364,51 @@ function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=i
   if(_c(sn.color_palette))b.push('palette: '+_c(sn.color_palette));
   if(_l(sn.textures_and_materials).length)b.push('materials: '+_s(sn.textures_and_materials));
   return b.join('; ');}
-function _posComposite(h){const sd=h.scene_direction||{};return [_c(sd.world_description),_c(sd.composition)&&'composition: '+_c(sd.composition),_c(sd.lighting)&&'lighting: '+_c(sd.lighting),_l(sd.props).length&&'props: '+_s(sd.props),_flavor(h.intake_expressive||{}),'leave a clear product-shaped placement area in the lower third','do not draw any product, can, bottle, or label in the scene'].filter(Boolean).join('. ');}
-function _posReference(h){const sd=h.scene_direction||{};return [_c(sd.world_description),_c(sd.product_placement_intent),_c(sd.composition)&&'composition: '+_c(sd.composition),_c(sd.lighting)&&'lighting: '+_c(sd.lighting),_l(sd.props).length&&'props: '+_s(sd.props),_flavor(h.intake_expressive||{}),'place the referenced product exactly as supplied, with label hierarchy and pack proportions unchanged'].filter(Boolean).join('. ');}
+function buildPlacementSpec(h){
+  const sd=h.scene_direction||{};
+  const txt=(_c(sd.product_placement_intent)+' '+_c(sd.composition)+' '+_c(sd.world_description)).toLowerCase();
+  const spec={anchor:'center-left',cx:0.38,cy:0.62,width_pct:0.32,shadow:'soft contact shadow',light_match:'soft natural light from camera left'};
+  if(txt.includes('lower third')) spec.cy=0.68;
+  if(txt.includes('center-left')||txt.includes('left vertical')) spec.cx=0.38;
+  else if(txt.includes('centered')||txt.includes('center')) spec.cx=0.50;
+  if(txt.includes('40%')||txt.includes('40 percent')) spec.width_pct=0.40;
+  if(txt.includes('camera left')) spec.light_match='soft natural light from camera left';
+  if(txt.includes('camera right')) spec.light_match='soft natural light from camera right';
+  return spec;
+}
+function _posComposite(h){
+  const sd=h.scene_direction||{};
+  const ix=h.intake_expressive||{};
+  const base=_firstSentences(sd.world_description,4);
+  const props=_l(sd.props).slice(0,6);
+  const placement=buildPlacementSpec(h);
+  return _sentenceJoin([
+    base,
+    _c(sd.composition)&&'composition: '+_c(sd.composition),
+    _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
+    props.length&&'props: '+props.join(', '),
+    _flavor(ix),
+    'leave one clean empty product placement area '+placement.anchor+' on the main surface, sized for the locked product image',
+    'do not draw any product, jar, bottle, can, box, package, label, logo, brand name, readable text, hands, or people'
+  ]);
+}
+function _posReference(h){
+  const sd=h.scene_direction||{};
+  const ix=h.intake_expressive||{};
+  const base=_firstSentences(_stripProductFreeLines(sd.world_description),4);
+  const props=_l(sd.props).slice(0,6);
+  return _sentenceJoin([
+    base,
+    sanitizeProductPlacement(sd.product_placement_intent),
+    _c(sd.composition)&&'composition: '+_c(sd.composition),
+    _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
+    props.length&&'props: '+props.join(', '),
+    _flavor(ix),
+    'use the supplied product image exactly as provided',
+    'preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged',
+    'do not redraw, retype, recolor, open, crop, relabel, or invent claims on the product'
+  ]);
+}
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
   const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h)];
@@ -341,11 +416,12 @@ function buildRenderPackage(h){
     meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
     fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
     locked_asset:{asset_id:_c(la.asset_id),asset_name:_c(la.asset_name),asset_type:_c(la.asset_type)||'packaging',lock_status:_c(la.lock_status)||'locked',image_ref:_c(la.image_ref)||_c(la.source_image_url)||'(attach the locked product image file)'},
-    scene_brief:{world_description:_c(sd.world_description),product_placement_intent:_c(sd.product_placement_intent),composition:_c(sd.composition),lighting:_c(sd.lighting),props:_l(sd.props)},
-    prompts:{positive:_posReference(h),negative:neg.join(', ')},
+    scene_brief:{world_description:_c(sd.world_description),product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),composition:_c(sd.composition),lighting:_c(sd.lighting),props:_l(sd.props)},
+    placement_spec:buildPlacementSpec(h),
+    prompts:{positive:_posReference(h),negative:_dedupe(neg).join(', ')},
     variants:[
-      {render_path:'composite',label:'Composite: generate a product-free world, then composite the locked product in',instructions:'Generate the environment only, with an empty product-shaped placement area. Composite the supplied locked product image into that area afterward. Best when the engine cannot preserve packaging reliably.',positive:_posComposite(h),negative:neg.join(', ')},
-      {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:_posReference(h),negative:neg.join(', ')}
+      {render_path:'composite',label:'Composite: generate a product-free world, then composite the locked product in',instructions:'Generate the environment only, with an empty product-shaped placement area. Composite the supplied locked product image into that area afterward. Best when the engine cannot preserve packaging reliably.',positive:_posComposite(h),negative:_dedupe(neg).join(', ')},
+      {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:_posReference(h),negative:_dedupe(neg).join(', ')}
     ],
     confidence_notes:{score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]},
     test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Label fidelity, proportions, and color accuracy are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
@@ -363,6 +439,7 @@ function renderPackageMarkdown(p){
   if(p.scene_brief.composition)L.push('Composition: '+p.scene_brief.composition);
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
   if(p.scene_brief.props.length)L.push('Props: '+p.scene_brief.props.join(', '));
+  if(p.placement_spec){L.push('Placement spec: '+JSON.stringify(p.placement_spec));}
   L.push('');L.push('## 4. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);
   L.push('');L.push('## 5. Variants to test');
   p.variants.forEach((v,i)=>{L.push('### 5.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
@@ -551,7 +628,7 @@ if(renderPreviewBtn){
     document.getElementById('loadingLine').textContent='Generating your preview';
     showView('loading');
     try{
-      const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl }) });
+      const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl, placement:CURRENT_PKG.placement_spec }) });
       if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render '+res.status+(t?': '+t.slice(0,160):'')); }
       const data=await res.json();
       await compositeAndShow(data);
