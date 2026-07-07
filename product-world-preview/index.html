@@ -229,6 +229,18 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <button class="linkbtn" id="startOver" type="button" style="margin-top:28px">Start over with a new URL</button>
   </section>
 
+  <section id="resultView" hidden>
+    <p class="eyebrow">Your preview</p>
+    <h1>Your product in its world</h1>
+    <canvas id="resultCanvas" width="1024" height="1024" style="max-width:100%;height:auto;border-radius:14px;border:1px solid var(--border);display:block;margin:8px 0 0"></canvas>
+    <p class="sub">Your real packaging, composited into the generated world. Nothing about the product was redrawn.</p>
+    <div class="pkgbtns">
+      <button class="pkgbtn" id="dlImg" type="button">Download image</button>
+      <button class="pkgbtn" id="copyPkg2" type="button">Copy package</button>
+    </div>
+    <button class="linkbtn" id="startOver2" type="button" style="margin-top:20px">Start over with a new URL</button>
+  </section>
+
   <div class="devbar">
     <span>DEV</span>
     <button id="toggleConf">Toggle brand confidence (now: HIGH)</button>
@@ -518,14 +530,43 @@ function buildHandoff(){
     chosen_direction:dir.scene_name
   };
 }
-cta.addEventListener('click',()=>{
+cta.addEventListener('click',async()=>{
   if(!canProceed()) return;
   CURRENT_PKG=buildRenderPackage(buildHandoff());
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
-  handoffBody.textContent=CURRENT_MD;
-  handoff.classList.add('on');
-  handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(!PREVIEW_ENDPOINT){
+    // demo mode: no render backend, show the package so the flow is still visible
+    handoffBody.textContent=CURRENT_MD; handoff.classList.add('on'); handoff.scrollIntoView({behavior:'smooth',block:'nearest'}); return;
+  }
+  // live: send the composite variant to the render path, composite the real product, show it
+  const composite=CURRENT_PKG.variants.find(v=>v.render_path==='composite')||CURRENT_PKG.variants[0];
+  const productUrl=(assets.find(a=>a.asset_id===selectedAssetId)||{}).name;
+  document.getElementById('loadingLine').textContent='Generating your preview';
+  showView('loading');
+  try{
+    const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'render', prompt:composite.positive, product_image_url:productUrl }) });
+    if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render '+res.status+(t?': '+t.slice(0,160):'')); }
+    const data=await res.json();
+    await compositeAndShow(data);
+    showView('result');
+  }catch(err){ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); }
 });
+
+function loadImg(src){ return new Promise((resolve,reject)=>{ const im=new Image(); im.onload=()=>resolve(im); im.onerror=()=>reject(new Error('image load failed')); im.src=src; }); }
+function drawCover(ctx,img,W,H){ const ir=img.width/img.height, cr=W/H; let w,h; if(ir>cr){ h=H; w=H*ir; } else { w=W; h=W/ir; } ctx.drawImage(img,(W-w)/2,(H-h)/2,w,h); }
+async function compositeAndShow(data){
+  const canvas=document.getElementById('resultCanvas'); const ctx=canvas.getContext('2d');
+  const world=await loadImg('data:'+data.world_image.media_type+';base64,'+data.world_image.b64);
+  const prod=await loadImg('data:'+data.product_image.media_type+';base64,'+data.product_image.b64);
+  const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
+  drawCover(ctx,world,W,H);
+  const p=data.placement||{cx:0.5,cy:0.66,scale:0.42};
+  const tw=W*p.scale, th=tw*(prod.height/prod.width);
+  const x=W*p.cx-tw/2, y=H*p.cy-th/2;
+  ctx.save(); ctx.globalAlpha=0.35; ctx.filter='blur(14px)'; ctx.fillStyle='#000';
+  ctx.beginPath(); ctx.ellipse(W*p.cx, y+th*0.99, tw*0.42, th*0.07, 0,0,Math.PI*2); ctx.fill(); ctx.restore();
+  ctx.drawImage(prod, x, y, tw, th);
+}
 function download(name,content,type){
   const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob);
   const el=document.createElement('a'); el.href=url; el.download=name; el.click(); URL.revokeObjectURL(url);
@@ -537,6 +578,9 @@ document.getElementById('copyPkg').addEventListener('click',e=>{
 });
 document.getElementById('dlMd').addEventListener('click',()=>{ if(CURRENT_MD) download('render-package.md',CURRENT_MD,'text/markdown'); });
 document.getElementById('dlJson').addEventListener('click',()=>{ if(CURRENT_PKG) download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json'); });
+document.getElementById('dlImg').addEventListener('click',()=>{ try{ const a=document.createElement('a'); a.href=document.getElementById('resultCanvas').toDataURL('image/png'); a.download='preview.png'; a.click(); }catch(e){} });
+document.getElementById('copyPkg2').addEventListener('click',e=>{ if(!CURRENT_MD) return; if(navigator.clipboard) navigator.clipboard.writeText(CURRENT_MD); e.target.textContent='Copied'; setTimeout(()=>e.target.textContent='Copy package',1400); });
+document.getElementById('startOver2').addEventListener('click',()=>showView('entry'));
 
 // upload fallback -> same injection path
 document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
@@ -559,7 +603,7 @@ document.getElementById('toggleConf').addEventListener('click',e=>{
 });
 
 // ---- view state machine ----
-const VIEWS=['entryView','loadingView','errorView','pickView'];
+const VIEWS=['entryView','loadingView','errorView','pickView','resultView'];
 function showView(name){ const id=name.endsWith('View')?name:name+'View'; VIEWS.forEach(v=>{ document.getElementById(v).hidden=(v!==id); }); }
 
 function renderPick(){
@@ -590,7 +634,7 @@ async function generate(){
     if(!apiKey){ hint.textContent='Add your Anthropic API key to run the brand read.'; return; }
     saveKey(apiKey);
   }
-  hint.textContent=''; showView('loading');
+  hint.textContent=''; document.getElementById('loadingLine').textContent='Fetching your product'; showView('loading');
   try{
     const { data }=await fetchPreviewData(productUrl, homeUrl, apiKey);
     DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
