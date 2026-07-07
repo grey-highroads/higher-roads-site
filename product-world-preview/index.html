@@ -493,7 +493,7 @@ const CANDS=[
    endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
    (8.1), are not yet proven and must be checked against live brands. */
 const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/'; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
-const ENABLE_RENDER = false; // keep false until the Worker has a render provider and RENDER_API_KEY secret
+const ENABLE_RENDER = true; // Worker has renderer adapter enabled
 
 function mockPreviewData(){
   return {
@@ -740,8 +740,8 @@ async function submitRenderBundle(){
     const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', body:form });
     if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render bundle '+res.status+(t?': '+t.slice(0,180):'')); }
     const data=await res.json();
+    if(data.rendered_image||data.final_image||data.preview_image||data.image){ await showRenderedImage(data.rendered_image||data.final_image||data.preview_image||data.image); showView('result'); return; }
     if(data.world_image||data.world||data.background_image){ await compositeAndShow(data); showView('result'); return; }
-    if(data.image||data.final_image||data.preview_image){ await compositeAndShow({ world_image:data.image||data.final_image||data.preview_image, product_image:{ b64:a.base64, media_type:a.mediaType }, placement:CURRENT_PKG.placement_spec }); showView('result'); return; }
     handoffBody.textContent=JSON.stringify(data,null,2);
     handoff.classList.add('on');
     showView('pick');
@@ -783,6 +783,15 @@ function normalizePlacement(p){
   out.cy=Number(out.cy)||fallback.cy;
   out.scale=Number(out.scale||out.width_pct)||fallback.scale;
   return out;
+}
+async function showRenderedImage(payload){
+  const src=imageSourceFromPayload(payload);
+  if(!src) throw new Error('No rendered image supplied');
+  const img=await loadImg(src);
+  const canvas=document.getElementById('resultCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawCover(ctx,img,canvas.width,canvas.height);
 }
 async function compositeAndShow(data){
   const canvas=document.getElementById('resultCanvas'); const ctx=canvas.getContext('2d');
