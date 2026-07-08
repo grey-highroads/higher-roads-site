@@ -917,25 +917,45 @@ async function submitRenderBundle(){
     const jobId=created.job_id;
     if(!jobId) throw new Error('render-jobs did not return a job_id');
 
-    // 2. Render the job. Synchronous: the response is the completed job with
-    //    an output_url served from storage.
+    // 2. Trigger the render. This enqueues the job and returns immediately;
+    //    the worker renders in the background off the request path.
     document.getElementById('loadingLine').textContent='Rendering product world';
-    const renderRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST' });
-    const job=await renderRes.json().catch(()=>({}));
-    if(!renderRes.ok || job.status==='error'){
-      const detail=job.detail||job.message||job.error||('Render '+renderRes.status);
-      throw new Error(String(detail).slice(0,200));
-    }
+    const startRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST' });
+    if(!startRes.ok && startRes.status!==202){ const t=await startRes.text().catch(()=>''); throw new Error('Start render '+startRes.status+(t?': '+t.slice(0,180):'')); }
+
+    // 3. Poll the job until it completes or errors. The render runs on a queue
+    //    consumer, so this can take a while without a request timing out.
+    const job=await pollJobUntilDone(jobId, { timeoutMs:180000, intervalMs:2500 });
+    if(job.status==='error') throw new Error(String(job.error_message||'Render failed').slice(0,200));
     const outputUrl=(job.assets&&job.assets.output_url)||job.output_image_url;
     if(!outputUrl) throw new Error('Render completed but no output URL was returned');
 
-    // 3. Show the stored output image.
+    // 4. Show the stored output image.
     await showRenderedImage(outputUrl);
     showView('result');
   }catch(err){
     document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
     showView('error');
   }
+}
+async function pollJobUntilDone(jobId, opts){
+  const timeoutMs=(opts&&opts.timeoutMs)||180000;
+  const intervalMs=(opts&&opts.intervalMs)||2500;
+  const deadline=Date.now()+timeoutMs;
+  let dots=0;
+  while(Date.now()<deadline){
+    await new Promise(r=>setTimeout(r,intervalMs));
+    let job;
+    try{
+      const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId));
+      if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Poll '+res.status+(t?': '+t.slice(0,120):'')); }
+      job=await res.json();
+    }catch(e){ continue; } // transient network blip: keep polling until the deadline
+    if(job.status==='complete'||job.status==='error') return job;
+    dots=(dots+1)%4;
+    document.getElementById('loadingLine').textContent='Rendering product world'+'.'.repeat(dots);
+  }
+  throw new Error('Render timed out after '+Math.round(timeoutMs/1000)+'s. The job may still finish; try again shortly.');
 }
 function dataUrlFromB64(mediaType,b64){ return 'data:'+(mediaType||'image/png')+';base64,'+b64; }
 function productImageSrcFromAsset(a){
