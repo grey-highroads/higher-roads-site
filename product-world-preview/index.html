@@ -78,6 +78,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .dir[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
 .dir .dname{font-family:'Playfair Display',serif; font-size:19px; margin:0 0 7px}
 .dir .dworld{font-size:14px; color:var(--white); opacity:.65; margin:0}
+.dir .dwhy{font-size:12.5px; color:var(--accent); opacity:.9; margin:9px 0 0; line-height:1.4}
 
 .footer-cta{margin:56px 0 0; display:flex; align-items:center; gap:20px; flex-wrap:wrap}
 .cta{
@@ -378,6 +379,17 @@ function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=i
   return b.join('; ');}
 function buildPlacementSpec(h){
   const sd=h.scene_direction||{};
+  const lp=sd.locked_product_placement;
+  if(lp&&(typeof lp.cx==='number'||typeof lp.width_pct==='number')){
+    return {
+      anchor:_c(lp.anchor)||'center-left',
+      cx:typeof lp.cx==='number'?lp.cx:0.38,
+      cy:typeof lp.cy==='number'?lp.cy:0.62,
+      width_pct:typeof lp.width_pct==='number'?lp.width_pct:0.32,
+      shadow:_c(lp.contact_shadow)||'soft contact shadow',
+      light_match:_c(lp.light_match)||'soft natural light from camera left'
+    };
+  }
   const txt=(_c(sd.product_placement_intent)+' '+_c(sd.composition)+' '+_c(sd.world_description)).toLowerCase();
   const spec={anchor:'center-left',cx:0.38,cy:0.62,width_pct:0.32,shadow:'soft contact shadow',light_match:'soft natural light from camera left'};
   if(txt.includes('lower third')) spec.cy=0.68;
@@ -391,13 +403,19 @@ function buildPlacementSpec(h){
 function _posComposite(h){
   const sd=h.scene_direction||{};
   const ix=h.intake_expressive||{};
-  const base=_firstSentences(sd.world_description,4);
+  const seed=_c(sd.prompt_seed);
+  const base=seed?_firstSentences(_stripProductFreeLines(seed),5):_firstSentences(sd.world_description,4);
   const props=_l(sd.props).slice(0,6);
   const placement=buildPlacementSpec(h);
   return _sentenceJoin([
     base,
+    _c(sd.surface)&&'surface: '+_c(sd.surface),
+    _c(sd.background)&&'background: '+_c(sd.background),
+    _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
+    _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
     _c(sd.composition)&&'composition: '+_c(sd.composition),
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
+    cameraToText(sd.camera),
     props.length&&'props: '+props.join(', '),
     _flavor(ix),
     'leave one clean empty product placement area '+placement.anchor+' on the main surface, sized for the locked product image',
@@ -407,13 +425,19 @@ function _posComposite(h){
 function _posReference(h){
   const sd=h.scene_direction||{};
   const ix=h.intake_expressive||{};
-  const base=_firstSentences(_stripProductFreeLines(sd.world_description),4);
+  const seed=_c(sd.prompt_seed);
+  const base=seed?_firstSentences(_stripProductFreeLines(seed),5):_firstSentences(_stripProductFreeLines(sd.world_description),4);
   const props=_l(sd.props).slice(0,6);
   return _sentenceJoin([
     base,
+    _c(sd.surface)&&'surface: '+_c(sd.surface),
+    _c(sd.background)&&'background: '+_c(sd.background),
+    _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
+    _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
     sanitizeProductPlacement(sd.product_placement_intent),
     _c(sd.composition)&&'composition: '+_c(sd.composition),
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
+    cameraToText(sd.camera),
     props.length&&'props: '+props.join(', '),
     _flavor(ix),
     'use the supplied product image exactly as provided',
@@ -421,6 +445,103 @@ function _posReference(h){
     'do not redraw, retype, recolor, open, crop, relabel, or invent claims on the product'
   ]);
 }
+/* ===================== Creative Scene Brief layer ===================== */
+/* Turns brand intelligence + locked product metadata into three specific,
+   art-directed scene directions. Renderer-neutral. The selected direction
+   feeds the render package prompt builders below. Browser-direct Anthropic
+   call using the key the page already holds. [VERIFY in browser] the direct
+   browser access header; if CORS blocks, route this through world-preview. */
+const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
+const ART_DIRECTOR_PROMPT=`You are a senior commercial art director and product-world concept designer.
+
+Your task is to turn brand intelligence and locked product metadata into three specific scene directions for a product-world render.
+
+Do not write final renderer prompts yet. Create renderer-neutral scene briefs a prompt engine can later adapt for OpenAI, ComfyUI, or another image engine.
+
+The product image is locked. The scene must be built around the supplied product. Do not propose any scene requiring the product label, shape, cap, packaging, logo, text, claims, or colors to change.
+
+Avoid generic category imagery. Do not rely on obvious props unless the brand evidence supports them. A beverage scene should not default to fruit piles, condensation, marble counters, tropical leaves, hands, or generic wellness props. A supplement scene should not default to spa stones, powder explosions, or fake clinical props. A CPG scene should not default to plain product-on-table staging.
+
+For each direction, describe a real photographic set. Include surface, background, props, materials, color palette, lighting, camera, composition, and locked product placement. Make every scene visually distinct.
+
+Use brand evidence. If confidence is low, say so and create safer, broader directions without inventing false brand claims.
+
+Return only valid JSON matching this schema, no prose, no markdown fences:
+{
+ "scene_direction_version":"0.1",
+ "brand_name":"","product_name":"","product_category":"",
+ "recommended_scene_id":"",
+ "directions":[
+  {"scene_id":"scene_01","scene_name":"","one_line_concept":"","creative_rationale":"",
+   "world_description":"","surface":"","background":"","props":[],"materials":[],
+   "color_palette":[],"lighting":"",
+   "camera":{"lens_feel":"","angle":"","depth_of_field":"","framing":""},
+   "composition":"",
+   "locked_product_placement":{"anchor":"","cx":0.38,"cy":0.62,"width_pct":0.32,"scale_notes":"","contact_shadow":"","light_match":""},
+   "brand_specific_cues":[],"avoid":[],"generic_risks":[],"why_this_is_not_generic":"",
+   "prompt_seed":"","confidence":{"score":"","reason":""}}
+ ]
+}
+Return exactly three directions.`;
+
+async function buildSceneDirections(data, apiKey){
+  const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
+  const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
+  const input={
+    brand_name:data.brand||'',
+    product_name:f.name||la.asset_name||'',
+    product_category:f.category||'',
+    locked_asset:{ asset_name:la.asset_name||'', media_type:la.mediaType||'', width:la.width||null, height:la.height||null },
+    brand_tone:ix.brand_state||{},
+    visual_territory:ix.visual_territory||{},
+    sensory:ix.sensory||{},
+    competitive:ix.competitive||{},
+    confidence:v.confidence||'unknown',
+    fidelity_rule:'The product image is locked. The scene must be built around the product. Do not redraw, retype, recolor, relabel, reshape, crop, open, or reinterpret the product packaging.'
+  };
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:3000, system:ART_DIRECTOR_PROMPT, messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
+  });
+  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
+  const payload=await res.json();
+  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  const parsed=extractJson(text);
+  if(!parsed||!Array.isArray(parsed.directions)||!parsed.directions.length) throw new Error('Scene builder returned no directions');
+  return parsed;
+}
+function extractJson(text){
+  let s=String(text||'').trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+  const a=s.indexOf('{'), b=s.lastIndexOf('}');
+  if(a>=0&&b>a) s=s.slice(a,b+1);
+  return JSON.parse(s);
+}
+function esc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function cameraToText(cam){ if(!cam||typeof cam!=='object') return ''; const p=[_c(cam.lens_feel),_c(cam.angle),_c(cam.depth_of_field),_c(cam.framing)].filter(Boolean); return p.length?('shot: '+p.join(', ')):''; }
+function mapSceneDirectionToSd(d){
+  const lp=d.locked_product_placement||{};
+  const intent=[_c(lp.anchor),_c(lp.scale_notes),_c(lp.light_match)].filter(Boolean).join(', ');
+  return {
+    scene_name:_c(d.scene_name),
+    world_description:_c(d.world_description),
+    product_placement_intent:intent||_c(d.composition),
+    composition:_c(d.composition),
+    lighting:_c(d.lighting),
+    props:_l(d.props),
+    avoid:_l(d.avoid),
+    render_path:'composite',
+    prompt_seed:_c(d.prompt_seed),
+    surface:_c(d.surface),
+    background:_c(d.background),
+    materials:_l(d.materials),
+    color_palette:_l(d.color_palette),
+    camera:d.camera||null,
+    brand_specific_cues:_l(d.brand_specific_cues),
+    locked_product_placement:lp
+  };
+}
+
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
   const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h)];
@@ -598,6 +719,24 @@ function pick(i){
 }
 function renderDirections(){
   const v=DATA.vibes;
+  const rich=Array.isArray(v.scene_directions)&&v.scene_directions.length?v.scene_directions:null;
+  if(rich){
+    directions.classList.add('on');
+    let recIdx=rich.findIndex(d=>d.scene_id&&d.scene_id===v.recommended_scene_id);
+    if(recIdx<0) recIdx=0;
+    chosenDirection=recIdx;
+    dgrid.innerHTML='';
+    rich.forEach((d,i)=>{
+      const b=document.createElement('button');
+      b.className='dir'; b.type='button'; b.setAttribute('aria-pressed', i===recIdx?'true':'false');
+      const concept=d.one_line_concept||d.world_description||'';
+      const why=d.why_this_is_not_generic?`<p class="dwhy">${esc(d.why_this_is_not_generic)}</p>`:'';
+      b.innerHTML=`<p class="dname">${esc(d.scene_name)}</p><p class="dworld">${esc(concept)}</p>${why}`;
+      b.addEventListener('click',()=>{ chosenDirection=i; [...dgrid.children].forEach((el,idx)=>el.setAttribute('aria-pressed',idx===i?'true':'false')); refresh(); });
+      dgrid.appendChild(b);
+    });
+    return;
+  }
   if(v.confidence!=='low'){ directions.classList.remove('on'); chosenDirection=0; return; }
   directions.classList.add('on');
   const list=[v.primary, ...(v.alternates||[])];
@@ -605,7 +744,7 @@ function renderDirections(){
   list.forEach((d,i)=>{
     const b=document.createElement('button');
     b.className='dir'; b.type='button'; b.setAttribute('aria-pressed','false');
-    b.innerHTML=`<p class="dname">${d.scene_name}</p><p class="dworld">${d.world_description}</p>`;
+    b.innerHTML=`<p class="dname">${esc(d.scene_name)}</p><p class="dworld">${esc(d.world_description)}</p>`;
     b.addEventListener('click',()=>{ chosenDirection=i; [...dgrid.children].forEach((el,idx)=>el.setAttribute('aria-pressed',idx===i?'true':'false')); refresh(); });
     dgrid.appendChild(b);
   });
@@ -622,15 +761,28 @@ let CURRENT_PKG=null, CURRENT_MD='';
 function buildHandoff(){
   const a=assets.find(x=>x.asset_id===selectedAssetId);
   const v=DATA.vibes;
-  const dir = v.confidence==='low' ? [v.primary,...(v.alternates||[])][chosenDirection] : v.primary;
+  const rich=Array.isArray(v.scene_directions)&&v.scene_directions.length?v.scene_directions:null;
+  let sceneDir, chosenName, alternates;
+  if(rich){
+    const idx=(chosenDirection!=null?chosenDirection:0);
+    const d=rich[idx]||rich[0];
+    sceneDir=mapSceneDirectionToSd(d);
+    chosenName=d.scene_name;
+    alternates=rich.filter((_,i)=>i!==idx).map(x=>({scene_name:_c(x.scene_name),world_description:_c(x.one_line_concept)||_c(x.world_description),why:_c(x.why_this_is_not_generic)}));
+  }else{
+    const dir=v.confidence==='low'?[v.primary,...(v.alternates||[])][chosenDirection]:v.primary;
+    sceneDir=v.scene_direction;
+    chosenName=dir.scene_name;
+    alternates=v.confidence==='low'?v.alternates:[];
+  }
   return {
     mode:getOverallMode(),
     locked_asset:{ asset_id:a.asset_id, asset_name:a.asset_name, asset_type:a.asset_type, lock_status:a.lock_status, preserve_elements:a.preserve_elements, image_ref:a.asset_url||a.source_image_url||a.name, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'', media_type:a.mediaType||'', base64:a.base64||'' },
     intake_expressive:v.intake_expressive,
-    scene_direction:v.scene_direction,
+    scene_direction:sceneDir,
     confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
-    alternates:v.confidence==='low'?v.alternates:[],
-    chosen_direction:dir.scene_name
+    alternates:alternates,
+    chosen_direction:chosenName
   };
 }
 cta.addEventListener('click',async()=>{
@@ -947,6 +1099,14 @@ async function generate(){
   try{
     const { data }=await fetchPreviewData(productUrl, homeUrl, apiKey);
     DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
+    if(apiKey){
+      document.getElementById('loadingLine').textContent='Designing scene directions';
+      try{
+        const sd=await buildSceneDirections(DATA, apiKey);
+        DATA.vibes.scene_directions=sd.directions;
+        DATA.vibes.recommended_scene_id=sd.recommended_scene_id||'';
+      }catch(sceneErr){ console.warn('scene direction builder failed; using brand-read scene', sceneErr); }
+    }
     renderPick(); showView('pick');
   }catch(err){
     document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
