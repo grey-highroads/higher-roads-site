@@ -237,8 +237,8 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   <section id="resultView" hidden>
     <p class="eyebrow">Your preview</p>
     <h1>Your product in its world</h1>
-    <canvas id="resultCanvas" width="1024" height="1024" style="max-width:100%;height:auto;border-radius:14px;border:1px solid var(--border);display:block;margin:8px 0 0"></canvas>
-    <p class="sub">Your real packaging, composited into the generated world. Nothing about the product was redrawn.</p>
+    <canvas id="resultCanvas" width="1536" height="1024" style="max-width:100%;height:auto;border-radius:14px;border:1px solid var(--border);display:block;margin:8px 0 0"></canvas>
+    <p class="sub">Your supplied product image was used as the locked reference for the render. Check label fidelity before sharing.</p>
     <div class="pkgbtns">
       <button class="pkgbtn" id="dlImg" type="button">Download image</button>
       <button class="pkgbtn" id="copyPkg2" type="button">Copy package</button>
@@ -806,12 +806,15 @@ async function showRenderedImage(payload){
   if(!src) throw new Error('No rendered image supplied');
   const img=await loadImg(src);
   const canvas=document.getElementById('resultCanvas');
+  canvas.width=img.naturalWidth||img.width;      // preserve whatever the model returned
+  canvas.height=img.naturalHeight||img.height;
   const ctx=canvas.getContext('2d');
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawCover(ctx,img,canvas.width,canvas.height);
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
 }
 async function compositeAndShow(data){
   const canvas=document.getElementById('resultCanvas'); const ctx=canvas.getContext('2d');
+  canvas.width=RENDER_W; canvas.height=RENDER_H;   // deterministic size for the fallback composite path
   const worldSrc=imageSourceFromPayload(data.world_image||data.world||data.background_image);
   const selected=selectedProductAsset();
   const productSrc=imageSourceFromPayload(data.product_image)||productImageSrcFromAsset(selected);
