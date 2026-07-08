@@ -396,14 +396,14 @@ function buildPlacementSpec(h){
 }
 function _posComposite(h){
   const sd=h.scene_direction||{};
-  const ix=h.intake_expressive||{};
   const seed=_c(sd.prompt_seed);
-  const base=seed?_firstSentences(_stripProductFreeLines(seed),5):_firstSentences(sd.world_description,4);
-  const props=_l(sd.props).slice(0,6);
+  const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(sd.world_description,5);
+  const props=_l(sd.props).slice(0,5);
   const placement=buildPlacementSpec(h);
   return _sentenceJoin([
+    'a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
     base,
-    _c(sd.surface)&&'surface: '+_c(sd.surface),
+    _c(sd.surface)&&'ground: '+_c(sd.surface),
     _c(sd.background)&&'background: '+_c(sd.background),
     _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
     _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
@@ -411,20 +411,20 @@ function _posComposite(h){
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
     cameraToText(sd.camera),
     props.length&&'props: '+props.join(', '),
-    _flavor(ix),
-    'leave one clean empty product placement area '+placement.anchor+' on the main surface, sized for the locked product image',
+    'the product sits off-center as a hero within the larger world, not centered and not filling the frame',
+    'leave one clean empty product placement area '+placement.anchor+' sized for the locked product image',
     'do not draw any product, jar, bottle, can, box, package, label, logo, brand name, readable text, hands, or people'
   ]);
 }
 function _posReference(h){
   const sd=h.scene_direction||{};
-  const ix=h.intake_expressive||{};
   const seed=_c(sd.prompt_seed);
-  const base=seed?_firstSentences(_stripProductFreeLines(seed),5):_firstSentences(_stripProductFreeLines(sd.world_description),4);
-  const props=_l(sd.props).slice(0,6);
+  const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(_stripProductFreeLines(sd.world_description),5);
+  const props=_l(sd.props).slice(0,5);
   return _sentenceJoin([
+    'a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
     base,
-    _c(sd.surface)&&'surface: '+_c(sd.surface),
+    _c(sd.surface)&&'ground: '+_c(sd.surface),
     _c(sd.background)&&'background: '+_c(sd.background),
     _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
     _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
@@ -433,7 +433,7 @@ function _posReference(h){
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
     cameraToText(sd.camera),
     props.length&&'props: '+props.join(', '),
-    _flavor(ix),
+    'the product sits off-center as a hero within the larger world, not centered and not filling the frame',
     'use the supplied product image exactly as provided',
     'preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged',
     'do not redraw, retype, recolor, open, crop, relabel, or invent claims on the product'
@@ -449,37 +449,50 @@ function _posReference(h){
    browser] the direct browser access header; if CORS blocks, route through
    world-preview. */
 const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
-const ART_DIRECTOR_PROMPT=`You are a senior commercial art director and product-world concept designer.
+const ART_DIRECTOR_PROMPT=`You are a director of photography and brand-world designer. You are NOT a CPG product photographer. You design one cinematic brand-world frame that a product lives inside, not a styled tabletop the product sits on. Think like someone shooting a still from a high-end campaign film.
 
-Your task is to turn brand intelligence and locked product metadata into ONE master scene direction for a product-world render. Concentrate your strongest thinking into a single coherent, specific, premium scene. Do not hedge across multiple ideas. Commit to the best one.
+The product image is locked and is the hero. Do not propose anything that changes its label, shape, cap, packaging, logo, text, claims, colors, or proportions. But the world around it must have authorship: place, scale, distance, atmosphere, light, texture, weather, terrain, architecture, motion cues, cultural context, or implied human activity. The product should feel discovered inside a brand moment, not placed on a surface.
 
-Do not write a final renderer prompt for a specific engine. Create a renderer-neutral scene brief a prompt engine can later adapt for OpenAI, ComfyUI, or another image engine.
+Do not translate flavor or ingredients into literal props. "Rose Petal and Lychee" does not become rose petals and lychee on stone. "Grapefruit Hibiscus" does not become grapefruit and flowers on sand. "Matcha" does not become a whisk, mug, and linen in morning light. Flavor may inform a palette or mood, but it must not drive the scene unless the brand clearly calls for literal ingredient styling.
 
-The product image is locked. The scene must be built around the supplied product. Do not propose anything requiring the product label, shape, cap, packaging, logo, text, claims, or colors to change.
+Before writing the scene, do a strategic creative read:
+1. Identify the brand's emotional territory.
+2. Identify the category cliches to avoid.
+3. Identify the brand-specific tension, belief, or point of view.
+4. Translate the brand ethos into place, light, camera, atmosphere, material, and implied action.
+5. Choose one unexpected but defensible cinematic world.
+6. Write a scene that reads like a still from a campaign film, not a catalog product photo.
 
-Avoid generic category imagery. Do not rely on obvious props unless the brand evidence supports them. A beverage scene should not default to fruit piles, condensation, marble counters, tropical leaves, hands, or generic wellness props. A supplement scene should not default to spa stones, powder explosions, or fake clinical props. A CPG scene should not default to plain product-on-table staging.
+The master scene must have: a clear world (not only a surface), a strong visual idea, a sense of scale or environmental depth, distinctive materials/architecture/terrain/weather or cultural cues, a concrete reason the product belongs there, a mood beyond beautiful natural light, an intentional camera choice, and a composition that does NOT center the product on a tabletop. Compose for a wide 16:9 cinematic frame with enough environment to support motion, website hero use, LED or projection, and campaign cropping. Place the product off-center and let it read as a hero within a larger world, not an object filling the frame.
 
-Describe a real photographic set: surface, background, props, materials, color palette, lighting, camera, composition, and locked product placement. Use brand evidence. Do not invent false brand claims.
+HARD RULE. Do not default to: tabletop still life, ingredient piles, fruit beside product, flowers beside product, linen, stone counters, ceramic props, soft window light, spa neutrals, or centered product-on-surface compositions. These are fallback CPG tropes, not brand worlds.
 
-Return only valid JSON matching this schema, no prose, no markdown fences:
+THE TEST. If you cannot explain in one sentence why this specific world belongs to this specific brand, the scene is not strong enough. Rewrite it until you can.
+
+Return only valid JSON, no prose, no markdown fences, matching:
 {
- "scene_direction_version":"0.2",
- "product_truth":{"product_name":"","product_category":"","what_it_is":""},
- "brand_world":{"tone":"","visual_territory":"","ownable_cue":""},
+ "scene_direction_version":"0.3",
+ "brand_world_read":"the emotional, cultural, and visual territory this brand owns",
+ "world_thesis":"one sentence: the cinematic world this brand belongs in",
+ "cinematic_translation":"how the brand ethos becomes place, scale, light, camera, atmosphere, material, and implied action",
+ "category_cliches_to_avoid":["generic_tabletop","linen_napkin","ingredient_pile","ceramic_cup","sunlit_stone_counter","spa_wellness_neutrals","generic_beach_fruit","fruit_beside_product","flowers_beside_product","soft_bokeh_lifestyle","centered_product_on_surface","premium_cpg_still_life","catalog_product_photo"],
+ "anti_tabletop_rules":["no tabletop still life","product not centered on a surface","no ingredient or flower props beside the product","the environment carries scale and depth, not a styled prop cluster"],
  "scene_direction":{
    "scene_name":"","one_line_concept":"","creative_rationale":"",
-   "world_description":"","surface":"","background":"","props":[],"materials":[],
-   "color_palette":[],"lighting":"",
-   "camera":{"lens_feel":"","angle":"","depth_of_field":"","framing":""},
-   "composition":"",
-   "locked_product_placement":{"anchor":"","cx":0.5,"cy":0.62,"width_pct":0.34,"scale_notes":"","contact_shadow":"","light_match":""},
-   "brand_specific_cues":[],"avoid":[],"why_this_is_not_generic":"","prompt_seed":""
+   "world_description":"the full cinematic environment in plain visual language: place, scale, distance, atmosphere, and why it reads as a real set",
+   "surface":"the ground or plane the product rests on, expressed as part of the world (e.g. wet basalt ledge, poured-concrete plinth in a plaza), never a generic tabletop",
+   "background":"depth and spatial relationship behind the product",
+   "props":[],"materials":[],"color_palette":[],"lighting":"time, direction, quality, contrast, and mood",
+   "camera":{"lens_feel":"","angle":"","depth_of_field":"","framing":"wide 16:9 cinematic"},
+   "composition":"product off-center with real environmental depth around it",
+   "locked_product_placement":{"anchor":"","cx":0.36,"cy":0.6,"width_pct":0.24,"scale_notes":"hero but sits within a larger world","contact_shadow":"","light_match":""},
+   "brand_specific_cues":[],"avoid":[],"why_this_belongs_to_this_brand":"","prompt_seed":"one tight renderer-neutral paragraph describing the cinematic frame, leading with the world and atmosphere, then the product's place within it"
  },
  "render_prompt":"",
- "fidelity_rules":[],
+ "fidelity_rules":["preserve the supplied product exactly: do not alter label, text, logo, shape, cap, colors, or proportions"],
  "diagnostics":{"confidence":{"score":"","reason":""},"generic_risks":[],"alternates":[]}
 }
-render_prompt is one tight renderer-neutral paragraph describing the scene, equivalent to scene_direction.prompt_seed. Leave diagnostics.alternates as an empty array UNLESS the provided confidence is low, in which case include up to two alternate scene concepts as short {scene_name, one_line_concept} objects there for later use. Return one scene_direction only.`;
+render_prompt equals scene_direction.prompt_seed. Keep props minimal and only if the brand justifies them. Leave diagnostics.alternates empty UNLESS the provided confidence is low, in which case include up to two short {scene_name, one_line_concept} alternates there. Return one scene_direction only.`;
 
 async function buildMasterScene(data, apiKey){
   const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
@@ -516,19 +529,22 @@ function extractJson(text){
 }
 function esc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function cameraToText(cam){ if(!cam||typeof cam!=='object') return ''; const p=[_c(cam.lens_feel),_c(cam.angle),_c(cam.depth_of_field),_c(cam.framing)].filter(Boolean); return p.length?('shot: '+p.join(', ')):''; }
-function mapSceneDirectionToSd(d){
+function mapSceneDirectionToSd(d, meta){
+  meta=meta||{};
   const lp=d.locked_product_placement||{};
   const intent=[_c(lp.anchor),_c(lp.scale_notes),_c(lp.light_match)].filter(Boolean).join(', ');
+  const avoids=_dedupe([].concat(_l(d.avoid), _l(meta.category_cliches_to_avoid), _l(meta.anti_tabletop_rules)));
   return {
     scene_name:_c(d.scene_name),
     world_description:_c(d.world_description),
+    world_thesis:_c(meta.world_thesis),
     product_placement_intent:intent||_c(d.composition),
     composition:_c(d.composition),
     lighting:_c(d.lighting),
     props:_l(d.props),
-    avoid:_l(d.avoid),
+    avoid:avoids,
     render_path:'composite',
-    prompt_seed:_c(d.prompt_seed),
+    prompt_seed:_c(d.prompt_seed)||_c(d.render_prompt),
     surface:_c(d.surface),
     background:_c(d.background),
     materials:_l(d.materials),
@@ -612,9 +628,10 @@ const CANDS=[
    (8.1), are not yet proven and must be checked against live brands. */
 const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/'; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
 const JOBS_ENDPOINT = 'https://render-jobs.grey-4fe.workers.dev'; // render job service: create job, render, persist to R2/D1
-// Edits sizes output to the input image aspect, so we hand the model a landscape
-// input. Keep these in sync with the Worker's OPENAI_IMAGE_SIZE.
-const RENDER_W = 1536, RENDER_H = 1024;
+// The padded input aspect should match the Worker's OPENAI_IMAGE_SIZE so the
+// output is a true 16:9 cinematic frame. gpt-image-2 accepts arbitrary sizes
+// with both edges divisible by 16; 1536x864 is exactly 16:9.
+const RENDER_W = 1536, RENDER_H = 864;
 const ENABLE_RENDER = true; // Worker has renderer adapter enabled
 
 function mockPreviewData(){
@@ -732,7 +749,7 @@ function buildHandoff(){
   const master=v.master_scene||null;
   let sceneDir, chosenName;
   if(master){
-    sceneDir=mapSceneDirectionToSd(master);
+    sceneDir=mapSceneDirectionToSd(master, v.master_scene_meta);
     chosenName=_c(master.scene_name);
   }else{
     // Fallback when the scene builder was skipped (demo) or failed: use the
@@ -847,25 +864,33 @@ async function downloadRenderBundleFiles(){
   download('render-package.json',JSON.stringify(CURRENT_PKG,null,2),'application/json');
   setTimeout(()=>downloadLockedProductImage().catch(err=>{ document.getElementById('errorDetail').textContent=String((err&&err.message)||err); showView('error'); }),250);
 }
-async function padProductToLandscapeBlob(a, W, H){
-  // Place the real product on a landscape canvas so the edit endpoint returns
-  // landscape. The white margin is space the model fills with the scene; the
-  // product pixels are untouched, so packaging is still preserved.
+async function padProductToLandscapeBlob(a, W, H, placement){
+  // Place the real product on a 16:9 canvas so the edit returns a cinematic
+  // frame. The white margin is space the model fills with the world; the
+  // product pixels are untouched, so packaging is preserved. Position and
+  // size come from the scene's placement so the product can sit off-center
+  // as a hero within a larger world rather than centered and oversized.
+  const p=placement||{};
   const src=productImageSrcFromAsset(a);
   if(!src) throw new Error('No product image to pad');
   const img=await loadImg(src);
   const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d');
   ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
-  const targetH=H*0.72, scale=targetH/img.height, targetW=img.width*scale;
-  const x=(W-targetW)/2, y=(H-targetH)/2 + H*0.04;
+  const widthPct=(typeof p.width_pct==='number' && p.width_pct>0.08 && p.width_pct<0.7) ? p.width_pct : 0.26;
+  const cx=(typeof p.cx==='number' && p.cx>0.1 && p.cx<0.9) ? p.cx : 0.5;
+  const cy=(typeof p.cy==='number' && p.cy>0.1 && p.cy<0.9) ? p.cy : 0.6;
+  let targetW=W*widthPct, scale=targetW/img.width, targetH=img.height*scale;
+  const maxH=H*0.86;
+  if(targetH>maxH){ scale=maxH/img.height; targetH=maxH; targetW=img.width*scale; }
+  const x=W*cx - targetW/2, y=H*cy - targetH/2;
   ctx.drawImage(img, x, y, targetW, targetH);
   return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('canvas toBlob failed')),'image/png'));
 }
 async function submitRenderBundle(){
   const a=await ensureSelectedProductImageData();
   await rebuildCurrentPackage();
-  const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H);
+  const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H, CURRENT_PKG&&CURRENT_PKG.placement_spec);
 
   // 1. Create a render job. This persists the package and the locked product
   //    image to R2/D1 on the render-jobs service and returns a job id.
@@ -1089,6 +1114,7 @@ async function generate(){
       try{
         const built=await buildMasterScene(DATA, apiKey);
         DATA.vibes.master_scene=built.scene_direction;
+        DATA.vibes.master_scene_meta={ brand_world_read:built.brand_world_read||'', world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', category_cliches_to_avoid:built.category_cliches_to_avoid||[], anti_tabletop_rules:built.anti_tabletop_rules||[] };
         DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
       }catch(sceneErr){ console.warn('scene builder failed; using brand-read scene', sceneErr); }
     }
