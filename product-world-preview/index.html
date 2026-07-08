@@ -205,12 +205,6 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <input type="file" id="fileInput" accept="image/*" hidden>
   </div>
 
-  <section class="directions" id="directions" aria-label="Choose a direction">
-    <p class="eyebrow">Your brand reads a couple of ways</p>
-    <h1 style="font-size:clamp(24px,4vw,32px)">Pick the direction</h1>
-    <div class="dgrid" id="dgrid"></div>
-  </section>
-
   <div class="footer-cta">
     <button class="cta" id="cta" disabled>Bring it to life</button>
     <span class="hint" id="ctaHint">Pick your product to continue.</span>
@@ -446,45 +440,48 @@ function _posReference(h){
   ]);
 }
 /* ===================== Creative Scene Brief layer ===================== */
-/* Turns brand intelligence + locked product metadata into three specific,
-   art-directed scene directions. Renderer-neutral. The selected direction
-   feeds the render package prompt builders below. Browser-direct Anthropic
-   call using the key the page already holds. [VERIFY in browser] the direct
-   browser access header; if CORS blocks, route this through world-preview. */
+/* Turns brand intelligence + locked product metadata into ONE master
+   art-directed scene, renderer-neutral, which feeds the render package prompt
+   builders below. No scene-selection step: the single scene flows straight
+   through after product selection. Low-confidence alternates, when produced,
+   are kept in diagnostics for a future Create variations feature. Browser-
+   direct Anthropic call using the key the page already holds. [VERIFY in
+   browser] the direct browser access header; if CORS blocks, route through
+   world-preview. */
 const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
 const ART_DIRECTOR_PROMPT=`You are a senior commercial art director and product-world concept designer.
 
-Your task is to turn brand intelligence and locked product metadata into three specific scene directions for a product-world render.
+Your task is to turn brand intelligence and locked product metadata into ONE master scene direction for a product-world render. Concentrate your strongest thinking into a single coherent, specific, premium scene. Do not hedge across multiple ideas. Commit to the best one.
 
-Do not write final renderer prompts yet. Create renderer-neutral scene briefs a prompt engine can later adapt for OpenAI, ComfyUI, or another image engine.
+Do not write a final renderer prompt for a specific engine. Create a renderer-neutral scene brief a prompt engine can later adapt for OpenAI, ComfyUI, or another image engine.
 
-The product image is locked. The scene must be built around the supplied product. Do not propose any scene requiring the product label, shape, cap, packaging, logo, text, claims, or colors to change.
+The product image is locked. The scene must be built around the supplied product. Do not propose anything requiring the product label, shape, cap, packaging, logo, text, claims, or colors to change.
 
 Avoid generic category imagery. Do not rely on obvious props unless the brand evidence supports them. A beverage scene should not default to fruit piles, condensation, marble counters, tropical leaves, hands, or generic wellness props. A supplement scene should not default to spa stones, powder explosions, or fake clinical props. A CPG scene should not default to plain product-on-table staging.
 
-For each direction, describe a real photographic set. Include surface, background, props, materials, color palette, lighting, camera, composition, and locked product placement. Make every scene visually distinct.
-
-Use brand evidence. If confidence is low, say so and create safer, broader directions without inventing false brand claims.
+Describe a real photographic set: surface, background, props, materials, color palette, lighting, camera, composition, and locked product placement. Use brand evidence. Do not invent false brand claims.
 
 Return only valid JSON matching this schema, no prose, no markdown fences:
 {
- "scene_direction_version":"0.1",
- "brand_name":"","product_name":"","product_category":"",
- "recommended_scene_id":"",
- "directions":[
-  {"scene_id":"scene_01","scene_name":"","one_line_concept":"","creative_rationale":"",
+ "scene_direction_version":"0.2",
+ "product_truth":{"product_name":"","product_category":"","what_it_is":""},
+ "brand_world":{"tone":"","visual_territory":"","ownable_cue":""},
+ "scene_direction":{
+   "scene_name":"","one_line_concept":"","creative_rationale":"",
    "world_description":"","surface":"","background":"","props":[],"materials":[],
    "color_palette":[],"lighting":"",
    "camera":{"lens_feel":"","angle":"","depth_of_field":"","framing":""},
    "composition":"",
-   "locked_product_placement":{"anchor":"","cx":0.38,"cy":0.62,"width_pct":0.32,"scale_notes":"","contact_shadow":"","light_match":""},
-   "brand_specific_cues":[],"avoid":[],"generic_risks":[],"why_this_is_not_generic":"",
-   "prompt_seed":"","confidence":{"score":"","reason":""}}
- ]
+   "locked_product_placement":{"anchor":"","cx":0.5,"cy":0.62,"width_pct":0.34,"scale_notes":"","contact_shadow":"","light_match":""},
+   "brand_specific_cues":[],"avoid":[],"why_this_is_not_generic":"","prompt_seed":""
+ },
+ "render_prompt":"",
+ "fidelity_rules":[],
+ "diagnostics":{"confidence":{"score":"","reason":""},"generic_risks":[],"alternates":[]}
 }
-Return exactly three directions.`;
+render_prompt is one tight renderer-neutral paragraph describing the scene, equivalent to scene_direction.prompt_seed. Leave diagnostics.alternates as an empty array UNLESS the provided confidence is low, in which case include up to two alternate scene concepts as short {scene_name, one_line_concept} objects there for later use. Return one scene_direction only.`;
 
-async function buildSceneDirections(data, apiKey){
+async function buildMasterScene(data, apiKey){
   const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
   const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
   const input={
@@ -502,13 +499,13 @@ async function buildSceneDirections(data, apiKey){
   const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:3000, system:ART_DIRECTOR_PROMPT, messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
+    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:2500, system:ART_DIRECTOR_PROMPT, messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
   });
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
   const payload=await res.json();
   const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
   const parsed=extractJson(text);
-  if(!parsed||!Array.isArray(parsed.directions)||!parsed.directions.length) throw new Error('Scene builder returned no directions');
+  if(!parsed||!parsed.scene_direction||typeof parsed.scene_direction!=='object') throw new Error('Scene builder returned no scene_direction');
   return parsed;
 }
 function extractJson(text){
@@ -677,7 +674,7 @@ function selectProduct(parsed){
   if(mode!=='product_accurate'){ removeProduct(); throw new Error('not product_accurate: '+mode); }
   selectedAssetId=a.asset_id; return a;
 }
-function canProceed(){ return !!selectedAssetId && chosenDirection!=null; }
+function canProceed(){ return !!selectedAssetId; }
 
 // --- render ---
 const grid=document.getElementById('grid');
@@ -718,62 +715,30 @@ function pick(i){
   refresh();
 }
 function renderDirections(){
-  const v=DATA.vibes;
-  const rich=Array.isArray(v.scene_directions)&&v.scene_directions.length?v.scene_directions:null;
-  if(rich){
-    directions.classList.add('on');
-    let recIdx=rich.findIndex(d=>d.scene_id&&d.scene_id===v.recommended_scene_id);
-    if(recIdx<0) recIdx=0;
-    chosenDirection=recIdx;
-    dgrid.innerHTML='';
-    rich.forEach((d,i)=>{
-      const b=document.createElement('button');
-      b.className='dir'; b.type='button'; b.setAttribute('aria-pressed', i===recIdx?'true':'false');
-      const concept=d.one_line_concept||d.world_description||'';
-      const why=d.why_this_is_not_generic?`<p class="dwhy">${esc(d.why_this_is_not_generic)}</p>`:'';
-      b.innerHTML=`<p class="dname">${esc(d.scene_name)}</p><p class="dworld">${esc(concept)}</p>${why}`;
-      b.addEventListener('click',()=>{ chosenDirection=i; [...dgrid.children].forEach((el,idx)=>el.setAttribute('aria-pressed',idx===i?'true':'false')); refresh(); });
-      dgrid.appendChild(b);
-    });
-    return;
-  }
-  if(v.confidence!=='low'){ directions.classList.remove('on'); chosenDirection=0; return; }
-  directions.classList.add('on');
-  const list=[v.primary, ...(v.alternates||[])];
-  dgrid.innerHTML='';
-  list.forEach((d,i)=>{
-    const b=document.createElement('button');
-    b.className='dir'; b.type='button'; b.setAttribute('aria-pressed','false');
-    b.innerHTML=`<p class="dname">${esc(d.scene_name)}</p><p class="dworld">${esc(d.world_description)}</p>`;
-    b.addEventListener('click',()=>{ chosenDirection=i; [...dgrid.children].forEach((el,idx)=>el.setAttribute('aria-pressed',idx===i?'true':'false')); refresh(); });
-    dgrid.appendChild(b);
-  });
+  // Scene selection removed. One master scene is generated automatically and
+  // flows straight into the render package. This just hides the old picker.
+  if(directions) directions.classList.remove('on');
+  chosenDirection=0;
 }
 function refresh(){
   modeReadout.textContent='mode: '+getOverallMode();
-  const ok=canProceed();
-  cta.disabled=!ok;
-  if(!selectedAssetId){ ctaHint.textContent='Pick your product to continue.'; }
-  else if(chosenDirection==null){ ctaHint.textContent='Pick a direction to continue.'; }
-  else{ ctaHint.textContent='Your packaging stays exactly as it is.'; }
+  cta.disabled=!canProceed();
+  ctaHint.textContent = selectedAssetId ? 'Your packaging stays exactly as it is.' : 'Pick your product to continue.';
 }
 let CURRENT_PKG=null, CURRENT_MD='';
 function buildHandoff(){
   const a=assets.find(x=>x.asset_id===selectedAssetId);
   const v=DATA.vibes;
-  const rich=Array.isArray(v.scene_directions)&&v.scene_directions.length?v.scene_directions:null;
-  let sceneDir, chosenName, alternates;
-  if(rich){
-    const idx=(chosenDirection!=null?chosenDirection:0);
-    const d=rich[idx]||rich[0];
-    sceneDir=mapSceneDirectionToSd(d);
-    chosenName=d.scene_name;
-    alternates=rich.filter((_,i)=>i!==idx).map(x=>({scene_name:_c(x.scene_name),world_description:_c(x.one_line_concept)||_c(x.world_description),why:_c(x.why_this_is_not_generic)}));
+  const master=v.master_scene||null;
+  let sceneDir, chosenName;
+  if(master){
+    sceneDir=mapSceneDirectionToSd(master);
+    chosenName=_c(master.scene_name);
   }else{
-    const dir=v.confidence==='low'?[v.primary,...(v.alternates||[])][chosenDirection]:v.primary;
+    // Fallback when the scene builder was skipped (demo) or failed: use the
+    // thin brand-read scene so the flow still produces a package.
     sceneDir=v.scene_direction;
-    chosenName=dir.scene_name;
-    alternates=v.confidence==='low'?v.alternates:[];
+    chosenName=(v.scene_direction&&v.scene_direction.scene_name)||(v.primary&&v.primary.scene_name)||'';
   }
   return {
     mode:getOverallMode(),
@@ -781,7 +746,7 @@ function buildHandoff(){
     intake_expressive:v.intake_expressive,
     scene_direction:sceneDir,
     confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
-    alternates:alternates,
+    alternates:[],
     chosen_direction:chosenName
   };
 }
@@ -1120,12 +1085,12 @@ async function generate(){
     const { data }=await fetchPreviewData(productUrl, homeUrl, apiKey);
     DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
     if(apiKey){
-      document.getElementById('loadingLine').textContent='Designing scene directions';
+      document.getElementById('loadingLine').textContent='Designing the scene';
       try{
-        const sd=await buildSceneDirections(DATA, apiKey);
-        DATA.vibes.scene_directions=sd.directions;
-        DATA.vibes.recommended_scene_id=sd.recommended_scene_id||'';
-      }catch(sceneErr){ console.warn('scene direction builder failed; using brand-read scene', sceneErr); }
+        const built=await buildMasterScene(DATA, apiKey);
+        DATA.vibes.master_scene=built.scene_direction;
+        DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
+      }catch(sceneErr){ console.warn('scene builder failed; using brand-read scene', sceneErr); }
     }
     renderPick(); showView('pick');
   }catch(err){
