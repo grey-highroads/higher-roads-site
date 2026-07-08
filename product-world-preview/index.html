@@ -548,13 +548,32 @@ function mapSceneDirectionToSd(d, meta){
   };
 }
 
+function buildLockedAssetRecord(la){
+  la=la||{};
+  const media=_c(la.media_type)||_c(la.mediaType)||'image/png';
+  const rec={
+    asset_id:_c(la.asset_id),
+    asset_name:_c(la.asset_name),
+    asset_type:_c(la.asset_type)||'packaging',
+    lock_status:_c(la.lock_status)||'locked',
+    image_ref:_c(la.image_ref)||_c(la.asset_url)||_c(la.source_image_url)||'(locked product image attached and stored server-side)',
+    source_image_url:_c(la.source_image_url),
+    asset_url:_c(la.asset_url),
+    stored_asset_url:_c(la.stored_asset_url),
+    media_type:media,
+    has_image_data:false
+  };
+  // Base64 stays out of the normal package. Embed only for manual/legacy debugging.
+  if(DEBUG_EMBED_BASE64 && _c(la.base64)){ rec.has_image_data=true; rec.image_data='data:'+media+';base64,'+_c(la.base64); }
+  return rec;
+}
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
   const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h)];
   return {
     meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
     fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
-    locked_asset:{asset_id:_c(la.asset_id),asset_name:_c(la.asset_name),asset_type:_c(la.asset_type)||'packaging',lock_status:_c(la.lock_status)||'locked',image_ref:_c(la.image_ref)||_c(la.asset_url)||_c(la.source_image_url)||'(attach the locked product image file)',source_image_url:_c(la.source_image_url),asset_url:_c(la.asset_url),media_type:_c(la.media_type)||_c(la.mediaType),has_image_data:!!_c(la.image_data)||!!_c(la.base64),image_data:_c(la.image_data)||(_c(la.base64)?('data:'+(_c(la.media_type)||_c(la.mediaType)||'image/png')+';base64,'+_c(la.base64)):'')},
+    locked_asset:buildLockedAssetRecord(la),
     scene_brief:{world_description:_c(sd.world_description),product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),composition:_c(sd.composition),lighting:_c(sd.lighting),props:_l(sd.props)},
     placement_spec:buildPlacementSpec(h),
     prompts:{positive:_posReference(h),negative:_dedupe(neg).join(', ')},
@@ -573,7 +592,7 @@ function renderPackageMarkdown(p){
   L.push('');L.push('## 1. Fidelity contract (non-negotiable)');L.push(p.fidelity_contract.statement);
   if(p.fidelity_contract.preserve.length)L.push('Preserve exactly: '+p.fidelity_contract.preserve.join(', ')+'.');
   p.fidelity_contract.rules.forEach(r=>L.push('- '+r));
-  L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);if(p.locked_asset.has_image_data)L.push('Attached asset: included in JSON package as image_data');if(p.locked_asset.media_type)L.push('Media type: '+p.locked_asset.media_type);
+  L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);if(p.locked_asset.stored_asset_url)L.push('Stored asset: '+p.locked_asset.stored_asset_url);else L.push('Locked image: attached as a file and stored server-side, not embedded in JSON');if(p.locked_asset.media_type)L.push('Media type: '+p.locked_asset.media_type);
   L.push('');L.push('## 3. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);L.push('Placement: '+p.scene_brief.product_placement_intent);
   if(p.scene_brief.composition)L.push('Composition: '+p.scene_brief.composition);
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
@@ -626,6 +645,7 @@ const JOBS_ENDPOINT = 'https://render-jobs.grey-4fe.workers.dev'; // render job 
 // with both edges divisible by 16; 1536x864 is exactly 16:9.
 const RENDER_W = 1536, RENDER_H = 864;
 const ENABLE_RENDER = true; // Worker has renderer adapter enabled
+const DEBUG_EMBED_BASE64 = false; // never embed base64 in the normal package; on only for manual/legacy debugging
 
 function mockPreviewData(){
   return {
