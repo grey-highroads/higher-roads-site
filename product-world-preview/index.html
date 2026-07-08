@@ -493,6 +493,7 @@ const CANDS=[
    endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
    (8.1), are not yet proven and must be checked against live brands. */
 const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/'; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
+const JOBS_ENDPOINT = 'https://render-jobs.grey-4fe.workers.dev'; // render job service: create job, render, persist to R2/D1
 // Edits sizes output to the input image aspect, so we hand the model a landscape
 // input. Keep these in sync with the Worker's OPENAI_IMAGE_SIZE.
 const RENDER_W = 1536, RENDER_H = 1024;
@@ -748,20 +749,37 @@ async function submitRenderBundle(){
   const a=await ensureSelectedProductImageData();
   await rebuildCurrentPackage();
   const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H);
-  const form=new FormData();
-  form.append('request_json', JSON.stringify(CURRENT_PKG));
-  form.append('locked_product_image', blob, 'locked-product.png');
-  document.getElementById('loadingLine').textContent='Sending render bundle';
+
+  // 1. Create a render job. This persists the package and the locked product
+  //    image to R2/D1 on the render-jobs service and returns a job id.
+  const createForm=new FormData();
+  createForm.append('request_json', JSON.stringify(CURRENT_PKG));
+  createForm.append('locked_product_image', blob, 'locked-product.png');
+
+  document.getElementById('loadingLine').textContent='Creating render job';
   showView('loading');
   try{
-    const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', body:form });
-    if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Render bundle '+res.status+(t?': '+t.slice(0,180):'')); }
-    const data=await res.json();
-    if(data.rendered_image||data.final_image||data.preview_image||data.image){ await showRenderedImage(data.rendered_image||data.final_image||data.preview_image||data.image); showView('result'); return; }
-    if(data.world_image||data.world||data.background_image){ await compositeAndShow(data); showView('result'); return; }
-    handoffBody.textContent=JSON.stringify(data,null,2);
-    handoff.classList.add('on');
-    showView('pick');
+    const createRes=await fetch(JOBS_ENDPOINT+'/render-jobs',{ method:'POST', body:createForm });
+    if(!createRes.ok){ const t=await createRes.text().catch(()=>''); throw new Error('Create job '+createRes.status+(t?': '+t.slice(0,180):'')); }
+    const created=await createRes.json();
+    const jobId=created.job_id;
+    if(!jobId) throw new Error('render-jobs did not return a job_id');
+
+    // 2. Render the job. Synchronous: the response is the completed job with
+    //    an output_url served from storage.
+    document.getElementById('loadingLine').textContent='Rendering product world';
+    const renderRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST' });
+    const job=await renderRes.json().catch(()=>({}));
+    if(!renderRes.ok || job.status==='error'){
+      const detail=job.detail||job.message||job.error||('Render '+renderRes.status);
+      throw new Error(String(detail).slice(0,200));
+    }
+    const outputUrl=(job.assets&&job.assets.output_url)||job.output_image_url;
+    if(!outputUrl) throw new Error('Render completed but no output URL was returned');
+
+    // 3. Show the stored output image.
+    await showRenderedImage(outputUrl);
+    showView('result');
   }catch(err){
     document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
     showView('error');
