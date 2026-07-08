@@ -328,8 +328,11 @@ function _dedupe(arr){return [...new Set(_l(arr).map(x=>x.replace(/\s+/g,' ').tr
 function _cleanText(s){
   return _c(s)
     .replace(/\s+/g,' ')
+    .replace(/\b0\.\s+0\.(?:\s+0\.)*/g,'')   // kill the "0. 0." artifact if a stray decimal ever leaks in
+    .replace(/(?:^|\s)0\.(?=\s|$)/g,' ')      // and a lone orphan "0."
     .replace(/\.{2,}/g,'.')
     .replace(/\s+([,.])/g,'$1')
+    .replace(/\s{2,}/g,' ')
     .trim();
 }
 function _sentences(s){
@@ -374,32 +377,24 @@ function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=i
 function buildPlacementSpec(h){
   const sd=h.scene_direction||{};
   const lp=sd.locked_product_placement;
-  if(lp&&(typeof lp.cx==='number'||typeof lp.width_pct==='number')){
-    return {
-      anchor:_c(lp.anchor)||'center-left',
-      cx:typeof lp.cx==='number'?lp.cx:0.38,
-      cy:typeof lp.cy==='number'?lp.cy:0.62,
-      width_pct:typeof lp.width_pct==='number'?lp.width_pct:0.32,
-      shadow:_c(lp.contact_shadow)||'soft contact shadow',
-      light_match:_c(lp.light_match)||'soft natural light from camera left'
-    };
-  }
-  const txt=(_c(sd.product_placement_intent)+' '+_c(sd.composition)+' '+_c(sd.world_description)).toLowerCase();
-  const spec={anchor:'center-left',cx:0.38,cy:0.62,width_pct:0.32,shadow:'soft contact shadow',light_match:'soft natural light from camera left'};
-  if(txt.includes('lower third')) spec.cy=0.68;
-  if(txt.includes('center-left')||txt.includes('left vertical')) spec.cx=0.38;
-  else if(txt.includes('centered')||txt.includes('center')) spec.cx=0.50;
-  if(txt.includes('40%')||txt.includes('40 percent')) spec.width_pct=0.40;
-  if(txt.includes('camera left')) spec.light_match='soft natural light from camera left';
-  if(txt.includes('camera right')) spec.light_match='soft natural light from camera right';
-  return spec;
+  const clamp=(v,d)=>(typeof v==='number'&&v>0.05&&v<0.95)?v:d;
+  const cx=lp?clamp(lp.cx,0.62):0.62;
+  const cy=lp?clamp(lp.cy,0.6):0.6;
+  const width_pct=lp?((typeof lp.width_pct==='number'&&lp.width_pct>0.08&&lp.width_pct<0.6)?lp.width_pct:0.24):0.24;
+  // Derive the verbal anchor from cx so the word and the number never disagree.
+  const anchor = cx<=0.42?'left third':(cx>=0.58?'right third':'center');
+  return {
+    anchor,
+    cx, cy, width_pct,
+    shadow:(lp&&_c(lp.contact_shadow))||'soft contact shadow',
+    light_match:(lp&&_c(lp.light_match))||'side light matched to the scene'
+  };
 }
 function _posComposite(h){
   const sd=h.scene_direction||{};
   const seed=_c(sd.prompt_seed);
   const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(sd.world_description,5);
   const props=_l(sd.props).slice(0,5);
-  const placement=buildPlacementSpec(h);
   return _sentenceJoin([
     'a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
     base,
@@ -410,10 +405,7 @@ function _posComposite(h){
     _c(sd.composition)&&'composition: '+_c(sd.composition),
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
     cameraToText(sd.camera),
-    props.length&&'props: '+props.join(', '),
-    'the product sits off-center as a hero within the larger world, not centered and not filling the frame',
-    'leave one clean empty product placement area '+placement.anchor+' sized for the locked product image',
-    'do not draw any product, jar, bottle, can, box, package, label, logo, brand name, readable text, hands, or people'
+    props.length&&'props: '+props.join(', ')
   ]);
 }
 function _posReference(h){
@@ -428,15 +420,12 @@ function _posReference(h){
     _c(sd.background)&&'background: '+_c(sd.background),
     _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
     _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
-    sanitizeProductPlacement(sd.product_placement_intent),
     _c(sd.composition)&&'composition: '+_c(sd.composition),
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
     cameraToText(sd.camera),
     props.length&&'props: '+props.join(', '),
-    'the product sits off-center as a hero within the larger world, not centered and not filling the frame',
     'use the supplied product image exactly as provided',
-    'preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged',
-    'do not redraw, retype, recolor, open, crop, relabel, or invent claims on the product'
+    'preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged'
   ]);
 }
 /* ===================== Creative Scene Brief layer ===================== */
@@ -463,11 +452,15 @@ Before writing the scene, do a strategic creative read:
 5. Choose one unexpected but defensible cinematic world.
 6. Write a scene that reads like a still from a campaign film, not a catalog product photo.
 
-The master scene must have: a clear world (not only a surface), a strong visual idea, a sense of scale or environmental depth, distinctive materials/architecture/terrain/weather or cultural cues, a concrete reason the product belongs there, a mood beyond beautiful natural light, an intentional camera choice, and a composition that does NOT center the product on a tabletop. Compose for a wide 16:9 cinematic frame with enough environment to support motion, website hero use, LED or projection, and campaign cropping. Place the product off-center and let it read as a hero within a larger world, not an object filling the frame.
+The master scene must have: a clear world (not only a surface), a strong visual idea, a sense of scale or environmental depth, distinctive materials/architecture/terrain/weather or cultural cues, a concrete reason the product belongs there, a mood beyond beautiful natural light, an intentional camera choice, and a composition that does NOT center the product on a tabletop. Compose for a wide 16:9 cinematic frame with enough environment to support motion, website hero use, LED or projection, and campaign cropping.
+
+Placement: the product is a small but clear hero placed off-center, in the right third or left third of the frame, occupying roughly a quarter of the frame, with real environment around it. Describe placement in WORDS in prose (for example, "in the right third, resting on the foreground ledge, label to camera"). Put the exact numeric position ONLY in locked_product_placement (cx, cy, width_pct). Do NOT write decimal numbers or pixel positions in world_description, composition, or prompt_seed, and do not say "front-center" or "centered". The prose and the numbers must agree.
 
 HARD RULE. Do not default to: tabletop still life, ingredient piles, fruit beside product, flowers beside product, linen, stone counters, ceramic props, soft window light, spa neutrals, or centered product-on-surface compositions. These are fallback CPG tropes, not brand worlds.
 
 THE TEST. If you cannot explain in one sentence why this specific world belongs to this specific brand, the scene is not strong enough. Rewrite it until you can.
+
+DEPTH CHECK. If the world is only a literal translation of the product name or a flavor (for example maple syrup becoming a sugar shack, or "citrus" becoming an orchard), push one level deeper into the brand's ethos, use-occasion, atmosphere, place, or implied story. A literal translation is acceptable only when that literal idea IS the core brand truth, and even then the frame must earn it with a real world, not a prop.
 
 Return only valid JSON, no prose, no markdown fences, matching:
 {
@@ -485,7 +478,7 @@ Return only valid JSON, no prose, no markdown fences, matching:
    "props":[],"materials":[],"color_palette":[],"lighting":"time, direction, quality, contrast, and mood",
    "camera":{"lens_feel":"","angle":"","depth_of_field":"","framing":"wide 16:9 cinematic"},
    "composition":"product off-center with real environmental depth around it",
-   "locked_product_placement":{"anchor":"","cx":0.36,"cy":0.6,"width_pct":0.24,"scale_notes":"hero but sits within a larger world","contact_shadow":"","light_match":""},
+   "locked_product_placement":{"anchor":"right third","cx":0.62,"cy":0.6,"width_pct":0.24,"scale_notes":"small but clear hero within a larger world","contact_shadow":"","light_match":""},
    "brand_specific_cues":[],"avoid":[],"why_this_belongs_to_this_brand":"","prompt_seed":"one tight renderer-neutral paragraph describing the cinematic frame, leading with the world and atmosphere, then the product's place within it"
  },
  "render_prompt":"",
