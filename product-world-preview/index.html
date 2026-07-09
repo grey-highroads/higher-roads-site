@@ -147,6 +147,16 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
 @media (max-width:520px){ .wrap{padding:32px 18px 72px} .brandbar{margin-bottom:40px} }
+
+.creative-direction{margin-top:14px;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--accent-soft);font-family:'Barlow',sans-serif;font-size:13px;line-height:1.5}
+.creative-direction .cd-head{font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);font-size:12px;margin-bottom:8px}
+.creative-direction .cd-tag{display:inline-block;margin-left:6px;padding:1px 6px;border:1px solid var(--accent-line);border-radius:6px;font-size:10px;color:var(--muted);letter-spacing:.06em}
+.creative-direction .cd-row{display:flex;gap:12px;padding:5px 0;border-top:1px solid var(--border)}
+.creative-direction .cd-row:first-of-type{border-top:none}
+.creative-direction .cd-k{flex:0 0 128px;color:var(--muted);font-weight:500}
+.creative-direction .cd-v{flex:1 1 auto;color:var(--white);word-break:break-word}
+.creative-direction .cd-chip{display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border:1px solid var(--accent-line);border-radius:20px;font-size:11px;color:var(--white)}
+.creative-direction .cd-prompt .cd-v{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:#d7c8b6;white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -224,6 +234,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
       <button class="pkgbtn" id="renderPreview" type="button" hidden>Render preview</button>
     </div>
     <pre id="handoffBody"></pre>
+    <div id="creativeDirection" class="creative-direction" hidden></div>
   </section>
 
     <button class="linkbtn" id="startOver" type="button" style="margin-top:28px">Start over with a new URL</button>
@@ -437,6 +448,174 @@ function _posReference(h){
    direct Anthropic call using the key the page already holds. [VERIFY in
    browser] the direct browser access header; if CORS blocks, route through
    world-preview. */
+/* ===================== Director Bank layer ===================== */
+/* Hidden creative-direction pass. Selects an underlying cinematic grammar for
+   the brand (never named in the render output), then hands concrete scene
+   variables to the scene builder so it translates director grammar into place,
+   camera, light, atmosphere, material, composition, and object treatment.
+   Best-effort: if selection fails the app falls back to the current render
+   prompt flow and logs the failure. Static JSON config held as a constant for
+   now (no CMS/admin tooling per scope). Browser-direct Anthropic call using the
+   key the page already holds, same as the scene builder. */
+const DEBUG_CREATIVE_DIRECTION = true; // internal review panel, this is an internal tool
+const DIRECTOR_BANK = {"bank_name":"Higher Roads Cinematic Director Bank Index","version":"v1.0","purpose":"Route a Higher Roads prompt-writing agent toward the right director-informed visual grammar for a brand-world render. This index does not replace the full dossiers or individual agent profiles.","global_rules":["One cinematic world.","One strong visual idea.","16:9 landscape by default.","Product remains locked hero.","Product fidelity outranks style.","Brand truth outranks director influence.","The product should belong inside a real place with scale, atmosphere, and implied story.","No generic tabletop fallback.","No literal ingredient still life unless the brand specifically demands it.","No recognizable movie imagery, characters, franchise cues, copied sets, costumes, signage, or typography.","Borrow cinematic grammar, not IP.","Director influence should support Higher Roads authorship, not replace it.","Final render prompts should usually not name the director."],"directors":[{"name":"James Cameron","core_role":"Operational scale, pressure, engineering logic, water, functional objects, thresholds, and product-as-mission-critical-object.","best_for":["functional beverages","hydration","outdoor endurance","marine or coastal brands","technical performance","industrial craft","large-format experiential worlds","event infrastructure","recovery, energy, focus, and field-use CPG"],"avoid_for":["soft domestic wellness","playful candy","delicate floral beauty","cozy pantry warmth","minimal fashion stillness","small-scale tabletop elegance","fragile floral worlds"],"use_when_brand_needs":["scale","pressure","water","field readiness","transformation","functional importance","operational realism","engineering logic","product necessity","clear physical geography","beauty under pressure"],"do_not_use_when":["the brand needs delicacy","the brand needs ease or softness","the product should feel playful, intimate, or charming","the scene should be quiet and domestic","the product should live in a small, warm pantry world","the brand needs fashion stillness or white-space minimalism"],"primary_prompt_variables":{"place":"operational environments with visible systems, thresholds, and physical rules","camera":"wide or medium-wide 16:9 frames with readable geography, foreground product clarity, and environmental depth","light":"motivated practical light with controlled product readability, often from work lamps, deck lights, dawn, storm light, screen glow, water reflection, or sun shafts","atmosphere":"rain, mist, spray, condensation, steam, dust, smoke, or particles with a visible source","material":"wet steel, glass, rubber, concrete, rope, water, tile, brass, cold metal, hard plastic cases, industrial surfaces, and working equipment","composition":"product as clear hero inside a larger system, with foreground product, mid-ground operational context, and background scale","object_treatment":"product feels useful, sealed, protected, prepared, activated, depended on, or necessary to the ritual","scale":"architecture, water, terrain, vehicles, machinery, infrastructure, or distant human silhouettes make the world larger than the product","motion_cue":"preparation, arrival, descent, field work, weather stress, launch, recovery, or one minute before action begins","emotional_pressure":"awe, readiness, competence, environmental pressure, trust in tools, or transformation through use"},"common_traps":["blue glowing forest","wet metal sci-fi corridor","generic action spectacle","military hardware","franchise cues","robots, aliens, or monster references","blue-orange action clichés","disaster imagery without brand reason","product lost inside spectacle","water used only as decoration"],"weighting_guide":{"default_range":"20-45%","low":"10-20% when borrowing only scale, atmosphere, threshold staging, or material contrast","medium":"20-35% when borrowing operational place, product-as-functional-object logic, and material contrast","high":"35-45% when the world needs pressure, water, machinery, field readiness, and physical system logic","exceptional":"45-60% only for marine, expedition, technical performance, industrial craft, event infrastructure, or large-scale experiential worlds","cap":"Do not exceed 60% because product fidelity, brand truth, and Higher Roads authorship must remain dominant"},"borrow":["threshold staging","operational realism","material pressure","world as working system","product as necessary object","scale through real place","motivated atmosphere","clear geography","transformation through preparation, immersion, movement, or use"],"avoid":["franchise cues","generic sci-fi","military hardware","spectacle that overwhelms product","blue-orange action clichés","alien worlds","robots","weapons","spaceship corridors","literal movie references","ingredient piles or generic tabletop fallback"],"higher_roads_translation":"Use Cameron as a world-logic reference, not an action reference. His grammar turns a product from a styled object into something that belongs inside a real place with pressure, scale, atmosphere, and implied use.","example_prompt_moves":["Place the product at the threshold between a controlled interior and a larger exterior force.","Frame the product in the foreground while the environment opens behind it into a dock, hangar, greenhouse, terminal, production floor, or rigging bay.","Use atmosphere only when it has a physical source, such as rain, condensation, steam, mist, dust, ocean spray, or machinery.","Treat supporting props as operational evidence, not decoration.","Use distant crew figures or silhouettes only when they help establish scale.","Keep the label readable even when the world has density, weather, water, or industrial detail."],"final_agent_instruction":"Borrow the underlying cinematic grammar, not the icons. Translate the style into real-world place, camera, light, material, atmosphere, scale, and object logic. Preserve product fidelity and Higher Roads authorship."},{"name":"Ridley Scott","core_role":"World density, atmosphere, architecture as power, material richness, smoke, rain, dust, luxury with tension, ritualized objects, monumental space, and product-as-charged-object.","best_for":["premium spirits","coffee","functional beverages with edge","hospitality","fragrance","design-led CPG","industrial craft brands","heritage food","technical outdoor products","event and venue media","luxury retail","atmospheric retail worlds"],"avoid_for":["bright cheerful lifestyle","simple appetite appeal","soft domestic wellness","playful children’s products","minimal white-space beauty","clean e-commerce","fresh natural tabletop","gentle home warmth"],"use_when_brand_needs":["atmosphere","scale","architecture","material density","ritual","premium tension","night","industrial craft","heritage","luxury with edge","survival logic","product as artifact, tool, ritual object, or status signal"],"do_not_use_when":["the brand needs bright ease","the brand needs clean freshness","the product should feel cheerful, soft, playful, or casual","the scene should feel warm, domestic, or plainly appetizing","the brand needs minimal white-space luxury","the product would suffer from shadow, density, smoke, or social tension"],"primary_prompt_variables":{"place":"real locations with architectural, social, or material power, such as hotel bars, old bank lobbies, private tasting rooms, industrial galleys, distillery floors, misted greenhouses, museum archives, ateliers, and event rigging bays","camera":"wide or medium-wide 16:9 frames with product foreground or strong middle-ground hero and architecture, room, street, or landscape depth behind it","light":"motivated light through smoke, rain, dust, glass, fabric, windows, practical lamps, signage, candlelight, industrial overheads, screen glow, or hard sun","atmosphere":"rain, smoke, steam, dust, candle haze, cold condensation, desert heat, urban pollution, kitchen vapor, or production haze with a source","material":"wet pavement, brass, stone, marble, dark wood, rubber, glass, leather, worn metal, canvas, tile, soil, sand, mirror, fabric, neon signage, and patinated surfaces","composition":"product as locked hero inside layered depth, with architecture carrying meaning and props subordinate","object_treatment":"product feels like evidence, artifact, ritual object, field tool, luxury signal, survival supply, craft proof, commerce unit, or threshold object","scale":"rooms, cities, institutions, corridors, crowds, landscapes, horizons, walls, or distant human figures establish power and context","emotional_pressure":"aspiration with tension, beauty with unease, isolation inside scale, desire mediated through objects, or social power held in the room"},"common_traps":["rain plus neon equals Ridley Scott","dark corridor equals Alien","smoke without a source","Roman architecture as shorthand for Gladiator","desert as empty sci-fi or road-movie cliché","luxury surface with no social or architectural meaning","generic cyberpunk","war spectacle","historical cosplay","product lost in darkness","over-smoked frames"],"weighting_guide":{"default_range":"25-50%","low":"10-25% when borrowing only atmosphere, material richness, frame depth, or light-through-smoke logic","medium":"25-40% when borrowing architecture, charged object logic, layered lighting, and material specificity","high":"40-50% when the world needs full density, power interiors, rain, smoke, dust, landscape scale, or premium unease","exceptional":"50-65% only for nocturnal urban worlds, premium luxury with edge, industrial craft, hospitality, heritage products, atmospheric retail, event infrastructure, large-scale spaces, or technical field-use products","cap":"Do not exceed 65% because parody, darkness, IP echoes, or product loss becomes likely"},"borrow":["world density","architecture as meaning","atmosphere with source","product as charged object","material specificity","light through particles, rain, dust, smoke, glass, or fabric","scale through room, city, landscape, or institution","beauty with tension","surface wear and patina","layered frames with product clarity"],"avoid":["literal franchise cues","generic cyberpunk","war spectacle","historical cosplay","monster horror","over-smoked frames","excessive darkness","unmotivated neon","product-losing scale","spaceship corridors","Replicant, Xenomorph, Roman armor, Mars astronaut, or Gucci imitation cues"],"higher_roads_translation":"Use Scott as a world-density reference, not a rain-and-neon reference. His grammar places a product inside a built environment where architecture, atmosphere, light, material, and social meaning explain why the product belongs there.","example_prompt_moves":["Place the product inside a real architectural world rather than on an isolated surface.","Assign the product a role before building the scene: artifact, tool, ritual object, status signal, survival supply, or proof of craft.","Use atmosphere with a visible source, such as rain, steam, dust, candle haze, kitchen vapor, or cold condensation.","Use worn or reflective materials to create depth, status, and tension.","Keep label readability protected inside shadow, smoke, reflection, or rain.","Use negative space only when it carries social or environmental pressure."],"final_agent_instruction":"Borrow the underlying cinematic grammar, not the icons. Translate the style into real-world place, architecture, light, atmosphere, material, scale, and object meaning. Preserve product fidelity and Higher Roads authorship."},{"name":"Wong Kar-wai","core_role":"Emotional atmosphere, nocturnal intimacy, urban compression, private ritual, color as memory, rain, glass, threshold framing, and product-as-charged-object.","best_for":["premium beverage","craft spirits","canned cocktails","tea and coffee","fragrance","chocolate and confection","hospitality","travel retail","fashion-adjacent CPG","music and venue-related brand worlds","nightlife and after-hours brands","urban limited editions","products tied to ritual, memory, longing, waiting, or private indulgence"],"avoid_for":["clinical wellness","family household basics","children’s food","bright farm-natural CPG","sports performance","technical hardware demonstration","medical or regulated claims imagery","value retail","clean PDP or e-commerce hero requirements","cheerful mass-market daytime campaigns","beach freshness","transparent sustainability proof requiring documentary clarity"],"use_when_brand_needs":["desire","waiting","after-hours energy","hospitality","sensory charge","rain","glass","threshold framing","private ritual","memory","small object with emotional weight"],"do_not_use_when":["the brand needs clinical clarity","the brand needs broad daytime cheer","the product must read as family-safe household basic","the scene needs outdoor scale or technical performance","the product would be weakened by mood, blur, rain, glass, shadow, or late-night atmosphere"],"primary_prompt_variables":{"place":"real, compressed, human-scaled environments with emotional pressure: late-night food counters, hotel corridors, service kiosks, transit stations, rain-wet alleys, apartment kitchens, private rooms, bars after closing, train compartments, old cinema lobbies, tiled stairwells, colored-glass lounges, station platforms, or old offices with glass partitions","camera":"counter-height, eye-level, corridor-depth, close foreground, or slightly low practical-world viewpoints; nearby but not fully invited in","light":"motivated practical-source lighting such as red corridor lamps, amber sconces, green fluorescents, blue street neon, counter fluorescents, train cabin panels, colored glass, rain-reflected signage, or hotel lamps, plus controlled hero light for product fidelity","atmosphere":"rain, humidity, steam, smoke, mist, snow, condensation, fan movement, wet pavement, glass moisture, or light haze when it deepens story and scale and has a source","material":"tile, wet concrete, glass, lacquer, wood, fabric, metal, mirrors, wallpaper, curtains, old stone, train metal, counters, colored glass, and service fixtures","composition":"product sharp, readable, and locked as hero, with windows, counters, doorways, rails, mirrors, glass partitions, corridors, or foreground edges creating depth and separation","object_treatment":"product as ritual object, memory object, threshold object, travel companion, after-hours purchase, private indulgence, or object someone returns to","human_presence":"hands, silhouettes, reflections, blurred passersby, partial bodies, or figures behind glass, always secondary to product","motion_cue":"sharp product with figures, train light, rain, tunnel reflections, fan movement, or street movement blurring around it","emotional_pressure":"waiting, longing, private appetite, late-night routine, memory, urban isolation, or near-contact without turning into a literal film scene"},"common_traps":["red room and cigarette smoke","rainy neon alley with no brand reason","retro Hong Kong shorthand","qipao, trench coat, hitman, or lonely gangster cues","product hidden behind glass, smoke, or rain","over-saturated red-green color grade with no practical source","hotel corridor that feels like a movie reference instead of a brand place","melancholy so heavy it drains appetite or product appeal","using neon as decoration rather than place logic","making the product a prop inside a scene instead of the hero"],"weighting_guide":{"default_range":"25-45%","low":"10-25% when borrowing only practical-source color, threshold framing, rain atmosphere, corridor depth, product-as-ritual logic, partial human presence, or motion around a locked hero product","medium":"25-45% when the brand world needs nocturnal intimacy, urban ritual, hospitality mood, private indulgence, memory, rain, transit, glass, or after-hours atmosphere","high":"45-60% only for premium nightlife beverage, spirits, fragrance, hospitality, music-adjacent brands, urban limited editions, late-night launch heroes, rain-world product images, hotel or transit worlds, and memory-led product stories","cap":"Do not exceed 60%. Above that, the image can become film homage, the product can get swallowed by mood, and the prompt can fall into retro neon cliché"},"borrow":["product as charged object","practical-source saturated color","threshold staging","rain, humidity, steam, mist, or condensation as spatial structure","layered framing through glass, corridors, counters, doorways, mirrors, or partitions","ritualized repetition","urban density with private isolation","motion around a sharp hero product","atmosphere with a physical source","human trace rather than human dominance"],"avoid":["recognizable film cues","named-director wording","generic neon noir","retro cosplay","guns, hitmen, crime, stalking, affair plots, or martial arts duels","cigarette-forward glamour","tabletop product photography","literal ingredient still life unless brand-specific","heavy atmosphere that hides the product","packaging color distortion","product as incidental prop"],"higher_roads_translation":"Use Wong as an emotional-place reference, not a neon reference. His grammar turns a product from a styled object into a charged object inside a real world of ritual, weather, waiting, glass, color, memory, and private use.","example_prompt_moves":["Place the locked product on a rain-wet late-night service counter, with amber fluorescent spill inside and blue street reflections outside.","Frame the product through a glass partition inside a narrow office or kiosk, with clocks, phones, menus, paperwork, or tickets as time-pressure cues.","Use a hotel corridor, practical lamp glow, and controlled shadow to make the product feel like a private ritual object, not a tabletop prop.","Keep the product sharp while figures, train light, rain, tunnel reflections, or street movement blur around it.","Use partial human presence as evidence of use: a hand leaving the frame, a reflection in glass, or a silhouette behind a doorway."],"final_agent_instruction":"Borrow the underlying cinematic grammar, not the icons. Translate the visual language into real-world place, camera, light, material, atmosphere, composition, and object logic. Preserve product fidelity, readability, brand truth, and Higher Roads authorship."},{"name":"Wes Anderson","core_role":"Designed institutions, ritualized object handling, frontal spatial clarity, controlled color systems, compartmental worlds, emotional distance, and product-as-cherished-or-cataloged-object.","best_for":["premium beverages","design-forward CPG","gifting and confectionery","tea, coffee, pantry, preserved goods, and specialty food","wellness brands with ritual or routine","travel-friendly products","heritage, archive, craft, or founder-led brands","hospitality-adjacent brands","museum, retail, event, projection, and cultural-space systems","product families, kits, subscriptions, collections, and seasonal releases"],"avoid_for":["gritty streetwear","raw documentary lifestyle","athletic performance","dark nightclub luxury","clinical tech minimalism","sensual macro food imagery","messy youth-culture social content","brands with weak packaging or generic visual identity","brands where playfulness lowers credibility"],"use_when_brand_needs":["design order","object ceremony","ritual","cataloging","packing, serving, checking in, or handoff behavior","a real place with rules","controlled whimsy","premium charm","color hierarchy","product family organization","discovery, memory, travel, or institutional care"],"do_not_use_when":["the brand needs speed, grit, aggression, or raw realism","the product should feel messy, sensual, chaotic, or improvised","the scene should feel minimal, clinical, or tech-neutral","the brand cannot support a designed-world tone","the product packaging is too weak to survive formal framing","the image risks becoming cute instead of credible"],"primary_prompt_variables":{"place":"real places with rules: hotel back offices, train compartments, ferry terminals, archives, school supply rooms, bakery packing rooms, museum workrooms, conservatories, field stations, postal rooms, camp stores, service counters, or weather stations","camera":"wide or medium-wide 16:9 frames with frontal or lateral clarity, moderate distance, readable geography, and enough environment to explain the product role","light":"practical, window-led, service-counter, skylight, or weather-softened light with low-to-medium contrast and protected product readability","atmosphere":"paper dust, rain on glass, sea air, mist, steam, snow brightness, desert dust, dusk air, or wet surfaces when the place gives atmosphere a source","material":"brass, tile, painted wood, plaster, glass, canvas, leather, paper, ledgers, route cards, labels, drawers, key hooks, train fabric, luggage, enamel, cork, waxed cardboard, painted metal, stone","composition":"product as locked hero inside an ordered room, counter, shelf, corridor, compartment, service window, or inventory system, with symmetry used as support rather than the concept","object_treatment":"product feels logged, checked in, packed, served, protected, prepared, delivered, cataloged, displayed, collected, assigned, or discovered"},"common_traps":["centered pastel room","flat dollhouse hotel lobby","quirky vintage props scattered around product","matching uniforms and deadpan faces as the main idea","fake title card or chapter-card typography","overly symmetrical product altar","storybook miniature with no real-world scale","mustard-yellow and pink palette without brand logic","product placed in designed room with no job","decorative suitcases, keys, maps, or binoculars with no story function","copied sets, costumes, fictional signs, props, or typography","whimsy that turns premium imagery into parody"],"weighting_guide":{"default_range":"20-40%","low":"10-20% when borrowing only object order, color hierarchy, frontal clarity, or cataloged-product treatment","medium":"20-40% when the brand needs designed-world logic, premium charm, ritualized object handling, product family organization, or institutional care","high":"40-55% only for design-forward CPG, gifting, confectionery, travel, cultural spaces, product collections, seasonal systems, or brands with strong packaging and typography","cap":"Do not exceed 55% because parody, cuteness, symmetry-as-concept, or packaging over-staging becomes likely"},"borrow":["designed-world logic","frontal spatial clarity","object ceremony","cataloged or cherished product treatment","controlled color hierarchy","real places with rules","service counters, compartments, shelves, archives, and inventory systems","product family organization","premium charm without randomness"],"avoid":["copied sets or fictional signage","fake title cards","deadpan character cosplay","quirky props without story function","pastel symmetry as the whole idea","miniature dollhouse scale","cuteness that lowers credibility","overly formal product altar","tabletop fallback without world logic"],"higher_roads_translation":"Use Wes as a designed-world and object-authorship reference, not a pastel symmetry reference. His grammar helps a product feel part of a complete brand universe with rules, rituals, color hierarchy, and authored object placement.","example_prompt_moves":["Place the product inside a real service counter, archive, ferry terminal, train compartment, bakery packing room, museum workroom, or camp store where the product has a job.","Use frontal or lateral clarity to make the product legible while the room’s rules explain its role.","Treat labels, ledgers, drawers, route cards, cases, shelves, and packaging systems as evidence of an authored world, not random props.","Use symmetry only as support, not as the concept.","Keep whimsy controlled so the image remains premium and credible."],"final_agent_instruction":"Borrow the underlying cinematic grammar, not the icons. Translate the style into real-world place, camera, light, material, atmosphere, color hierarchy, composition, and object logic. Preserve product fidelity and Higher Roads authorship."}],"quick_selection_matrix":[{"condition":"scale, water, pressure, field readiness, transformation, engineering, physical geography, operational worlds, product necessity","choose":"James Cameron"},{"condition":"dark atmosphere, premium materiality, architectural depth, visual seduction, smoke, light-through-particles, myth, industrial luxury, social power, world density","choose":"Ridley Scott"},{"condition":"intimacy, mood, ritual, longing, reflection, memory, saturated practical color, after-hours energy, private urban atmosphere, product as emotional object","choose":"Wong Kar-wai"},{"condition":"playful authorship, graphic control, packaging charm, designed-world logic, product families, object ceremony, color hierarchy, theatrical staging, institutional care","choose":"Wes Anderson"}],"blending_rules":["Choose one primary director.","Use one secondary director only if it adds a missing dimension.","Do not blend more than two directors in normal use.","Primary influence should usually sit between 25% and 45%.","Secondary influence should usually sit between 10% and 20%.","Use higher influence only when the brand strongly fits that director’s grammar.","Use lower influence when borrowing only one trait, such as atmosphere, scale, color, or object treatment.","Higher Roads authorship always remains dominant.","Product fidelity always remains dominant.","If the best director choice would compromise product readability or brand truth, choose a lower weight or a different primary."],"required_selection_agent_output_schema":{"primary_influence":"string","primary_weight":"number between 0 and 1","secondary_influence":"string or null","secondary_weight":"number between 0 and 1 or 0","selection_reason":"string","borrow_from_primary":["string"],"borrow_from_secondary":["string"],"avoid":["string"],"scene_archetype":"string","prompt_variables":{"place":"string","camera":"string","light":"string","atmosphere":"string","material":"string","composition":"string","object_treatment":"string"}}};
+
+const DIRECTOR_SELECTION_PROMPT = `You are the Higher Roads Director Selection Agent. Choose director-informed cinematic grammar for a brand-world render. You do NOT write the final render prompt. You select the visual grammar and return structured direction only.
+
+Use the supplied director bank as the source of truth. It contains four directors, each with best_for, avoid_for, use_when_brand_needs, do_not_use_when, primary_prompt_variables, borrow, avoid, weighting_guide, and common_traps.
+
+Selection rules:
+- Choose one primary director.
+- Choose one secondary director only if it adds a clearly useful missing dimension. Otherwise set secondary_influence to null and secondary_weight to 0.
+- Do not blend more than two directors.
+- primary_weight is a decimal between 0.25 and 0.45 unless the brand strongly fits that director's grammar, and never above that director's cap in the bank.
+- secondary_weight is a decimal between 0.10 and 0.20.
+- Product fidelity and brand truth outrank director influence. Higher Roads authorship outranks director influence.
+- If a director's strongest traits would hide the product, distort packaging, center it on a tabletop, or create parody, lower the weight or choose a different director.
+- Borrow cinematic grammar, not recognizable movie imagery, characters, settings, signage, typography, or IP.
+
+prompt_variables must be concrete Higher Roads scene grammar translated from the chosen director, written as buildable scene instructions, not copied bank descriptions and not film references. Never name any director, film, character, or franchise in prompt_variables, scene_archetype, selection_reason, or anywhere in your output.
+
+scene_archetype is a short label for the kind of world (for example "operational dock threshold", "after-hours service counter", "misted archive interior").
+
+avoid lists the specific traps and clichés to keep out of this scene, drawn from the director's common_traps and the category clichés.
+
+Return ONLY this JSON object, no prose, no markdown fences:
+{
+  "primary_influence": "",
+  "primary_weight": 0,
+  "secondary_influence": null,
+  "secondary_weight": 0,
+  "selection_reason": "",
+  "borrow_from_primary": [],
+  "borrow_from_secondary": [],
+  "avoid": [],
+  "scene_archetype": "",
+  "prompt_variables": {
+    "place": "",
+    "camera": "",
+    "light": "",
+    "atmosphere": "",
+    "material": "",
+    "composition": "",
+    "object_treatment": ""
+  }
+}`;
+
+function directorSelectionInput(data){
+  const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
+  const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
+  return {
+    brand_read:{
+      brand_name:data.brand||'',
+      brand_state:ix.brand_state||{},
+      visual_territory:ix.visual_territory||{},
+      competitive:ix.competitive||{}
+    },
+    product_read:{
+      product_name:f.name||la.asset_name||'',
+      category:f.category||'',
+      sensory:ix.sensory||{}
+    },
+    category:f.category||'',
+    product_cues:{ visual_territory:ix.visual_territory||{}, sensory:ix.sensory||{} },
+    category_cliches_to_avoid:(v.master_scene_meta&&v.master_scene_meta.category_cliches_to_avoid)||[],
+    higher_roads_rules:DIRECTOR_BANK.global_rules||[],
+    read_confidence:v.confidence||'unknown'
+  };
+}
+
+async function selectDirector(data, apiKey){
+  const input=directorSelectionInput(data);
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:1400, system:DIRECTOR_SELECTION_PROMPT, messages:[{role:'user',content:'Director bank:\n'+JSON.stringify(DIRECTOR_BANK)+'\n\nBrand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
+  });
+  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Director selection '+res.status+(t?': '+t.slice(0,160):'')); }
+  const payload=await res.json();
+  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  const sel=extractJson(text);
+  if(!sel||!_c(sel.primary_influence)||!sel.prompt_variables) throw new Error('Director selection returned no usable direction');
+  // Clamp weights defensively so a stray value never lets director grammar dominate.
+  const clampW=(w,lo,hi,d)=>{ const n=Number(w); return (isFinite(n)&&n>0)?Math.min(hi,Math.max(lo,n)):d; };
+  sel.primary_weight=clampW(sel.primary_weight,0.10,0.60,0.35);
+  sel.secondary_influence=_c(sel.secondary_influence)||null;
+  sel.secondary_weight=sel.secondary_influence?clampW(sel.secondary_weight,0.05,0.20,0.12):0;
+  sel.borrow_from_primary=_l(sel.borrow_from_primary);
+  sel.borrow_from_secondary=_l(sel.borrow_from_secondary);
+  sel.avoid=_l(sel.avoid);
+  return sel;
+}
+
+function directorGuidanceBlock(sel){
+  if(!sel) return '';
+  const pv=sel.prompt_variables||{};
+  const lines=[];
+  lines.push('\n\nCREATIVE DIRECTION (hidden logic; never name any director, film, character, franchise, or IP anywhere in your output). A creative-direction pass selected an underlying cinematic grammar for this brand. Translate that grammar into the scene through place, camera, light, atmosphere, material, composition, and object treatment. Borrow grammar, not imagery.');
+  if(_c(sel.scene_archetype)) lines.push('Scene archetype to honor: '+_c(sel.scene_archetype)+'.');
+  if(_c(sel.selection_reason)) lines.push('Why this grammar fits the brand: '+_c(sel.selection_reason));
+  const borrow=_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
+  if(borrow.length) lines.push('Grammar to borrow (primary weight about '+(sel.primary_weight||0)+(sel.secondary_influence?(', secondary weight about '+(sel.secondary_weight||0)):'')+'): '+borrow.join('; ')+'.');
+  const pvLines=[
+    _c(pv.place)&&('- place: '+_c(pv.place)),
+    _c(pv.camera)&&('- camera: '+_c(pv.camera)),
+    _c(pv.light)&&('- light: '+_c(pv.light)),
+    _c(pv.atmosphere)&&('- atmosphere: '+_c(pv.atmosphere)),
+    _c(pv.material)&&('- material: '+_c(pv.material)),
+    _c(pv.composition)&&('- composition: '+_c(pv.composition)),
+    _c(pv.object_treatment)&&('- object treatment: '+_c(pv.object_treatment))
+  ].filter(Boolean);
+  if(pvLines.length){ lines.push('Translate these scene variables into the world:'); lines.push(pvLines.join('\n')); }
+  if(_l(sel.avoid).length) lines.push('Grammar and clichés to avoid: '+_l(sel.avoid).join('; ')+'.');
+  lines.push('Higher Roads authorship and product fidelity outrank this grammar. If any borrowed trait would hide the product, distort packaging, center it on a tabletop, or create parody, drop that trait.');
+  lines.push('In addition to the required schema, add two top-level fields to your JSON: "borrowed_visual_grammar" (array of short strings: the grammar you actually used) and "excluded_visual_grammar" (array of short strings: grammar you deliberately dropped, each with a brief reason).');
+  return lines.join('\n');
+}
+
+function buildCreativeDirectionBlock(h, finalPrompt, negStr){
+  const sel=(h&&h.director_selection)||null;
+  const st=(h&&h.scene_translation)||{};
+  const sd=(h&&h.scene_direction)||{};
+  return {
+    director_layer_status: sel?'ok':'fallback',
+    director_selection: sel,
+    scene_translation:{
+      world_thesis:_c(st.world_thesis),
+      cinematic_translation:_c(st.cinematic_translation),
+      borrowed_visual_grammar:_l(st.borrowed_visual_grammar),
+      excluded_visual_grammar:_l(st.excluded_visual_grammar),
+      scene_brief:_c(sd.world_description),
+      final_render_prompt:_c(finalPrompt),
+      negative_prompt_rules:String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean)
+    }
+  };
+}
+
+function renderCreativeDirectionPanel(){
+  const el=document.getElementById('creativeDirection');
+  if(!el) return;
+  if(!DEBUG_CREATIVE_DIRECTION || !CURRENT_PKG || !CURRENT_PKG.creative_direction){ el.hidden=true; el.innerHTML=''; return; }
+  const cd=CURRENT_PKG.creative_direction;
+  const sel=cd.director_selection, st=cd.scene_translation||{};
+  const row=(label,val)=>val?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+esc(val)+'</span></div>'):'';
+  const chips=(label,arr)=>(arr&&arr.length)?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+arr.map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>'):'';
+  let html='<div class="cd-head">Creative direction <span class="cd-tag">internal</span></div>';
+  if(!sel){
+    html+='<div class="cd-row"><span class="cd-k">Director layer</span><span class="cd-v">fallback (selection unavailable, using current render prompt flow)</span></div>';
+  }else{
+    html+=row('Primary influence',sel.primary_influence+'  ·  weight '+(sel.primary_weight||0));
+    if(sel.secondary_influence) html+=row('Secondary influence',sel.secondary_influence+'  ·  weight '+(sel.secondary_weight||0));
+    html+=row('Scene archetype',sel.scene_archetype);
+    html+=row('Selection reason',sel.selection_reason);
+    html+=chips('Borrowed',_dedupe([].concat(sel.borrow_from_primary||[],sel.borrow_from_secondary||[],st.borrowed_visual_grammar||[])));
+    html+=chips('Avoided',_dedupe([].concat(sel.avoid||[],st.excluded_visual_grammar||[])));
+  }
+  if(st.final_render_prompt) html+='<div class="cd-row cd-prompt"><span class="cd-k">Final render prompt</span><span class="cd-v">'+esc(st.final_render_prompt)+'</span></div>';
+  el.innerHTML=html;
+  el.hidden=false;
+}
+
 const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
 const ART_DIRECTOR_PROMPT=`You are a director of photography and brand-world designer. You are NOT a CPG product photographer. You design one cinematic brand-world frame that a product lives inside, not a styled tabletop the product sits on. Think like someone shooting a still from a high-end campaign film.
 
@@ -487,7 +666,7 @@ Return only valid JSON, no prose, no markdown fences, matching:
 }
 render_prompt equals scene_direction.prompt_seed. Keep props minimal and only if the brand justifies them. Leave diagnostics.alternates empty UNLESS the provided confidence is low, in which case include up to two short {scene_name, one_line_concept} alternates there. Return one scene_direction only.`;
 
-async function buildMasterScene(data, apiKey){
+async function buildMasterScene(data, apiKey, directorSelection){
   const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
   const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
   const input={
@@ -505,7 +684,7 @@ async function buildMasterScene(data, apiKey){
   const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:2500, system:ART_DIRECTOR_PROMPT, messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
+    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:3000, system:ART_DIRECTOR_PROMPT+directorGuidanceBlock(directorSelection), messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
   });
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
   const payload=await res.json();
@@ -582,6 +761,7 @@ function buildRenderPackage(h){
       {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:_posReference(h),negative:_dedupe(neg).join(', ')}
     ],
     confidence_notes:{score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]},
+    creative_direction:buildCreativeDirectionBlock(h,_posComposite(h),_dedupe(neg).join(', ')),
     test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Label fidelity, proportions, and color accuracy are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
   };
 }
@@ -777,6 +957,8 @@ function buildHandoff(){
     scene_direction:sceneDir,
     confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
     alternates:[],
+    director_selection:(DATA.vibes&&DATA.vibes.director_selection)||null,
+    scene_translation:(DATA.vibes&&DATA.vibes.scene_translation)||null,
     chosen_direction:chosenName
   };
 }
@@ -786,6 +968,7 @@ cta.addEventListener('click',async()=>{
   CURRENT_PKG=buildRenderPackage(buildHandoff());
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
   handoffBody.textContent=CURRENT_MD;
+  renderCreativeDirectionPanel();
   handoff.classList.add('on');
   handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
@@ -862,6 +1045,7 @@ async function rebuildCurrentPackage(){
   CURRENT_PKG=buildRenderPackage(buildHandoff());
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
   if(handoffBody) handoffBody.textContent=CURRENT_MD;
+  renderCreativeDirectionPanel();
   return CURRENT_PKG;
 }
 async function downloadLockedProductImage(){
@@ -1124,11 +1308,18 @@ async function generate(){
     DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
     if(apiKey){
       document.getElementById('loadingLine').textContent='Designing the scene';
+      // Creative-direction pass: pick hidden cinematic grammar for the brand.
+      // Best-effort. On failure we fall back to the current render prompt flow.
+      let directorSelection=null;
+      try{ directorSelection=await selectDirector(DATA, apiKey); }
+      catch(dirErr){ console.warn('director layer failed; using current render prompt flow', dirErr); directorSelection=null; }
+      DATA.vibes.director_selection=directorSelection;
       try{
-        const built=await buildMasterScene(DATA, apiKey);
+        const built=await buildMasterScene(DATA, apiKey, directorSelection);
         DATA.vibes.master_scene=built.scene_direction;
         DATA.vibes.master_scene_meta={ brand_world_read:built.brand_world_read||'', world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', category_cliches_to_avoid:built.category_cliches_to_avoid||[], anti_tabletop_rules:built.anti_tabletop_rules||[] };
         DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
+        DATA.vibes.scene_translation={ world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', borrowed_visual_grammar:built.borrowed_visual_grammar||[], excluded_visual_grammar:built.excluded_visual_grammar||[] };
       }catch(sceneErr){ console.warn('scene builder failed; using brand-read scene', sceneErr); }
     }
     renderPick(); showView('pick');
