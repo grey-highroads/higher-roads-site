@@ -263,6 +263,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <button id="toggleConf">Toggle brand confidence (now: HIGH)</button>
     <span id="modeReadout">mode: none</span>
     <button id="copyTiming" type="button">Copy timing log</button>
+    <button id="clearPreviewCache" type="button">Clear URL cache</button>
     <span class="buildstamp" id="buildStamp">build: loading</span>
   </div>
 </div>
@@ -334,8 +335,10 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-09-perf-v1';
-const PWP_BUILD_NOTE = 'visible build stamp + action timing instrumentation';
+const PWP_BUILD_ID = 'pwp-index-2026-07-09-fast-cache-v1';
+const PWP_BUILD_NOTE = 'fast mode: cached brand reads, director-built scene fallback, package hygiene, action timing';
+const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
+const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
   const el=document.getElementById('buildStamp');
   if(el) el.textContent='build: '+PWP_BUILD_ID;
@@ -396,6 +399,30 @@ const PERF={
     return navigator.clipboard.writeText(JSON.stringify(payload,null,2));
   }
 };
+function cacheKeyForPreview(productUrl, homeUrl){
+  return 'pwp_preview_cache_v1::'+btoa(unescape(encodeURIComponent(JSON.stringify({product_url:productUrl||'',home_url:homeUrl||''}))));
+}
+function readPreviewCache(productUrl, homeUrl){
+  try{
+    const raw=localStorage.getItem(cacheKeyForPreview(productUrl, homeUrl));
+    if(!raw) return null;
+    const hit=JSON.parse(raw);
+    if(!hit||!hit.saved_at||!hit.data) return null;
+    const age=Date.now()-Number(hit.saved_at);
+    if(age>PWP_CACHE_TTL_MS){ localStorage.removeItem(cacheKeyForPreview(productUrl, homeUrl)); return null; }
+    return {data:hit.data, age_ms:age, age_seconds:+(age/1000).toFixed(1)};
+  }catch(e){ console.warn('preview cache read failed',e); return null; }
+}
+function writePreviewCache(productUrl, homeUrl, data){
+  try{ localStorage.setItem(cacheKeyForPreview(productUrl, homeUrl), JSON.stringify({saved_at:Date.now(), data:data})); }
+  catch(e){ console.warn('preview cache write failed',e); }
+}
+function clearPreviewCache(){
+  try{
+    Object.keys(localStorage).filter(k=>k.indexOf('pwp_preview_cache_v1::')===0).forEach(k=>localStorage.removeItem(k));
+    PERF.log('preview_cache_cleared',{});
+  }catch(e){ console.warn('preview cache clear failed',e); }
+}
 setBuildStamp();
 const FIDELITY_NEGATIVES = HR_CREATIVE_CONFIG.fidelityNegatives || [];
 const RUBRIC_CRITERIA = HR_CREATIVE_CONFIG.rubricCriteria || [];
@@ -716,6 +743,50 @@ function renderCreativeDirectionPanel(){
 const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
 const ART_DIRECTOR_PROMPT = HR_CREATIVE_CONFIG.artDirectorPrompt;
 
+function sceneFromDirectorSelection(data, directorSelection){
+  const v=(data&&data.vibes)||{}, f=(data&&data.factual)||{};
+  const sel=directorSelection||{};
+  const pv=sel.prompt_variables||{};
+  const name=_c(sel.scene_archetype)||_c(v.scene_direction&&v.scene_direction.scene_name)||'brand world preview';
+  const place=_c(pv.place)||_c(v.scene_direction&&v.scene_direction.world_description)||'a real environment with physical rules and brand-specific context';
+  const material=_c(pv.material);
+  const composition=_c(pv.composition)||_c(v.scene_direction&&v.scene_direction.composition)||'Product locked as sharp hero in foreground or strong middle ground, with enough environment to show scale, context, and use.';
+  const lighting=_c(pv.light)||_c(v.scene_direction&&v.scene_direction.lighting)||'Motivated natural or practical light with controlled hero readability on the product label.';
+  const atmosphere=_c(pv.atmosphere);
+  const camera=_c(pv.camera);
+  const objectTreatment=_c(pv.object_treatment)||'Product treated as a useful, desired, brand-defining object within the world.';
+  const world=[place, material&&('Materials: '+material), atmosphere&&('Atmosphere: '+atmosphere)].filter(Boolean).join(' ');
+  const promptSeed=[
+    'scene: '+name+'.',
+    'setting: '+place,
+    material&&('materials: '+material),
+    'composition: '+composition,
+    'lighting: '+lighting,
+    atmosphere&&('atmosphere: '+atmosphere),
+    camera&&('camera: '+camera),
+    'the product reads as '+objectTreatment,
+    sel.selection_reason&&('brand fit: '+_c(sel.selection_reason))
+  ].filter(Boolean).join(' ');
+  return {
+    scene_name:name,
+    world_description:world,
+    product_placement_intent:objectTreatment,
+    composition:composition,
+    lighting:lighting,
+    props:[],
+    avoid:_dedupe([].concat(_l(sel.avoid), _l(v.scene_direction&&v.scene_direction.avoid))),
+    render_path:'composite',
+    prompt_seed:promptSeed,
+    surface:_c(pv.surface)||'',
+    background:place,
+    materials:material?[material]:[],
+    color_palette:[],
+    camera:camera?{framing:camera}:null,
+    brand_specific_cues:_dedupe([_c(sel.brand_posture), _c(sel.brand_fit_check), _c(f.category)]),
+    locked_product_placement:{anchor:'foreground or strong middle ground', scale_notes:'clear readable hero; packaging unchanged', light_match:'controlled hero light matched to the scene'}
+  };
+}
+
 async function buildMasterScene(data, apiKey, directorSelection){
   const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
   const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
@@ -799,19 +870,40 @@ function buildLockedAssetRecord(la){
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
   const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.director_selection&&_l(h.director_selection.avoid))||[])];
+  const negStr=_dedupe(neg).join(', ');
+  const positiveComposite=_posComposite(h);
+  const positiveReference=_posReference(h);
+  const creativeDirection=buildCreativeDirectionBlock(h,positiveComposite,negStr);
+  const sel=h.director_selection||null;
+  const pv=(sel&&sel.prompt_variables)||{};
+  const directorLayerOk=!!(creativeDirection&&creativeDirection.director_layer_status==='ok'&&sel);
+  const effectiveChosenDirection=directorLayerOk?(_c(sel.scene_archetype)||_c(sd.scene_name)):(_c(h.chosen_direction)||_c(sd.scene_name));
+  const effectiveSceneBrief=directorLayerOk?{
+    world_description:_c(creativeDirection.scene_translation&&creativeDirection.scene_translation.scene_brief)||_c(sd.world_description)||_c(pv.place),
+    product_placement_intent:sanitizeProductPlacement(_c(pv.object_treatment)||_c(sd.product_placement_intent)),
+    composition:_c(pv.composition)||_c(sd.composition),
+    lighting:_c(pv.light)||_c(sd.lighting),
+    props:_l(sd.props)
+  }:{
+    world_description:_c(sd.world_description),
+    product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),
+    composition:_c(sd.composition),
+    lighting:_c(sd.lighting),
+    props:_l(sd.props)
+  };
   return {
-    meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
+    meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:effectiveChosenDirection,render_path_recommendation:_c(sd.render_path)||'composite'},
     fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
     locked_asset:buildLockedAssetRecord(la),
-    scene_brief:{world_description:_c(sd.world_description),product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),composition:_c(sd.composition),lighting:_c(sd.lighting),props:_l(sd.props)},
+    scene_brief:effectiveSceneBrief,
     placement_spec:buildPlacementSpec(h),
-    prompts:{positive:_posReference(h),negative:_dedupe(neg).join(', ')},
+    prompts:{positive:positiveReference,negative:negStr},
     variants:[
-      {render_path:'composite',label:'Composite: generate a product-free world, then composite the locked product in',instructions:'Generate the environment only, with an empty product-shaped placement area. Composite the supplied locked product image into that area afterward. Best when the engine cannot preserve packaging reliably.',positive:_posComposite(h),negative:_dedupe(neg).join(', ')},
-      {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:_posReference(h),negative:_dedupe(neg).join(', ')}
+      {render_path:'composite',label:'Composite: generate a product-free world, then composite the locked product in',instructions:'Generate the environment only, with an empty product-shaped placement area. Composite the supplied locked product image into that area afterward. Best when the engine cannot preserve packaging reliably.',positive:positiveComposite,negative:negStr},
+      {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:positiveReference,negative:negStr}
     ],
     confidence_notes:{score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]},
-    creative_direction:buildCreativeDirectionBlock(h,_posComposite(h),_dedupe(neg).join(', ')),
+    creative_direction:creativeDirection,
     test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Label fidelity, proportions, and color accuracy are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
   };
 }
@@ -911,15 +1003,24 @@ function mockPreviewData(){
 }
 
 async function fetchPreviewData(productUrl, homeUrl, apiKey){
+  const cached=readPreviewCache(productUrl, homeUrl);
+  if(cached){
+    PERF.log('parse_and_brand_read_cache_hit',{age_seconds:cached.age_seconds});
+    return { demo:false, cached:true, data:cached.data };
+  }
+  PERF.log('parse_and_brand_read_cache_miss',{});
   if(!PREVIEW_ENDPOINT){
     await new Promise(r=>setTimeout(r,700)); // demo only: let the loading state render
-    return { demo:true, data:mockPreviewData() };
+    const data=mockPreviewData();
+    writePreviewCache(productUrl, homeUrl, data);
+    return { demo:true, cached:false, data:data };
   }
   const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ product_url:productUrl, home_url:homeUrl, api_key:apiKey }) });
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Parser returned '+res.status+(t?': '+t.slice(0,140):'')); }
   const payload=await res.json();
   if(!payload||!Array.isArray(payload.candidates)||!payload.candidates.length) throw new Error('No product image was found on that page. Try the direct product URL, or upload the image after this.');
-  return { demo:false, data:payload };
+  writePreviewCache(productUrl, homeUrl, payload);
+  return { demo:false, cached:false, data:payload };
 }
 
 // --- pick controller (mirrors pick-state.js) ---
@@ -1400,8 +1501,9 @@ async function generate(){
   hint.textContent=''; document.getElementById('loadingLine').textContent='Fetching your product'; showView('loading');
   try{
     PERF.start('parse_and_brand_read_worker');
-    const { data }=await fetchPreviewData(productUrl, homeUrl, apiKey);
-    PERF.end('parse_and_brand_read_worker',{brand:data&&data.brand, candidates:data&&data.candidates?data.candidates.length:0, has_vibes:!!(data&&data.vibes)});
+    const preview=await fetchPreviewData(productUrl, homeUrl, apiKey);
+    const data=preview.data;
+    PERF.end('parse_and_brand_read_worker',{brand:data&&data.brand, candidates:data&&data.candidates?data.candidates.length:0, has_vibes:!!(data&&data.vibes), cached:!!preview.cached});
 
     DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
     if(apiKey){
@@ -1419,17 +1521,37 @@ async function generate(){
         console.warn('director layer failed; using current render prompt flow', dirErr); directorSelection=null;
       }
       DATA.vibes.director_selection=directorSelection;
-      try{
-        PERF.start('master_scene_anthropic');
-        const built=await buildMasterScene(DATA, apiKey, directorSelection);
-        PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name});
-        DATA.vibes.master_scene=built.scene_direction;
-        DATA.vibes.master_scene_meta={ brand_world_read:built.brand_world_read||'', world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', category_cliches_to_avoid:built.category_cliches_to_avoid||[], anti_tabletop_rules:built.anti_tabletop_rules||[] };
-        DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
-        DATA.vibes.scene_translation={ world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', borrowed_visual_grammar:built.borrowed_visual_grammar||[], excluded_visual_grammar:built.excluded_visual_grammar||[] };
-      }catch(sceneErr){
-        PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
-        console.warn('scene builder failed; using brand-read scene', sceneErr);
+      if(PWP_FAST_MODE){
+        PERF.log('master_scene_anthropic_skipped',{reason:'PWP_FAST_MODE', source:'director_selection_prompt_variables'});
+        const fastScene=sceneFromDirectorSelection(DATA, directorSelection);
+        DATA.vibes.master_scene=fastScene;
+        DATA.vibes.master_scene_meta={
+          brand_world_read:'fast mode: derived from director selection and brand read',
+          world_thesis:_c(directorSelection&&directorSelection.selection_reason)||_c(directorSelection&&directorSelection.brand_fit_check)||'',
+          cinematic_translation:'fast mode scene built from director prompt_variables; master scene call skipped',
+          category_cliches_to_avoid:_l(directorSelection&&directorSelection.avoid),
+          anti_tabletop_rules:['no tabletop fallback','use a real world with physical rules']
+        };
+        DATA.vibes.scene_diagnostics={fast_mode:true, skipped_master_scene:true};
+        DATA.vibes.scene_translation={
+          world_thesis:DATA.vibes.master_scene_meta.world_thesis,
+          cinematic_translation:DATA.vibes.master_scene_meta.cinematic_translation,
+          borrowed_visual_grammar:_dedupe([].concat(_l(directorSelection&&directorSelection.borrow_from_primary),_l(directorSelection&&directorSelection.borrow_from_secondary))),
+          excluded_visual_grammar:_l(directorSelection&&directorSelection.avoid)
+        };
+      }else{
+        try{
+          PERF.start('master_scene_anthropic');
+          const built=await buildMasterScene(DATA, apiKey, directorSelection);
+          PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name});
+          DATA.vibes.master_scene=built.scene_direction;
+          DATA.vibes.master_scene_meta={ brand_world_read:built.brand_world_read||'', world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', category_cliches_to_avoid:built.category_cliches_to_avoid||[], anti_tabletop_rules:built.anti_tabletop_rules||[] };
+          DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
+          DATA.vibes.scene_translation={ world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', borrowed_visual_grammar:built.borrowed_visual_grammar||[], excluded_visual_grammar:built.excluded_visual_grammar||[] };
+        }catch(sceneErr){
+          PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
+          console.warn('scene builder failed; using brand-read scene', sceneErr);
+        }
       }
     }
     PERF.start('render_pick_ui');
@@ -1450,6 +1572,8 @@ document.getElementById('homeUrl').addEventListener('keydown',e=>{ if(e.key==='E
 document.getElementById('errorBack').addEventListener('click',()=>showView('entry'));
 const copyTimingBtn=document.getElementById('copyTiming');
 if(copyTimingBtn){ copyTimingBtn.addEventListener('click',async()=>{ try{ await PERF.copy(); copyTimingBtn.textContent='Timing copied'; setTimeout(()=>copyTimingBtn.textContent='Copy timing log',1200); }catch(e){ console.warn('copy timing failed',e); } }); }
+const clearCacheBtn=document.getElementById('clearPreviewCache');
+if(clearCacheBtn){ clearCacheBtn.addEventListener('click',()=>{ clearPreviewCache(); clearCacheBtn.textContent='Cache cleared'; setTimeout(()=>clearCacheBtn.textContent='Clear URL cache',1200); }); }
 document.getElementById('startOver').addEventListener('click',()=>{ handoff.classList.remove('on'); showView('entry'); });
 
 // honest demo banner from the first screen when no backend is configured
