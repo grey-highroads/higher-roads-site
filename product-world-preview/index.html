@@ -873,6 +873,23 @@ function buildLockedAssetRecord(la){
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
   const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.director_selection&&_l(h.director_selection.avoid))||[])];
+const creativeDirection=buildCreativeDirectionBlock(h,_posComposite(h),_dedupe(neg).join(', '));
+const sel=h.director_selection||null;
+const pv=(sel&&sel.prompt_variables)||{};
+const effectiveChosenDirection=(creativeDirection.director_layer_status==='ok'&&sel)?_c(sel.scene_archetype):(_c(h.chosen_direction)||_c(sd.scene_name));
+const effectiveSceneBrief=(creativeDirection.director_layer_status==='ok'&&sel)?{
+  world_description:_c(creativeDirection.scene_translation&&creativeDirection.scene_translation.scene_brief)||_c(pv.place)||_c(sd.world_description),
+  product_placement_intent:sanitizeProductPlacement(_c(pv.object_treatment)||_c(sd.product_placement_intent)),
+  composition:_c(pv.composition)||_c(sd.composition),
+  lighting:_c(pv.light)||_c(sd.lighting),
+  props:[]
+}:{
+  world_description:_c(sd.world_description),
+  product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),
+  composition:_c(sd.composition),
+  lighting:_c(sd.lighting),
+  props:_l(sd.props)
+};
   return {
     meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
     fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
