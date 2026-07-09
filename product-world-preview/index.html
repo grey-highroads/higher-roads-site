@@ -340,8 +340,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-09-render-observe-v1';
-const PWP_BUILD_NOTE = 'fast mode plus render observability: 300s timeout, poll logging, visible job id, manual job check';
+const PWP_BUILD_ID = 'pwp-index-2026-07-09-prompt-sanitize-v1';
+const PWP_BUILD_NOTE = 'prompt sanitation: filter non-string/empty/dangling-label fragments, collapse duplicated setting/background; fast mode plus render observability retained';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -456,7 +456,23 @@ function _stripProductFreeLines(s){
 }
 function _firstSentences(s,n){return _sentences(s).slice(0,n).join(' ');}
 function _sentenceJoin(parts){
-  return _l(parts).map(_cleanText).filter(Boolean).join('. ').replace(/\.{2,}/g,'.');
+  // Sanitation chokepoint for every render prompt. Drop non-string, empty, and
+  // dangling-label fragments before joining so booleans, zeros, and blank
+  // "label:" stubs can never leak in. Collapse fragments that repeat the same
+  // value under a different label (the duplicated setting/background artifact).
+  const seen=new Set(), out=[];
+  (Array.isArray(parts)?parts:[parts]).forEach(p=>{
+    if(typeof p!=='string') return;              // drops false, 0, null, undefined, objects
+    const frag=_cleanText(p);
+    if(!frag) return;                            // drops empty
+    if(/^[a-z][a-z ]{1,24}:\s*$/i.test(frag)) return;  // drops a dangling "label:" with no value
+    const val=frag.replace(/^[a-z][a-z ]{1,24}:\s*/i,'').toLowerCase().trim();
+    const key=val||frag.toLowerCase();
+    if(seen.has(key)) return;                    // drops a value already present under another label
+    seen.add(key);
+    out.push(frag);
+  });
+  return out.join('. ').replace(/\.{2,}/g,'.');
 }
 function sanitizeProductPlacement(s){
   return _cleanText(s)
@@ -783,7 +799,7 @@ function sceneFromDirectorSelection(data, directorSelection){
     render_path:'composite',
     prompt_seed:promptSeed,
     surface:_c(pv.surface)||'',
-    background:place,
+    background:'', // place already carries the environment as setting/world_description; duplicating it here produced the duplicated-background artifact
     materials:material?[material]:[],
     color_palette:[],
     camera:camera?{framing:camera}:null,
