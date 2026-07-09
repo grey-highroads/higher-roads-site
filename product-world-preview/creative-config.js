@@ -42,6 +42,21 @@ Hierarchy:
 
 Never choose a world mainly because of a flavor name. Flavor may influence color, sensory tone, palette, or mood, but it should not become literal props or define the world.
 
+Anti-rut guardrail:
+Do not overuse service counters, kiosks, archives, menu boards, labeled drawers, glass display cases, brass fixtures, catalog systems, apothecary walls, resort counters, or boutique retail thresholds as a universal solution.
+
+These are valid only when the brand specifically supports hospitality, retail, travel, resort, archive, apothecary, service, or product-system logic. They are not default substitutes for tabletop photography.
+
+Before selecting the scene_archetype, consider three distinct possible world types:
+1. use_occasion_world: where, when, or how the product is actually used or desired.
+2. origin_or_production_world: where the product's making, sourcing, craft, system, or logistics could be made cinematic.
+3. cultural_or_lifestyle_world: the broader social, subcultural, seasonal, travel, design, athletic, culinary, or domestic context the brand belongs to.
+
+Choose the strongest brand-fit world, not the one most associated with the selected director. If two recent or obvious options would create similar counter/kiosk/archive imagery, choose a different defensible world type.
+
+A real place does not have to be a counter. Consider thresholds, vehicles, field stations, prep areas, clubs, workshops, loading zones, outdoor rituals, hospitality back-of-house, production environments, event spaces, travel moments, routes, storage systems, service moments, and actual use occasions.
+
+
 Selection rules:
 - Choose one primary director.
 - Choose one secondary director only if it adds a clearly useful missing dimension. Otherwise set secondary_influence to null and secondary_weight to 0.
@@ -57,6 +72,9 @@ Important fit checks:
 - If the brand reads bright, friendly, playful, approachable, vacation-coded, social, or legal adult CPG, avoid worlds that feel gloomy, hidden, illicit, noir, unsafe, lonely, shame-coded, or like a secretive purchase.
 - If the brand reads premium, atmospheric, architectural, dark, intense, ritualistic, or luxury-with-edge, Ridley or Wong may fit.
 - If the brand reads designed, playful, packaging-forward, colorful, charming, ritualized, or object-system driven, Wes may fit.
+- If using Wes Anderson influence, do not automatically use labeled drawers, service counters, menu boards, archives, brass fixtures, glass display cases, or frontal kiosk compositions. Wes can translate into camp stores, ferry terminals, pool clubs, school supply rooms, packing benches, train compartments, field stations, back-of-house hospitality rooms, pantry systems, delivery rooms, cultural institutions, route systems, and product-family rituals. Choose the least expected defensible world.
+- If a product is bright, playful, or designed, that does not automatically mean resort kiosk or catalog counter. Test whether the brand is better served by a use occasion, production environment, lifestyle setting, or origin world.
+
 - If the brand reads functional, outdoor, engineered, field-ready, water-connected, or performance-driven, Cameron may fit.
 - If no director clearly fits, choose the closest director at a lower weight and explain the restraint in brand_fit_check.
 
@@ -77,6 +95,11 @@ scene_archetype is a short label for the kind of world, for example:
 "misted archive interior"
 "boutique travel counter"
 "field station handoff"
+"studio prep bench"
+"delivery loading threshold"
+"club cooler handoff"
+"production floor tasting window"
+"travel route checkpoint"
 
 avoid lists the specific traps and clichés to keep out of this scene, drawn from:
 - the chosen director's common_traps
@@ -89,6 +112,12 @@ Return ONLY this JSON object, no prose, no markdown fences:
   "brand_posture": "",
   "category_risk": "",
   "brand_fit_check": "",
+  "world_type_options": {
+    "use_occasion_world": "",
+    "origin_or_production_world": "",
+    "cultural_or_lifestyle_world": ""
+  },
+  "repetition_risk_check": "",
   "primary_influence": "",
   "primary_weight": 0,
   "secondary_influence": null,
@@ -128,6 +157,18 @@ Placement: the product is a small but clear hero placed off-center, in the right
 
 HARD RULE. Do not default to: tabletop still life, ingredient piles, fruit beside product, flowers beside product, linen, stone counters, ceramic props, soft window light, spa neutrals, or centered product-on-surface compositions. These are fallback CPG tropes, not brand worlds.
 
+ANTI-RUT RULE. Do not make every product live on a service counter, retail shelf, kiosk, archive table, apothecary wall, menu board, labeled drawer system, brass-and-glass display case, or resort counter. Those worlds are allowed only when the brand truly supports that logic. They are not a universal answer to the no-tabletop rule.
+
+Before finalizing the scene, actively test at least three different world families in your head:
+1. A use-occasion world.
+2. An origin, production, logistics, or craft world.
+3. A cultural, lifestyle, travel, seasonal, or social world.
+
+Choose the one with the strongest brand-specific reason. If your chosen scene feels similar to a boutique counter, catalog archive, pool kiosk, apothecary shelf, or labeled drawer system by default, rewrite it into a different defensible world unless that counter/system is clearly the brand truth.
+
+A real place does not have to be a counter. Consider thresholds, vehicles, field stations, prep areas, clubs, workshops, loading zones, outdoor rituals, hospitality back-of-house, production environments, event spaces, travel moments, routes, storage systems, service moments, and actual use occasions.
+
+
 THE TEST. If you cannot explain in one sentence why this specific world belongs to this specific brand, the scene is not strong enough. Rewrite it until you can.
 
 DEPTH CHECK. If the world is only a literal translation of the product name or a flavor (for example maple syrup becoming a sugar shack, or "citrus" becoming an orchard), push one level deeper into the brand's ethos, use-occasion, atmosphere, place, or implied story. A literal translation is acceptable only when that literal idea IS the core brand truth, and even then the frame must earn it with a real world, not a prop.
@@ -136,6 +177,8 @@ Return only valid JSON, no prose, no markdown fences, matching:
 {
  "scene_direction_version":"0.3",
  "brand_world_read":"the emotional, cultural, and visual territory this brand owns",
+ "world_type_options":{"use_occasion_world":"one distinct possible world","origin_or_production_world":"one distinct possible world","cultural_or_lifestyle_world":"one distinct possible world"},
+ "repetition_risk_check":"one sentence naming any overused counter/kiosk/archive/tabletop risk and how you avoided it",
  "world_thesis":"one sentence: the cinematic world this brand belongs in",
  "cinematic_translation":"how the brand ethos becomes place, scale, light, camera, atmosphere, material, and implied action",
  "category_cliches_to_avoid":["generic_tabletop","linen_napkin","ingredient_pile","ceramic_cup","sunlit_stone_counter","spa_wellness_neutrals","generic_beach_fruit","fruit_beside_product","flowers_beside_product","soft_bokeh_lifestyle","centered_product_on_surface","premium_cpg_still_life","catalog_product_photo"],
