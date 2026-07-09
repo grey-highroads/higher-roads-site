@@ -161,6 +161,8 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .buildstamp{margin-left:auto;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0;text-transform:none;opacity:.95}
 .perf-panel{margin-top:14px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(0,0,0,.16);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.45;color:#d7c8b6;white-space:pre-wrap;max-height:260px;overflow:auto}
 .perf-panel b{color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.job-status{margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);border-radius:12px;background:rgba(210,139,74,.07);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.45;color:#d7c8b6;white-space:pre-wrap;max-height:220px;overflow:auto}
+.job-status b{color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 
 </style>
 </head>
@@ -258,12 +260,15 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <button class="linkbtn" id="startOver2" type="button" style="margin-top:20px">Start over with a new URL</button>
   </section>
 
+  <pre id="jobStatusPanel" class="job-status" hidden></pre>
+
   <div class="devbar">
     <span>DEV</span>
     <button id="toggleConf">Toggle brand confidence (now: HIGH)</button>
     <span id="modeReadout">mode: none</span>
     <button id="copyTiming" type="button">Copy timing log</button>
     <button id="clearPreviewCache" type="button">Clear URL cache</button>
+    <button id="checkLastRenderJob" type="button">Check last render job</button>
     <span class="buildstamp" id="buildStamp">build: loading</span>
   </div>
 </div>
@@ -335,8 +340,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-09-fast-cache-v1';
-const PWP_BUILD_NOTE = 'fast mode: cached brand reads, director-built scene fallback, package hygiene, action timing';
+const PWP_BUILD_ID = 'pwp-index-2026-07-09-render-observe-v1';
+const PWP_BUILD_NOTE = 'fast mode plus render observability: 300s timeout, poll logging, visible job id, manual job check';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -966,6 +971,10 @@ const JOBS_ENDPOINT = 'https://render-jobs.grey-4fe.workers.dev'; // render job 
 // output is a true 16:9 cinematic frame. gpt-image-2 accepts arbitrary sizes
 // with both edges divisible by 16; 1536x864 is exactly 16:9.
 const RENDER_W = 1536, RENDER_H = 864;
+const RENDER_TIMEOUT_MS = 300000; // longer test timeout so we can separate slow render from stuck render
+const RENDER_POLL_INTERVAL_MS = 5000; // lower request churn while still providing readable status
+let CURRENT_RENDER_JOB_ID = '';
+let LAST_RENDER_JOB_SUMMARY = null;
 const ENABLE_RENDER = true; // Worker has renderer adapter enabled
 const DEBUG_EMBED_BASE64 = false; // never embed base64 in the normal package; on only for manual/legacy debugging
 
@@ -1253,6 +1262,69 @@ async function padProductToLandscapeBlob(a, W, H, placement){
   ctx.drawImage(img, x, y, targetW, targetH);
   return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('canvas toBlob failed')),'image/png'));
 }
+
+function summarizeRenderJob(job){
+  if(!job) return null;
+  const assets=job.assets||{};
+  return {
+    job_id:job.job_id||job.id||CURRENT_RENDER_JOB_ID||'',
+    status:job.status||'',
+    error_message:_cleanText(job.error_message||job.error||'').slice(0,240),
+    output_url:assets.output_url||job.output_image_url||'',
+    updated_at:job.updated_at||job.updatedAt||'',
+    created_at:job.created_at||job.createdAt||'',
+    provider:job.provider||job.model_provider||'',
+    model:job.model||job.render_model||'',
+    raw_keys:Object.keys(job).slice(0,24)
+  };
+}
+function setRenderJobStatus(title, meta){
+  const el=document.getElementById('jobStatusPanel');
+  if(!el) return;
+  const lines=[];
+  lines.push('Render job status');
+  if(title) lines.push(title);
+  if(meta){
+    Object.entries(meta).forEach(([k,v])=>{
+      if(v==null||v==='') return;
+      let text=typeof v==='string'?v:JSON.stringify(v);
+      if(text.length>260) text=text.slice(0,260)+'…';
+      lines.push(k+': '+text);
+    });
+  }
+  el.textContent=lines.join('\n');
+  el.hidden=false;
+}
+async function fetchRenderJob(jobId){
+  if(!jobId) throw new Error('No render job id available yet');
+  const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId));
+  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Check job '+res.status+(t?': '+t.slice(0,180):'')); }
+  return await res.json();
+}
+async function checkLastRenderJob(){
+  const jobId=CURRENT_RENDER_JOB_ID;
+  if(!jobId){ setRenderJobStatus('No render job has been started in this session yet.',{}); return null; }
+  PERF.log('render_job_manual_check:start',{job_id:jobId});
+  const job=await fetchRenderJob(jobId);
+  const summary=summarizeRenderJob(job);
+  LAST_RENDER_JOB_SUMMARY=summary;
+  PERF.log('render_job_manual_check',summary);
+  setRenderJobStatus('Manual check', summary);
+  const outputUrl=(job.assets&&job.assets.output_url)||job.output_image_url;
+  if((job.status==='complete'||outputUrl) && outputUrl){
+    try{
+      PERF.start('render_output_load_display_after_manual_check',{job_id:jobId});
+      await showRenderedImage(outputUrl);
+      PERF.end('render_output_load_display_after_manual_check',{output_url:outputUrl});
+      showView('result');
+    }catch(e){
+      PERF.log('render_output_load_display_after_manual_check:error',{error:String((e&&e.message)||e).slice(0,180)});
+    }
+  }
+  PERF.summary();
+  return job;
+}
+
 async function submitRenderBundle(){
   PERF.reset('render_preview');
   PERF.start('render_total');
@@ -1283,8 +1355,10 @@ async function submitRenderBundle(){
     if(!createRes.ok){ const t=await createRes.text().catch(()=>''); throw new Error('Create job '+createRes.status+(t?': '+t.slice(0,180):'')); }
     const created=await createRes.json();
     const jobId=created.job_id;
+    CURRENT_RENDER_JOB_ID=jobId||'';
     PERF.end('render_job_create_upload',{job_id:jobId||'', status:createRes.status});
     if(!jobId) throw new Error('render-jobs did not return a job_id');
+    setRenderJobStatus('Created render job',{job_id:jobId,status:'created'});
 
     // 2. Trigger the render. This enqueues the job and returns immediately;
     //    the worker renders in the background off the request path.
@@ -1296,9 +1370,17 @@ async function submitRenderBundle(){
 
     // 3. Poll the job until it completes or errors. The render runs on a queue
     //    consumer, so this can take a while without a request timing out.
-    PERF.start('render_queue_and_generation_polling',{job_id:jobId});
-    const job=await pollJobUntilDone(jobId, { timeoutMs:180000, intervalMs:2500 });
-    PERF.end('render_queue_and_generation_polling',{status:job.status, attempts:job.__poll_attempts||null});
+    PERF.start('render_queue_and_generation_polling',{job_id:jobId, timeout_seconds:Math.round(RENDER_TIMEOUT_MS/1000), interval_seconds:+(RENDER_POLL_INTERVAL_MS/1000).toFixed(1)});
+    let job;
+    try{
+      job=await pollJobUntilDone(jobId, { timeoutMs:RENDER_TIMEOUT_MS, intervalMs:RENDER_POLL_INTERVAL_MS });
+      PERF.end('render_queue_and_generation_polling',{status:job.status, attempts:job.__poll_attempts||null, job_id:jobId});
+    }catch(pollErr){
+      const meta=(pollErr&&pollErr.pwp_meta)||{};
+      PERF.end('render_queue_and_generation_polling',Object.assign({error:String((pollErr&&pollErr.message)||pollErr).slice(0,220), job_id:jobId}, meta));
+      setRenderJobStatus('Polling ended before completion',Object.assign({job_id:jobId,error:String((pollErr&&pollErr.message)||pollErr).slice(0,220)}, meta));
+      throw pollErr;
+    }
     if(job.status==='error') throw new Error(String(job.error_message||'Render failed').slice(0,200));
     const outputUrl=(job.assets&&job.assets.output_url)||job.output_image_url;
     if(!outputUrl) throw new Error('Render completed but no output URL was returned');
@@ -1318,25 +1400,62 @@ async function submitRenderBundle(){
   }
 }
 async function pollJobUntilDone(jobId, opts){
-  const timeoutMs=(opts&&opts.timeoutMs)||180000;
-  const intervalMs=(opts&&opts.intervalMs)||2500;
-  const deadline=Date.now()+timeoutMs;
+  const timeoutMs=(opts&&opts.timeoutMs)||RENDER_TIMEOUT_MS||300000;
+  const intervalMs=(opts&&opts.intervalMs)||RENDER_POLL_INTERVAL_MS||5000;
+  const start=Date.now();
+  const deadline=start+timeoutMs;
   let dots=0;
   let attempts=0;
+  let lastStatus='not_polled';
+  let lastError='';
+  let lastSummary=null;
+  let lastLoggedStatus='';
   while(Date.now()<deadline){
     await new Promise(r=>setTimeout(r,intervalMs));
     let job;
+    attempts++;
+    const elapsedMs=Date.now()-start;
     try{
-      attempts++;
       const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId));
       if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Poll '+res.status+(t?': '+t.slice(0,120):'')); }
       job=await res.json();
-    }catch(e){ continue; } // transient network blip: keep polling until the deadline
+      job.__poll_attempts=attempts;
+      lastStatus=job.status||'unknown';
+      lastSummary=summarizeRenderJob(job);
+      LAST_RENDER_JOB_SUMMARY=lastSummary;
+      lastError='';
+      const pollMeta={job_id:jobId, attempt:attempts, elapsed_seconds:+(elapsedMs/1000).toFixed(1), status:lastStatus};
+      if(lastSummary&&lastSummary.error_message) pollMeta.error_message=lastSummary.error_message;
+      if(lastSummary&&lastSummary.output_url) pollMeta.output_url=lastSummary.output_url;
+      // Log every poll in the copied timing payload. The visible panel only shows the last rows.
+      PERF.log('render_poll', pollMeta);
+      if(lastStatus!==lastLoggedStatus || attempts===1 || attempts%3===0){
+        setRenderJobStatus('Polling render job', Object.assign({}, pollMeta, {timeout_seconds:Math.round(timeoutMs/1000)}));
+        lastLoggedStatus=lastStatus;
+      }
+    }catch(e){
+      lastError=String((e&&e.message)||e).slice(0,220);
+      PERF.log('render_poll_error',{job_id:jobId, attempt:attempts, elapsed_seconds:+(elapsedMs/1000).toFixed(1), error:lastError});
+      setRenderJobStatus('Polling render job',{job_id:jobId, attempt:attempts, elapsed_seconds:+(elapsedMs/1000).toFixed(1), last_status:lastStatus, last_error:lastError, timeout_seconds:Math.round(timeoutMs/1000)});
+      continue; // transient network blip: keep polling until the deadline
+    }
     if(job.status==='complete'||job.status==='error') return job;
     dots=(dots+1)%4;
     document.getElementById('loadingLine').textContent='Rendering product world'+'.'.repeat(dots);
   }
-  throw new Error('Render timed out after '+Math.round(timeoutMs/1000)+'s. The job may still finish; try again shortly.');
+  const elapsedMs=Date.now()-start;
+  const message='Render timed out after '+Math.round(timeoutMs/1000)+'s. Job '+jobId+' may still finish; use Check last render job shortly.';
+  const err=new Error(message);
+  err.pwp_meta={
+    job_id:jobId,
+    timeout_seconds:Math.round(timeoutMs/1000),
+    elapsed_seconds:+(elapsedMs/1000).toFixed(1),
+    poll_count:attempts,
+    last_status:lastStatus,
+    last_error:lastError,
+    last_job_summary:lastSummary
+  };
+  throw err;
 }
 function dataUrlFromB64(mediaType,b64){ return 'data:'+(mediaType||'image/png')+';base64,'+b64; }
 function productImageSrcFromAsset(a){
@@ -1574,6 +1693,8 @@ const copyTimingBtn=document.getElementById('copyTiming');
 if(copyTimingBtn){ copyTimingBtn.addEventListener('click',async()=>{ try{ await PERF.copy(); copyTimingBtn.textContent='Timing copied'; setTimeout(()=>copyTimingBtn.textContent='Copy timing log',1200); }catch(e){ console.warn('copy timing failed',e); } }); }
 const clearCacheBtn=document.getElementById('clearPreviewCache');
 if(clearCacheBtn){ clearCacheBtn.addEventListener('click',()=>{ clearPreviewCache(); clearCacheBtn.textContent='Cache cleared'; setTimeout(()=>clearCacheBtn.textContent='Clear URL cache',1200); }); }
+const checkLastRenderJobBtn=document.getElementById('checkLastRenderJob');
+if(checkLastRenderJobBtn){ checkLastRenderJobBtn.addEventListener('click',async()=>{ try{ checkLastRenderJobBtn.textContent='Checking job'; await checkLastRenderJob(); checkLastRenderJobBtn.textContent='Checked'; setTimeout(()=>checkLastRenderJobBtn.textContent='Check last render job',1400); }catch(e){ setRenderJobStatus('Manual check failed',{job_id:CURRENT_RENDER_JOB_ID,error:String((e&&e.message)||e).slice(0,220)}); checkLastRenderJobBtn.textContent='Check failed'; setTimeout(()=>checkLastRenderJobBtn.textContent='Check last render job',1600); } }); }
 document.getElementById('startOver').addEventListener('click',()=>{ handoff.classList.remove('on'); showView('entry'); });
 
 // honest demo banner from the first screen when no backend is configured
