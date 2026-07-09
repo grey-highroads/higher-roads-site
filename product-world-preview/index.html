@@ -401,8 +401,33 @@ function buildPlacementSpec(h){
     light_match:(lp&&_c(lp.light_match))||'side light matched to the scene'
   };
 }
+function _posDirectorCore(sel, sd){
+  // Deterministic render prompt from the director selection. When the director
+  // layer succeeds the world is authored from prompt_variables, not the pre-
+  // director scene concept, so the render provably reflects the selected
+  // grammar. Flavor is never turned into props here. Palette (color and mood)
+  // is allowed to carry through from the scene builder. Built as a clean string
+  // array so no falsy segment can leak into the prompt.
+  sd=sd||{};
+  const pv=sel.prompt_variables||{};
+  const borrow=_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
+  const seg=['a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo'];
+  if(_c(sel.scene_archetype)) seg.push('scene: '+_c(sel.scene_archetype));
+  if(_c(pv.place)) seg.push('setting: '+_c(pv.place));
+  if(_c(pv.material)) seg.push('materials: '+_c(pv.material));
+  if(_l(sd.color_palette).length) seg.push('palette: '+_l(sd.color_palette).slice(0,6).join(', '));
+  if(_c(pv.composition)) seg.push('composition: '+_c(pv.composition));
+  if(_c(pv.light)) seg.push('lighting: '+_c(pv.light));
+  if(_c(pv.atmosphere)) seg.push('atmosphere: '+_c(pv.atmosphere));
+  if(_c(pv.camera)) seg.push('camera: '+_c(pv.camera));
+  if(_c(pv.object_treatment)) seg.push('the product reads as '+_c(pv.object_treatment));
+  if(borrow.length) seg.push('cinematic qualities: '+borrow.slice(0,6).join(', '));
+  return seg;
+}
 function _posComposite(h){
   const sd=h.scene_direction||{};
+  const sel=h.director_selection||null;
+  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd));
   const seed=_c(sd.prompt_seed);
   const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(sd.world_description,5);
   const props=_l(sd.props).slice(0,5);
@@ -421,6 +446,8 @@ function _posComposite(h){
 }
 function _posReference(h){
   const sd=h.scene_direction||{};
+  const sel=h.director_selection||null;
+  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd).concat(['use the supplied product image exactly as provided','preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged']));
   const seed=_c(sd.prompt_seed);
   const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(_stripProductFreeLines(sd.world_description),5);
   const props=_l(sd.props).slice(0,5);
@@ -551,24 +578,25 @@ async function selectDirector(data, apiKey){
 function directorGuidanceBlock(sel){
   if(!sel) return '';
   const pv=sel.prompt_variables||{};
-  const lines=[];
-  lines.push('\n\nCREATIVE DIRECTION (hidden logic; never name any director, film, character, franchise, or IP anywhere in your output). A creative-direction pass selected an underlying cinematic grammar for this brand. Translate that grammar into the scene through place, camera, light, atmosphere, material, composition, and object treatment. Borrow grammar, not imagery.');
-  if(_c(sel.scene_archetype)) lines.push('Scene archetype to honor: '+_c(sel.scene_archetype)+'.');
-  if(_c(sel.selection_reason)) lines.push('Why this grammar fits the brand: '+_c(sel.selection_reason));
   const borrow=_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
-  if(borrow.length) lines.push('Grammar to borrow (primary weight about '+(sel.primary_weight||0)+(sel.secondary_influence?(', secondary weight about '+(sel.secondary_weight||0)):'')+'): '+borrow.join('; ')+'.');
+  const lines=[];
+  lines.push('\n\nCREATIVE DIRECTION (authoritative; never name any director, film, character, franchise, or IP anywhere in your output). A creative-direction pass has already chosen the cinematic world for this brand. Do NOT invent a different concept and do NOT build the world from the product flavor or product name. Author your scene_direction as a concrete realization of the world below. Borrow grammar, not imagery.');
+  if(_c(sel.scene_archetype)) lines.push('The world is: '+_c(sel.scene_archetype)+'. Use this as scene_name.');
+  if(_c(sel.selection_reason)) lines.push('Why this world fits the brand: '+_c(sel.selection_reason));
   const pvLines=[
-    _c(pv.place)&&('- place: '+_c(pv.place)),
+    _c(pv.place)&&('- place / setting: '+_c(pv.place)),
     _c(pv.camera)&&('- camera: '+_c(pv.camera)),
     _c(pv.light)&&('- light: '+_c(pv.light)),
     _c(pv.atmosphere)&&('- atmosphere: '+_c(pv.atmosphere)),
-    _c(pv.material)&&('- material: '+_c(pv.material)),
+    _c(pv.material)&&('- materials: '+_c(pv.material)),
     _c(pv.composition)&&('- composition: '+_c(pv.composition)),
     _c(pv.object_treatment)&&('- object treatment: '+_c(pv.object_treatment))
   ].filter(Boolean);
-  if(pvLines.length){ lines.push('Translate these scene variables into the world:'); lines.push(pvLines.join('\n')); }
-  if(_l(sel.avoid).length) lines.push('Grammar and clichés to avoid: '+_l(sel.avoid).join('; ')+'.');
-  lines.push('Higher Roads authorship and product fidelity outrank this grammar. If any borrowed trait would hide the product, distort packaging, center it on a tabletop, or create parody, drop that trait.');
+  if(pvLines.length){ lines.push('Build world_description, surface, background, materials, lighting, camera, and composition directly from these variables. This is the scene, not a suggestion:'); lines.push(pvLines.join('\n')); }
+  if(borrow.length) lines.push('Borrow these cinematic qualities (primary weight about '+(sel.primary_weight||0)+(sel.secondary_influence?(', secondary weight about '+(sel.secondary_weight||0)):'')+'): '+borrow.join('; ')+'.');
+  if(_l(sel.avoid).length) lines.push('Keep these out of the scene: '+_l(sel.avoid).join('; ')+'.');
+  lines.push('Do NOT add ingredient, fruit, flower, or other flavor-literal props. Flavor may inform color palette or mood only. If any flavor-literal prop is listed above to avoid, exclude it.');
+  lines.push('Populate world_thesis and cinematic_translation. Keep the product a small, readable, off-center hero with packaging unchanged: product fidelity and Higher Roads authorship outrank this grammar, so drop any borrowed trait that would hide the product, distort packaging, center it on a tabletop, or create parody.');
   lines.push('In addition to the required schema, add two top-level fields to your JSON: "borrowed_visual_grammar" (array of short strings: the grammar you actually used) and "excluded_visual_grammar" (array of short strings: grammar you deliberately dropped, each with a brief reason).');
   return lines.join('\n');
 }
@@ -577,9 +605,35 @@ function buildCreativeDirectionBlock(h, finalPrompt, negStr){
   const sel=(h&&h.director_selection)||null;
   const st=(h&&h.scene_translation)||{};
   const sd=(h&&h.scene_direction)||{};
+  const negRules=String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean);
+  if(sel){
+    // Director layer succeeded: guarantee the acceptance fields. Prefer the
+    // scene builder's narrative, fall back to the selection so nothing is empty.
+    const pv=sel.prompt_variables||{};
+    const archetype=_c(sel.scene_archetype);
+    const place=_c(pv.place);
+    const borrowed=_l(st.borrowed_visual_grammar).length?_l(st.borrowed_visual_grammar):_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
+    const excluded=_l(st.excluded_visual_grammar).length?_l(st.excluded_visual_grammar):_l(sel.avoid);
+    const thesis=_c(st.world_thesis)||(archetype?('This brand belongs in a '+archetype+'.'):_c(sel.selection_reason));
+    const translation=_c(st.cinematic_translation)||_dedupe([place,_c(pv.light),_c(pv.atmosphere),_c(pv.material),_c(pv.composition),_c(pv.object_treatment)]).join('; ');
+    const brief=[archetype,place].filter(Boolean).join(': ')||_c(sd.world_description);
+    return {
+      director_layer_status:'ok',
+      director_selection:sel,
+      scene_translation:{
+        world_thesis:thesis,
+        cinematic_translation:translation,
+        borrowed_visual_grammar:borrowed,
+        excluded_visual_grammar:excluded,
+        scene_brief:brief,
+        final_render_prompt:_c(finalPrompt),
+        negative_prompt_rules:negRules
+      }
+    };
+  }
   return {
-    director_layer_status: sel?'ok':'fallback',
-    director_selection: sel,
+    director_layer_status:'fallback',
+    director_selection:null,
     scene_translation:{
       world_thesis:_c(st.world_thesis),
       cinematic_translation:_c(st.cinematic_translation),
@@ -587,7 +641,7 @@ function buildCreativeDirectionBlock(h, finalPrompt, negStr){
       excluded_visual_grammar:_l(st.excluded_visual_grammar),
       scene_brief:_c(sd.world_description),
       final_render_prompt:_c(finalPrompt),
-      negative_prompt_rules:String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean)
+      negative_prompt_rules:negRules
     }
   };
 }
@@ -748,7 +802,7 @@ function buildLockedAssetRecord(la){
 }
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
-  const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h)];
+  const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.director_selection&&_l(h.director_selection.avoid))||[])];
   return {
     meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:_c(h.chosen_direction)||_c(sd.scene_name),render_path_recommendation:_c(sd.render_path)||'composite'},
     fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
