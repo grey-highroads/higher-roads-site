@@ -157,6 +157,11 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .creative-direction .cd-v{flex:1 1 auto;color:var(--white);word-break:break-word}
 .creative-direction .cd-chip{display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border:1px solid var(--accent-line);border-radius:20px;font-size:11px;color:var(--white)}
 .creative-direction .cd-prompt .cd-v{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:#d7c8b6;white-space:pre-wrap}
+
+.buildstamp{margin-left:auto;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0;text-transform:none;opacity:.95}
+.perf-panel{margin-top:14px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(0,0,0,.16);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.45;color:#d7c8b6;white-space:pre-wrap;max-height:260px;overflow:auto}
+.perf-panel b{color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+
 </style>
 </head>
 <body>
@@ -235,6 +240,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     </div>
     <pre id="handoffBody"></pre>
     <div id="creativeDirection" class="creative-direction" hidden></div>
+    <div id="perfPanel" class="perf-panel" hidden></div>
   </section>
 
     <button class="linkbtn" id="startOver" type="button" style="margin-top:28px">Start over with a new URL</button>
@@ -256,6 +262,8 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <span>DEV</span>
     <button id="toggleConf">Toggle brand confidence (now: HIGH)</button>
     <span id="modeReadout">mode: none</span>
+    <button id="copyTiming" type="button">Copy timing log</button>
+    <span class="buildstamp" id="buildStamp">build: loading</span>
   </div>
 </div>
 
@@ -325,6 +333,70 @@ function buildLockedProductAsset(parsed){
    no renderer integration. render_path is a test label, not a gate. --- */
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
+
+const PWP_BUILD_ID = 'pwp-index-2026-07-09-perf-v1';
+const PWP_BUILD_NOTE = 'visible build stamp + action timing instrumentation';
+function setBuildStamp(){
+  const el=document.getElementById('buildStamp');
+  if(el) el.textContent='build: '+PWP_BUILD_ID;
+  try{ window.PWP_BUILD_ID=PWP_BUILD_ID; window.PWP_BUILD_NOTE=PWP_BUILD_NOTE; }catch{}
+}
+
+const PERF={
+  marks:{}, rows:[], runId:'',
+  reset(scope){
+    this.marks={}; this.rows=[];
+    this.runId=(scope||'run')+'-'+new Date().toISOString();
+    this.log('run_start',{scope:scope||'run', build:PWP_BUILD_ID});
+    this.render();
+  },
+  now(){ return Math.round(performance.now()); },
+  start(label, meta){
+    this.marks[label]=performance.now();
+    this.log(label+':start', meta||{});
+  },
+  end(label, meta){
+    const t0=this.marks[label];
+    const ms=t0?Math.round(performance.now()-t0):0;
+    delete this.marks[label];
+    this.rows.push({type:'timing', label, ms, seconds:+(ms/1000).toFixed(2), meta:meta||null, at:new Date().toISOString()});
+    console.log('[PWP timing]', label, +(ms/1000).toFixed(2)+'s', meta||'');
+    this.render();
+    return ms;
+  },
+  log(label, meta){
+    const row={type:'action', label, ms:0, seconds:0, meta:meta||null, at:new Date().toISOString()};
+    this.rows.push(row);
+    console.log('[PWP action]', label, meta||'');
+    this.render();
+  },
+  summary(){
+    const timed=this.rows.filter(r=>r.type==='timing');
+    const total=timed.reduce((sum,r)=>sum+(r.ms||0),0);
+    const payload={build:PWP_BUILD_ID, note:PWP_BUILD_NOTE, run_id:this.runId, total_measured_ms:total, total_measured_seconds:+(total/1000).toFixed(2), rows:this.rows.slice()};
+    try{ console.table(timed.map(r=>({step:r.label, seconds:r.seconds, meta:r.meta?JSON.stringify(r.meta).slice(0,140):''}))); }catch{}
+    console.log('[PWP timing summary]', payload);
+    this.render(payload);
+    return payload;
+  },
+  render(payload){
+    const el=document.getElementById('perfPanel');
+    if(!el) return;
+    const data=payload||{build:PWP_BUILD_ID, run_id:this.runId, rows:this.rows.slice(-18)};
+    const rows=(data.rows||[]).slice(-18).map(r=>{
+      const meta=r.meta?(' '+JSON.stringify(r.meta).slice(0,160)):'';
+      return (r.type==='timing'?'⏱ ':'• ')+r.label+(r.type==='timing'?' — '+r.seconds+'s':'')+meta;
+    });
+    if(!rows.length){ el.hidden=true; return; }
+    el.hidden=false;
+    el.innerHTML='<b>Timing / action log</b>\nBuild: '+PWP_BUILD_ID+'\nRun: '+(data.run_id||this.runId||'')+'\n'+rows.join('\n');
+  },
+  copy(){
+    const payload=this.summary();
+    return navigator.clipboard.writeText(JSON.stringify(payload,null,2));
+  }
+};
+setBuildStamp();
 const FIDELITY_NEGATIVES = HR_CREATIVE_CONFIG.fidelityNegatives || [];
 const RUBRIC_CRITERIA = HR_CREATIVE_CONFIG.rubricCriteria || [];
 const _c=s=>String(s==null?'':s).trim();
@@ -942,13 +1014,27 @@ function buildHandoff(){
 }
 cta.addEventListener('click',async()=>{
   if(!canProceed()) return;
-  try{ await ensureSelectedProductImageData({silent:true}); }catch(e){ console.warn('locked product image was not materialized', e); }
+  PERF.start('bring_it_to_life_total',{asset_id:selectedAssetId});
+  try{
+    PERF.start('materialize_locked_product_image',{silent:true});
+    await ensureSelectedProductImageData({silent:true});
+    PERF.end('materialize_locked_product_image',{status:'ok'});
+  }catch(e){
+    PERF.end('materialize_locked_product_image',{status:'warning', error:String((e&&e.message)||e).slice(0,160)});
+    console.warn('locked product image was not materialized', e);
+  }
+  PERF.start('build_render_package');
   CURRENT_PKG=buildRenderPackage(buildHandoff());
+  CURRENT_PKG.performance_timing=PERF.summary();
+  CURRENT_PKG.build_id=PWP_BUILD_ID;
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
+  PERF.end('build_render_package',{bytes:CURRENT_MD.length});
   handoffBody.textContent=CURRENT_MD;
   renderCreativeDirectionPanel();
   handoff.classList.add('on');
   handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
+  PERF.end('bring_it_to_life_total');
+  PERF.summary();
 });
 
 const renderPreviewBtn=document.getElementById('renderPreview');
@@ -1020,10 +1106,14 @@ function lockedProductBlobFromAsset(a){
   return dataUrlToBlob(dataUrlFromB64(a.mediaType||'image/png',a.base64));
 }
 async function rebuildCurrentPackage(){
+  PERF.start('rebuild_current_package');
   CURRENT_PKG=buildRenderPackage(buildHandoff());
+  CURRENT_PKG.performance_timing=PERF.summary();
+  CURRENT_PKG.build_id=PWP_BUILD_ID;
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
   if(handoffBody) handoffBody.textContent=CURRENT_MD;
   renderCreativeDirectionPanel();
+  PERF.end('rebuild_current_package',{bytes:CURRENT_MD.length});
   return CURRENT_PKG;
 }
 async function downloadLockedProductImage(){
@@ -1063,42 +1153,65 @@ async function padProductToLandscapeBlob(a, W, H, placement){
   return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('canvas toBlob failed')),'image/png'));
 }
 async function submitRenderBundle(){
-  const a=await ensureSelectedProductImageData();
-  await rebuildCurrentPackage();
-  const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H, CURRENT_PKG&&CURRENT_PKG.placement_spec);
-
-  // 1. Create a render job. This persists the package and the locked product
-  //    image to R2/D1 on the render-jobs service and returns a job id.
-  const createForm=new FormData();
-  createForm.append('request_json', JSON.stringify(CURRENT_PKG));
-  createForm.append('locked_product_image', blob, 'locked-product.png');
-
-  document.getElementById('loadingLine').textContent='Creating render job';
-  showView('loading');
+  PERF.reset('render_preview');
+  PERF.start('render_total');
   try{
+    PERF.start('render_materialize_product');
+    const a=await ensureSelectedProductImageData();
+    PERF.end('render_materialize_product',{media_type:a.mediaType||'', has_base64:!!a.base64});
+
+    PERF.start('render_rebuild_package');
+    await rebuildCurrentPackage();
+    PERF.end('render_rebuild_package',{direction:CURRENT_PKG&&CURRENT_PKG.meta&&CURRENT_PKG.meta.chosen_direction});
+
+    PERF.start('render_pad_product_to_landscape');
+    const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H, CURRENT_PKG&&CURRENT_PKG.placement_spec);
+    PERF.end('render_pad_product_to_landscape',{bytes:blob&&blob.size, w:RENDER_W, h:RENDER_H});
+
+    // 1. Create a render job. This persists the package and the locked product
+    //    image to R2/D1 on the render-jobs service and returns a job id.
+    const createForm=new FormData();
+    createForm.append('request_json', JSON.stringify(CURRENT_PKG));
+    createForm.append('locked_product_image', blob, 'locked-product.png');
+
+    document.getElementById('loadingLine').textContent='Creating render job';
+    showView('loading');
+
+    PERF.start('render_job_create_upload');
     const createRes=await fetch(JOBS_ENDPOINT+'/render-jobs',{ method:'POST', body:createForm });
     if(!createRes.ok){ const t=await createRes.text().catch(()=>''); throw new Error('Create job '+createRes.status+(t?': '+t.slice(0,180):'')); }
     const created=await createRes.json();
     const jobId=created.job_id;
+    PERF.end('render_job_create_upload',{job_id:jobId||'', status:createRes.status});
     if(!jobId) throw new Error('render-jobs did not return a job_id');
 
     // 2. Trigger the render. This enqueues the job and returns immediately;
     //    the worker renders in the background off the request path.
     document.getElementById('loadingLine').textContent='Rendering product world';
+    PERF.start('render_job_start');
     const startRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST' });
+    PERF.end('render_job_start',{status:startRes.status});
     if(!startRes.ok && startRes.status!==202){ const t=await startRes.text().catch(()=>''); throw new Error('Start render '+startRes.status+(t?': '+t.slice(0,180):'')); }
 
     // 3. Poll the job until it completes or errors. The render runs on a queue
     //    consumer, so this can take a while without a request timing out.
+    PERF.start('render_queue_and_generation_polling',{job_id:jobId});
     const job=await pollJobUntilDone(jobId, { timeoutMs:180000, intervalMs:2500 });
+    PERF.end('render_queue_and_generation_polling',{status:job.status, attempts:job.__poll_attempts||null});
     if(job.status==='error') throw new Error(String(job.error_message||'Render failed').slice(0,200));
     const outputUrl=(job.assets&&job.assets.output_url)||job.output_image_url;
     if(!outputUrl) throw new Error('Render completed but no output URL was returned');
 
     // 4. Show the stored output image.
+    PERF.start('render_output_load_display');
     await showRenderedImage(outputUrl);
+    PERF.end('render_output_load_display',{output_url:outputUrl});
+    PERF.end('render_total');
+    PERF.summary();
     showView('result');
   }catch(err){
+    PERF.end('render_total',{error:String((err&&err.message)||err).slice(0,200)});
+    PERF.summary();
     document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
     showView('error');
   }
@@ -1108,10 +1221,12 @@ async function pollJobUntilDone(jobId, opts){
   const intervalMs=(opts&&opts.intervalMs)||2500;
   const deadline=Date.now()+timeoutMs;
   let dots=0;
+  let attempts=0;
   while(Date.now()<deadline){
     await new Promise(r=>setTimeout(r,intervalMs));
     let job;
     try{
+      attempts++;
       const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId));
       if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Poll '+res.status+(t?': '+t.slice(0,120):'')); }
       job=await res.json();
@@ -1280,28 +1395,51 @@ async function generate(){
     if(!apiKey){ hint.textContent='Add your Anthropic API key to run the brand read.'; return; }
     saveKey(apiKey);
   }
+  PERF.reset('generate_preview');
+  PERF.start('total_generate_to_pick_view',{product_url:productUrl, has_home_url:!!homeUrl, build:PWP_BUILD_ID});
   hint.textContent=''; document.getElementById('loadingLine').textContent='Fetching your product'; showView('loading');
   try{
+    PERF.start('parse_and_brand_read_worker');
     const { data }=await fetchPreviewData(productUrl, homeUrl, apiKey);
+    PERF.end('parse_and_brand_read_worker',{brand:data&&data.brand, candidates:data&&data.candidates?data.candidates.length:0, has_vibes:!!(data&&data.vibes)});
+
     DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
     if(apiKey){
       document.getElementById('loadingLine').textContent='Designing the scene';
       // Creative-direction pass: pick hidden cinematic grammar for the brand.
       // Best-effort. On failure we fall back to the current render prompt flow.
       let directorSelection=null;
-      try{ directorSelection=await selectDirector(DATA, apiKey); }
-      catch(dirErr){ console.warn('director layer failed; using current render prompt flow', dirErr); directorSelection=null; }
+      try{
+        PERF.start('director_selection_anthropic');
+        directorSelection=await selectDirector(DATA, apiKey);
+        PERF.end('director_selection_anthropic',{primary:directorSelection&&directorSelection.primary_influence, archetype:directorSelection&&directorSelection.scene_archetype});
+      }
+      catch(dirErr){
+        PERF.end('director_selection_anthropic',{error:String((dirErr&&dirErr.message)||dirErr).slice(0,160)});
+        console.warn('director layer failed; using current render prompt flow', dirErr); directorSelection=null;
+      }
       DATA.vibes.director_selection=directorSelection;
       try{
+        PERF.start('master_scene_anthropic');
         const built=await buildMasterScene(DATA, apiKey, directorSelection);
+        PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name});
         DATA.vibes.master_scene=built.scene_direction;
         DATA.vibes.master_scene_meta={ brand_world_read:built.brand_world_read||'', world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', category_cliches_to_avoid:built.category_cliches_to_avoid||[], anti_tabletop_rules:built.anti_tabletop_rules||[] };
         DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
         DATA.vibes.scene_translation={ world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', borrowed_visual_grammar:built.borrowed_visual_grammar||[], excluded_visual_grammar:built.excluded_visual_grammar||[] };
-      }catch(sceneErr){ console.warn('scene builder failed; using brand-read scene', sceneErr); }
+      }catch(sceneErr){
+        PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
+        console.warn('scene builder failed; using brand-read scene', sceneErr);
+      }
     }
+    PERF.start('render_pick_ui');
     renderPick(); showView('pick');
+    PERF.end('render_pick_ui',{assets:assets.length});
+    PERF.end('total_generate_to_pick_view');
+    PERF.summary();
   }catch(err){
+    PERF.end('total_generate_to_pick_view',{error:String((err&&err.message)||err).slice(0,200)});
+    PERF.summary();
     document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
     showView('error');
   }
@@ -1310,6 +1448,8 @@ document.getElementById('generateBtn').addEventListener('click',generate);
 document.getElementById('productUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
 document.getElementById('homeUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
 document.getElementById('errorBack').addEventListener('click',()=>showView('entry'));
+const copyTimingBtn=document.getElementById('copyTiming');
+if(copyTimingBtn){ copyTimingBtn.addEventListener('click',async()=>{ try{ await PERF.copy(); copyTimingBtn.textContent='Timing copied'; setTimeout(()=>copyTimingBtn.textContent='Copy timing log',1200); }catch(e){ console.warn('copy timing failed',e); } }); }
 document.getElementById('startOver').addEventListener('click',()=>{ handoff.classList.remove('on'); showView('entry'); });
 
 // honest demo banner from the first screen when no backend is configured
