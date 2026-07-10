@@ -163,6 +163,9 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .perf-panel b{color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .job-status{margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);border-radius:12px;background:rgba(210,139,74,.07);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.45;color:#d7c8b6;white-space:pre-wrap;max-height:220px;overflow:auto}
 .job-status b{color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.advanced-home{margin:10px 0 4px;color:var(--muted);font-size:13px}
+.advanced-home summary{cursor:pointer;color:var(--accent);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:12px}
+.advanced-home .advanced-body{margin-top:10px}
 
 </style>
 </head>
@@ -180,10 +183,16 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <h1>Paste your product. See it in a world built for your brand.</h1>
     <p class="sub">Drop a link to your product page. We read your product and your brand, then build a scene around your real packaging without ever redrawing it.</p>
     <div class="entryform">
-      <label class="fieldlabel" for="productUrl">Product page URL</label>
+      <label class="fieldlabel" for="productUrl">Product page or product listing URL</label>
       <input class="urlinput" id="productUrl" type="url" inputmode="url" placeholder="https://yourbrand.com/products/your-product" autocomplete="off">
-      <label class="fieldlabel" for="homeUrl">Homepage URL <span class="opt">optional, sharpens the brand read</span></label>
-      <input class="urlinput" id="homeUrl" type="url" inputmode="url" placeholder="https://yourbrand.com" autocomplete="off">
+      <p class="entryhint" style="margin-top:6px">We’ll infer the brand homepage from this URL. Marketplace links can be used; the parser will try to resolve the official brand site.</p>
+      <details class="advanced-home" id="advancedHome">
+        <summary>Advanced: override brand homepage</summary>
+        <div class="advanced-body">
+          <label class="fieldlabel" for="homeUrl">Brand homepage override <span class="opt">rarely needed</span></label>
+          <input class="urlinput" id="homeUrl" type="url" inputmode="url" placeholder="https://yourbrand.com" autocomplete="off">
+        </div>
+      </details>
       <div id="keyRow" hidden>
         <label class="fieldlabel" for="apiKey">Anthropic API key <span class="opt">used only for the brand read, same as the Builder</span></label>
         <input class="urlinput" id="apiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
@@ -340,8 +349,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-09-prompt-sanitize-v1';
-const PWP_BUILD_NOTE = 'prompt sanitation: filter non-string/empty/dangling-label fragments, collapse duplicated setting/background; fast mode plus render observability retained';
+const PWP_BUILD_ID = 'pwp-index-2026-07-10-url-simplify-v1';
+const PWP_BUILD_NOTE = 'single product URL input, derived homepage, marketplace fallback request, fast mode, render observability';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -456,23 +465,7 @@ function _stripProductFreeLines(s){
 }
 function _firstSentences(s,n){return _sentences(s).slice(0,n).join(' ');}
 function _sentenceJoin(parts){
-  // Sanitation chokepoint for every render prompt. Drop non-string, empty, and
-  // dangling-label fragments before joining so booleans, zeros, and blank
-  // "label:" stubs can never leak in. Collapse fragments that repeat the same
-  // value under a different label (the duplicated setting/background artifact).
-  const seen=new Set(), out=[];
-  (Array.isArray(parts)?parts:[parts]).forEach(p=>{
-    if(typeof p!=='string') return;              // drops false, 0, null, undefined, objects
-    const frag=_cleanText(p);
-    if(!frag) return;                            // drops empty
-    if(/^[a-z][a-z ]{1,24}:\s*$/i.test(frag)) return;  // drops a dangling "label:" with no value
-    const val=frag.replace(/^[a-z][a-z ]{1,24}:\s*/i,'').toLowerCase().trim();
-    const key=val||frag.toLowerCase();
-    if(seen.has(key)) return;                    // drops a value already present under another label
-    seen.add(key);
-    out.push(frag);
-  });
-  return out.join('. ').replace(/\.{2,}/g,'.');
+  return _l(parts).map(_cleanText).filter(Boolean).join('. ').replace(/\.{2,}/g,'.');
 }
 function sanitizeProductPlacement(s){
   return _cleanText(s)
@@ -799,7 +792,7 @@ function sceneFromDirectorSelection(data, directorSelection){
     render_path:'composite',
     prompt_seed:promptSeed,
     surface:_c(pv.surface)||'',
-    background:'', // place already carries the environment as setting/world_description; duplicating it here produced the duplicated-background artifact
+    background:place,
     materials:material?[material]:[],
     color_palette:[],
     camera:camera?{framing:camera}:null,
@@ -1027,7 +1020,7 @@ function mockPreviewData(){
   };
 }
 
-async function fetchPreviewData(productUrl, homeUrl, apiKey){
+async function fetchPreviewData(productUrl, homeUrl, apiKey, urlResolution){
   const cached=readPreviewCache(productUrl, homeUrl);
   if(cached){
     PERF.log('parse_and_brand_read_cache_hit',{age_seconds:cached.age_seconds});
@@ -1040,7 +1033,7 @@ async function fetchPreviewData(productUrl, homeUrl, apiKey){
     writePreviewCache(productUrl, homeUrl, data);
     return { demo:true, cached:false, data:data };
   }
-  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ product_url:productUrl, home_url:homeUrl, api_key:apiKey }) });
+  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ product_url:productUrl, home_url:homeUrl, api_key:apiKey, home_url_source:urlResolution&&urlResolution.home_url_source, input_url_host:urlResolution&&urlResolution.product_host, marketplace_detected:!!(urlResolution&&urlResolution.marketplace_detected), marketplace_fallback_search:!!(urlResolution&&urlResolution.marketplace_fallback_search) }) });
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Parser returned '+res.status+(t?': '+t.slice(0,140):'')); }
   const payload=await res.json();
   if(!payload||!Array.isArray(payload.candidates)||!payload.candidates.length) throw new Error('No product image was found on that page. Try the direct product URL, or upload the image after this.');
@@ -1612,6 +1605,61 @@ function renderPick(){
 
 function validUrl(u){ try{ const x=new URL(u); return x.protocol==='http:'||x.protocol==='https:'; }catch{ return false; } }
 
+const MARKETPLACE_HOST_HINTS = [
+  'amazon.', 'walmart.', 'target.', 'instacart.', 'ubereats.', 'doordash.', 'gopuff.',
+  'wholefoodsmarket.', 'kroger.', 'thrive-market.', 'vitacost.', 'iherb.', 'shopify.com',
+  'faire.', 'goodeggs.', 'freshdirect.', 'mercato.', 'safeway.', 'albertsons.', 'publix.'
+];
+function normalizedHostFromUrl(inputUrl){
+  try{ return new URL(_c(inputUrl)).hostname.toLowerCase().replace(/^www\./,''); }
+  catch{ return ''; }
+}
+function deriveHomeUrlFromProductUrl(inputUrl){
+  try{
+    const u=new URL(_c(inputUrl));
+    if(u.protocol!=='http:'&&u.protocol!=='https:') return '';
+    return u.origin+'/';
+  }catch{ return ''; }
+}
+function isLikelyMarketplaceHost(inputUrl){
+  const host=normalizedHostFromUrl(inputUrl);
+  if(!host) return false;
+  return MARKETPLACE_HOST_HINTS.some(h=>host.includes(String(h).toLowerCase()));
+}
+function resolveHomeUrlForProduct(productUrl, explicitHomeUrl){
+  const product_host=normalizedHostFromUrl(productUrl);
+  const marketplace_detected=isLikelyMarketplaceHost(productUrl);
+  const explicit=_c(explicitHomeUrl);
+  if(explicit){
+    return {
+      product_host,
+      marketplace_detected,
+      home_url:explicit,
+      home_url_source:'advanced_override',
+      marketplace_fallback_search:false,
+      note:marketplace_detected?'Marketplace URL with explicit brand homepage override.':'Explicit brand homepage override.'
+    };
+  }
+  if(marketplace_detected){
+    return {
+      product_host,
+      marketplace_detected:true,
+      home_url:'',
+      home_url_source:'marketplace_fallback_search_requested',
+      marketplace_fallback_search:true,
+      note:'Marketplace or retail host detected; parser should extract the brand from the listing and resolve the official homepage.'
+    };
+  }
+  return {
+    product_host,
+    marketplace_detected:false,
+    home_url:deriveHomeUrlFromProductUrl(productUrl),
+    home_url_source:'derived_from_product_url_origin',
+    marketplace_fallback_search:false,
+    note:'Brand homepage inferred from product URL origin.'
+  };
+}
+
 // guarded key persistence (localStorage works on the deployed page; guarded so the
 // in-chat preview never throws). For an internal testing tool this mirrors the Builder.
 // [ASSUMED, verify before public] a public self-serve version must move the key to a
@@ -1622,9 +1670,12 @@ function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
 async function generate(){
   const productUrl=document.getElementById('productUrl').value.trim();
-  const homeUrl=document.getElementById('homeUrl').value.trim();
+  const explicitHomeUrl=(document.getElementById('homeUrl')&&document.getElementById('homeUrl').value.trim())||'';
   const hint=document.getElementById('entryHint');
-  if(!validUrl(productUrl)){ hint.textContent='Enter a valid product page URL, starting with https://'; return; }
+  if(!validUrl(productUrl)){ hint.textContent='Enter a valid product or listing URL, starting with https://'; return; }
+  if(explicitHomeUrl&&!validUrl(explicitHomeUrl)){ hint.textContent='The advanced homepage override needs to start with https://'; return; }
+  const urlResolution=resolveHomeUrlForProduct(productUrl, explicitHomeUrl);
+  const homeUrl=urlResolution.home_url;
   let apiKey='';
   if(PREVIEW_ENDPOINT){
     apiKey=document.getElementById('apiKey').value.trim()||readKey();
@@ -1632,15 +1683,16 @@ async function generate(){
     saveKey(apiKey);
   }
   PERF.reset('generate_preview');
-  PERF.start('total_generate_to_pick_view',{product_url:productUrl, has_home_url:!!homeUrl, build:PWP_BUILD_ID});
+  PERF.start('total_generate_to_pick_view',{product_url:productUrl, home_url:homeUrl||null, home_url_source:urlResolution.home_url_source, marketplace_detected:!!urlResolution.marketplace_detected, build:PWP_BUILD_ID});
+  PERF.log('home_url_resolved', urlResolution);
   hint.textContent=''; document.getElementById('loadingLine').textContent='Fetching your product'; showView('loading');
   try{
     PERF.start('parse_and_brand_read_worker');
-    const preview=await fetchPreviewData(productUrl, homeUrl, apiKey);
+    const preview=await fetchPreviewData(productUrl, homeUrl, apiKey, urlResolution);
     const data=preview.data;
     PERF.end('parse_and_brand_read_worker',{brand:data&&data.brand, candidates:data&&data.candidates?data.candidates.length:0, has_vibes:!!(data&&data.vibes), cached:!!preview.cached});
 
-    DATA=data; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
+    DATA=data; DATA.url_resolution=urlResolution; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
     if(apiKey){
       document.getElementById('loadingLine').textContent='Designing the scene';
       // Creative-direction pass: pick hidden cinematic grammar for the brand.
