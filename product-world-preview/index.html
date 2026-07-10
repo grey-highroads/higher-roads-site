@@ -351,8 +351,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-10-prompt-writer-v1';
-const PWP_BUILD_NOTE = 'prompt writer v1: deterministic prompt compiler, raw prompt preservation, compiled prompts, package hygiene, render observability';
+const PWP_BUILD_ID = 'pwp-index-2026-07-10-compiled-loadbearing-v1';
+const PWP_BUILD_NOTE = 'compiled prompts load-bearing: compiled positive/negative copied into worker-read prompts and variants, raw preserved in raw_prompts, prompt_source_for_render stamped; deterministic compiler, render observability';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -1035,6 +1035,34 @@ function getPromptWriter(){
   if(!writer||typeof writer.compile!=='function') return null;
   return {cfg,id,writer};
 }
+function makeCompiledLoadBearing(pkg, compiled){
+  // Option 1 wiring: the render worker reads variants[].positive/negative and
+  // prompts.positive/negative, in that order. Copy the compiled prompt into
+  // exactly those fields so the compiler becomes load-bearing, and preserve the
+  // originals in raw_prompts (top level) and raw_positive/raw_negative (per
+  // variant). Packages are rebuilt fresh each time, but the raw-guard keeps a
+  // second call from ever capturing already-compiled text as the raw copy.
+  const pos=_c(compiled.compiled_positive), neg=_c(compiled.compiled_negative);
+  if(!pkg.raw_prompts){
+    pkg.raw_prompts={
+      positive:(pkg.prompts&&pkg.prompts.positive)||'',
+      negative:(pkg.prompts&&pkg.prompts.negative)||''
+    };
+  }
+  pkg.prompts={positive:pos,negative:neg};
+  if(Array.isArray(pkg.variants)){
+    pkg.variants=pkg.variants.map(v=>{
+      const nv=Object.assign({},v);
+      if(!('raw_positive' in nv)) nv.raw_positive=v.positive||'';
+      if(!('raw_negative' in nv)) nv.raw_negative=v.negative||'';
+      nv.positive=pos; nv.negative=neg;
+      return nv;
+    });
+  }
+  pkg.prompt_source_for_render='compiled_prompts';
+  pkg.raw_prompts_preserved=true;
+  return pkg;
+}
 function applyPromptWriterToPackage(pkg, options){
   if(!pkg) return pkg;
   const pw=getPromptWriter();
@@ -1042,6 +1070,7 @@ function applyPromptWriterToPackage(pkg, options){
     pkg.compiled_prompts=null;
     pkg.prompt_writer={id:'raw_package_prompt',version:'none',label:'Raw Package Prompt',warnings:['Prompt writer unavailable; using raw package prompts.'],removed_terms:[],stats:{}};
     try{ PERF.log('prompt_writer_unavailable',{fallback:'raw_package_prompt'}); }catch{}
+    pkg.prompt_source_for_render='raw_prompts'; pkg.raw_prompts_preserved=false;
     return pkg;
   }
   let compiled=null;
@@ -1075,9 +1104,11 @@ function applyPromptWriterToPackage(pkg, options){
       removed_terms:compiled.removed_terms||[],
       stats:compiled.prompt_stats||{}
     };
+    makeCompiledLoadBearing(pkg, compiled);
   }else{
     pkg.compiled_prompts=null;
     pkg.prompt_writer={id:'raw_package_prompt',version:'none',label:'Raw Package Prompt',warnings:['Compiled prompts unavailable; using raw package prompts.'],removed_terms:[],stats:{}};
+    pkg.prompt_source_for_render='raw_prompts'; pkg.raw_prompts_preserved=false;
   }
   return pkg;
 }
@@ -1120,7 +1151,7 @@ function renderPackageMarkdown(p){
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
   if(p.scene_brief.props.length)L.push('Props: '+p.scene_brief.props.join(', '));
   if(p.placement_spec){L.push('Placement spec: '+JSON.stringify(p.placement_spec));}
-  L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);if(p.compiled_prompts&&p.compiled_prompts.positive){L.push('');L.push('## 5.1 Compiled prompts (prompt writer)');L.push('Writer: '+((p.prompt_writer&&p.prompt_writer.label)||'unknown')+' · '+((p.prompt_writer&&p.prompt_writer.version)||'unknown'));if(p.prompt_writer&&p.prompt_writer.stats)L.push('Stats: '+JSON.stringify(p.prompt_writer.stats));if(p.prompt_writer&&p.prompt_writer.warnings&&p.prompt_writer.warnings.length)L.push('Warnings: '+p.prompt_writer.warnings.join('; '));if(p.prompt_writer&&p.prompt_writer.removed_terms&&p.prompt_writer.removed_terms.length)L.push('Removed/narrowed terms: '+p.prompt_writer.removed_terms.map(x=>typeof x==='string'?x:((x.term||'')+(x.reason?' ('+x.reason+')':''))).join('; '));L.push('Compiled positive:');L.push('> '+p.compiled_prompts.positive);L.push('Compiled negative:');L.push('> '+p.compiled_prompts.negative);}
+  L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Rendered from: '+(p.prompt_source_for_render||'raw_prompts')+(p.raw_prompts_preserved?' (originals preserved in raw_prompts and variant raw_positive/raw_negative)':''));L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);if(p.compiled_prompts&&p.compiled_prompts.positive){L.push('');L.push('## 5.1 Compiled prompts (prompt writer)');L.push('Writer: '+((p.prompt_writer&&p.prompt_writer.label)||'unknown')+' · '+((p.prompt_writer&&p.prompt_writer.version)||'unknown'));if(p.prompt_writer&&p.prompt_writer.stats)L.push('Stats: '+JSON.stringify(p.prompt_writer.stats));if(p.prompt_writer&&p.prompt_writer.warnings&&p.prompt_writer.warnings.length)L.push('Warnings: '+p.prompt_writer.warnings.join('; '));if(p.prompt_writer&&p.prompt_writer.removed_terms&&p.prompt_writer.removed_terms.length)L.push('Removed/narrowed terms: '+p.prompt_writer.removed_terms.map(x=>typeof x==='string'?x:((x.term||'')+(x.reason?' ('+x.reason+')':''))).join('; '));L.push('Compiled positive:');L.push('> '+p.compiled_prompts.positive);L.push('Compiled negative:');L.push('> '+p.compiled_prompts.negative);}
   L.push('');L.push('## 6. Variants to test');
   p.variants.forEach((v,i)=>{L.push('### 6.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
   L.push('## 7. Confidence notes');L.push('Read confidence: '+p.confidence_notes.score);
