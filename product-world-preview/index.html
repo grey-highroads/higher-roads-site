@@ -251,6 +251,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     </div>
     <pre id="handoffBody"></pre>
     <div id="creativeDirection" class="creative-direction" hidden></div>
+    <div id="promptWriterPanel" class="creative-direction" hidden></div>
     <div id="perfPanel" class="perf-panel" hidden></div>
   </section>
 
@@ -283,6 +284,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 </div>
 
 <script src="./creative-config.js"></script>
+<script src="./render-prompt-writer.js"></script>
 <script>
 /* ============================================================================
    MIRRORED LOGIC. This standalone Preview page mirrors, verbatim, three things
@@ -349,8 +351,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-10-integration-v2';
-const PWP_BUILD_NOTE = 'integration v2: package-format-aware fidelity, third-party branding suppression, fast mode, render observability';
+const PWP_BUILD_ID = 'pwp-index-2026-07-10-prompt-writer-v1';
+const PWP_BUILD_NOTE = 'prompt writer v1: deterministic prompt compiler, raw prompt preservation, compiled prompts, package hygiene, render observability';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -1024,6 +1026,84 @@ function buildRenderPackage(h){
     test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Identity fidelity, proportions, color accuracy, and scene integration are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
   };
 }
+
+function getPromptWriter(){
+  const cfg=window.HR_PROMPT_WRITER_CONFIG||null;
+  if(!cfg||!cfg.writers) return null;
+  const id=cfg.defaultWriterId||'deterministic_compiler_v1';
+  const writer=cfg.writers[id];
+  if(!writer||typeof writer.compile!=='function') return null;
+  return {cfg,id,writer};
+}
+function applyPromptWriterToPackage(pkg, options){
+  if(!pkg) return pkg;
+  const pw=getPromptWriter();
+  if(!pw){
+    pkg.compiled_prompts=null;
+    pkg.prompt_writer={id:'raw_package_prompt',version:'none',label:'Raw Package Prompt',warnings:['Prompt writer unavailable; using raw package prompts.'],removed_terms:[],stats:{}};
+    try{ PERF.log('prompt_writer_unavailable',{fallback:'raw_package_prompt'}); }catch{}
+    return pkg;
+  }
+  let compiled=null;
+  try{
+    PERF.start('prompt_writer_compile',{prompt_writer_id:pw.id,prompt_writer_version:pw.cfg.version});
+    compiled=pw.writer.compile(pkg, Object.assign({
+      renderEngine:'generic',
+      packageFormat:pkg.package_format||(pkg.fidelity_contract&&pkg.fidelity_contract.package_format)||'',
+      sceneFamily:pkg.scene_family||'',
+      build:PWP_BUILD_ID
+    }, options||{}));
+    PERF.end('prompt_writer_compile',{
+      prompt_writer_id:compiled&&compiled.prompt_writer_id,
+      prompt_writer_version:compiled&&compiled.prompt_writer_version,
+      positive_chars:compiled&&compiled.prompt_stats&&compiled.prompt_stats.positive_chars,
+      negative_chars:compiled&&compiled.prompt_stats&&compiled.prompt_stats.negative_chars,
+      warnings_count:(compiled&&compiled.warnings&&compiled.warnings.length)||0,
+      removed_terms_count:(compiled&&compiled.removed_terms&&compiled.removed_terms.length)||0
+    });
+  }catch(e){
+    try{ PERF.end('prompt_writer_compile',{error:String((e&&e.message)||e).slice(0,200)}); }catch{}
+    console.warn('prompt writer failed; falling back to raw prompts', e);
+  }
+  if(compiled&&_c(compiled.compiled_positive)&&_c(compiled.compiled_negative)){
+    pkg.compiled_prompts={positive:compiled.compiled_positive,negative:compiled.compiled_negative};
+    pkg.prompt_writer={
+      id:compiled.prompt_writer_id||pw.id,
+      version:compiled.prompt_writer_version||pw.cfg.version,
+      label:pw.writer.label||pw.id,
+      warnings:compiled.warnings||[],
+      removed_terms:compiled.removed_terms||[],
+      stats:compiled.prompt_stats||{}
+    };
+  }else{
+    pkg.compiled_prompts=null;
+    pkg.prompt_writer={id:'raw_package_prompt',version:'none',label:'Raw Package Prompt',warnings:['Compiled prompts unavailable; using raw package prompts.'],removed_terms:[],stats:{}};
+  }
+  return pkg;
+}
+function renderPromptWriterPanel(){
+  const el=document.getElementById('promptWriterPanel');
+  if(!el) return;
+  if(!CURRENT_PKG||!CURRENT_PKG.prompt_writer){ el.hidden=true; el.innerHTML=''; return; }
+  const pw=CURRENT_PKG.prompt_writer||{};
+  const cp=CURRENT_PKG.compiled_prompts||{};
+  const stats=pw.stats||{};
+  const removed=(pw.removed_terms||[]).map(x=>typeof x==='string'?x:((x.term||'')+(x.reason?' — '+x.reason:''))).filter(Boolean);
+  let html='<div class="cd-head">Prompt writer <span class="cd-tag">compiler</span></div>';
+  html+='<div class="cd-row"><span class="cd-k">Writer</span><span class="cd-v">'+esc(pw.label||pw.id||'raw_package_prompt')+'</span></div>';
+  html+='<div class="cd-row"><span class="cd-k">Version</span><span class="cd-v">'+esc(pw.version||'none')+'</span></div>';
+  if(stats.positive_chars||stats.negative_chars) html+='<div class="cd-row"><span class="cd-k">Stats</span><span class="cd-v">positive '+esc(stats.positive_chars||0)+' chars · negative '+esc(stats.negative_chars||0)+' chars</span></div>';
+  if((pw.warnings||[]).length) html+='<div class="cd-row"><span class="cd-k">Warnings</span><span class="cd-v">'+(pw.warnings||[]).map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>';
+  if(removed.length) html+='<div class="cd-row"><span class="cd-k">Removed / narrowed</span><span class="cd-v">'+removed.slice(0,16).map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>';
+  if(cp.positive) html+='<div class="cd-row cd-prompt"><span class="cd-k">Compiled positive</span><span class="cd-v">'+esc(cp.positive)+'</span></div>';
+  if(cp.negative) html+='<div class="cd-row cd-prompt"><span class="cd-k">Compiled negative</span><span class="cd-v">'+esc(cp.negative)+'</span></div>';
+  if(cp.positive||cp.negative) html+='<button class="pkgbtn" id="copyCompiledPrompt" type="button">Copy compiled prompt</button>';
+  el.innerHTML=html;
+  el.hidden=false;
+  const btn=document.getElementById('copyCompiledPrompt');
+  if(btn){ btn.addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText('Positive:\n'+(cp.positive||'')+'\n\nNegative:\n'+(cp.negative||'')); btn.textContent='Copied'; setTimeout(()=>btn.textContent='Copy compiled prompt',1200); }catch(e){ console.warn('copy compiled prompt failed',e); } }); }
+}
+
 function renderPackageMarkdown(p){
   const L=[];
   L.push('# Render package: '+p.meta.product_name);
@@ -1040,7 +1120,7 @@ function renderPackageMarkdown(p){
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
   if(p.scene_brief.props.length)L.push('Props: '+p.scene_brief.props.join(', '));
   if(p.placement_spec){L.push('Placement spec: '+JSON.stringify(p.placement_spec));}
-  L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);
+  L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);if(p.compiled_prompts&&p.compiled_prompts.positive){L.push('');L.push('## 5.1 Compiled prompts (prompt writer)');L.push('Writer: '+((p.prompt_writer&&p.prompt_writer.label)||'unknown')+' · '+((p.prompt_writer&&p.prompt_writer.version)||'unknown'));if(p.prompt_writer&&p.prompt_writer.stats)L.push('Stats: '+JSON.stringify(p.prompt_writer.stats));if(p.prompt_writer&&p.prompt_writer.warnings&&p.prompt_writer.warnings.length)L.push('Warnings: '+p.prompt_writer.warnings.join('; '));if(p.prompt_writer&&p.prompt_writer.removed_terms&&p.prompt_writer.removed_terms.length)L.push('Removed/narrowed terms: '+p.prompt_writer.removed_terms.map(x=>typeof x==='string'?x:((x.term||'')+(x.reason?' ('+x.reason+')':''))).join('; '));L.push('Compiled positive:');L.push('> '+p.compiled_prompts.positive);L.push('Compiled negative:');L.push('> '+p.compiled_prompts.negative);}
   L.push('');L.push('## 6. Variants to test');
   p.variants.forEach((v,i)=>{L.push('### 6.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
   L.push('## 7. Confidence notes');L.push('Read confidence: '+p.confidence_notes.score);
@@ -1250,12 +1330,14 @@ cta.addEventListener('click',async()=>{
   }
   PERF.start('build_render_package');
   CURRENT_PKG=buildRenderPackage(buildHandoff());
+  applyPromptWriterToPackage(CURRENT_PKG);
   CURRENT_PKG.performance_timing=PERF.summary();
   CURRENT_PKG.build_id=PWP_BUILD_ID;
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
   PERF.end('build_render_package',{bytes:CURRENT_MD.length});
   handoffBody.textContent=CURRENT_MD;
   renderCreativeDirectionPanel();
+  renderPromptWriterPanel();
   handoff.classList.add('on');
   handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
   PERF.end('bring_it_to_life_total');
@@ -1333,11 +1415,13 @@ function lockedProductBlobFromAsset(a){
 async function rebuildCurrentPackage(){
   PERF.start('rebuild_current_package');
   CURRENT_PKG=buildRenderPackage(buildHandoff());
+  applyPromptWriterToPackage(CURRENT_PKG);
   CURRENT_PKG.performance_timing=PERF.summary();
   CURRENT_PKG.build_id=PWP_BUILD_ID;
   CURRENT_MD=renderPackageMarkdown(CURRENT_PKG);
   if(handoffBody) handoffBody.textContent=CURRENT_MD;
   renderCreativeDirectionPanel();
+  renderPromptWriterPanel();
   PERF.end('rebuild_current_package',{bytes:CURRENT_MD.length});
   return CURRENT_PKG;
 }
