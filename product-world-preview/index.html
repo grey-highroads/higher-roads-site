@@ -349,7 +349,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-10-url-simplify-v1';
+const PWP_BUILD_ID = 'pwp-index-2026-07-10-integration-v1';
 const PWP_BUILD_NOTE = 'single product URL input, derived homepage, marketplace fallback request, fast mode, render observability';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
@@ -440,6 +440,7 @@ function clearPreviewCache(){
 setBuildStamp();
 const FIDELITY_NEGATIVES = HR_CREATIVE_CONFIG.fidelityNegatives || [];
 const RUBRIC_CRITERIA = HR_CREATIVE_CONFIG.rubricCriteria || [];
+const CREATIVE_CONFIG_VERSION = HR_CREATIVE_CONFIG.version || '';
 const _c=s=>String(s==null?'':s).trim();
 const _l=a=>Array.isArray(a)?a.map(_c).filter(Boolean):(a?[_c(a)]:[]);
 const _s=a=>_l(a).join(', ');
@@ -493,6 +494,65 @@ function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=i
   if(_c(sn.color_palette))b.push('palette: '+_c(sn.color_palette));
   if(_l(sn.textures_and_materials).length)b.push('materials: '+_s(sn.textures_and_materials));
   return b.join('; ');}
+
+function textBlobForIntegration(h){
+  const parts=[];
+  const sd=(h&&h.scene_direction)||{};
+  const sel=(h&&h.director_selection)||{};
+  const pv=(sel&&sel.prompt_variables)||{};
+  const f=(DATA&&DATA.factual)||{};
+  parts.push(_c(f.category), _c(f.name), _c((h&&h.locked_asset&&h.locked_asset.asset_name)||''));
+  parts.push(_c(sd.scene_name), _c(sd.world_description), _c(sd.surface), _c(sd.background), _c(sd.lighting), _l(sd.materials).join(' '), _l(sd.props).join(' '));
+  parts.push(_c(sel.scene_archetype), _c(pv.place), _c(pv.atmosphere), _c(pv.material), _c(pv.object_treatment));
+  return parts.join(' ').toLowerCase();
+}
+function hasAny(hay, words){ return words.some(w=>hay.indexOf(w)>=0); }
+function buildIntegrationTreatment(h){
+  const la=(h&&h.locked_asset)||{};
+  const txt=textBlobForIntegration(h);
+  const baseEffects=['contact_shadow','local_occlusion','color_spill','reflected_light','specular_highlights','edge_darkening','depth_of_field','atmospheric_haze','lens_softness'];
+  let profile='light', level='light', notes='Use subtle scene-consistent integration only: product identity remains clean and fully readable, but light, shadow, reflection, and local atmosphere should make it physically belong in the frame.';
+  let effects=baseEffects.slice();
+  if(hasAny(txt,['trail','field','mountain','forest','camp','alpine','gravel','bike','bicycle','tailgate','truck','dock','lake','beach','outdoor','expedition','utility','gear','mud','dust','rain','mist','storm','wet ground','recovery threshold'])){
+    profile='field'; level='field';
+    effects=effects.concat(['light_dust','dirt_speckling','minor_surface_scuffs','edge_wear','minor_pouch_wrinkles','wetness','condensation','gear_shadow','partial_foreground_obstruction']);
+    notes='Field/outdoor integration: allow light dust or dirt on lower edges, minor pouch/bag wrinkles if applicable, wetness or condensation when physically motivated, shadow from nearby gear, subtle edge wear, and cool/warm environmental light spill. Do not make the product look destroyed, unreadable, or redesigned.';
+  }else if(hasAny(txt,['cooler','ice','cold','pool','water','condensation','beverage','can','bottle','hydration','sparkling','soda','drink','spritz','shooter'])){
+    profile='cold_beverage'; level='light';
+    effects=effects.concat(['condensation_beads','wet_contact_base','cold_highlights','cooler_reflections','subtle_label_gloss','small_water_droplets']);
+    notes='Cold beverage integration: allow condensation beads, a wet contact base, cold highlights, cooler/glass reflections, and small water droplets. Do not warp the label, invent droplets as printed graphics, or obscure the product name.';
+  }else if(hasAny(txt,['kitchen','cook','skillet','steam','oil','bottling','prep','production','bakery','pantry','workstation','stainless','tile','packing','quality control','dish','flour'])){
+    profile='kitchen_production'; level='light';
+    effects=effects.concat(['steam_haze','soft_fingerprints','counter_reflection','oil_sheen','paper_dust','subtle_surface_scuffs','worklight_reflection']);
+    notes='Kitchen/production integration: allow steam haze, counter reflection, soft fingerprints, slight oil sheen or paper dust when motivated, and practical worklight reflections. Do not add fake label text, competing labels, or messy effects that lower product readability.';
+  }else if(hasAny(txt,['retail','gallery','museum','display','luxury','hotel','service','counter','archive','conservatory','shelf','glass','case'])){
+    profile='premium_controlled'; level='clean';
+    effects=effects.concat(['controlled_reflections','glass_refraction','soft_contact_shadow','subtle_surface_reflection']);
+    notes='Premium/controlled integration: keep the product mostly clean, using controlled reflections, glass refraction, color spill, and precise contact shadow. Avoid grime unless the brand/world specifically earns it.';
+  }
+  const protectedDefaults=['brand_logo','product_name','flavor_or_sku_name','primary_graphic_system','label_hierarchy','typography','key_claims_or_regulatory_copy','pack_shape','pack_proportions','color_blocking','barcode_or_required_markings_if_visible'];
+  const preserve=_l(la.preserve_elements).map(x=>x.toLowerCase().replace(/[^a-z0-9]+/g,'_')).filter(Boolean);
+  return {
+    profile,
+    level,
+    principle:'Identity-locked, physically integrated packaging: preserve the brand-critical design while allowing non-destructive scene effects over the physical object.',
+    allowed_effects:_dedupe(effects),
+    protected_regions:_dedupe(protectedDefaults.concat(preserve)),
+    max_obscuration:{brand_logo:'5%',product_name:'10%',flavor_or_sku_name:'10%',primary_graphic_system:'15%',secondary_copy:'25%'},
+    scene_specific_notes:notes,
+    avoid:['redesigned label','retyped or invented text','recolored packaging','warped logo','changed pack proportions','crushed silhouette','torn packaging unless explicitly requested','mud, dust, glare, or occlusion covering the logo or product name','damage that reads as a different SKU or package']
+  };
+}
+function integrationTreatmentText(t, mode){
+  if(!t) return '';
+  const effects=_l(t.allowed_effects).slice(0,12).join(', ');
+  const protectedRegions=_l(t.protected_regions).slice(0,10).join(', ');
+  const max=t.max_obscuration||{};
+  const base='physical integration treatment: the locked product image remains the source of truth, but the object should inherit scene-consistent, non-destructive effects such as '+effects+'. Protect '+protectedRegions+'. Maximum obscuration: logo '+(max.brand_logo||'5%')+', product name '+(max.product_name||'10%')+', secondary copy '+(max.secondary_copy||'25%')+'. '+_c(t.scene_specific_notes)+' Never redesign, retype, recolor, warp, crush, or reinterpret the packaging.';
+  if(mode==='composite') return base+' Generate environmental light, shadow, reflection, haze, and possible foreground occlusion that a later composite pass can apply to the locked product; do not generate alternate product packaging.';
+  return base+' Apply these effects over the supplied product only as physical scene integration, not as changes to the printed design.';
+}
+
 function buildPlacementSpec(h){
   const sd=h.scene_direction||{};
   const lp=sd.locked_product_placement;
@@ -535,7 +595,8 @@ function _posDirectorCore(sel, sd){
 function _posComposite(h){
   const sd=h.scene_direction||{};
   const sel=h.director_selection||null;
-  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd));
+  const treatment=buildIntegrationTreatment(h);
+  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd).concat([integrationTreatmentText(treatment,'composite')]));
   const seed=_c(sd.prompt_seed);
   const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(sd.world_description,5);
   const props=_l(sd.props).slice(0,5);
@@ -549,13 +610,15 @@ function _posComposite(h){
     _c(sd.composition)&&'composition: '+_c(sd.composition),
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
     cameraToText(sd.camera),
-    props.length&&'props: '+props.join(', ')
+    props.length&&'props: '+props.join(', '),
+    integrationTreatmentText(treatment,'composite')
   ]);
 }
 function _posReference(h){
   const sd=h.scene_direction||{};
   const sel=h.director_selection||null;
-  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd).concat(['use the supplied product image exactly as provided','preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged']));
+  const treatment=buildIntegrationTreatment(h);
+  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd).concat([integrationTreatmentText(treatment,'reference'),'use the supplied product image as the identity source of truth','preserve brand-critical packaging structure: label hierarchy, text, logo, colors, proportions, SKU identity, and packaging details must remain readable and structurally unchanged']));
   const seed=_c(sd.prompt_seed);
   const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(_stripProductFreeLines(sd.world_description),5);
   const props=_l(sd.props).slice(0,5);
@@ -570,8 +633,9 @@ function _posReference(h){
     _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
     cameraToText(sd.camera),
     props.length&&'props: '+props.join(', '),
-    'use the supplied product image exactly as provided',
-    'preserve the closed product, cap, label hierarchy, text, logo, colors, proportions, and packaging details unchanged'
+    integrationTreatmentText(treatment,'reference'),
+    'use the supplied product image as the identity source of truth',
+    'preserve brand-critical packaging structure: label hierarchy, text, logo, colors, proportions, SKU identity, and packaging details must remain readable and structurally unchanged'
   ]);
 }
 /* ===================== Creative Scene Brief layer ===================== */
@@ -885,6 +949,7 @@ function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
   const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.director_selection&&_l(h.director_selection.avoid))||[])];
   const negStr=_dedupe(neg).join(', ');
+  const integrationTreatment=buildIntegrationTreatment(h);
   const positiveComposite=_posComposite(h);
   const positiveReference=_posReference(h);
   const creativeDirection=buildCreativeDirectionBlock(h,positiveComposite,negStr);
@@ -906,9 +971,10 @@ function buildRenderPackage(h){
     props:_l(sd.props)
   };
   return {
-    meta:{package_version:'0.1',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:effectiveChosenDirection,render_path_recommendation:_c(sd.render_path)||'composite'},
-    fidelity_contract:{statement:'The product image is locked. Do not redraw, retype, recolor, resize, or reinterpret the packaging. Use the supplied image directly.',preserve:_l(la.preserve_elements),rules:['Label hierarchy must be preserved.','Pack proportions must not change.','Packaging colors must stay accurate.','The product is composited or referenced from the supplied image, never generated.']},
+    meta:{package_version:'0.2',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:effectiveChosenDirection,render_path_recommendation:_c(sd.render_path)||'composite',creative_config_version:CREATIVE_CONFIG_VERSION},
+    fidelity_contract:{statement:'The product image is identity-locked. Do not redraw, retype, recolor, relabel, reshape, resize, crop, open, or reinterpret the brand-critical packaging structure. Use the supplied product image as the source of truth.',preserve:_l(la.preserve_elements),rules:['Brand-critical identity must be preserved: logo, label hierarchy, typography, SKU/flavor identity, primary graphic system, color blocking, pack shape, and proportions.','Physically plausible scene integration is allowed as a non-destructive overlay on the object: condensation, dust, dirt, grime, small wrinkles, edge wear, scuffs, wetness, contact shadows, local occlusion, reflected light, color spill, atmospheric haze, lens softness, and depth of field.','Integration effects must not obscure or alter protected identity regions beyond the integration_treatment limits.','The product is composited or referenced from the supplied image; any environmental treatment sits over the locked asset rather than replacing it.']},
     locked_asset:buildLockedAssetRecord(la),
+    integration_treatment:integrationTreatment,
     scene_brief:effectiveSceneBrief,
     placement_spec:buildPlacementSpec(h),
     prompts:{positive:positiveReference,negative:negStr},
@@ -918,7 +984,7 @@ function buildRenderPackage(h){
     ],
     confidence_notes:{score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]},
     creative_direction:creativeDirection,
-    test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Label fidelity, proportions, and color accuracy are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
+    test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Identity fidelity, proportions, color accuracy, and scene integration are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
   };
 }
 function renderPackageMarkdown(p){
@@ -929,19 +995,20 @@ function renderPackageMarkdown(p){
   if(p.fidelity_contract.preserve.length)L.push('Preserve exactly: '+p.fidelity_contract.preserve.join(', ')+'.');
   p.fidelity_contract.rules.forEach(r=>L.push('- '+r));
   L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);if(p.locked_asset.stored_asset_url)L.push('Stored asset: '+p.locked_asset.stored_asset_url);else L.push('Locked image: attached as a file and stored server-side, not embedded in JSON');if(p.locked_asset.media_type)L.push('Media type: '+p.locked_asset.media_type);
-  L.push('');L.push('## 3. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);L.push('Placement: '+p.scene_brief.product_placement_intent);
+  if(p.integration_treatment){const it=p.integration_treatment;L.push('');L.push('## 3. Scene integration allowance');L.push('Level: '+it.level+' · Profile: '+it.profile);L.push(it.principle);if(_l(it.allowed_effects).length)L.push('Allowed effects: '+_l(it.allowed_effects).join(', ')+'.');if(_l(it.protected_regions).length)L.push('Protected regions: '+_l(it.protected_regions).join(', ')+'.');if(it.max_obscuration)L.push('Max obscuration: '+JSON.stringify(it.max_obscuration));if(_c(it.scene_specific_notes))L.push('Scene notes: '+_c(it.scene_specific_notes));if(_l(it.avoid).length)L.push('Avoid: '+_l(it.avoid).join(', ')+'.');}
+  L.push('');L.push('## 4. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);L.push('Placement: '+p.scene_brief.product_placement_intent);
   if(p.scene_brief.composition)L.push('Composition: '+p.scene_brief.composition);
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
   if(p.scene_brief.props.length)L.push('Props: '+p.scene_brief.props.join(', '));
   if(p.placement_spec){L.push('Placement spec: '+JSON.stringify(p.placement_spec));}
-  L.push('');L.push('## 4. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);
-  L.push('');L.push('## 5. Variants to test');
-  p.variants.forEach((v,i)=>{L.push('### 5.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
-  L.push('## 6. Confidence notes');L.push('Read confidence: '+p.confidence_notes.score);
+  L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);
+  L.push('');L.push('## 6. Variants to test');
+  p.variants.forEach((v,i)=>{L.push('### 6.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
+  L.push('## 7. Confidence notes');L.push('Read confidence: '+p.confidence_notes.score);
   if(p.confidence_notes.agreement_notes.length)L.push('Agreement: '+p.confidence_notes.agreement_notes.join('; '));
   if(p.confidence_notes.conflicts.length)L.push('Conflicts: '+p.confidence_notes.conflicts.join('; '));
   if(p.confidence_notes.alternates.length){L.push('Alternate directions available:');p.confidence_notes.alternates.forEach(a=>L.push('- '+a.scene_name+': '+a.world_description+(a.why?' ('+a.why+')':'')));}
-  L.push('');L.push('## 7. Manual test rubric');L.push(p.test_rubric.instructions);L.push('Scale: '+p.test_rubric.scale);L.push('');
+  L.push('');L.push('## 8. Manual test rubric');L.push(p.test_rubric.instructions);L.push('Scale: '+p.test_rubric.scale);L.push('');
   L.push('| Criterion | What to check | Engine A | Engine B | Engine C |');L.push('| --- | --- | --- | --- | --- |');
   p.test_rubric.criteria.forEach(c=>L.push('| '+c.label+' | '+c.ask+' |  |  |  |'));
   return L.join('\n');
