@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:image" content="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png" />
+  <meta property="og:title" content="Advisory | Higher Roads" />
+  <meta property="og:description" content="For owners deciding what to build next. We help you identify the few technology-enabled opportunities worth testing, then turn the strongest one into a practical pilot." />
+  <meta property="og:url" content="https://higher-roads.com/advisory/" />
+  <meta property="og:type" content="website" />
+  <meta name="description" content="Advisory from Higher Roads. For owners and operators deciding what to build next. Opportunity mapping, pilot design, and execution roadmaps grounded in real production experience." />
+  <title>Advisory | Higher Roads</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/grey-highroads/higher-roads-site/main/images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root, [data-theme="ember"] {
+      --black:        #0a0906;
+      --ink:          #1a1410;
+      --cream:        #f5ede2;
+      --dark:         #181510;
+      --dark-card:    #111009;
+      --accent:       #e8782a;
+      --accent-dim:   #a04f18;
+      --glow:         rgba(232, 120, 42, 0.07);
+      --white:        #f5ede2;
+      --muted:        #6b6057;
+      --border:       rgba(232, 120, 42, 0.18);
+      --border-sub:   rgba(232, 120, 42, 0.09);
+      --border-light: rgba(26, 20, 16, 0.11);
+    }
+    [data-theme="neon-noir"] {
+      --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
+      --accent: #f72585; --accent-dim: #7b1fa2;
+      --glow: rgba(183,0,255,0.08); --white: #ede8f5;
+      --muted: #5c5470; --border: rgba(247,37,133,0.2);
+      --border-sub: rgba(247,37,133,0.09);
+    }
+    [data-theme="ice"] {
+      --black: #050810; --dark: #0a0f1e; --dark-card: #060a14;
+      --accent: #4fc3f7; --accent-dim: #1a6a8a;
+      --glow: rgba(79,195,247,0.07); --white: #e8f4f8;
+      --muted: #4a6070; --border: rgba(79,195,247,0.18);
+      --border-sub: rgba(79,195,247,0.09);
+    }
+    [data-theme="acid"] {
+      --black: #040a04; --dark: #081208; --dark-card: #050d05;
+      --accent: #39ff14; --accent-dim: #1a7a08;
+      --glow: rgba(57,255,20,0.06); --white: #e8f5e8;
+      --muted: #4a6b4a; --border: rgba(57,255,20,0.18);
+      --border-sub: rgba(57,255,20,0.09);
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.8;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      padding: 2rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: rgba(10,9,6,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .header-logo { height: 28px; width: auto; display: block; }
+
+    nav.nav-links {
+      display: flex; gap: 2.2rem; align-items: center;
+    }
+
+    nav.nav-links a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    nav.nav-links a:hover { color: var(--white); }
+    nav.nav-links a.current { color: var(--white); }
+
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--white); transition: all 0.3s; transform-origin: center;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none; flex-direction: column;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem; gap: 1.25rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif; font-weight: 500;
+      font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+    }
+    .mobile-nav a:hover { color: var(--white); }
+
+    /* SHARED */
+    main { flex: 1; display: flex; flex-direction: column; }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    .eyebrow {
+      display: block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 6rem 3rem 4rem;
+      max-width: 860px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 1.8rem;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-body {
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--white); opacity: 0.7;
+      max-width: 600px; margin-bottom: 1.4rem;
+    }
+
+    .hero-body:last-of-type { margin-bottom: 2.6rem; }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); text-decoration: none;
+      border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent); color: var(--black); }
+
+    /* LOWER PAGE MODULES */
+    .lower-section {
+      padding: 4rem 3rem;
+      border-top: 1px solid var(--border);
+    }
+    .lower-section-header { margin-bottom: 2.2rem; }
+    .lower-section-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      line-height: 1.2; color: var(--white);
+      margin-top: 0.5rem; max-width: 640px;
+    }
+
+    .section-prose {
+      font-size: 1rem; line-height: 1.85;
+      color: var(--white); opacity: 0.7;
+      max-width: 640px; margin-bottom: 1.4rem;
+    }
+    .section-prose:last-child { margin-bottom: 0; }
+    .section-prose a {
+      color: var(--accent); text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .section-prose a:hover { border-color: var(--accent); }
+
+    /* STAGES */
+    .stage-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 2.4rem;
+    }
+
+    .stage-col {
+      background: var(--dark-card);
+      padding: 2rem 1.8rem;
+    }
+
+    .stage-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.9rem; display: block;
+    }
+
+    .stage-desc {
+      font-size: 0.92rem; line-height: 1.7;
+      color: var(--white); opacity: 0.65;
+    }
+
+    /* VIDEO BREAK */
+    .video-break {
+      width: 100%;
+      margin-top: 3.5rem;
+      height: 62vh;
+      min-height: 320px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-break video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-break::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right,
+        rgba(6,5,3,0.42) 0%,
+        rgba(6,5,3,0.22) 30%,
+        rgba(6,5,3,0.06) 55%,
+        rgba(6,5,3,0.00) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* STARTING POINTS */
+    .starting-points {
+      font-family: 'Playfair Display', serif;
+      font-style: italic; font-weight: 400;
+      font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+      line-height: 1.85;
+      color: var(--white); opacity: 0.72;
+      max-width: 720px;
+    }
+
+    /* CTA CLOSE */
+    .cta-close {
+      padding: 5rem 3rem 6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-close-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-weight: 500; line-height: 1.15;
+      color: var(--white); margin-bottom: 1.2rem;
+      max-width: 720px;
+    }
+
+    .cta-close-text em { font-style: italic; color: var(--accent); }
+
+    .cta-sub {
+      font-size: 0.95rem; line-height: 1.8;
+      color: var(--white); opacity: 0.55;
+      max-width: 520px; margin-bottom: 2.2rem;
+    }
+
+    /* CONTACT FORM */
+    .lead-form {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 2.2rem;
+    }
+
+    .lead-form input,
+    .lead-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--white);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .lead-form input:focus,
+    .lead-form textarea:focus { border-color: var(--accent); }
+
+    .lead-form input::placeholder,
+    .lead-form textarea::placeholder { color: var(--muted); }
+
+    .lead-form textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .lead-form button {
+      align-self: flex-start;
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      padding: 0.85rem 2rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .lead-form button:hover { opacity: 0.85; }
+
+    /* FOOTER */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted);
+    }
+
+    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+
+    .footer-email {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-email:hover { color: var(--accent); }
+
+    .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
+    .theme-label {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    }
+    .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
+    .theme-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { transform: scale(1.25); box-shadow: 0 0 7px 2px var(--dot-color); }
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header { padding: 1.5rem; }
+      nav.nav-links { display: none; }
+      .nav-toggle { display: flex; }
+
+      .hero { padding: 4rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.1rem; }
+
+      .lower-section { padding: 3rem 1.5rem; }
+      .stage-flow { grid-template-columns: 1fr; }
+
+      .video-break {
+        height: 42vh;
+        min-height: 220px;
+        margin-top: 2.5rem;
+      }
+
+      .cta-close { padding: 4rem 1.5rem 5rem; }
+
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <div class="page">
+
+    <header>
+      <a href="https://higher-roads.com/">
+        <img src="https://raw.githubusercontent.com/grey-highroads/higher-roads-site/main/images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="https://higher-roads.com/screens/">For Screens</a>
+        <a href="https://higher-roads.com/spaces/">For Spaces</a>
+        <a href="https://higher-roads.com/for-partners/">For Partners</a>
+        <a href="https://higher-roads.com/advisory/" class="current">Advisory</a>
+        <a href="https://higher-roads.com/#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="https://higher-roads.com/screens/">For Screens</a>
+      <a href="https://higher-roads.com/spaces/">For Spaces</a>
+      <a href="https://higher-roads.com/for-partners/">For Partners</a>
+      <a href="https://higher-roads.com/advisory/">Advisory</a>
+      <a href="https://higher-roads.com/#contact">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- HERO -->
+      <section class="hero reveal">
+        <span class="eyebrow">Advisory</span>
+        <h1>For owners deciding<br><em>what to build next.</em></h1>
+        <p class="hero-body">New tools keep making new things possible for venues, brands, catalogs, and portfolios. The hard part is deciding which of those possibilities deserves your money, your team's attention, and a place on the roadmap.</p>
+        <p class="hero-body">Most opportunities sound interesting before they are priced, scoped, and connected to a real outcome. Advisory exists for that moment. We help you identify the few technology-enabled opportunities worth testing, then turn the strongest one into a practical pilot.</p>
+        <a href="#contact" class="btn-primary">Bring the question →</a>
+      </section>
+
+      <!-- WHO THIS IS FOR -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Who this is for</span>
+          <h2>Owners and operators who know there is something here but have not decided what to build.</h2>
+        </div>
+        <p class="section-prose">A venue with underused rooms. A brand whose visual presence works harder in some places than others. A portfolio of businesses with shared creative and operational needs. A catalog or audience that could support experiences it does not have yet. A property that should do more than sit there.</p>
+        <p class="section-prose">If your team keeps circling AI, content systems, or interactive media without landing on a first move, this is where you start.</p>
+      </div>
+
+      <!-- THE WORK -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">The work</span>
+          <h2>Three stages, each producing a decision.</h2>
+        </div>
+        <div class="stage-flow">
+          <div class="stage-col">
+            <span class="stage-label">Opportunity Mapping</span>
+            <p class="stage-desc">We study the business, the audience, the assets, and the constraints, and find the places where modern tools could create real leverage.</p>
+          </div>
+          <div class="stage-col">
+            <span class="stage-label">Pilot Design</span>
+            <p class="stage-desc">We define the strongest opportunity in practical terms: what it is, what it needs to prove, and what would make it worth continuing.</p>
+          </div>
+          <div class="stage-col">
+            <span class="stage-label">Execution Roadmap</span>
+            <p class="stage-desc">We turn the pilot into a buildable plan, with scope, sequence, budget ranges, partner needs, and the decisions required before anything gets made.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHY HIGHER ROADS -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Why Higher Roads</span>
+          <h2>Advice from practice, not decks.</h2>
+        </div>
+        <p class="section-prose">Most new technology conversations break down in the same place: the idea is interesting, the demo is impressive, and then the business case and the execution path go fuzzy. We close that gap because we build for a living. When <a href="https://higher-roads.com/mycopop/">Mycopop</a> needed their new formulation launch to feel like an evolution of the brand, we built them a world, one visual system carrying the event, the room, and everything downstream of it. We build our own tools and work with the newest ones, so the advice comes from practice, not decks.</p>
+        <p class="section-prose">We know what changes when an idea has to become a render, a room, a workflow, or a live experience with real people in it.</p>
+        <div class="video-break">
+          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4"
+            poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png"
+            autoplay muted loop playsinline></video>
+        </div>
+      </div>
+
+      <!-- WHAT YOU LEAVE WITH -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">What you leave with</span>
+          <h2>A clear next step.</h2>
+        </div>
+        <p class="section-prose">An opportunity map, a recommended pilot, a build roadmap, budget and production assumptions, and a brief that can be handed to Higher Roads or any qualified team. The roadmap is yours. Higher Roads can be one possible builder, but the plan does not depend on us owning the execution.</p>
+      </div>
+
+      <!-- COMMON STARTING POINTS -->
+      <div class="lower-section reveal">
+        <div class="lower-section-header">
+          <span class="eyebrow">Common starting points</span>
+        </div>
+        <p class="starting-points">How could this venue or property become more useful, memorable, and programmable? How could our brand show up across screens, retail, and spaces with more consistency? How could we turn an audience or catalog into something people can experience? How could we use AI-assisted workflows without turning the business into a science project? How do we test this without overbuilding it?</p>
+      </div>
+
+      <!-- CONTACT -->
+      <section id="contact" class="cta-close reveal">
+        <p class="cta-close-text">Bring the question<br><em>before it becomes a scope.</em></p>
+        <p class="cta-sub">Tell us what you own, what you are exploring, and where you think the opportunity might be. We will take it from there.</p>
+        <form
+          class="lead-form"
+          action="https://formspree.io/f/xrerprnv"
+          method="POST"
+        >
+          <input type="hidden" name="page" value="advisory" />
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="email" name="email" placeholder="Your email" required />
+          <textarea name="message" placeholder="What are you exploring?" rows="5"></textarea>
+          <button type="submit">Start the Conversation</button>
+        </form>
+      </section>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"></div>
+          <div class="theme-dot"        data-t="neon-noir"></div>
+          <div class="theme-dot"        data-t="ice"></div>
+          <div class="theme-dot"        data-t="acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
