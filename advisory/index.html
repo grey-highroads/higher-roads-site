@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="ember">
 <head>
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
-  <!-- End Google Tag Manager -->
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:image" content="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png" />
@@ -21,25 +13,22 @@
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/grey-highroads/higher-roads-site/main/images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root, [data-theme="ember"] {
-      --black:        #0a0906;
-      --ink:          #1a1410;
-      --cream:        #f5ede2;
-      --dark:         #181510;
-      --dark-card:    #111009;
-      --accent:       #e8782a;
-      --accent-dim:   #a04f18;
-      --glow:         rgba(232, 120, 42, 0.07);
-      --white:        #f5ede2;
-      --muted:        #6b6057;
-      --border:       rgba(232, 120, 42, 0.18);
-      --border-sub:   rgba(232, 120, 42, 0.09);
-      --border-light: rgba(26, 20, 16, 0.11);
+      --black:      #0a0906;
+      --dark:       #181510;
+      --dark-card:  #111009;
+      --accent:     #e8782a;
+      --accent-dim: #a04f18;
+      --glow:       rgba(232, 120, 42, 0.07);
+      --white:      #f5ede2;
+      --muted:      #6b6057;
+      --border:     rgba(232, 120, 42, 0.18);
+      --border-sub: rgba(232, 120, 42, 0.09);
     }
     [data-theme="neon-noir"] {
       --black: #07050f; --dark: #0e0a1a; --dark-card: #090614;
@@ -68,7 +57,7 @@
       background-color: var(--black);
       color: var(--white);
       font-family: 'Barlow', sans-serif;
-      font-weight: 300;
+      font-weight: 400;
       overflow-x: hidden;
       scroll-behavior: smooth;
       transition: background-color 0.4s ease, color 0.4s ease;
@@ -83,7 +72,7 @@
 
     body::after {
       content: '';
-      position: fixed; top: 30%; left: 50%;
+      position: fixed; top: 25%; left: 50%;
       transform: translate(-50%, -50%);
       width: 700px; height: 500px;
       background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
@@ -91,12 +80,12 @@
     }
 
     .page {
-      position: relative;
+      position: relative; z-index: 1;
       min-height: 100vh;
       display: flex; flex-direction: column;
     }
 
-    /* HEADER */
+    /* ══ HEADER ══ */
     header {
       padding: 2rem 3rem;
       display: flex; align-items: center; justify-content: space-between;
@@ -112,7 +101,6 @@
     nav.nav-links {
       display: flex; gap: 2.2rem; align-items: center;
     }
-
     nav.nav-links a {
       font-family: 'Rajdhani', sans-serif; font-weight: 500;
       font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
@@ -146,7 +134,7 @@
     }
     .mobile-nav a:hover { color: var(--white); }
 
-    /* SHARED */
+    /* ══ SHARED ══ */
     main { flex: 1; display: flex; flex-direction: column; }
 
     .reveal {
@@ -162,10 +150,21 @@
       color: var(--accent); margin-bottom: 1rem;
     }
 
-    /* HERO */
+    /* ══ HERO ══ */
     .hero {
-      padding: 6rem 3rem 4rem;
-      max-width: 860px;
+      position: relative;
+      padding: 7rem 3rem 5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 4rem;
+      overflow: hidden;
+    }
+
+    .hero-text {
+      max-width: 580px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
     }
 
     .hero h1 {
@@ -178,146 +177,427 @@
     .hero h1 em { font-style: italic; color: var(--accent); }
 
     .hero-body {
-      font-size: 1.05rem; line-height: 1.8;
-      color: var(--white); opacity: 0.7;
-      max-width: 600px; margin-bottom: 1.4rem;
+      font-size: 1rem; line-height: 1.8;
+      color: var(--white); opacity: 0.65;
+      max-width: 520px; margin-bottom: 1.2rem;
     }
 
-    .hero-body:last-of-type { margin-bottom: 2.6rem; }
+    .hero-body:last-of-type { margin-bottom: 2.4rem; }
+
+    .hero-visual {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-visual-frame {
+      width: 100%;
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .hero-visual-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.7);
+    }
+
+    .hero-visual-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(10,9,6,0.5) 0%,
+        rgba(10,9,6,0.05) 60%,
+        rgba(10,9,6,0.3) 100%
+      );
+      pointer-events: none;
+    }
 
     .btn-primary {
       display: inline-block;
       font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--accent); text-decoration: none;
       border: 1px solid var(--accent); padding: 0.75rem 1.8rem;
       transition: background 0.2s, color 0.2s;
     }
     .btn-primary:hover { background: var(--accent); color: var(--black); }
 
-    /* LOWER PAGE MODULES */
-    .lower-section {
-      padding: 4rem 3rem;
+    @media (max-width: 900px) {
+      .hero { flex-direction: column; padding: 5rem 1.5rem 3.5rem; gap: 2.5rem; }
+      .hero-text { max-width: 100%; }
+      .hero-visual-frame { aspect-ratio: 16/9; }
+    }
+
+    /* ══ WHO THIS IS FOR ══ */
+    .who-section {
+      padding: 4.5rem 3rem;
       border-top: 1px solid var(--border);
     }
-    .lower-section-header { margin-bottom: 2.2rem; }
-    .lower-section-header h2 {
+
+    .who-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .who-header h2 {
       font-family: 'Playfair Display', serif; font-weight: 400;
-      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
-      line-height: 1.2; color: var(--white);
-      margin-top: 0.5rem; max-width: 640px;
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      line-height: 1.3; color: var(--white);
+      margin-top: 0.5rem; max-width: 600px;
     }
 
-    .section-prose {
-      font-size: 1rem; line-height: 1.85;
-      color: var(--white); opacity: 0.7;
-      max-width: 640px; margin-bottom: 1.4rem;
-    }
-    .section-prose:last-child { margin-bottom: 0; }
-    .section-prose a {
-      color: var(--accent); text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      transition: border-color 0.2s;
-    }
-    .section-prose a:hover { border-color: var(--accent); }
-
-    /* STAGES */
-    .stage-flow {
+    .who-scenarios {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
       border: 1px solid var(--border);
-      margin-top: 2.4rem;
+      max-width: 900px;
     }
 
-    .stage-col {
+    .who-scenario {
       background: var(--dark-card);
-      padding: 2rem 1.8rem;
+      padding: 1.6rem 1.8rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
     }
 
-    .stage-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 0.9rem; display: block;
-    }
-
-    .stage-desc {
-      font-size: 0.92rem; line-height: 1.7;
-      color: var(--white); opacity: 0.65;
-    }
-
-    /* VIDEO BREAK */
-    .video-break {
-      width: 100%;
-      margin-top: 3.5rem;
-      height: 62vh;
-      min-height: 320px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .video-break video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
+    .who-scenario-marker {
+      flex-shrink: 0;
+      width: 3px;
       height: 100%;
+      min-height: 2rem;
+      background: var(--accent);
+      opacity: 0.35;
+      border-radius: 1px;
+    }
+
+    .who-scenario p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--white);
+      opacity: 0.6;
+    }
+
+    .who-kicker {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.55;
+      margin-top: 2rem;
+      max-width: 600px;
+    }
+
+    @media (max-width: 768px) {
+      .who-section { padding: 3.5rem 1.5rem; }
+      .who-scenarios { grid-template-columns: 1fr; }
+    }
+
+    /* ══ PROOF BREAK ══ */
+    .proof-break {
+      position: relative;
+      height: 55vh;
+      min-height: 300px;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .proof-break video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    .video-break::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right,
-        rgba(6,5,3,0.42) 0%,
-        rgba(6,5,3,0.22) 30%,
-        rgba(6,5,3,0.06) 55%,
-        rgba(6,5,3,0.00) 100%);
+    .proof-break-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,9,6,0.15) 0%,
+        rgba(10,9,6,0.05) 40%,
+        rgba(10,9,6,0.65) 100%
+      );
       z-index: 1;
-      pointer-events: none;
     }
 
-    /* STARTING POINTS */
-    .starting-points {
+    .proof-break-caption {
+      position: absolute;
+      bottom: 2rem;
+      left: 3rem;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .proof-break-caption span {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: 0.5;
+    }
+
+    .proof-break-caption a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .proof-break-caption a:hover { opacity: 1; }
+
+    @media (max-width: 768px) {
+      .proof-break { height: 40vh; min-height: 240px; }
+      .proof-break-caption { left: 1.5rem; bottom: 1.5rem; }
+    }
+
+    /* ══ THE WORK (STAGES) ══ */
+    .stages-section {
+      padding: 4.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stages-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .stages-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      line-height: 1.3; color: var(--white);
+      margin-top: 0.5rem;
+    }
+
+    .stage-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      max-width: 1000px;
+    }
+
+    .stage-col {
+      padding: 2rem 2rem 2.2rem;
+      border: 1px solid var(--border);
+      border-right: none;
+      position: relative;
+    }
+
+    .stage-col:last-child { border-right: 1px solid var(--border); }
+
+    .stage-col::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .stage-col:hover::before { opacity: 1; }
+
+    .stage-number {
       font-family: 'Playfair Display', serif;
-      font-style: italic; font-weight: 400;
-      font-size: clamp(1.05rem, 1.7vw, 1.3rem);
-      line-height: 1.85;
-      color: var(--white); opacity: 0.72;
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--accent);
+      opacity: 0.2;
+      line-height: 1;
+      margin-bottom: 1.2rem;
+    }
+
+    .stage-label {
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.8rem; display: block;
+    }
+
+    .stage-desc {
+      font-size: 0.88rem; line-height: 1.7;
+      color: var(--white); opacity: 0.55;
+    }
+
+    @media (max-width: 768px) {
+      .stages-section { padding: 3.5rem 1.5rem; }
+      .stage-flow { grid-template-columns: 1fr; }
+      .stage-col { border-right: 1px solid var(--border); border-bottom: none; }
+      .stage-col:last-child { border-bottom: 1px solid var(--border); }
+    }
+
+    /* ══ WHY HIGHER ROADS ══ */
+    .why-section {
+      padding: 4.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .why-inner {
+      max-width: 680px;
+    }
+
+    .why-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .why-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      line-height: 1.3; color: var(--white);
+      margin-top: 0.5rem;
+    }
+
+    .why-body {
+      font-size: 0.95rem; line-height: 1.85;
+      color: var(--white); opacity: 0.6;
+      max-width: 600px; margin-bottom: 1.2rem;
+    }
+
+    .why-body a {
+      color: var(--accent); text-decoration: none;
+      border-bottom: 1px solid var(--border-sub);
+      transition: border-color 0.2s;
+    }
+    .why-body a:hover { border-color: var(--accent); }
+
+    .why-body:last-of-type { margin-bottom: 0; }
+
+    @media (max-width: 768px) {
+      .why-section { padding: 3.5rem 1.5rem; }
+    }
+
+    /* ══ WHAT YOU LEAVE WITH ══ */
+    .deliverable-section {
+      padding: 4.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .deliverable-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .deliverable-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      line-height: 1.3; color: var(--white);
+      margin-top: 0.5rem;
+    }
+
+    .deliverable-body {
+      font-size: 0.95rem; line-height: 1.85;
+      color: var(--white); opacity: 0.6;
+      max-width: 600px;
+    }
+
+    @media (max-width: 768px) {
+      .deliverable-section { padding: 3.5rem 1.5rem; }
+    }
+
+    /* ══ STARTING POINTS ══ */
+    .starting-section {
+      padding: 4.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .starting-header {
+      margin-bottom: 2rem;
+    }
+
+    .starting-header h2 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+      line-height: 1.3; color: var(--white);
+      margin-top: 0.5rem; opacity: 0.85;
+    }
+
+    .starting-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
       max-width: 720px;
     }
 
-    /* CTA CLOSE */
+    .starting-item {
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border-sub);
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .starting-item:last-child { border-bottom: none; }
+
+    .starting-item::before {
+      content: '';
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      opacity: 0.3;
+      border-radius: 50%;
+      margin-top: 0.45rem;
+    }
+
+    .starting-item p {
+      font-family: 'Playfair Display', serif;
+      font-style: italic; font-weight: 400;
+      font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+      line-height: 1.6;
+      color: var(--white);
+      opacity: 0.6;
+    }
+
+    @media (max-width: 768px) {
+      .starting-section { padding: 3.5rem 1.5rem; }
+    }
+
+    /* ══ CTA CLOSE ══ */
     .cta-close {
-      padding: 5rem 3rem 6rem;
-      border-top: 1px solid var(--border);
+      padding: 5rem 3rem 5.5rem;
     }
 
     .cta-close-text {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
       font-weight: 500; line-height: 1.15;
-      color: var(--white); margin-bottom: 1.2rem;
-      max-width: 720px;
+      color: var(--white); margin-bottom: 1rem;
+      max-width: 640px;
     }
 
     .cta-close-text em { font-style: italic; color: var(--accent); }
 
     .cta-sub {
-      font-size: 0.95rem; line-height: 1.8;
-      color: var(--white); opacity: 0.55;
-      max-width: 520px; margin-bottom: 2.2rem;
+      font-size: 0.9rem; line-height: 1.75;
+      color: var(--white); opacity: 0.5;
+      max-width: 480px; margin-bottom: 2rem;
     }
 
-    /* CONTACT FORM */
     .lead-form {
       width: 100%;
-      max-width: 560px;
+      max-width: 520px;
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
-      margin-top: 2.2rem;
+      gap: 0.8rem;
     }
 
     .lead-form input,
@@ -326,10 +606,10 @@
       background: rgba(255,255,255,0.03);
       color: var(--white);
       border: 1px solid var(--border);
-      padding: 1rem;
+      padding: 0.9rem 1rem;
       font-family: 'Barlow', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 300;
+      font-size: 0.9rem;
+      font-weight: 400;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -341,7 +621,7 @@
     .lead-form textarea::placeholder { color: var(--muted); }
 
     .lead-form textarea {
-      min-height: 160px;
+      min-height: 140px;
       resize: vertical;
     }
 
@@ -350,9 +630,9 @@
       background: var(--accent);
       color: var(--black);
       border: none;
-      padding: 0.85rem 2rem;
+      padding: 0.8rem 2rem;
       font-family: 'Rajdhani', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       letter-spacing: 0.2em;
       text-transform: uppercase;
@@ -362,7 +642,11 @@
 
     .lead-form button:hover { opacity: 0.85; }
 
-    /* FOOTER */
+    @media (max-width: 768px) {
+      .cta-close { padding: 3.5rem 1.5rem 4.5rem; }
+    }
+
+    /* ══ FOOTER ══ */
     footer {
       padding: 2rem 3rem;
       border-top: 1px solid var(--border);
@@ -370,18 +654,23 @@
       font-size: 0.75rem; color: var(--muted);
     }
 
-    .footer-note { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+    .footer-note {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
 
     .footer-email {
-      font-family: 'Rajdhani', sans-serif; font-size: 0.75rem;
-      letter-spacing: 0.05em; color: var(--muted);
+      font-family: 'Rajdhani', sans-serif; font-size: 0.65rem;
+      letter-spacing: 0.08em; color: var(--muted);
       text-decoration: none; transition: color 0.2s;
     }
     .footer-email:hover { color: var(--accent); }
 
     .theme-switcher { display: flex; align-items: center; gap: 0.75rem; }
     .theme-label {
-      font-family: 'Rajdhani', sans-serif; font-size: 0.55rem;
+      font-family: 'Rajdhani', sans-serif; font-size: 0.5rem;
       letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
     }
     .theme-dots { display: flex; gap: 0.5rem; align-items: center; }
@@ -397,26 +686,7 @@
     .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
     .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
 
-    /* RESPONSIVE */
     @media (max-width: 768px) {
-      header { padding: 1.5rem; }
-      nav.nav-links { display: none; }
-      .nav-toggle { display: flex; }
-
-      .hero { padding: 4rem 1.5rem 3rem; }
-      .hero h1 { font-size: 2.1rem; }
-
-      .lower-section { padding: 3rem 1.5rem; }
-      .stage-flow { grid-template-columns: 1fr; }
-
-      .video-break {
-        height: 42vh;
-        min-height: 220px;
-        margin-top: 2.5rem;
-      }
-
-      .cta-close { padding: 4rem 1.5rem 5rem; }
-
       footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
     }
   </style>
@@ -453,80 +723,136 @@
 
     <main>
 
-      <!-- HERO -->
+      <!-- ═══ HERO ═══ -->
       <section class="hero reveal">
-        <span class="eyebrow">Advisory</span>
-        <h1>For owners deciding<br><em>what to build next.</em></h1>
-        <p class="hero-body">New tools keep making new things possible for venues, brands, catalogs, and portfolios. The hard part is deciding which of those possibilities deserves your money, your team's attention, and a place on the roadmap.</p>
-        <p class="hero-body">Most opportunities sound interesting before they are priced, scoped, and connected to a real outcome. Advisory exists for that moment. We help you identify the few technology-enabled opportunities worth testing, then turn the strongest one into a practical pilot.</p>
-        <a href="#contact" class="btn-primary">Bring the question →</a>
+        <div class="hero-text">
+          <span class="eyebrow">Advisory</span>
+          <h1>For owners deciding<br><em>what to build next.</em></h1>
+          <p class="hero-body">New tools keep making new things possible for venues, brands, catalogs, and portfolios. The hard part is deciding which possibilities deserve your money, your team's attention, and a place on the roadmap.</p>
+          <p class="hero-body">We help you identify the few technology-enabled opportunities worth testing, then turn the strongest one into a practical pilot.</p>
+          <a href="#contact" class="btn-primary">Bring the question &rarr;</a>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-frame">
+            <video autoplay muted loop playsinline preload="auto"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switchback-vid.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
       </section>
 
-      <!-- WHO THIS IS FOR -->
-      <div class="lower-section reveal">
-        <div class="lower-section-header">
+      <!-- ═══ WHO THIS IS FOR ═══ -->
+      <section class="who-section reveal">
+        <div class="who-header">
           <span class="eyebrow">Who this is for</span>
-          <h2>Owners and operators who know there is something here but have not decided what to build.</h2>
+          <h2>Owners and operators who know something is here but haven't decided what to build.</h2>
         </div>
-        <p class="section-prose">A venue with underused rooms. A brand whose visual presence works harder in some places than others. A portfolio of businesses with shared creative and operational needs. A catalog or audience that could support experiences it does not have yet. A property that should do more than sit there.</p>
-        <p class="section-prose">If your team keeps circling AI, content systems, or interactive media without landing on a first move, this is where you start.</p>
-      </div>
+        <div class="who-scenarios">
+          <div class="who-scenario">
+            <div class="who-scenario-marker"></div>
+            <p>A venue with underused rooms and the infrastructure to do more with them.</p>
+          </div>
+          <div class="who-scenario">
+            <div class="who-scenario-marker"></div>
+            <p>A brand whose visual presence works harder in some channels than others.</p>
+          </div>
+          <div class="who-scenario">
+            <div class="who-scenario-marker"></div>
+            <p>A portfolio of businesses with shared creative and operational needs.</p>
+          </div>
+          <div class="who-scenario">
+            <div class="who-scenario-marker"></div>
+            <p>A catalog or audience that could support experiences it doesn't have yet.</p>
+          </div>
+        </div>
+        <p class="who-kicker">If your team keeps circling AI, content systems, or interactive media without landing on a first move, this is where you start.</p>
+      </section>
 
-      <!-- THE WORK -->
-      <div class="lower-section reveal">
-        <div class="lower-section-header">
+      <!-- ═══ PROOF BREAK ═══ -->
+      <section class="proof-break">
+        <video autoplay muted loop playsinline preload="auto"
+          poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
+          <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+        </video>
+        <div class="proof-break-overlay"></div>
+        <div class="proof-break-caption">
+          <span>Mycopop &mdash; world build for brand launch</span>
+          <a href="https://higher-roads.com/mycopop/">View the project &rarr;</a>
+        </div>
+      </section>
+
+      <!-- ═══ THE WORK ═══ -->
+      <section class="stages-section reveal">
+        <div class="stages-header">
           <span class="eyebrow">The work</span>
           <h2>Three stages, each producing a decision.</h2>
         </div>
         <div class="stage-flow">
           <div class="stage-col">
+            <div class="stage-number">1</div>
             <span class="stage-label">Opportunity Mapping</span>
-            <p class="stage-desc">We study the business, the audience, the assets, and the constraints, and find the places where modern tools could create real leverage.</p>
+            <p class="stage-desc">We study the business, the audience, the assets, and the constraints, then find the places where modern tools create real leverage.</p>
           </div>
           <div class="stage-col">
+            <div class="stage-number">2</div>
             <span class="stage-label">Pilot Design</span>
             <p class="stage-desc">We define the strongest opportunity in practical terms: what it is, what it needs to prove, and what would make it worth continuing.</p>
           </div>
           <div class="stage-col">
+            <div class="stage-number">3</div>
             <span class="stage-label">Execution Roadmap</span>
-            <p class="stage-desc">We turn the pilot into a buildable plan, with scope, sequence, budget ranges, partner needs, and the decisions required before anything gets made.</p>
+            <p class="stage-desc">We turn the pilot into a buildable plan with scope, sequence, budget ranges, and the decisions required before anything gets made.</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- WHY HIGHER ROADS -->
-      <div class="lower-section reveal">
-        <div class="lower-section-header">
-          <span class="eyebrow">Why Higher Roads</span>
-          <h2>Advice from practice, not decks.</h2>
+      <!-- ═══ WHY HIGHER ROADS ═══ -->
+      <section class="why-section reveal">
+        <div class="why-inner">
+          <div class="why-header">
+            <span class="eyebrow">Why Higher Roads</span>
+            <h2>Advice from practice, not decks.</h2>
+          </div>
+          <p class="why-body">Most new technology conversations break down in the same place: the idea is interesting, the demo is impressive, and then the business case and the execution path go fuzzy. We close that gap because we build for a living.</p>
+          <p class="why-body">When <a href="https://higher-roads.com/mycopop/">Mycopop</a> needed their new formulation launch to feel like an evolution of the brand, we built them a world: one visual system carrying the event, the room, and everything downstream of it. We build our own tools and work with the newest ones, so the advice comes from practice, not decks.</p>
         </div>
-        <p class="section-prose">Most new technology conversations break down in the same place: the idea is interesting, the demo is impressive, and then the business case and the execution path go fuzzy. We close that gap because we build for a living. When <a href="https://higher-roads.com/mycopop/">Mycopop</a> needed their new formulation launch to feel like an evolution of the brand, we built them a world, one visual system carrying the event, the room, and everything downstream of it. We build our own tools and work with the newest ones, so the advice comes from practice, not decks.</p>
-        <p class="section-prose">We know what changes when an idea has to become a render, a room, a workflow, or a live experience with real people in it.</p>
-        <div class="video-break">
-          <video src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4"
-            poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png"
-            autoplay muted loop playsinline></video>
-        </div>
-      </div>
+      </section>
 
-      <!-- WHAT YOU LEAVE WITH -->
-      <div class="lower-section reveal">
-        <div class="lower-section-header">
+      <!-- ═══ WHAT YOU LEAVE WITH ═══ -->
+      <section class="deliverable-section reveal">
+        <div class="deliverable-header">
           <span class="eyebrow">What you leave with</span>
           <h2>A clear next step.</h2>
         </div>
-        <p class="section-prose">An opportunity map, a recommended pilot, a build roadmap, budget and production assumptions, and a brief that can be handed to Higher Roads or any qualified team. The roadmap is yours. Higher Roads can be one possible builder, but the plan does not depend on us owning the execution.</p>
-      </div>
+        <p class="deliverable-body">An opportunity map, a recommended pilot, a build roadmap, and the budget and production assumptions behind each. The roadmap is yours. Higher Roads can be one possible builder, but the plan doesn't depend on us owning the execution.</p>
+      </section>
 
-      <!-- COMMON STARTING POINTS -->
-      <div class="lower-section reveal">
-        <div class="lower-section-header">
+      <!-- ═══ STARTING POINTS ═══ -->
+      <section class="starting-section reveal">
+        <div class="starting-header">
           <span class="eyebrow">Common starting points</span>
         </div>
-        <p class="starting-points">How could this venue or property become more useful, memorable, and programmable? How could our brand show up across screens, retail, and spaces with more consistency? How could we turn an audience or catalog into something people can experience? How could we use AI-assisted workflows without turning the business into a science project? How do we test this without overbuilding it?</p>
-      </div>
+        <div class="starting-list">
+          <div class="starting-item">
+            <p>How could this venue or property become more useful, memorable, and programmable?</p>
+          </div>
+          <div class="starting-item">
+            <p>How could our brand show up across screens, retail, and spaces with more consistency?</p>
+          </div>
+          <div class="starting-item">
+            <p>How could we turn an audience or catalog into something people can experience?</p>
+          </div>
+          <div class="starting-item">
+            <p>How could we use AI-assisted workflows without turning the business into a science project?</p>
+          </div>
+          <div class="starting-item">
+            <p>How do we test this without overbuilding it?</p>
+          </div>
+        </div>
+      </section>
 
-      <!-- CONTACT -->
+      <!-- ═══ CONTACT ═══ -->
       <section id="contact" class="cta-close reveal">
         <p class="cta-close-text">Bring the question<br><em>before it becomes a scope.</em></p>
         <p class="cta-sub">Tell us what you own, what you are exploring, and where you think the opportunity might be. We will take it from there.</p>
@@ -546,7 +872,7 @@
     </main>
 
     <footer>
-      <span class="footer-note">© 2026 Higher Roads</span>
+      <span class="footer-note">&copy; 2026 Higher Roads</span>
       <div class="theme-switcher">
         <span class="theme-label">Theme</span>
         <div class="theme-dots">
@@ -576,10 +902,9 @@
     });
 
     const dots = document.querySelectorAll('.theme-dot');
-    const root = document.documentElement;
     dots.forEach(dot => {
       dot.addEventListener('click', () => {
-        root.setAttribute('data-theme', dot.dataset.t);
+        document.documentElement.setAttribute('data-theme', dot.dataset.t);
         dots.forEach(d => d.classList.remove('active'));
         dot.classList.add('active');
       });
