@@ -183,7 +183,7 @@
   function compressedNegative(positive, pkg, profileInfo, removed){
     let terms=[];
     terms=terms.concat([
-      'redrawn packaging','retyped label','altered label hierarchy','changed package format','recolored packaging','warped logo','invented product text','changed product state','removed lid or cap','added scoop','exposed contents','changed fill state','readable phone UI','readable screen text','pseudo-text','generated duplicate products','extra branded packages','readable third-party branding','people or hands unless explicitly allowed','tabletop fallback','cluttered set dressing','too many props','generic stock-photo styling','product pasted on after the fact','environmental effects covering logo or product name','fake sponsor marks','competing brand identities'
+      'redesigned packaging','warped logo','invented product identity','changed SKU','unrecognizable package silhouette','duplicate branded products','readable environmental text','readable screen UI','category-default props not present in the approved scene','extra branded packages','readable third-party branding','people or hands unless explicitly allowed','tabletop fallback','cluttered set dressing','too many props','generic stock-photo styling','product pasted on after the fact','environmental effects covering logo or product name','fake sponsor marks','competing brand identities'
     ]);
     terms=terms.concat(l(profileInfo.avoid));
     terms=terms.concat(splitTerms(pkg&&pkg.prompts&&pkg.prompts.negative));
@@ -255,9 +255,9 @@
       lighting && ('lighting: '+lighting),
       atmosphere && ('atmosphere: '+atmosphere),
       'physical integration: apply scene-matched non-destructive effects only where plausible, such as '+allowedEffects.join(', '),
-      'environmental signage, maps, route cards, shelf tags, labels, utility markings, screens, phones, or displays must be blank, abstract, cropped, or unreadable; no pseudo-text or readable interface copy',
-      'product state fidelity: preserve the exact supplied open or closed state; do not remove or add lids or caps, add scoops, expose contents, pour, unwrap, change fill state, or invent accessories',
-      'product fidelity: identity-locked packaging; preserve package format ('+format+'), '+formatTerms.join(', ')+', logo, label hierarchy, text, color relationships, proportions, SKU or flavor identity, and primary graphic system unchanged'
+      'approved scene authority: use only props and environmental cues contained in the approved scene brief; do not introduce category-default set dressing',
+      'environmental signage, screens, phones, or displays must be blank, abstract, cropped, or unreadable',
+      'product fidelity: preserve recognizable package format ('+format+'), logo, label hierarchy, core colors, SKU, proportions, and silhouette while matching the authored world'
     ];
     const compiled_positive=compactPrompt(positiveParts);
     const compiled_negative=compressedNegative(compiled_positive, pkg, profileInfo, removed_terms);
@@ -310,9 +310,9 @@
       'lighting: '+light,
       atmosphere,
       'physical integration: '+integration,
-      'all environmental markings and screens are blank, abstract, cropped, or unreadable; no readable phone UI, interface copy, menu text, pseudo-text, third-party logos, patches, agency names, store names, or invented brand systems',
-      'product state fidelity: preserve the exact supplied open or closed state; do not remove or add lids or caps, add scoops, expose contents, pour, unwrap, change fill state, or invent accessories',
-      'product fidelity: preserve identity-locked '+format+' packaging, '+formatTerms.join(', ')+', logo, label hierarchy, typography, product text, color relationships, proportions, SKU or flavor identity, primary graphic system, and silhouette unchanged'
+      'approved scene authority: use only the place, props, visual anchors, actions, and environmental cues present in the approved scene brief; do not add category-default objects',
+      'all environmental markings and screens are blank, abstract, cropped, or unreadable',
+      'product fidelity: preserve recognizable '+format+' packaging identity, logo, label hierarchy, core colors, SKU, proportions, and silhouette while integrating it naturally into the authored world'
     ];
     const compiled_positive=compactPrompt(positiveParts);
     const compiled_negative=compressedNegative(compiled_positive, pkg, profileInfo, removed_terms);

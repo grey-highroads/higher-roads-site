@@ -462,9 +462,9 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-evidence-gated-scenes-state-fix-v1';
-const PWP_BUILD_NOTE = 'direction workflow has explicit loading, repair, error, retry, and ready states; Step 2 never collapses into a blank panel';
-const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-creative-first-world-builder-v1';
+const PWP_BUILD_NOTE = 'creative scene building restored as primary authority; evidence advisory; creative critic improves brand specificity, originality, cinematic ambition, coherence, director influence, and cliché risk';
+const PWP_FAST_MODE = false; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
   const el=document.getElementById('buildStamp');
@@ -964,35 +964,20 @@ async function selectDirector(data, apiKey){
 }
 
 function directorGuidanceBlock(sel){
-  if(!sel) return '';
-  const pv=sel.prompt_variables||{};
-  const borrow=_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
-  const lines=[];
-  lines.push('\n\nCREATIVE DIRECTION (authoritative; never name any director, film, character, franchise, or IP anywhere in your output). A creative-direction pass has already chosen the cinematic world for this brand. Do NOT invent a different concept and do NOT build the world from the product flavor or product name. Author your scene_direction as a concrete realization of the world below. Borrow grammar, not imagery.');
-  if(_c(sel.scene_archetype)) lines.push('The world is: '+_c(sel.scene_archetype)+'. Use this as scene_name.');
-  if(_c(sel.brand_posture)) lines.push('Brand posture: '+_c(sel.brand_posture));
-  if(_c(sel.category_risk)) lines.push('Category risk: '+_c(sel.category_risk));
-  if(_c(sel.brand_fit_check)) lines.push('Brand fit check: '+_c(sel.brand_fit_check));
-  if(_c(sel.selection_reason)) lines.push('Why this world fits the brand: '+_c(sel.selection_reason));
-  const pvLines=[
-    _c(pv.place)&&('- place / setting: '+_c(pv.place)),
-    _c(pv.camera)&&('- camera: '+_c(pv.camera)),
-    _c(pv.light)&&('- light: '+_c(pv.light)),
-    _c(pv.atmosphere)&&('- atmosphere: '+_c(pv.atmosphere)),
-    _c(pv.material)&&('- materials: '+_c(pv.material)),
-    _c(pv.composition)&&('- composition: '+_c(pv.composition)),
-    _c(pv.object_treatment)&&('- object treatment: '+_c(pv.object_treatment))
-  ].filter(Boolean);
-  if(pvLines.length){ lines.push('Build world_description, surface, background, materials, lighting, camera, and composition directly from these variables. This is the scene, not a suggestion:'); lines.push(pvLines.join('\n')); }
-  if(borrow.length) lines.push('Borrow these cinematic qualities (primary weight about '+(sel.primary_weight||0)+(sel.secondary_influence?(', secondary weight about '+(sel.secondary_weight||0)):'')+'): '+borrow.join('; ')+'.');
-  if(_l(sel.avoid).length) lines.push('Keep these out of the scene: '+_l(sel.avoid).join('; ')+'.');
-  lines.push('Do NOT add ingredient, fruit, flower, powder, splash, or other flavor-literal props unless the supplied campaign evidence explicitly makes them part of the campaign concept. Flavor may inform color palette, shape language, motion, or mood only.');
-  lines.push('Do not open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or invent product accessories. Preserve the exact supplied product state.');
-  lines.push('Any phone, tablet, computer, TV, sign, menu, poster, label, screen, or display must be blank, abstract, cropped, or too defocused to read. Do not generate pseudo-text, interface copy, invented words, or letter-like markings.');
-  lines.push('Brand evidence outranks category ritual. Do not default to shaker bottles, scoops, yoga mats, gym bags, kitchen counters, spa objects, pools, fruit, or outdoor gear unless the brand and campaign evidence directly support them.');
-  lines.push('Populate world_thesis and cinematic_translation. Keep the product a small, readable, off-center hero with packaging and product state unchanged: product fidelity and Higher Roads authorship outrank this grammar, so drop any borrowed trait that would hide the product, distort packaging, center it on a tabletop, or create parody.');
-  lines.push('In addition to the required schema, add two top-level fields to your JSON: "borrowed_visual_grammar" (array of short strings: the grammar you actually used) and "excluded_visual_grammar" (array of short strings: grammar you deliberately dropped, each with a brief reason).');
-  return lines.join('\n');
+  if(!sel||sel.no_fit||_c(sel.primary_influence).toLowerCase()==='none'){
+    return [
+      'No director fit is forced.',
+      'Preserve the brand thesis and create a cinematic commercial world with strong composition, motivated light, visual tension, material specificity, and a memorable point of view.'
+    ].join('\n');
+  }
+  return [
+    'Use '+_c(sel.primary_influence)+' as cinematic grammar, not as the source of the brand world.',
+    'Borrow: '+_l(sel.borrow_from_primary).join(', ')+'.',
+    sel.secondary_influence?('Secondary influence: '+_c(sel.secondary_influence)+' for '+_l(sel.borrow_from_secondary).join(', ')+'.'):'',
+    'Apply influence through camera, light, atmosphere, material behavior, scale, movement, and composition.',
+    'Brand ethos and campaign energy own the world. Director influence should make the scene more authored and cinematic without replacing the brand.',
+    'Avoid: '+_l(sel.avoid).join(', ')+'.'
+  ].filter(Boolean).join('\n');
 }
 
 function buildCreativeDirectionBlock(h, finalPrompt, negStr){
@@ -1076,21 +1061,20 @@ const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for ric
 const ART_DIRECTOR_PROMPT = [
   HR_CREATIVE_CONFIG.artDirectorPrompt||'',
   '',
-  'GENERALIZED SCENE FIDELITY OVERRIDE:',
-  'Brand and campaign evidence own the world. Category conventions are weak evidence and must not define the scene.',
-  'Preserve the exact supplied product state. Do not open, close, unwrap, pour, peel, tear, remove or add lids or caps, add scoops, expose contents, alter fill state, or invent accessories.',
-  'Do not use literal flavor ingredients, fruit, botanicals, powders, splashes, or ingredient piles as props unless supplied campaign evidence explicitly uses them as campaign imagery.',
-  'Any phone, tablet, computer, TV, sign, menu, poster, label, package, screen, or display must be blank, abstract, cropped, or too defocused to read. Never generate pseudo-text, interface copy, fake menu items, invented words, or letter-like markings.',
-  'Do not default to shaker bottles, scoops, yoga mats, gym bags, kitchen counters, spa objects, pools, fruit, tactical equipment, or outdoor gear because of product category alone.',
-  'Create a specific brand-authored moment with a concrete use occasion, implied action, recognizable location, and at least three cues traceable to brand or campaign evidence.',
-  'If a prop is merely a category cliché and not supported by brand evidence, exclude it.',
-  'Return evidence_map as an array of objects with decision, evidence, source, confidence, and evidence_level.',
-  'evidence_level must be direct, strong_inference, or category_inference.',
-  'The main location and use occasion each require direct or strong-inference support.',
-  'At least two distinctive visual cues each require direct or strong-inference support.',
-  'Category inference may support minor set dressing only and must not define the scene.',
-  'Generic emotional words do not count as evidence unless tied to concrete source language.',
-  'Restrictions such as no text, no people, or no screens do not count as positive evidence cues.'
+  'CREATIVE-FIRST AUTHORITY:',
+  'Create a distinctive cinematic product world expressing brand ethos, audience identity, cultural posture, emotional promise, and campaign energy.',
+  'Use the brand read as creative source material, not as a compliance checklist.',
+  'Build one authored visual thesis with a concrete place, implied activity, physical rules, memorable spatial idea, and clear emotional point of view.',
+  'The world should feel specific enough that a competitor in the same category would not naturally receive the same concept.',
+  'Avoid default kitchen counters, yoga mats, shaker bottles, spas, pools, open roads, tactical field scenes, luxury resorts, clean studios, and generic outdoor settings unless the brand transforms the territory into something unmistakably its own.',
+  'Apply director influence through camera, composition, light, atmosphere, material behavior, movement, scale, and visual tension. Do not reduce influence to adjectives.',
+  'Favor cinematic ambition and brand specificity over literal category demonstration.',
+  'The product belongs in the world, but the world remains the main act of creative authorship.',
+  'Preserve recognizable package identity, logo, label hierarchy, core colors, silhouette, and SKU. Keep product protection concise and secondary.',
+  'Do not use literal flavor ingredients as props unless the campaign itself uses them as an authored visual idea.',
+  'Environmental text and screen UI must remain blank, abstract, cropped, or unreadable.',
+  'Return creative_rationale explaining why the scene belongs to this brand.',
+  'Return only the existing scene JSON schema.'
 ].join('\n');
 
 function sceneFromDirectorSelection(data, directorSelection){
@@ -1750,8 +1734,8 @@ function showDirectionError(){
     brandProgress.classList.add('on');
     brandProgress.classList.add('error');
   }
-  if(brandProgressLabel) brandProgressLabel.textContent='Direction needs another pass';
-  setBrandProgressMessage('We could not finish a defensible brand direction',true);
+  if(brandProgressLabel) brandProgressLabel.textContent='Creative direction needs another pass';
+  setBrandProgressMessage('We could not finish the creative direction',true);
   if(brandProgressDetail){
     const msg=PREVIEW_FLOW_STATE.brandError&&PREVIEW_FLOW_STATE.brandError.message
       ? PREVIEW_FLOW_STATE.brandError.message
@@ -1759,7 +1743,7 @@ function showDirectionError(){
     brandProgressDetail.textContent=msg;
   }
   if(retryDirectionBtn) retryDirectionBtn.classList.add('on');
-  if(stepDirectionSummary) stepDirectionSummary.textContent='Direction needs another pass';
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Creative direction needs another pass';
 }
 function syncBrandProgress(){
   if(!selectedAssetId){ stopBrandProgress(); return; }
@@ -1775,7 +1759,7 @@ function syncBrandProgress(){
   if(PREVIEW_FLOW_STATE.scene==='loading'){
     if(brandProgress) brandProgress.classList.remove('error');
     if(retryDirectionBtn) retryDirectionBtn.classList.remove('on');
-    if(stepDirectionSummary) stepDirectionSummary.textContent='Shaping and checking the direction';
+    if(stepDirectionSummary) stepDirectionSummary.textContent='Building and refining the creative direction';
     startBrandProgress('scene');
     return;
   }
@@ -1875,6 +1859,7 @@ function buildHandoff(){
     alternates:[],
     director_selection:(DATA.vibes&&DATA.vibes.director_selection)||null,
     scene_translation:(DATA.vibes&&DATA.vibes.scene_translation)||null,
+    creative_review:(DATA.vibes&&DATA.vibes.creative_review)||null,
     chosen_direction:chosenName
   };
 }
@@ -2433,116 +2418,65 @@ function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ ret
 function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
 
-const GENERIC_SCENE_CUE_RE=/\b(pink|sunset|golden hour|fabric|linen|stone|water|pool|spa|soft light|glossy surface|wellness|fitness|luxury|resort|gritty|industrial|outdoor gear|shaker bottle|scoop|yoga mat|gym bag|kitchen counter|fruit|ingredient|succulent|motivational print)\b/i;
-const FLAVOR_LITERAL_RE=/\b(fruit|berry|berries|cherry|lime|lemon|orange|grapefruit|dragon fruit|mango|peach|watermelon|coconut|vanilla|chocolate|mint|botanical|flower|powder pile|ingredient pile|splash)\b/i;
-function sceneEvidenceReport(scene, campaignSignals){
-  const s=scene||{};
-  const campaign=campaignSignals||{};
-  const map=Array.isArray(s.evidence_map)?s.evidence_map:[];
-  const supported=map.filter(item=>{
-    const level=_c(item&&item.evidence_level);
-    return level==='direct'||level==='strong_inference';
-  });
-  const categoryOnly=map.filter(item=>_c(item&&item.evidence_level)==='category_inference');
-  const supportedLocation=supported.filter(item=>/location|setting|place|environment/i.test(_c(item.decision)));
-  const supportedOccasion=supported.filter(item=>/use occasion|occasion|moment|behavior/i.test(_c(item.decision)));
-  const supportedCues=supported.filter(item=>/visual cue|object|material|cultural cue|behavioral cue|prop/i.test(_c(item.decision)));
-  const invalidPositiveEvidence=map.filter(item=>/no text|no people|no screen|no signage|unreadable|blank screen|no clutter/i.test(_c(item.decision)+' '+_c(item.evidence)));
-  const vagueEvidence=map.filter(item=>/freedom|momentum|confidence|energy|ritual|premium|elevated|effortless/i.test(_c(item.evidence))&&!/exact phrase|campaign|product page|homepage|visual territory|audience|brand state/i.test(_c(item.source)));
-  const passes=
-    supportedLocation.length>=1 &&
-    supportedOccasion.length>=1 &&
-    supportedCues.length>=2 &&
-    invalidPositiveEvidence.length===0 &&
-    vagueEvidence.length===0;
-  return {
-    supported_location:supportedLocation,
-    supported_use_occasion:supportedOccasion,
-    supported_distinctive_cues:supportedCues,
-    category_only_decisions:categoryOnly,
-    invalid_positive_evidence:invalidPositiveEvidence,
-    vague_evidence:vagueEvidence,
-    evidence_count:map.length,
-    passes
-  };
+const CREATIVE_CRITIC_PROMPT = [
+  'You are a senior commercial creative director reviewing one proposed product-world scene.',
+  'Judge the quality of the creative concept, not the formatting of its reasoning.',
+  'Score each dimension from 1 to 5: brand_specificity, originality, cinematic_ambition, emotional_fit, visual_coherence, director_influence, product_relevance, category_cliche_risk.',
+  'For category_cliche_risk, 1 means low risk and 5 means dominated by familiar category imagery.',
+  'Return JSON only with scores, strengths, weaknesses, revision_priority, and verdict.',
+  'verdict must be approve, revise, or reject.',
+  'Approve only when brand_specificity, originality, cinematic_ambition, emotional_fit, and visual_coherence are all at least 3, and category_cliche_risk is 3 or lower.'
+].join('\n');
+function creativeCriticInput(data,scene){
+  const v=(data&&data.vibes)||{},ix=v.intake_expressive||{};
+  return {brand:data.brand||'',product:data.factual||{},brand_read:{
+    product_truth:ix.product_truth||{},audience:ix.audience||{},brand_state:ix.brand_state||{},
+    visual_territory:ix.visual_territory||{},sensory:ix.sensory||{},competitive:ix.competitive||{},
+    campaign_signals:ix.campaign_signals||{},brand_intent:ix.assets&&ix.assets.brand_intent||''
+  },director_selection:v.director_selection||null,proposed_scene:scene||{}};
 }
-function buildSceneEvidenceRepairPrompt(data, scene, report){
-  const v=(data&&data.vibes)||{};
-  const ix=v.intake_expressive||{};
-  return [
-    'Repair this scene brief without changing the product, brand truth, campaign evidence, or fidelity rules.',
-    'The current scene lacks a defensible evidence chain.',
-    'Every major scene decision must cite supporting brand evidence.',
-    'The main location must have direct or strong-inference support.',
-    'The use occasion must have direct or strong-inference support.',
-    'At least two distinctive visual cues must each have direct or strong-inference support.',
-    'Category inference may support minor set dressing only.',
-    'Do not use generic emotional language as evidence.',
-    'Do not count restrictions such as no text, no people, or no screens as positive evidence.',
-    'Do not introduce tactical, field-readiness, grungy outdoor, spa, resort, hospitality, archive, institutional, or service-counter clichés unless the campaign evidence explicitly supports them.',
-    'Do not use literal flavor ingredients, fruit, botanicals, powders, splashes, or ingredient piles unless campaign evidence explicitly supports them.',
-    'Preserve the exact supplied product state. Do not open, close, unwrap, pour, remove lids or caps, add scoops, expose contents, or change fill state.',
-    'Any phone, screen, sign, menu, poster, label, or display must be blank, abstract, cropped, or unreadable.',
-    'Return only valid JSON matching the existing scene_direction shape, including evidence_map.',
-    'Campaign signals:',
-    JSON.stringify(ix.campaign_signals||{},null,2),
-    'Brand read:',
-    JSON.stringify({
-      product_truth:ix.product_truth||{},
-      audience:ix.audience||{},
-      brand_state:ix.brand_state||{},
-      visual_territory:ix.visual_territory||{},
-      sensory:ix.sensory||{},
-      assets:ix.assets||{}
-    },null,2),
-    'Current scene:',
-    JSON.stringify(scene||{},null,2),
-    'Specificity report:',
-    JSON.stringify(report||{},null,2)
+function normalizeCreativeReview(review){
+  const r=review&&typeof review==='object'?review:{};
+  const keys=['brand_specificity','originality','cinematic_ambition','emotional_fit','visual_coherence','director_influence','product_relevance','category_cliche_risk'];
+  const scores={};keys.forEach(k=>{const n=Number(r.scores&&r.scores[k]);scores[k]=Number.isFinite(n)?Math.max(1,Math.min(5,n)):3;});
+  let verdict=_c(r.verdict).toLowerCase();if(!['approve','revise','reject'].includes(verdict)) verdict='revise';
+  return {scores,strengths:_l(r.strengths),weaknesses:_l(r.weaknesses),revision_priority:_l(r.revision_priority),verdict};
+}
+async function reviewCreativeScene(data,apiKey,scene){
+  if(!apiKey) return normalizeCreativeReview({verdict:'approve'});
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+    'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
+  },body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:1800,system:CREATIVE_CRITIC_PROMPT,messages:[{role:'user',content:JSON.stringify(creativeCriticInput(data,scene),null,2)}]})});
+  if(!res.ok){const t=await res.text().catch(()=>'');throw new Error('Creative critic '+res.status+(t?': '+t.slice(0,160):''));}
+  const payload=await res.json();const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  return normalizeCreativeReview(extractJson(text));
+}
+function buildCreativeRevisionPrompt(data,scene,review){
+  const v=(data&&data.vibes)||{},ix=v.intake_expressive||{};
+  return ['Revise the scene as a senior commercial creative director.',
+    'Create a more distinctive, cinematic, brand-authored world.',
+    'Preserve the strongest parts, but materially improve the critic weaknesses.',
+    'Do not answer with more category props, literal flavor ingredients, safer styling, or a cleaner generic scene.',
+    'Strengthen visual thesis, emotional specificity, spatial idea, cinematic grammar, and brand attitude.',
+    'Keep recognizable product identity, but do not let fidelity instructions dominate the world-building.',
+    'Return only one scene JSON object using the existing schema.',
+    'Brand read:',JSON.stringify({product_truth:ix.product_truth||{},audience:ix.audience||{},brand_state:ix.brand_state||{},
+      visual_territory:ix.visual_territory||{},sensory:ix.sensory||{},competitive:ix.competitive||{},
+      campaign_signals:ix.campaign_signals||{},brand_intent:ix.assets&&ix.assets.brand_intent||''},null,2),
+    'Director selection:',JSON.stringify(v.director_selection||{},null,2),
+    'Current scene:',JSON.stringify(scene||{},null,2),'Creative critic:',JSON.stringify(review||{},null,2)
   ].join('\n\n');
 }
-async function repairSceneEvidence(data, apiKey, scene, report){
-  if(!apiKey) return scene;
-  const system=[
-    'You are a senior commercial art director repairing a weak scene brief.',
-    'Preserve brand truth and product fidelity.',
-    'Increase campaign specificity without inventing unsupported claims or changing the brand world.',
-    'Output only one JSON object representing scene_direction.',
-    'Required fields: scene_name, world_description, use_occasion, implied_action, evidence_cues, signature_objects, evidence_map, product_placement_intent, composition, lighting, props, avoid, claim_rules, render_path.',
-    'Each evidence_map item must include decision, evidence, source, confidence, and evidence_level.',
-    'render_path must be "composite".'
-  ].join('\n');
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'content-type':'application/json',
-      'x-api-key':apiKey,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model:ANTHROPIC_MODEL,
-      max_tokens:2200,
-      system,
-      messages:[{role:'user',content:buildSceneEvidenceRepairPrompt(data,scene,report)}]
-    })
-  });
-  if(!res.ok){
-    const t=await res.text().catch(()=>'');
-    throw new Error('Scene specificity repair '+res.status+(t?': '+t.slice(0,160):''));
-  }
-  const payload=await res.json();
-  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  const repaired=extractJson(text);
-  if(!repaired||typeof repaired!=='object') throw new Error('Scene specificity repair returned no usable scene');
-  repaired.render_path='composite';
-  repaired.evidence_cues=_l(repaired.evidence_cues);
-  repaired.signature_objects=_l(repaired.signature_objects);
-  repaired.evidence_map=Array.isArray(repaired.evidence_map)?repaired.evidence_map:[];
-  repaired.props=_l(repaired.props);
-  repaired.avoid=_l(repaired.avoid);
-  repaired.claim_rules=_l(repaired.claim_rules);
-  return repaired;
+async function reviseCreativeScene(data,apiKey,scene,review){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+    'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
+  },body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:3200,system:ART_DIRECTOR_PROMPT,messages:[{role:'user',content:buildCreativeRevisionPrompt(data,scene,review)}]})});
+  if(!res.ok){const t=await res.text().catch(()=>'');throw new Error('Creative revision '+res.status+(t?': '+t.slice(0,160):''));}
+  const payload=await res.json();const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  const revised=extractJson(text);if(!revised||typeof revised!=='object') throw new Error('Creative revision returned no usable scene');
+  revised.render_path='composite';revised.props=_l(revised.props);revised.avoid=_l(revised.avoid);revised.claim_rules=_l(revised.claim_rules);
+  revised.evidence_cues=_l(revised.evidence_cues);revised.signature_objects=_l(revised.signature_objects);
+  return revised;
 }
 
 async function completeCreativePipeline(brandData, apiKey){
@@ -2604,40 +2538,42 @@ async function completeCreativePipeline(brandData, apiKey){
       console.warn('scene builder failed; using brand-read scene',sceneErr);
     }
   }
-  const campaignSignals=(DATA.vibes&&DATA.vibes.intake_expressive&&DATA.vibes.intake_expressive.campaign_signals)||{};
-  let evidenceReport=sceneEvidenceReport(DATA.vibes.master_scene||DATA.vibes.scene_direction||{},campaignSignals);
-  PERF.log('scene_evidence_check',evidenceReport);
-  if(!evidenceReport.passes){
+  let creativeReview=null;
+  try{
+    PERF.start('creative_critic');
+    creativeReview=await reviewCreativeScene(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{});
+    PERF.end('creative_critic',{verdict:creativeReview.verdict,scores:creativeReview.scores});
+  }catch(criticErr){
+    PERF.end('creative_critic',{error:String((criticErr&&criticErr.message)||criticErr).slice(0,180)});
+    console.warn('creative critic failed; preserving authored scene',criticErr);
+    creativeReview=normalizeCreativeReview({verdict:'approve'});
+  }
+  DATA.vibes.creative_review=creativeReview;
+  if(creativeReview.verdict!=='approve'){
     try{
-      PERF.start('scene_evidence_repair');
-      const repaired=await repairSceneEvidence(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},evidenceReport);
-      DATA.vibes.master_scene=repaired;
-      evidenceReport=sceneEvidenceReport(repaired,campaignSignals);
+      PERF.start('creative_scene_revision');
+      const revised=await reviseCreativeScene(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},creativeReview);
+      DATA.vibes.master_scene=revised;
+      const secondReview=await reviewCreativeScene(DATA,apiKey,revised);
+      DATA.vibes.creative_review_initial=creativeReview;
+      DATA.vibes.creative_review=secondReview;
       DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-        evidence_repaired:true,
-        evidence_report:evidenceReport
+        creative_revision_applied:true,creative_review:secondReview
       });
-      PERF.end('scene_evidence_repair',{passes:evidenceReport.passes,evidence_count:evidenceReport.evidence_count});
-    }catch(repairErr){
-      PERF.end('scene_evidence_repair',{error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)});
+      PERF.end('creative_scene_revision',{verdict:secondReview.verdict,scores:secondReview.scores});
+    }catch(revisionErr){
+      PERF.end('creative_scene_revision',{error:String((revisionErr&&revisionErr.message)||revisionErr).slice(0,180)});
+      console.warn('creative revision failed; using original authored scene',revisionErr);
       DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-        evidence_repaired:false,
-        evidence_report:evidenceReport,
-        evidence_repair_error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)
+        creative_revision_applied:false,creative_revision_error:String((revisionErr&&revisionErr.message)||revisionErr).slice(0,180),
+        creative_review:creativeReview
       });
-      console.warn('scene evidence repair failed',repairErr);
     }
   }
-  if(!evidenceReport.passes){
-    PREVIEW_FLOW_STATE.scene='error';
-    PREVIEW_FLOW_STATE.brandError=new Error('The scene could not be tied closely enough to brand evidence.');
-    refresh();
-    PERF.log('scene_blocked_by_evidence_gate',{evidence_report:evidenceReport});
-    return;
-  }
   PREVIEW_FLOW_STATE.scene='ready';
+  PREVIEW_FLOW_STATE.brandError=null;
   refresh();
-  PERF.log('scene_ready',{evidence_passes:true,evidence_count:evidenceReport.evidence_count});
+  PERF.log('scene_ready',{creative_verdict:DATA.vibes.creative_review&&DATA.vibes.creative_review.verdict});
 }
 
 async function generate(){
