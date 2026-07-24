@@ -460,11 +460,12 @@ function buildLockedProductAsset(parsed){
 /* --- Step 4 render-package exporter (mirrored from render-package.js). Engine-agnostic,
    no renderer integration. render_path is a test label, not a gate. --- */
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
-if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
+if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the grammar pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-creative-first-scene-handoff-repair-v1';
-const PWP_BUILD_NOTE = 'creative-first scene output normalized and validated; malformed master scenes receive schema repair; Worker scene is validated fallback; empty scenes cannot reach critic, prompt writer, or renderer';
-const PWP_FAST_MODE = false; // skip slow/brittle master scene call; build package from director selection + brand read
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-grammar-pipeline-v2';
+const PWP_BUILD_NOTE = 'grammar pipeline: full brand dossier (incl. campaign signals and visual identity) feeds three divergent world theses, comparative selection with modular cinematic grammar replaces director selection and score-then-revise criticism, the approved master scene is the sole source of the render prompt via authored_prompt prose, and director-variable substitution in compilation is removed';
+// PWP_FAST_MODE retired: the deterministic fast path substituted selection
+// variables for the authored world, which is the failure class this build removes.
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
   const el=document.getElementById('buildStamp');
@@ -556,6 +557,7 @@ const RUBRIC_CRITERIA = HR_CREATIVE_CONFIG.rubricCriteria || [];
 const CREATIVE_CONFIG_VERSION = HR_CREATIVE_CONFIG.version || '';
 const _c=s=>String(s==null?'':s).trim();
 const _l=a=>Array.isArray(a)?a.map(_c).filter(Boolean):(a?[_c(a)]:[]);
+const _objs=a=>Array.isArray(a)?a.filter(x=>x&&typeof x==='object'):[];
 const _s=a=>_l(a).join(', ');
 function _dedupe(arr){return [...new Set(_l(arr).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean))];}
 
@@ -646,12 +648,12 @@ function _flavor(ix){const bs=ix.brand_state||{},vt=ix.visual_territory||{},sn=i
 function textBlobForIntegration(h){
   const parts=[];
   const sd=(h&&h.scene_direction)||{};
-  const sel=(h&&h.director_selection)||{};
-  const pv=(sel&&sel.prompt_variables)||{};
+  const cs=(h&&h.creative_selection)||{};
+  const thesis=(h&&h.world_thesis_selected)||{};
   const f=(DATA&&DATA.factual)||{};
   parts.push(_c(f.category), _c(f.name), _c((h&&h.locked_asset&&h.locked_asset.asset_name)||''));
-  parts.push(_c(sd.scene_name), _c(sd.world_description), _c(sd.surface), _c(sd.background), _c(sd.lighting), _l(sd.materials).join(' '), _l(sd.props).join(' '));
-  parts.push(_c(sel.scene_archetype), _c(pv.place), _c(pv.atmosphere), _c(pv.material), _c(pv.object_treatment));
+  parts.push(_c(sd.scene_name), _c(sd.world_description), _c(sd.authored_prompt), _c(sd.surface), _c(sd.background), _c(sd.lighting), _l(sd.materials).join(' '), _l(sd.props).join(' '));
+  parts.push(_c(thesis.world_thesis), _c(thesis.memorable_image), _c(cs.brand_posture));
   return parts.join(' ').toLowerCase();
 }
 function hasAny(hay, words){ return words.some(w=>hay.indexOf(w)>=0); }
@@ -725,79 +727,59 @@ function buildPlacementSpec(h){
     light_match:(lp&&_c(lp.light_match))||'side light matched to the scene'
   };
 }
-function _posDirectorCore(sel, sd){
-  // Deterministic render prompt from the director selection. When the director
-  // layer succeeds the world is authored from prompt_variables, not the pre-
-  // director scene concept, so the render provably reflects the selected
-  // grammar. Flavor is never turned into props here. Palette (color and mood)
-  // is allowed to carry through from the scene builder. Built as a clean string
-  // array so no falsy segment can leak into the prompt.
-  sd=sd||{};
-  const pv=sel.prompt_variables||{};
-  const borrow=_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
-  const seg=['a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo'];
-  if(_c(sel.scene_archetype)) seg.push('scene: '+_c(sel.scene_archetype));
-  if(_c(pv.place)) seg.push('setting: '+_c(pv.place));
-  if(_c(pv.material)) seg.push('materials: '+_c(pv.material));
-  if(_l(sd.color_palette).length) seg.push('palette: '+_l(sd.color_palette).slice(0,6).join(', '));
-  if(_c(pv.composition)) seg.push('composition: '+_c(pv.composition));
-  if(_c(pv.light)) seg.push('lighting: '+_c(pv.light));
-  if(_c(pv.atmosphere)) seg.push('atmosphere: '+_c(pv.atmosphere));
-  if(_c(pv.camera)) seg.push('camera: '+_c(pv.camera));
-  if(_c(pv.object_treatment)) seg.push('the product reads as '+_c(pv.object_treatment));
-  if(borrow.length) seg.push('cinematic qualities: '+borrow.slice(0,6).join(', '));
-  seg.push(genericSignagePositive());
-  return seg;
+function _grammarRefinementSegs(h){
+  // Grammar refinement APPENDS to the authored scene; it never substitutes for
+  // world, composition, or lighting. This is the fix for the compile-time
+  // inversion where director prompt_variables displaced the master scene.
+  const cs=(h&&h.creative_selection)||null;
+  if(!cs||cs.no_grammar_fit) return [];
+  const mods=resolvedGrammarModules(cs);
+  if(!mods.length) return [];
+  const names=mods.map(m=>m.name).join(', ');
+  const behaviors=_dedupe(mods.map(m=>_c(m.grammar))).slice(0,3).join(' ');
+  const segs=['cinematic grammar refinement ('+names+'): '+behaviors];
+  const avoid=_l(cs.avoid).slice(0,6);
+  if(avoid.length) segs.push('keep out of this frame: '+avoid.join(', '));
+  return segs;
+}
+function _posSceneCore(h){
+  const sd=h.scene_direction||{};
+  // The authored prose is the world. Everything else is supplementary structure
+  // for engines or reviewers that want it; the prose leads.
+  const authored=_c(sd.authored_prompt)||_c(sd.prompt_seed);
+  const base=authored?_stripProductFreeLines(authored):_firstSentences(_stripProductFreeLines(sd.world_description),5);
+  const props=_l(sd.props).slice(0,5);
+  return [
+    'a wide cinematic brand-world photograph in landscape framing with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
+    base,
+    !authored&&_c(sd.surface)&&'ground: '+_c(sd.surface),
+    !authored&&_c(sd.background)&&'background: '+_c(sd.background),
+    !authored&&_l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
+    _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
+    !authored&&_c(sd.composition)&&'composition: '+_c(sd.composition),
+    !authored&&_c(sd.lighting)&&'lighting: '+_c(sd.lighting),
+    !authored&&cameraToText(sd.camera),
+    !authored&&props.length&&'props: '+props.join(', ')
+  ].filter(Boolean);
 }
 function _posComposite(h){
-  const sd=h.scene_direction||{};
-  const sel=h.director_selection||null;
   const treatment=buildIntegrationTreatment(h);
-  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd).concat([integrationTreatmentText(treatment,'composite')]));
-  const seed=_c(sd.prompt_seed);
-  const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(sd.world_description,5);
-  const props=_l(sd.props).slice(0,5);
-  return _sentenceJoin([
-    'a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
-    base,
-    _c(sd.surface)&&'ground: '+_c(sd.surface),
-    _c(sd.background)&&'background: '+_c(sd.background),
-    _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
-    _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
-    _c(sd.composition)&&'composition: '+_c(sd.composition),
-    _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
-    cameraToText(sd.camera),
-    props.length&&'props: '+props.join(', '),
-    genericSignagePositive(),
-    integrationTreatmentText(treatment,'composite')
-  ]);
+  return _sentenceJoin(_posSceneCore(h)
+    .concat(_grammarRefinementSegs(h))
+    .concat([genericSignagePositive(), integrationTreatmentText(treatment,'composite')]));
 }
 function _posReference(h){
-  const sd=h.scene_direction||{};
-  const sel=h.director_selection||null;
   const treatment=buildIntegrationTreatment(h);
-  if(sel) return _sentenceJoin(_posDirectorCore(sel, sd).concat([integrationTreatmentText(treatment,'reference'),'use the supplied product image as the identity source of truth','preserve brand-critical packaging structure: package format, label hierarchy, text, logo, colors, proportions, SKU identity, and packaging details must remain readable and structurally unchanged']));
-  const seed=_c(sd.prompt_seed);
-  const base=seed?_firstSentences(_stripProductFreeLines(seed),6):_firstSentences(_stripProductFreeLines(sd.world_description),5);
-  const props=_l(sd.props).slice(0,5);
-  return _sentenceJoin([
-    'a wide 16:9 cinematic brand-world photograph with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
-    base,
-    _c(sd.surface)&&'ground: '+_c(sd.surface),
-    _c(sd.background)&&'background: '+_c(sd.background),
-    _l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
-    _l(sd.color_palette).length&&'palette: '+_l(sd.color_palette).slice(0,6).join(', '),
-    _c(sd.composition)&&'composition: '+_c(sd.composition),
-    _c(sd.lighting)&&'lighting: '+_c(sd.lighting),
-    cameraToText(sd.camera),
-    props.length&&'props: '+props.join(', '),
-    genericSignagePositive(),
-    integrationTreatmentText(treatment,'reference'),
-    'use the supplied product image as the identity source of truth',
-    'preserve brand-critical packaging structure: package format, label hierarchy, text, logo, colors, proportions, SKU identity, and packaging details must remain readable and structurally unchanged'
-  ]);
+  return _sentenceJoin(_posSceneCore(h)
+    .concat(_grammarRefinementSegs(h))
+    .concat([
+      genericSignagePositive(),
+      integrationTreatmentText(treatment,'reference'),
+      'use the supplied product image as the identity source of truth',
+      'preserve brand-critical packaging structure: package format, label hierarchy, text, logo, colors, proportions, SKU identity, and packaging details must remain readable and structurally unchanged'
+    ]));
 }
-/* ===================== Creative Scene Brief layer ===================== */
+/* ===================== Creative Scene Brief layer =====================/* ===================== Creative Scene Brief layer ===================== */
 /* Turns brand intelligence + locked product metadata into ONE master
    art-directed scene, renderer-neutral, which feeds the render package prompt
    builders below. No scene-selection step: the single scene flows straight
@@ -806,219 +788,156 @@ function _posReference(h){
    direct Anthropic call using the key the page already holds. [VERIFY in
    browser] the direct browser access header; if CORS blocks, route through
    world-preview. */
-/* ===================== Director Bank layer ===================== */
-/* Hidden creative-direction pass. Selects an underlying cinematic grammar for
-   the brand (never named in the render output), then hands concrete scene
-   variables to the scene builder so it translates director grammar into place,
-   camera, light, atmosphere, material, composition, and object treatment.
-   Best-effort: if selection fails the app falls back to the current render
-   prompt flow and logs the failure. Static JSON config held as a constant for
-   now (no CMS/admin tooling per scope). Browser-direct Anthropic call using the
-   key the page already holds, same as the scene builder. */
+/* ===================== Grammar pipeline layer ===================== */
+/* Replaces the director bank. Three calls, strictly forward:
+     1. ideateWorldTheses      three divergent world theses from the FULL dossier
+     2. selectThesisAndGrammar comparative selection + up to three grammar modules
+     3. buildMasterScene       one authored scene from the winner (below)
+   No stage downstream of the master scene may originate content; compilation
+   verifies and appends only. Browser-direct Anthropic calls, same key pattern
+   as before. [ASSUMED, verify in browser] CORS on direct access, as previously. */
 const DEBUG_CREATIVE_DIRECTION = true; // internal review panel, this is an internal tool
-const DIRECTOR_BANK = HR_CREATIVE_CONFIG.directorBank;
+const GRAMMAR_MODULES = _objs(HR_CREATIVE_CONFIG.grammarModules);
+const WORLD_IDEATION_PROMPT = HR_CREATIVE_CONFIG.worldIdeationPrompt||'';
+const THESIS_SELECTION_PROMPT = HR_CREATIVE_CONFIG.thesisSelectionPrompt||'';
 
-const DIRECTOR_SELECTION_PROMPT = [
-  HR_CREATIVE_CONFIG.directorSelectionPrompt||'',
-  '',
-  'BRAND-FIRST AUTHORITY OVERRIDE:',
-  'The supplied brand_world_thesis and brand_scene_authority are authoritative. Do not replace their world, place family, emotional posture, campaign cues, use occasion, or color logic.',
-  'Your role is to refine cinematic grammar inside the supplied brand territory: camera, light behavior, atmosphere, material emphasis, composition, depth, motion, and object treatment.',
-  'Do not choose a director because the product category appears in best_for. Category is weak evidence. Brand-specific language, campaign signals, audience state, and visual territory are stronger evidence.',
-  'If none of the directors fits the authoritative brand world without distorting it, return primary_influence as "none", primary_weight as 0, secondary_influence as null, secondary_weight as 0, no_fit as true, and explain why in selection_reason.',
-  'When no_fit is true, prompt_variables should preserve the brand scene directly and add only neutral photographic guidance.',
-  'Never turn a bright, playful, nostalgic, pop, social, fashion, beauty, candy, or youth-oriented brand into a field-readiness, industrial, tactical, grungy, spa, resort, hospitality, noir, archive, or service-counter world unless the brand evidence explicitly calls for it.',
-  'Return the existing required JSON schema, plus "no_fit": boolean and "brand_world_preserved": string.'
-].join('\\n');
-
-function brandWorldAuthority(data){
+function fullBrandDossier(data){
+  // The complete brand read. Every creative call receives all of it; the
+  // previous build withheld campaign_signals, audience, product_truth, and
+  // brand_intent from the scene author, which was the single largest
+  // specificity leak in the pipeline.
   const v=(data&&data.vibes)||{};
   const ix=v.intake_expressive||{};
-  const sd=v.scene_direction||{};
-  const primary=v.primary||{};
   const f=(data&&data.factual)||{};
-  const worldThesis=_c(sd.world_thesis)||_c(primary.world_description)||_c(sd.world_description)||[
-    _c(ix.brand_state&&ix.brand_state.make_people_feel),
-    _c(ix.visual_territory&&ix.visual_territory.ownable),
-    _c(ix.assets&&ix.assets.brand_intent)
-  ].filter(Boolean).join('; ');
+  const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
   return {
-    brand_world_thesis:worldThesis,
-    brand_scene_authority:{
-      scene_name:_c(sd.scene_name)||_c(primary.scene_name),
-      world_description:_c(sd.world_description)||_c(primary.world_description),
-      product_placement_intent:_c(sd.product_placement_intent),
-      composition:_c(sd.composition),
-      lighting:_c(sd.lighting),
-      props:_l(sd.props),
-      avoid:_l(sd.avoid),
-      claim_rules:_l(sd.claim_rules)
-    },
-    brand_signals:{
-      product_truth:ix.product_truth||{},
-      audience:ix.audience||{},
-      brand_state:ix.brand_state||{},
-      visual_territory:ix.visual_territory||{},
-      sensory:ix.sensory||{},
-      competitive:ix.competitive||{},
-      assets:ix.assets||{},
-      campaign_signals:ix.campaign_signals||{}
-    },
-    product_facts:{
-      name:_c(f.name),
-      category:_c(f.category),
-      sku:_c(f.flavor_sku),
-      price:f.price||{}
+    brand_name:data.brand||'',
+    product_facts:{ name:_c(f.name)||_c(la.asset_name), category:_c(f.category), flavor_sku:_c(f.flavor_sku), price:f.price||{} },
+    locked_asset:{ asset_name:la.asset_name||'', media_type:la.mediaType||'' },
+    product_truth:ix.product_truth||{},
+    audience:ix.audience||{},
+    brand_state:ix.brand_state||{},
+    visual_territory:ix.visual_territory||{},
+    sensory:ix.sensory||{},
+    competitive:ix.competitive||{},
+    visual_identity:ix.visual_identity||{},
+    campaign_signals:ix.campaign_signals||{},
+    brand_intent:(ix.assets&&ix.assets.brand_intent)||'',
+    never_world:_l(ix.visual_identity&&ix.visual_identity.never_world),
+    read_confidence:v.confidence||'unknown',
+    worker_scene_sketch:{
+      scene_name:_c(v.scene_direction&&v.scene_direction.scene_name),
+      world_description:_c(v.scene_direction&&v.scene_direction.world_description)
     }
   };
 }
 
-function directorSelectionInput(data){
-  const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
-  const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
-  const authority=brandWorldAuthority(data);
-  return {
-    brand_world_thesis:authority.brand_world_thesis,
-    brand_scene_authority:authority.brand_scene_authority,
-    brand_read:{
-      brand_name:data.brand||'',
-      product_truth:ix.product_truth||{},
-      audience:ix.audience||{},
-      brand_state:ix.brand_state||{},
-      visual_territory:ix.visual_territory||{},
-      sensory:ix.sensory||{},
-      competitive:ix.competitive||{},
-      assets:ix.assets||{},
-      campaign_signals:ix.campaign_signals||{},
-      primary_direction:v.primary||{},
-      source_scene_direction:v.scene_direction||{}
-    },
-    product_read:{
-      product_name:f.name||la.asset_name||'',
-      category:f.category||'',
-      flavor_sku:f.flavor_sku||'',
-      sensory:ix.sensory||{},
-      product_truth:ix.product_truth||{}
-    },
-    category:f.category||'',
-    product_cues:{
-      visual_territory:ix.visual_territory||{},
-      sensory:ix.sensory||{},
-      audience:ix.audience||{},
-      product_truth:ix.product_truth||{}
-    },
-    category_cliches_to_avoid:_dedupe([].concat(
-      _l(v.scene_direction&&v.scene_direction.avoid),
-      _l(ix.visual_territory&&ix.visual_territory.stay_away_from),
-      _l(ix.brand_state&&ix.brand_state.avoid_states)
-    )),
-    higher_roads_rules:DIRECTOR_BANK.global_rules||[],
-    read_confidence:v.confidence||'unknown',
-    instruction:'Preserve the authoritative brand world. Select only cinematic grammar that fits inside it, or return no_fit.'
-  };
-}
-
-async function selectDirector(data, apiKey){
-  const input=directorSelectionInput(data);
+async function callAnthropicJson(system, userText, apiKey, maxTokens){
   const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:1800, system:DIRECTOR_SELECTION_PROMPT, messages:[{role:'user',content:'Director bank:\n'+JSON.stringify(DIRECTOR_BANK)+'\n\nBrand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
+    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:maxTokens||2000, system, messages:[{role:'user',content:userText}] })
   });
-  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Director selection '+res.status+(t?': '+t.slice(0,160):'')); }
+  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Model call '+res.status+(t?': '+t.slice(0,160):'')); }
   const payload=await res.json();
   const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  const sel=extractJson(text);
-  if(
-    !sel ||
-    !_c(sel.primary_influence) ||
-    !sel.prompt_variables ||
-    !_c(sel.brand_posture) ||
-    !_c(sel.brand_fit_check)
-  ) throw new Error('Director selection returned no usable brand-fit direction');
-
-  sel.brand_posture=_c(sel.brand_posture);
-  sel.category_risk=_c(sel.category_risk);
-  sel.brand_fit_check=_c(sel.brand_fit_check);
-  sel.no_fit=sel.no_fit===true||_c(sel.primary_influence).toLowerCase()==='none';
-  sel.brand_world_preserved=_c(sel.brand_world_preserved);
-  if(sel.no_fit){
-    sel.primary_influence='none';
-    sel.primary_weight=0;
-    sel.secondary_influence=null;
-    sel.secondary_weight=0;
-    sel.borrow_from_primary=[];
-    sel.borrow_from_secondary=[];
-  }
-  // Clamp weights defensively so a stray value never lets director grammar dominate.
-  const clampW=(w,lo,hi,d)=>{ const n=Number(w); return (isFinite(n)&&n>0)?Math.min(hi,Math.max(lo,n)):d; };
-  if(!sel.no_fit){
-    sel.primary_weight=clampW(sel.primary_weight,0.10,0.45,0.25);
-    sel.secondary_influence=_c(sel.secondary_influence)||null;
-    sel.secondary_weight=sel.secondary_influence?clampW(sel.secondary_weight,0.05,0.18,0.10):0;
-  }
-  sel.borrow_from_primary=_l(sel.borrow_from_primary);
-  sel.borrow_from_secondary=_l(sel.borrow_from_secondary);
-  sel.avoid=_l(sel.avoid);
-  return sel;
+  return extractJson(text);
 }
 
-function directorGuidanceBlock(sel){
-  if(!sel||sel.no_fit||_c(sel.primary_influence).toLowerCase()==='none'){
-    return [
-      'No director fit is forced.',
-      'Preserve the brand thesis and create a cinematic commercial world with strong composition, motivated light, visual tension, material specificity, and a memorable point of view.'
-    ].join('\n');
+async function ideateWorldTheses(data, apiKey){
+  const parsed=await callAnthropicJson(
+    WORLD_IDEATION_PROMPT,
+    'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2),
+    apiKey, 2200);
+  const theses=(parsed&&Array.isArray(parsed.theses)?parsed.theses:[])
+    .map(t=>({
+      thesis_name:_c(t&&t.thesis_name),
+      world_thesis:_c(t&&t.world_thesis),
+      memorable_image:_c(t&&t.memorable_image),
+      belongs_because:_c(t&&t.belongs_because),
+      human_trace:_c(t&&t.human_trace),
+      divergence_axis:_c(t&&t.divergence_axis)
+    }))
+    .filter(t=>t.thesis_name&&t.world_thesis);
+  if(theses.length<2) throw new Error('World ideation returned fewer than two usable theses');
+  return theses.slice(0,3);
+}
+
+async function selectThesisAndGrammar(data, apiKey, theses){
+  const moduleLibrary=GRAMMAR_MODULES.map(m=>({id:m.id,name:m.name,grammar:m.grammar,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
+  const parsed=await callAnthropicJson(
+    THESIS_SELECTION_PROMPT,
+    'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2)+
+    '\n\nCandidate world theses:\n'+JSON.stringify(theses,null,2)+
+    '\n\nGrammar module library:\n'+JSON.stringify(moduleLibrary,null,2),
+    apiKey, 1600);
+  if(!parsed||!_c(parsed.selected_thesis_name)) throw new Error('Thesis selection returned no usable choice');
+  const sel={
+    selected_thesis_name:_c(parsed.selected_thesis_name),
+    selection_reason:_c(parsed.selection_reason),
+    comparative_notes:_c(parsed.comparative_notes),
+    brand_posture:_c(parsed.brand_posture),
+    category_risk:_c(parsed.category_risk),
+    grammar_modules:(Array.isArray(parsed.grammar_modules)?parsed.grammar_modules:[])
+      .map(g=>({id:_c(g&&g.id),why:_c(g&&g.why)}))
+      .filter(g=>g.id&&GRAMMAR_MODULES.some(m=>m.id===g.id))
+      .slice(0,3),
+    no_grammar_fit:parsed.no_grammar_fit===true,
+    avoid:_l(parsed.avoid).slice(0,10)
+  };
+  if(sel.no_grammar_fit) sel.grammar_modules=[];
+  const winner=theses.find(t=>t.thesis_name.toLowerCase()===sel.selected_thesis_name.toLowerCase())||theses[0];
+  return {selection:sel, thesis:winner};
+}
+
+function resolvedGrammarModules(selection){
+  if(!selection||selection.no_grammar_fit) return [];
+  return _objs(selection.grammar_modules)
+    .map(g=>GRAMMAR_MODULES.find(m=>m.id===g.id))
+    .filter(Boolean);
+}
+
+function grammarGuidanceBlock(selection, thesis){
+  const lines=[
+    'SELECTED WORLD THESIS (this is the world; develop it, never replace it):',
+    JSON.stringify(thesis||{},null,2)
+  ];
+  const mods=resolvedGrammarModules(selection);
+  if(mods.length){
+    lines.push('CINEMATIC GRAMMAR MODULES (how the frame behaves, never where the world is):');
+    lines.push(JSON.stringify(mods,null,2));
+  }else{
+    lines.push('No grammar module fits this world. Use neutral high-quality commercial grammar: strong composition, motivated light, material specificity, and a memorable point of view.');
   }
-  return [
-    'Use '+_c(sel.primary_influence)+' as cinematic grammar, not as the source of the brand world.',
-    'Borrow: '+_l(sel.borrow_from_primary).join(', ')+'.',
-    sel.secondary_influence?('Secondary influence: '+_c(sel.secondary_influence)+' for '+_l(sel.borrow_from_secondary).join(', ')+'.'):'',
-    'Apply influence through camera, light, atmosphere, material behavior, scale, movement, and composition.',
-    'Brand ethos and campaign energy own the world. Director influence should make the scene more authored and cinematic without replacing the brand.',
-    'Avoid: '+_l(sel.avoid).join(', ')+'.'
-  ].filter(Boolean).join('\n');
+  if(selection){
+    if(_c(selection.brand_posture)) lines.push('Brand posture: '+_c(selection.brand_posture));
+    if(_c(selection.category_risk)) lines.push('Category risk to avoid: '+_c(selection.category_risk));
+    if(_l(selection.avoid).length) lines.push('Keep out of this scene: '+_l(selection.avoid).join(', '));
+  }
+  return '\n\n'+lines.join('\n');
 }
 
 function buildCreativeDirectionBlock(h, finalPrompt, negStr){
-  const sel=(h&&h.director_selection)||null;
+  const cs=(h&&h.creative_selection)||null;
+  const thesis=(h&&h.world_thesis_selected)||null;
+  const theses=_objs(h&&h.world_theses);
   const st=(h&&h.scene_translation)||{};
   const sd=(h&&h.scene_direction)||{};
+  const mods=resolvedGrammarModules(cs);
   const negRules=String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean);
-  if(sel && !sel.no_fit && _c(sel.primary_influence).toLowerCase()!=='none'){
-    // Director layer succeeded: guarantee the acceptance fields. Prefer the
-    // scene builder's narrative, fall back to the selection so nothing is empty.
-    const pv=sel.prompt_variables||{};
-    const archetype=_c(sel.scene_archetype);
-    const place=_c(pv.place);
-    const borrowed=_l(st.borrowed_visual_grammar).length?_l(st.borrowed_visual_grammar):_dedupe([].concat(_l(sel.borrow_from_primary),_l(sel.borrow_from_secondary)));
-    const excluded=_l(st.excluded_visual_grammar).length?_l(st.excluded_visual_grammar):_l(sel.avoid);
-    const thesis=_c(st.world_thesis)||(archetype?('This brand belongs in a '+archetype+'.'):_c(sel.selection_reason));
-    const translation=_c(st.cinematic_translation)||_dedupe([place,_c(pv.light),_c(pv.atmosphere),_c(pv.material),_c(pv.composition),_c(pv.object_treatment)]).join('; ');
-    const brief=[archetype,place].filter(Boolean).join(': ')||_c(sd.world_description);
-    return {
-      director_layer_status:'ok',
-      director_selection:sel,
-      scene_translation:{
-        world_thesis:thesis,
-        cinematic_translation:translation,
-        borrowed_visual_grammar:borrowed,
-        excluded_visual_grammar:excluded,
-        scene_brief:brief,
-        final_render_prompt:_c(finalPrompt),
-        negative_prompt_rules:negRules
-      }
-    };
-  }
   return {
-    director_layer_status:'fallback',
-    director_selection:null,
+    creative_layer_status:cs?'grammar_pipeline':'brand_read_fallback',
+    world_theses:theses,
+    world_thesis_selected:thesis,
+    creative_selection:cs,
+    grammar_modules_applied:mods.map(m=>({id:m.id,name:m.name})),
     scene_translation:{
-      world_thesis:_c(st.world_thesis),
+      world_thesis:_c(thesis&&thesis.world_thesis)||_c(st.world_thesis)||_c(sd.creative_rationale),
       cinematic_translation:_c(st.cinematic_translation),
-      borrowed_visual_grammar:_l(st.borrowed_visual_grammar),
-      excluded_visual_grammar:_l(st.excluded_visual_grammar),
+      borrowed_visual_grammar:mods.map(m=>m.name),
+      excluded_visual_grammar:_l(cs&&cs.avoid),
       scene_brief:_c(sd.world_description),
+      authored_prompt:_c(sd.authored_prompt),
       final_render_prompt:_c(finalPrompt),
       negative_prompt_rules:negRules
     }
@@ -1030,28 +949,24 @@ function renderCreativeDirectionPanel(){
   if(!el) return;
   if(!DEBUG_CREATIVE_DIRECTION || !CURRENT_PKG || !CURRENT_PKG.creative_direction){ el.hidden=true; el.innerHTML=''; return; }
   const cd=CURRENT_PKG.creative_direction;
-  const sel=cd.director_selection, st=cd.scene_translation||{};
+  const cs=cd.creative_selection, st=cd.scene_translation||{};
   const row=(label,val)=>val?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+esc(val)+'</span></div>'):'';
   const chips=(label,arr)=>(arr&&arr.length)?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+arr.map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>'):'';
   let html='<div class="cd-head">Creative direction <span class="cd-tag">internal</span></div>';
-  if(!sel){
-    html+='<div class="cd-row"><span class="cd-k">Director layer</span><span class="cd-v">fallback (selection unavailable, using brand-read scene)</span></div>';
-  }else if(sel.no_fit||_c(sel.primary_influence).toLowerCase()==='none'){
-    html+='<div class="cd-row"><span class="cd-k">Director layer</span><span class="cd-v">no fit, preserving the brand-read world without director influence</span></div>';
-    html+=row('Brand posture',sel.brand_posture);
-    html+=row('Brand fit check',sel.brand_fit_check);
-    html+=row('Selection reason',sel.selection_reason);
+  if(!cs){
+    html+='<div class="cd-row"><span class="cd-k">Pipeline</span><span class="cd-v">fallback (grammar pipeline unavailable, using brand-read scene)</span></div>';
   }else{
-    html+=row('Primary influence',sel.primary_influence+'  ·  weight '+(sel.primary_weight||0));
-    if(sel.secondary_influence) html+=row('Secondary influence',sel.secondary_influence+'  ·  weight '+(sel.secondary_weight||0));
-    html+=row('Scene archetype',sel.scene_archetype);
-    html+=row('Brand posture',sel.brand_posture);
-    html+=row('Category risk',sel.category_risk);
-    html+=row('Brand fit check',sel.brand_fit_check);
-    html+=row('Selection reason',sel.selection_reason);
-    html+=chips('Borrowed',_dedupe([].concat(sel.borrow_from_primary||[],sel.borrow_from_secondary||[],st.borrowed_visual_grammar||[])));
-    html+=chips('Avoided',_dedupe([].concat(sel.avoid||[],st.excluded_visual_grammar||[])));
+    const theses=_objs(cd.world_theses);
+    if(theses.length) html+=chips('Candidate worlds',theses.map(t=>t.thesis_name));
+    html+=row('Selected world',_c(cd.world_thesis_selected&&cd.world_thesis_selected.thesis_name));
+    html+=row('Why it won',cs.selection_reason);
+    html+=row('Why the others lost',cs.comparative_notes);
+    html+=row('Brand posture',cs.brand_posture);
+    html+=row('Category risk',cs.category_risk);
+    html+=chips('Grammar modules',(cd.grammar_modules_applied||[]).map(m=>m.name));
+    html+=chips('Avoided',_l(cs.avoid));
   }
+  if(st.authored_prompt) html+='<div class="cd-row cd-prompt"><span class="cd-k">Authored prompt</span><span class="cd-v">'+esc(st.authored_prompt)+'</span></div>';
   if(st.final_render_prompt) html+='<div class="cd-row cd-prompt"><span class="cd-k">Final render prompt</span><span class="cd-v">'+esc(st.final_render_prompt)+'</span></div>';
   el.innerHTML=html;
   el.hidden=false;
@@ -1062,134 +977,11 @@ const ART_DIRECTOR_PROMPT = [
   HR_CREATIVE_CONFIG.artDirectorPrompt||'',
   '',
   'CREATIVE-FIRST AUTHORITY:',
-  'Create a distinctive cinematic product world expressing brand ethos, audience identity, cultural posture, emotional promise, and campaign energy.',
-  'Use the brand read as creative source material, not as a compliance checklist.',
-  'Build one authored visual thesis with a concrete place, implied activity, physical rules, memorable spatial idea, and clear emotional point of view.',
-  'The world should feel specific enough that a competitor in the same category would not naturally receive the same concept.',
-  'Avoid default kitchen counters, yoga mats, shaker bottles, spas, pools, open roads, tactical field scenes, luxury resorts, clean studios, and generic outdoor settings unless the brand transforms the territory into something unmistakably its own.',
-  'Apply director influence through camera, composition, light, atmosphere, material behavior, movement, scale, and visual tension. Do not reduce influence to adjectives.',
-  'Favor cinematic ambition and brand specificity over literal category demonstration.',
-  'The product belongs in the world, but the world remains the main act of creative authorship.',
-  'Preserve recognizable package identity, logo, label hierarchy, core colors, silhouette, and SKU. Keep product protection concise and secondary.',
-  'Do not use literal flavor ingredients as props unless the campaign itself uses them as an authored visual idea.',
-  'Environmental text and screen UI must remain blank, abstract, cropped, or unreadable.',
-  'Return creative_rationale explaining why the scene belongs to this brand.',
-  'Return only the existing scene JSON schema.'
+  'The selected world thesis is authoritative. Develop it into one authored master scene; never relocate it, dilute it toward category convention, or replace it with a grammar-default location.',
+  'Use the full brand dossier, including campaign signals and visual identity, as creative source material, not as a compliance checklist.',
+  'authored_prompt is the deliverable: one 120-180 word cinematic paragraph that will be sent to the renderer nearly verbatim. Write it to be read as prose, world first, product inside it, light and atmosphere last.',
+  'Return only the required JSON schema.'
 ].join('\n');
-
-function sceneFromDirectorSelection(data, directorSelection){
-  const v=(data&&data.vibes)||{}, f=(data&&data.factual)||{};
-  const source=v.scene_direction||{};
-  const primary=v.primary||{};
-  const sel=directorSelection||{};
-  const pv=sel.prompt_variables||{};
-  const noFit=!!sel.no_fit||_c(sel.primary_influence).toLowerCase()==='none';
-
-  const sourceName=_c(source.scene_name)||_c(primary.scene_name)||'brand world preview';
-  const sourceWorld=_c(source.world_description)||_c(primary.world_description)||'a brand-specific real environment with physical rules and a clear use occasion';
-  const sourcePlacement=_c(source.product_placement_intent)||'The locked product remains the readable hero inside the brand world.';
-  const sourceComposition=_c(source.composition)||'Product readable in the foreground or strong middle ground, with enough environment to communicate the brand world.';
-  const sourceLighting=_c(source.lighting)||'Motivated brand-appropriate light with controlled product readability.';
-  const sourceProps=_l(source.props);
-  const sourceAvoid=_l(source.avoid);
-  const campaign=(v.intake_expressive&&v.intake_expressive.campaign_signals)||{};
-  const campaignCues=_dedupe([].concat(
-    _l(campaign.cultural_codes),
-    _l(campaign.locations),
-    _l(campaign.actions_and_motion),
-    _l(campaign.signature_objects),
-    _l(campaign.exact_phrases)
-  ));
-  const useOccasion=_c(source.use_occasion)||_l(campaign.use_occasions)[0]||'a concrete brand-relevant use occasion';
-  const impliedAction=_c(source.implied_action)||_l(campaign.actions_and_motion)[0]||'recent or imminent human activity implied through the environment';
-
-  // The brand read owns world, place family, emotional posture, campaign cues,
-  // props, and palette. Director selection contributes photographic grammar only.
-  const camera=noFit?'brand-appropriate commercial camera with readable environmental depth':_c(pv.camera);
-  const grammarLight=noFit?'':_c(pv.light);
-  const grammarAtmosphere=noFit?'':_c(pv.atmosphere);
-  const grammarMaterial=noFit?'':_c(pv.material);
-  const grammarComposition=noFit?'':_c(pv.composition);
-  const grammarObject=noFit?'':_c(pv.object_treatment);
-
-  const world=[
-    sourceWorld,
-    grammarMaterial&&('Material emphasis: '+grammarMaterial),
-    grammarAtmosphere&&('Atmospheric treatment: '+grammarAtmosphere)
-  ].filter(Boolean).join(' ');
-
-  const composition=[
-    sourceComposition,
-    grammarComposition&&('Cinematic refinement: '+grammarComposition)
-  ].filter(Boolean).join(' ');
-
-  const lighting=[
-    sourceLighting,
-    grammarLight&&('Cinematic refinement: '+grammarLight)
-  ].filter(Boolean).join(' ');
-
-  const objectTreatment=[
-    sourcePlacement,
-    grammarObject&&('Object treatment: '+grammarObject)
-  ].filter(Boolean).join(' ');
-
-  const promptSeed=[
-    'authoritative brand world: '+sourceWorld,
-    'brand scene: '+sourceName,
-    campaignCues.length&&('campaign evidence: '+campaignCues.slice(0,8).join(', ')),
-    sourceProps.length&&('brand-specific props and cues: '+sourceProps.join(', ')),
-    'use occasion: '+useOccasion,
-    'implied action: '+impliedAction,
-    'composition: '+composition,
-    'lighting: '+lighting,
-    camera&&('camera: '+camera),
-    objectTreatment&&('product role: '+objectTreatment),
-    !noFit&&sel.selection_reason&&('cinematic grammar rationale: '+_c(sel.selection_reason)),
-    'Do not replace the brand world with a category cliché or director-default location.'
-  ].filter(Boolean).join('. ');
-
-  return {
-    scene_name:sourceName,
-    world_description:world,
-    product_placement_intent:objectTreatment,
-    composition,
-    lighting,
-    use_occasion:useOccasion,
-    implied_action:impliedAction,
-    evidence_cues:_dedupe([].concat(_l(source.evidence_cues),campaignCues)).slice(0,10),
-    signature_objects:_dedupe([].concat(_l(source.signature_objects),_l(campaign.signature_objects))).slice(0,8),
-    evidence_map:Array.isArray(source.evidence_map)?source.evidence_map:[],
-    props:_dedupe([].concat(sourceProps,_l(campaign.signature_objects))).slice(0,10),
-    avoid:_dedupe([].concat(sourceAvoid,_l(sel.avoid),[
-      'category-default field readiness unless brand-authored',
-      'generic spa or pool resort unless brand-authored',
-      'generic grungy outdoor gear world unless brand-authored',
-      'generic service counter, archive, or institutional room unless brand-authored'
-    ])),
-    render_path:'composite',
-    prompt_seed:promptSeed,
-    surface:_c(source.surface)||'',
-    background:_c(source.background)||sourceWorld,
-    materials:_dedupe([].concat(_l(source.materials),grammarMaterial?[grammarMaterial]:[])),
-    color_palette:_l(source.color_palette),
-    camera:camera?{framing:camera}:source.camera||null,
-    brand_specific_cues:_dedupe([
-      _c(sel.brand_posture),
-      _c(sel.brand_fit_check),
-      _c(sel.brand_world_preserved),
-      _c(f.category),
-      _c(source.scene_name)
-    ]),
-    locked_product_placement:source.locked_product_placement||{
-      anchor:'foreground or strong middle ground',
-      scale_notes:'clear readable hero; packaging unchanged',
-      light_match:'controlled hero light matched to the brand scene'
-    },
-    source_authority:'brand_read',
-    director_grammar_status:noFit?'no_fit_brand_only':'grammar_refinement_only'
-  };
-}
-
 
 function normalizeSceneObject(raw){
   if(!raw||typeof raw!=='object') return null;
@@ -1236,7 +1028,8 @@ function normalizeSceneObject(raw){
     avoid:_l(source.avoid),
     claim_rules:_l(source.claim_rules),
     render_path:'composite',
-    prompt_seed:_c(source.prompt_seed)||_c(source.render_prompt),
+    authored_prompt:_c(source.authored_prompt),
+    prompt_seed:_c(source.prompt_seed)||_c(source.render_prompt)||_c(source.authored_prompt),
     surface:_c(source.surface),
     background:_c(source.background),
     materials:_l(source.materials),
@@ -1294,7 +1087,8 @@ function buildSceneNormalizationPrompt(data,raw){
     'Do not replace the concept with generic category imagery.',
     'Return JSON only.',
     'Required fields:',
-    'scene_name, world_description, product_placement_intent, composition, lighting, use_occasion, implied_action, evidence_cues, signature_objects, creative_rationale, props, avoid, claim_rules, render_path.',
+    'scene_name, authored_prompt, world_description, product_placement_intent, composition, lighting, use_occasion, implied_action, evidence_cues, signature_objects, creative_rationale, props, avoid, claim_rules, render_path.',
+    'authored_prompt is one cinematic prose paragraph of 120 to 180 words: world first, spatial hierarchy in prose, the product inside it off-center, light and atmosphere last, no labels or numbers. If the original output lacks it, write it faithfully from the original concept without changing the idea.',
     'world_description must describe a concrete cinematic environment in at least two sentences.',
     'composition and lighting must contain actionable visual direction.',
     'props must include only objects already present or clearly implied by the original creative concept.',
@@ -1377,25 +1171,19 @@ function workerFallbackScene(data){
   return null;
 }
 
-async function buildMasterScene(data, apiKey, directorSelection){
-  const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
-  const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
+async function buildMasterScene(data, apiKey, creativeSelection, winningThesis){
+  // The scene author receives the COMPLETE dossier. The previous build passed
+  // only brand_tone, visual_territory, sensory, and competitive, withholding
+  // campaign_signals, audience, product_truth, and brand_intent from the one
+  // call that authors the world.
   const input={
-    brand_name:data.brand||'',
-    product_name:f.name||la.asset_name||'',
-    product_category:f.category||'',
-    locked_asset:{ asset_name:la.asset_name||'', media_type:la.mediaType||'', width:la.width||null, height:la.height||null },
-    brand_tone:ix.brand_state||{},
-    visual_territory:ix.visual_territory||{},
-    sensory:ix.sensory||{},
-    competitive:ix.competitive||{},
-    confidence:v.confidence||'unknown',
+    dossier:fullBrandDossier(data),
     fidelity_rule:'The product image is identity-locked and state-locked. The scene must be built around the product. Do not redraw, retype, recolor, relabel, reshape, crop, open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or reinterpret the product packaging. Any screens, signs, posters, menus, labels, or displays in the environment must be blank, abstract, cropped, or unreadable.'
   };
   const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:3000, system:ART_DIRECTOR_PROMPT+directorGuidanceBlock(directorSelection), messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
+    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:3200, system:ART_DIRECTOR_PROMPT+grammarGuidanceBlock(creativeSelection, winningThesis), messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
   });
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
   const payload=await res.json();
@@ -1464,7 +1252,8 @@ function mapSceneDirectionToSd(d, meta){
     props:_l(d.props),
     avoid:avoids,
     render_path:'composite',
-    prompt_seed:_c(d.prompt_seed)||_c(d.render_prompt),
+    authored_prompt:_c(d.authored_prompt),
+    prompt_seed:_c(d.prompt_seed)||_c(d.render_prompt)||_c(d.authored_prompt),
     surface:_c(d.surface),
     background:_c(d.background),
     materials:_l(d.materials),
@@ -1496,25 +1285,23 @@ function buildLockedAssetRecord(la){
 }
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
-  const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.director_selection&&_l(h.director_selection.avoid))||[])];
+  const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.creative_selection&&_l(h.creative_selection.avoid))||[])];
   const negStr=_dedupe(neg).join(', ');
   const packageInfo=packageFormatInfo(la);
   const integrationTreatment=buildIntegrationTreatment(h);
   const positiveComposite=_posComposite(h);
   const positiveReference=_posReference(h);
   const creativeDirection=buildCreativeDirectionBlock(h,positiveComposite,negStr);
-  const sel=h.director_selection||null;
-  const pv=(sel&&sel.prompt_variables)||{};
-  const directorLayerOk=!!(creativeDirection&&creativeDirection.director_layer_status==='ok'&&sel&&!sel.no_fit&&_c(sel.primary_influence).toLowerCase()!=='none');
-  const effectiveChosenDirection=directorLayerOk?(_c(sel.scene_archetype)||_c(sd.scene_name)):(_c(h.chosen_direction)||_c(sd.scene_name));
-  const effectiveSceneBrief=directorLayerOk?{
-    world_description:_c(creativeDirection.scene_translation&&creativeDirection.scene_translation.scene_brief)||_c(sd.world_description)||_c(pv.place),
-    product_placement_intent:sanitizeProductPlacement(_c(pv.object_treatment)||_c(sd.product_placement_intent)),
-    composition:_c(pv.composition)||_c(sd.composition),
-    lighting:_c(pv.light)||_c(sd.lighting),
-    props:_l(sd.props)
-  }:{
+  // The approved master scene is the sole source of world content. The previous
+  // build substituted director-selection prompt_variables for the authored
+  // world, composition, and lighting whenever the director layer succeeded,
+  // which discarded the most creative call in the pipeline. Grammar refinement
+  // now appends inside the prompt builders instead.
+  const effectiveChosenDirection=_c(h.chosen_direction)||_c(sd.scene_name);
+  const effectiveSceneBrief={
     world_description:_c(sd.world_description),
+    authored_prompt:_c(sd.authored_prompt),
+    prompt_seed:_c(sd.prompt_seed),
     product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),
     composition:_c(sd.composition),
     lighting:_c(sd.lighting),
@@ -2081,9 +1868,10 @@ function buildHandoff(){
     scene_direction:sceneDir,
     confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
     alternates:[],
-    director_selection:(DATA.vibes&&DATA.vibes.director_selection)||null,
+    creative_selection:(DATA.vibes&&DATA.vibes.creative_selection)||null,
+    world_theses:(DATA.vibes&&DATA.vibes.world_theses)||[],
+    world_thesis_selected:(DATA.vibes&&DATA.vibes.world_thesis_selected)||null,
     scene_translation:(DATA.vibes&&DATA.vibes.scene_translation)||null,
-    creative_review:(DATA.vibes&&DATA.vibes.creative_review)||null,
     chosen_direction:chosenName
   };
 }
@@ -2661,67 +2449,6 @@ function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ ret
 function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
 
-const CREATIVE_CRITIC_PROMPT = [
-  'You are a senior commercial creative director reviewing one proposed product-world scene.',
-  'Judge the quality of the creative concept, not the formatting of its reasoning.',
-  'Score each dimension from 1 to 5: brand_specificity, originality, cinematic_ambition, emotional_fit, visual_coherence, director_influence, product_relevance, category_cliche_risk.',
-  'For category_cliche_risk, 1 means low risk and 5 means dominated by familiar category imagery.',
-  'Return JSON only with scores, strengths, weaknesses, revision_priority, and verdict.',
-  'verdict must be approve, revise, or reject.',
-  'Approve only when brand_specificity, originality, cinematic_ambition, emotional_fit, and visual_coherence are all at least 3, and category_cliche_risk is 3 or lower.'
-].join('\n');
-function creativeCriticInput(data,scene){
-  const v=(data&&data.vibes)||{},ix=v.intake_expressive||{};
-  return {brand:data.brand||'',product:data.factual||{},brand_read:{
-    product_truth:ix.product_truth||{},audience:ix.audience||{},brand_state:ix.brand_state||{},
-    visual_territory:ix.visual_territory||{},sensory:ix.sensory||{},competitive:ix.competitive||{},
-    campaign_signals:ix.campaign_signals||{},brand_intent:ix.assets&&ix.assets.brand_intent||''
-  },director_selection:v.director_selection||null,proposed_scene:scene||{}};
-}
-function normalizeCreativeReview(review){
-  const r=review&&typeof review==='object'?review:{};
-  const keys=['brand_specificity','originality','cinematic_ambition','emotional_fit','visual_coherence','director_influence','product_relevance','category_cliche_risk'];
-  const scores={};keys.forEach(k=>{const n=Number(r.scores&&r.scores[k]);scores[k]=Number.isFinite(n)?Math.max(1,Math.min(5,n)):3;});
-  let verdict=_c(r.verdict).toLowerCase();if(!['approve','revise','reject'].includes(verdict)) verdict='revise';
-  return {scores,strengths:_l(r.strengths),weaknesses:_l(r.weaknesses),revision_priority:_l(r.revision_priority),verdict};
-}
-async function reviewCreativeScene(data,apiKey,scene){
-  if(!apiKey) return normalizeCreativeReview({verdict:'approve'});
-  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
-    'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
-  },body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:1800,system:CREATIVE_CRITIC_PROMPT,messages:[{role:'user',content:JSON.stringify(creativeCriticInput(data,scene),null,2)}]})});
-  if(!res.ok){const t=await res.text().catch(()=>'');throw new Error('Creative critic '+res.status+(t?': '+t.slice(0,160):''));}
-  const payload=await res.json();const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  return normalizeCreativeReview(extractJson(text));
-}
-function buildCreativeRevisionPrompt(data,scene,review){
-  const v=(data&&data.vibes)||{},ix=v.intake_expressive||{};
-  return ['Revise the scene as a senior commercial creative director.',
-    'Create a more distinctive, cinematic, brand-authored world.',
-    'Preserve the strongest parts, but materially improve the critic weaknesses.',
-    'Do not answer with more category props, literal flavor ingredients, safer styling, or a cleaner generic scene.',
-    'Strengthen visual thesis, emotional specificity, spatial idea, cinematic grammar, and brand attitude.',
-    'Keep recognizable product identity, but do not let fidelity instructions dominate the world-building.',
-    'Return only one scene JSON object using the existing schema.',
-    'Brand read:',JSON.stringify({product_truth:ix.product_truth||{},audience:ix.audience||{},brand_state:ix.brand_state||{},
-      visual_territory:ix.visual_territory||{},sensory:ix.sensory||{},competitive:ix.competitive||{},
-      campaign_signals:ix.campaign_signals||{},brand_intent:ix.assets&&ix.assets.brand_intent||''},null,2),
-    'Director selection:',JSON.stringify(v.director_selection||{},null,2),
-    'Current scene:',JSON.stringify(scene||{},null,2),'Creative critic:',JSON.stringify(review||{},null,2)
-  ].join('\n\n');
-}
-async function reviseCreativeScene(data,apiKey,scene,review){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
-    'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
-  },body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:3200,system:ART_DIRECTOR_PROMPT,messages:[{role:'user',content:buildCreativeRevisionPrompt(data,scene,review)}]})});
-  if(!res.ok){const t=await res.text().catch(()=>'');throw new Error('Creative revision '+res.status+(t?': '+t.slice(0,160):''));}
-  const payload=await res.json();const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  const revised=extractJson(text);if(!revised||typeof revised!=='object') throw new Error('Creative revision returned no usable scene');
-  revised.render_path='composite';revised.props=_l(revised.props);revised.avoid=_l(revised.avoid);revised.claim_rules=_l(revised.claim_rules);
-  revised.evidence_cues=_l(revised.evidence_cues);revised.signature_objects=_l(revised.signature_objects);
-  return revised;
-}
-
 async function completeCreativePipeline(brandData, apiKey){
   DATA.brand=brandData.brand||DATA.brand;
   DATA.factual=Object.assign({},DATA.factual||{},brandData.factual||{});
@@ -2738,75 +2465,77 @@ async function completeCreativePipeline(brandData, apiKey){
     return;
   }
 
-  let directorSelection=null;
+  // Stage 3: three divergent world theses from the full dossier.
+  let theses=null;
   try{
-    PERF.start('director_selection_anthropic');
-    directorSelection=await selectDirector(DATA,apiKey);
-    PERF.end('director_selection_anthropic',{primary:directorSelection&&directorSelection.primary_influence,archetype:directorSelection&&directorSelection.scene_archetype});
-  }catch(dirErr){
-    PERF.end('director_selection_anthropic',{error:String((dirErr&&dirErr.message)||dirErr).slice(0,160)});
-    console.warn('director layer failed; using current render prompt flow',dirErr);
+    PERF.start('world_ideation_anthropic');
+    theses=await ideateWorldTheses(DATA,apiKey);
+    PERF.end('world_ideation_anthropic',{count:theses.length,names:theses.map(t=>t.thesis_name).join(' | ')});
+  }catch(ideaErr){
+    PERF.end('world_ideation_anthropic',{error:String((ideaErr&&ideaErr.message)||ideaErr).slice(0,160)});
+    console.warn('world ideation failed; scene author will work from the dossier alone',ideaErr);
   }
-  DATA.vibes.director_selection=directorSelection;
+  DATA.vibes.world_theses=theses||[];
 
-  if(PWP_FAST_MODE){
-    PERF.log('master_scene_anthropic_skipped',{reason:'PWP_FAST_MODE',source:'director_selection_prompt_variables'});
-    const fastScene=sceneFromDirectorSelection(DATA,directorSelection);
-    DATA.vibes.master_scene=fastScene;
-    DATA.vibes.master_scene_meta={
-      brand_world_read:'brand-first fast mode: authoritative brand-read scene refined by optional director grammar',
-      world_thesis:_c(directorSelection&&directorSelection.selection_reason)||_c(directorSelection&&directorSelection.brand_fit_check)||'',
-      cinematic_translation:'brand-read world preserved; director prompt_variables used only for camera, light, atmosphere, material emphasis, composition, and object treatment; master scene call skipped',
-      category_cliches_to_avoid:_l(directorSelection&&directorSelection.avoid),
-      anti_tabletop_rules:['no tabletop fallback','use a real world with physical rules']
-    };
-    DATA.vibes.scene_diagnostics={fast_mode:true,skipped_master_scene:true,brand_authority_preserved:true,director_no_fit:!!(directorSelection&&directorSelection.no_fit)};
-    DATA.vibes.scene_translation={
-      world_thesis:DATA.vibes.master_scene_meta.world_thesis,
-      cinematic_translation:DATA.vibes.master_scene_meta.cinematic_translation,
-      borrowed_visual_grammar:_dedupe([].concat(_l(directorSelection&&directorSelection.borrow_from_primary),_l(directorSelection&&directorSelection.borrow_from_secondary))),
-      excluded_visual_grammar:_l(directorSelection&&directorSelection.avoid)
-    };
-  }else{
+  // Stage 4: comparative selection plus grammar modules. Selection replaces the
+  // previous score-then-revise critic; choosing between divergent candidates
+  // beats revising a single one toward the mean.
+  let creativeSelection=null, winningThesis=null;
+  if(theses&&theses.length){
     try{
-      PERF.start('master_scene_anthropic');
-      const built=await buildMasterScene(DATA,apiKey,directorSelection);
-      PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name});
-      DATA.vibes.master_scene=built.scene_direction;
-      DATA.vibes.master_scene_meta={brand_world_read:built.brand_world_read||'',world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',category_cliches_to_avoid:built.category_cliches_to_avoid||[],anti_tabletop_rules:built.anti_tabletop_rules||[]};
-      DATA.vibes.scene_diagnostics=built.diagnostics||null;
-      DATA.vibes.scene_translation={world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',borrowed_visual_grammar:built.borrowed_visual_grammar||[],excluded_visual_grammar:built.excluded_visual_grammar||[]};
-    }catch(sceneErr){
-      PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
-      console.warn('scene builder failed; validating brand-read fallback',sceneErr);
+      PERF.start('thesis_selection_anthropic');
+      const picked=await selectThesisAndGrammar(DATA,apiKey,theses);
+      creativeSelection=picked.selection;
+      winningThesis=picked.thesis;
+      PERF.end('thesis_selection_anthropic',{selected:creativeSelection.selected_thesis_name,modules:(creativeSelection.grammar_modules||[]).map(g=>g.id).join(',')});
+    }catch(selErr){
+      PERF.end('thesis_selection_anthropic',{error:String((selErr&&selErr.message)||selErr).slice(0,160)});
+      console.warn('thesis selection failed; using the first thesis without grammar modules',selErr);
+      winningThesis=theses[0];
+    }
+  }
+  DATA.vibes.creative_selection=creativeSelection;
+  DATA.vibes.world_thesis_selected=winningThesis;
 
-      const fallback=workerFallbackScene(DATA);
-      if(fallback){
-        DATA.vibes.master_scene=fallback;
-        DATA.vibes.master_scene_meta={
-          brand_world_read:'validated Worker brand-read fallback',
-          world_thesis:_c(fallback.creative_rationale)||_c(DATA.vibes.primary&&DATA.vibes.primary.world_description),
-          cinematic_translation:'master scene failed; preserved complete Worker scene without prompt-writer invention',
-          category_cliches_to_avoid:[],
-          anti_tabletop_rules:['no generic tabletop fallback']
-        };
-        DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-          master_scene_failed:true,
-          fallback_source:'worker_scene_direction',
-          master_scene_error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)
-        });
-      }else{
-        PREVIEW_FLOW_STATE.scene='error';
-        PREVIEW_FLOW_STATE.brandError=new Error('The creative scene did not return a complete world. Try the direction again.');
-        DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-          master_scene_failed:true,
-          fallback_source:null,
-          master_scene_error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)
-        });
-        refresh();
-        PERF.log('scene_blocked_incomplete_creative_direction',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)});
-        return;
-      }
+  // Stage 6: one authored master scene from the winner, with everything in hand.
+  try{
+    PERF.start('master_scene_anthropic');
+    const built=await buildMasterScene(DATA,apiKey,creativeSelection,winningThesis);
+    PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name,authored_prompt:!!(built&&built.scene_direction&&built.scene_direction.authored_prompt)});
+    DATA.vibes.master_scene=built.scene_direction;
+    DATA.vibes.master_scene_meta={brand_world_read:built.brand_world_read||'',world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',category_cliches_to_avoid:built.category_cliches_to_avoid||[],anti_tabletop_rules:built.anti_tabletop_rules||[]};
+    DATA.vibes.scene_diagnostics=built.diagnostics||null;
+    DATA.vibes.scene_translation={world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',borrowed_visual_grammar:resolvedGrammarModules(creativeSelection).map(m=>m.name),excluded_visual_grammar:_l(creativeSelection&&creativeSelection.avoid)};
+  }catch(sceneErr){
+    PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
+    console.warn('scene builder failed; validating brand-read fallback',sceneErr);
+
+    const fallback=workerFallbackScene(DATA);
+    if(fallback){
+      DATA.vibes.master_scene=fallback;
+      DATA.vibes.master_scene_meta={
+        brand_world_read:'validated Worker brand-read fallback',
+        world_thesis:_c(fallback.creative_rationale)||_c(DATA.vibes.primary&&DATA.vibes.primary.world_description),
+        cinematic_translation:'master scene failed; preserved complete Worker scene without prompt-writer invention',
+        category_cliches_to_avoid:[],
+        anti_tabletop_rules:['no generic tabletop fallback']
+      };
+      DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
+        master_scene_failed:true,
+        fallback_source:'worker_scene_direction',
+        master_scene_error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)
+      });
+    }else{
+      PREVIEW_FLOW_STATE.scene='error';
+      PREVIEW_FLOW_STATE.brandError=new Error('The creative scene did not return a complete world. Try the direction again.');
+      DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
+        master_scene_failed:true,
+        fallback_source:null,
+        master_scene_error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)
+      });
+      refresh();
+      PERF.log('scene_blocked_incomplete_creative_direction',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)});
+      return;
     }
   }
 
@@ -2815,54 +2544,15 @@ async function completeCreativePipeline(brandData, apiKey){
     PREVIEW_FLOW_STATE.scene='error';
     PREVIEW_FLOW_STATE.brandError=new Error('The creative scene was incomplete and could not be safely rendered.');
     refresh();
-    PERF.log('scene_blocked_before_critic',{});
+    PERF.log('scene_blocked_incomplete',{});
     return;
   }
   DATA.vibes.master_scene=approvedScene;
 
-  let creativeReview=null;
-  try{
-    PERF.start('creative_critic');
-    creativeReview=await reviewCreativeScene(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{});
-    PERF.end('creative_critic',{verdict:creativeReview.verdict,scores:creativeReview.scores});
-  }catch(criticErr){
-    PERF.end('creative_critic',{error:String((criticErr&&criticErr.message)||criticErr).slice(0,180)});
-    console.warn('creative critic failed; preserving authored scene',criticErr);
-    creativeReview=normalizeCreativeReview({verdict:'approve'});
-  }
-  DATA.vibes.creative_review=creativeReview;
-  if(creativeReview.verdict!=='approve'){
-    try{
-      PERF.start('creative_scene_revision');
-      const revisedRaw=await reviseCreativeScene(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},creativeReview);
-      let revised=usableSceneOrNull(revisedRaw);
-      if(!revised){
-        revised=await repairSceneSchema(DATA,apiKey,revisedRaw);
-      }
-      if(!sceneUsabilityReport(revised).usable){
-        throw new Error('Creative revision returned an incomplete scene');
-      }
-      DATA.vibes.master_scene=revised;
-      const secondReview=await reviewCreativeScene(DATA,apiKey,revised);
-      DATA.vibes.creative_review_initial=creativeReview;
-      DATA.vibes.creative_review=secondReview;
-      DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-        creative_revision_applied:true,creative_review:secondReview
-      });
-      PERF.end('creative_scene_revision',{verdict:secondReview.verdict,scores:secondReview.scores});
-    }catch(revisionErr){
-      PERF.end('creative_scene_revision',{error:String((revisionErr&&revisionErr.message)||revisionErr).slice(0,180)});
-      console.warn('creative revision failed; using original authored scene',revisionErr);
-      DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-        creative_revision_applied:false,creative_revision_error:String((revisionErr&&revisionErr.message)||revisionErr).slice(0,180),
-        creative_review:creativeReview
-      });
-    }
-  }
   PREVIEW_FLOW_STATE.scene='ready';
   PREVIEW_FLOW_STATE.brandError=null;
   refresh();
-  PERF.log('scene_ready',{creative_verdict:DATA.vibes.creative_review&&DATA.vibes.creative_review.verdict});
+  PERF.log('scene_ready',{selected_world:_c(winningThesis&&winningThesis.thesis_name)||'fallback',authored_prompt:!!_c(approvedScene.authored_prompt)});
 }
 
 async function generate(){
