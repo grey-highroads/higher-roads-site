@@ -449,9 +449,9 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-brand-specificity-gate-v1';
-const PWP_BUILD_NOTE = 'campaign signals passed through brand-first scene authority; deterministic specificity gate blocks vague scenes and runs one repair call before rendering';
-const PWP_FAST_MODE = false; // skip slow/brittle master scene call; build package from director selection + brand read
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-generalized-scene-fidelity-v1';
+const PWP_BUILD_NOTE = 'full scene pass retained; product state locked; readable screens and signage banned; brand evidence outranks category ritual; tub and jar formats detected; domestic fitness scenes separated from field profiles';
+const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
   const el=document.getElementById('buildStamp');
@@ -552,20 +552,26 @@ function inferPackageFormat(asset){
     .filter(Boolean).join(' ').toLowerCase();
   if(/\b(pouch|bag|packet|sachet|stand[- ]?up|jerky|granola|chips|mix)\b/.test(s)) return 'pouch';
   if(/\b(can|soda|seltzer|spritz|sparkling|ready[- ]?to[- ]?drink|rtd)\b/.test(s)) return 'can';
-  if(/\b(bottle|shooter|shot|squeeze|jar|dropper|vial|flask)\b/.test(s)) return 'bottle';
-  if(/\b(box|carton|case|tub|tin)\b/.test(s)) return 'box';
+  if(/\b(tub|jar|canister|powder container|supplement tub|pre-workout)\b/.test(s)) return 'tub';
+  if(/\b(bottle|shooter|shot|squeeze|dropper|vial|flask)\b/.test(s)) return 'bottle';
+  if(/\b(box|carton|case|tin)\b/.test(s)) return 'box';
   return 'package';
 }
 const PACKAGE_FORMAT_INFO={
   pouch:{label:'pouch',structure:['sealed pouch structure','top seal','hang hole if present','gusset if present','product window if present','front face','pack silhouette'],avoid:['torn pouch','crushed pouch proportions','fake wrinkles through typography','mud or scuffs covering logo or product name']},
   can:{label:'can',structure:['can body','can top','pull tab','rim','label wrap','cylindrical proportions'],avoid:['warped cylinder','fake pull tab changes','dented can that distorts label hierarchy','condensation obscuring logo or product name']},
-  bottle:{label:'bottle',structure:['bottle body','cap','neck','shoulder','label wrap','bottle silhouette'],avoid:['changed cap','warped neck','opened bottle unless supplied open','fake fluid level or label wrap changes']},
-  box:{label:'box/carton',structure:['carton panels','front face','folds','closure','edges','box proportions'],avoid:['crushed carton proportions','opened closure unless supplied open','fake panel text','damaged front face']},
-  package:{label:'package',structure:['package structure','front face','silhouette','proportions'],avoid:['changed package structure','crushed silhouette','fake package details']}
+  tub:{label:'tub/jar',structure:['tub body','lid','rim','label wrap','cylindrical proportions','closed or open state exactly as supplied'],avoid:['removed lid unless supplied removed','opened tub unless supplied open','added scoop','visible powder unless supplied visible','changed fill state','warped cylinder','fake lid details']},
+  bottle:{label:'bottle',structure:['bottle body','cap','neck','shoulder','label wrap','bottle silhouette','closed or open state exactly as supplied'],avoid:['changed cap','warped neck','opened bottle unless supplied open','fake fluid level or label wrap changes']},
+  box:{label:'box/carton',structure:['carton panels','front face','folds','closure','edges','box proportions','closed or open state exactly as supplied'],avoid:['crushed carton proportions','opened closure unless supplied open','fake panel text','damaged front face']},
+  package:{label:'package',structure:['package structure','front face','silhouette','proportions','closed or open state exactly as supplied'],avoid:['changed package structure','crushed silhouette','fake package details','opened or altered package state']}
 };
 function packageFormatInfo(asset){
   const fmt=inferPackageFormat(asset);
   return Object.assign({format:fmt}, PACKAGE_FORMAT_INFO[fmt]||PACKAGE_FORMAT_INFO.package);
+}
+function productStateLockText(asset){
+  const info=packageFormatInfo(asset||{});
+  return 'Product state is locked exactly as supplied. Preserve the '+info.label+' as pictured. Do not open, close, unwrap, pour, peel, tear, remove or add a lid or cap, add a scoop, expose contents, change fill state, reposition removable parts, or invent accessories.';
 }
 function thirdPartyBrandingNegative(){
   return 'no readable third-party logos, badges, patches, agency names, park service marks, store names, invented brand systems, fake sponsor marks, competing brand identities, or readable environmental signage that looks like another brand';
@@ -643,7 +649,11 @@ function buildIntegrationTreatment(h){
   const baseEffects=['contact_shadow','local_occlusion','color_spill','reflected_light','specular_highlights','edge_darkening','depth_of_field','atmospheric_haze','lens_softness'];
   let profile='light', level='light', notes='Use subtle scene-consistent integration only: product identity remains clean and fully readable, but light, shadow, reflection, and local atmosphere should make it physically belong in the frame.';
   let effects=baseEffects.slice();
-  if(hasAny(txt,['trail','field','mountain','forest','camp','alpine','gravel','bike','bicycle','tailgate','truck','dock','lake','beach','outdoor','expedition','utility','gear','mud','dust','rain','mist','storm','wet ground','recovery threshold'])){
+  if(hasAny(txt,['home workout','pre-gym','workout corner','kitchen counter','fitness studio','training prep','playlist','earbuds','resistance band','shaker bottle','gym bag']) && !hasAny(txt,['trail','mountain','forest','camp','gravel','dock','expedition','mud','storm','wet ground'])){
+    profile='active_lifestyle'; level='clean';
+    effects=effects.concat(['soft_contact_shadow','counter_reflection','warm_practical_light','subtle_fingerprints','local_color_spill']);
+    notes='Active lifestyle integration: keep the product clean and credible, using scene-matched light, contact shadow, counter or floor reflection, subtle fingerprints only when plausible, and restrained local color spill. Do not add field grime, dust, edge wear, or weathering.';
+  }else if(hasAny(txt,['trail','field','mountain','forest','camp','alpine','gravel','bike trail','tailgate','truck bed','dock','lake','beach expedition','outdoor expedition','utility field','mud','dust storm','rain','storm','wet ground','recovery threshold'])){
     profile='field'; level='field';
     effects=effects.concat(['light_dust','dirt_speckling','minor_surface_scuffs','edge_wear','minor_pouch_wrinkles','wetness','condensation','gear_shadow','partial_foreground_obstruction']);
     notes='Field/outdoor integration: allow light dust or dirt on lower edges, minor '+packageInfo.label+' wrinkles or deformation if applicable, wetness or condensation when physically motivated, shadow from nearby gear, subtle edge wear, and cool/warm environmental light spill. Do not make the product look destroyed, unreadable, or redesigned.';
@@ -963,8 +973,11 @@ function directorGuidanceBlock(sel){
   if(pvLines.length){ lines.push('Build world_description, surface, background, materials, lighting, camera, and composition directly from these variables. This is the scene, not a suggestion:'); lines.push(pvLines.join('\n')); }
   if(borrow.length) lines.push('Borrow these cinematic qualities (primary weight about '+(sel.primary_weight||0)+(sel.secondary_influence?(', secondary weight about '+(sel.secondary_weight||0)):'')+'): '+borrow.join('; ')+'.');
   if(_l(sel.avoid).length) lines.push('Keep these out of the scene: '+_l(sel.avoid).join('; ')+'.');
-  lines.push('Do NOT add ingredient, fruit, flower, or other flavor-literal props. Flavor may inform color palette or mood only. If any flavor-literal prop is listed above to avoid, exclude it.');
-  lines.push('Populate world_thesis and cinematic_translation. Keep the product a small, readable, off-center hero with packaging unchanged: product fidelity and Higher Roads authorship outrank this grammar, so drop any borrowed trait that would hide the product, distort packaging, center it on a tabletop, or create parody.');
+  lines.push('Do NOT add ingredient, fruit, flower, powder, splash, or other flavor-literal props unless the supplied campaign evidence explicitly makes them part of the campaign concept. Flavor may inform color palette, shape language, motion, or mood only.');
+  lines.push('Do not open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or invent product accessories. Preserve the exact supplied product state.');
+  lines.push('Any phone, tablet, computer, TV, sign, menu, poster, label, screen, or display must be blank, abstract, cropped, or too defocused to read. Do not generate pseudo-text, interface copy, invented words, or letter-like markings.');
+  lines.push('Brand evidence outranks category ritual. Do not default to shaker bottles, scoops, yoga mats, gym bags, kitchen counters, spa objects, pools, fruit, or outdoor gear unless the brand and campaign evidence directly support them.');
+  lines.push('Populate world_thesis and cinematic_translation. Keep the product a small, readable, off-center hero with packaging and product state unchanged: product fidelity and Higher Roads authorship outrank this grammar, so drop any borrowed trait that would hide the product, distort packaging, center it on a tabletop, or create parody.');
   lines.push('In addition to the required schema, add two top-level fields to your JSON: "borrowed_visual_grammar" (array of short strings: the grammar you actually used) and "excluded_visual_grammar" (array of short strings: grammar you deliberately dropped, each with a brief reason).');
   return lines.join('\n');
 }
@@ -1047,7 +1060,18 @@ function renderCreativeDirectionPanel(){
 }
 
 const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
-const ART_DIRECTOR_PROMPT = HR_CREATIVE_CONFIG.artDirectorPrompt;
+const ART_DIRECTOR_PROMPT = [
+  HR_CREATIVE_CONFIG.artDirectorPrompt||'',
+  '',
+  'GENERALIZED SCENE FIDELITY OVERRIDE:',
+  'Brand and campaign evidence own the world. Category conventions are weak evidence and must not define the scene.',
+  'Preserve the exact supplied product state. Do not open, close, unwrap, pour, peel, tear, remove or add lids or caps, add scoops, expose contents, alter fill state, or invent accessories.',
+  'Do not use literal flavor ingredients, fruit, botanicals, powders, splashes, or ingredient piles as props unless supplied campaign evidence explicitly uses them as campaign imagery.',
+  'Any phone, tablet, computer, TV, sign, menu, poster, label, package, screen, or display must be blank, abstract, cropped, or too defocused to read. Never generate pseudo-text, interface copy, fake menu items, invented words, or letter-like markings.',
+  'Do not default to shaker bottles, scoops, yoga mats, gym bags, kitchen counters, spa objects, pools, fruit, tactical equipment, or outdoor gear because of product category alone.',
+  'Create a specific brand-authored moment with a concrete use occasion, implied action, recognizable location, and at least three cues traceable to brand or campaign evidence.',
+  'If a prop is merely a category cliché and not supported by brand evidence, exclude it.'
+].join('\n');
 
 function sceneFromDirectorSelection(data, directorSelection){
   const v=(data&&data.vibes)||{}, f=(data&&data.factual)||{};
@@ -1174,7 +1198,7 @@ async function buildMasterScene(data, apiKey, directorSelection){
     sensory:ix.sensory||{},
     competitive:ix.competitive||{},
     confidence:v.confidence||'unknown',
-    fidelity_rule:'The product image is locked. The scene must be built around the product. Do not redraw, retype, recolor, relabel, reshape, crop, open, or reinterpret the product packaging.'
+    fidelity_rule:'The product image is identity-locked and state-locked. The scene must be built around the product. Do not redraw, retype, recolor, relabel, reshape, crop, open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or reinterpret the product packaging. Any screens, signs, posters, menus, labels, or displays in the environment must be blank, abstract, cropped, or unreadable.'
   };
   const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -1273,7 +1297,7 @@ function buildRenderPackage(h){
   };
   return {
     meta:{package_version:'0.2',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:effectiveChosenDirection,render_path_recommendation:_c(sd.render_path)||'composite',creative_config_version:CREATIVE_CONFIG_VERSION},
-    fidelity_contract:{statement:'The product image is identity-locked. Do not redraw, retype, recolor, relabel, reshape, resize, crop, open, or reinterpret the brand-critical packaging structure. Use the supplied product image as the source of truth.',package_format:packageInfo.format,package_format_label:packageInfo.label,format_protection:packageInfo.structure.slice(),preserve:_dedupe(_l(la.preserve_elements).filter(x=>!/^can format$/i.test(x)).concat(['package format']).concat(packageInfo.structure)),rules:['Brand-critical identity must be preserved: logo, label hierarchy, typography, SKU/flavor identity, primary graphic system, color blocking, pack shape, and proportions.','Physically plausible scene integration is allowed as a non-destructive overlay on the object: condensation, dust, dirt, grime, small wrinkles, edge wear, scuffs, wetness, contact shadows, local occlusion, reflected light, color spill, atmospheric haze, lens softness, and depth of field.','Integration effects must not obscure or alter protected identity regions beyond the integration_treatment limits.','The product is composited or referenced from the supplied image; any environmental treatment sits over the locked asset rather than replacing it.']},
+    fidelity_contract:{statement:'The product image is identity-locked and state-locked. Do not redraw, retype, recolor, relabel, reshape, resize, crop, open, close, unwrap, pour, remove or add parts, expose contents, change fill state, or reinterpret the brand-critical packaging structure. Use the supplied product image as the source of truth.',package_format:packageInfo.format,package_format_label:packageInfo.label,format_protection:packageInfo.structure.slice(),preserve:_dedupe(_l(la.preserve_elements).filter(x=>!/^can format$/i.test(x)).concat(['package format']).concat(packageInfo.structure)),rules:['Brand-critical identity must be preserved: logo, label hierarchy, typography, SKU/flavor identity, primary graphic system, color blocking, pack shape, proportions, and exact open/closed product state.','Do not open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or invent accessories.','Physically plausible scene integration is allowed as a non-destructive overlay on the object: condensation, dust, dirt, grime, small wrinkles, edge wear, scuffs, wetness, contact shadows, local occlusion, reflected light, color spill, atmospheric haze, lens softness, and depth of field.','Integration effects must not obscure or alter protected identity regions beyond the integration_treatment limits.','The product is composited or referenced from the supplied image; any environmental treatment sits over the locked asset rather than replacing it.']},
     locked_asset:buildLockedAssetRecord(la),
     integration_treatment:integrationTreatment,
     scene_brief:effectiveSceneBrief,
@@ -2334,7 +2358,8 @@ function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ ret
 function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
 
-const GENERIC_SCENE_CUE_RE=/\b(pink|sunset|golden hour|fabric|linen|stone|water|pool|spa|soft light|glossy surface|wellness|fitness|luxury|resort|gritty|industrial|outdoor gear)\b/i;
+const GENERIC_SCENE_CUE_RE=/\b(pink|sunset|golden hour|fabric|linen|stone|water|pool|spa|soft light|glossy surface|wellness|fitness|luxury|resort|gritty|industrial|outdoor gear|shaker bottle|scoop|yoga mat|gym bag|kitchen counter|fruit|ingredient|succulent|motivational print)\b/i;
+const FLAVOR_LITERAL_RE=/\b(fruit|berry|berries|cherry|lime|lemon|orange|grapefruit|dragon fruit|mango|peach|watermelon|coconut|vanilla|chocolate|mint|botanical|flower|powder pile|ingredient pile|splash)\b/i;
 function sceneSpecificityReport(scene, campaignSignals){
   const s=scene||{};
   const campaign=campaignSignals||{};
@@ -2346,7 +2371,13 @@ function sceneSpecificityReport(scene, campaignSignals){
     _l(campaign.locations),
     _l(campaign.signature_objects)
   ));
-  const distinctive=all.filter(cue=>!GENERIC_SCENE_CUE_RE.test(_c(cue)));
+  const campaignEvidenceText=JSON.stringify(campaign||{}).toLowerCase();
+  const distinctive=all.filter(cue=>{
+    const text=_c(cue);
+    if(GENERIC_SCENE_CUE_RE.test(text)) return false;
+    if(FLAVOR_LITERAL_RE.test(text) && !campaignEvidenceText.includes(text.toLowerCase())) return false;
+    return true;
+  });
   const hasSpecificLocation=!!_c(s.world_description)&&!/^a (real|brand-specific|concrete) environment/i.test(_c(s.world_description));
   const hasUseOccasion=!!_c(s.use_occasion);
   const hasAction=!!_c(s.implied_action);
@@ -2370,6 +2401,9 @@ function buildSceneRepairPrompt(data, scene, report){
     'Add one specific use occasion, one implied action, and one recognizable location.',
     'At least one cue must be more specific than color, lighting, texture, fabric, water, stone, pool, spa, sunset, or generic fitness styling.',
     'Do not introduce tactical, field-readiness, grungy outdoor, spa, resort, hospitality, archive, institutional, or service-counter clichés unless the campaign evidence explicitly supports them.',
+    'Do not use literal flavor ingredients, fruit, botanicals, powders, splashes, or ingredient piles unless campaign evidence explicitly supports them.',
+    'Preserve the exact supplied product state. Do not open, close, unwrap, pour, remove lids or caps, add scoops, expose contents, or change fill state.',
+    'Any phone, screen, sign, menu, poster, label, or display must be blank, abstract, cropped, or unreadable.',
     'Return only valid JSON matching the existing scene_direction shape.',
     'Campaign signals:',
     JSON.stringify(ix.campaign_signals||{},null,2),

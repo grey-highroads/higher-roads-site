@@ -44,8 +44,9 @@
   const FORMAT_TERMS = {
     can:['can body','can top','pull tab','rim','label wrap','cylindrical proportions'],
     pouch:['sealed pouch','top seal','hang hole if visible','gusset if visible','front face','product window if visible','pack silhouette'],
-    bottle:['bottle body','cap','neck','shoulder','label wrap','bottle silhouette'],
-    box:['carton panels','folds','closure','front face','edges','box proportions'],
+    tub:['tub body','lid','rim','label wrap','cylindrical proportions','closed or open state exactly as supplied'],
+    bottle:['bottle body','cap','neck','shoulder','label wrap','bottle silhouette','closed or open state exactly as supplied'],
+    box:['carton panels','folds','closure','front face','edges','box proportions','closed or open state exactly as supplied'],
     package:['package structure','front face','silhouette','proportions']
   };
 
@@ -53,6 +54,10 @@
     clean_interior:{
       allowed:['contact shadow','warm or cool color spill','soft reflection','edge darkening','slight package crinkle','subtle paper dust','lens softness'],
       avoid:['mud','heavy dust','field grime','wetness','condensation unless physically motivated']
+    },
+    active_lifestyle:{
+      allowed:['contact shadow','counter or floor reflection','warm practical light','subtle fingerprints','local color spill','soft edge darkening'],
+      avoid:['mud','heavy dust','field grime','edge wear','weathering','condensation unless physically motivated']
     },
     field_outdoor:{
       allowed:['light dust','dirt speckling','minor scuffs','edge wear','gear shadow','local occlusion','weather light','minor pouch wrinkles'],
@@ -79,7 +84,8 @@
     const s=[a.asset_name,a.asset_type,a.image_ref,a.source_image_url,a.asset_url,a.media_type].map(c).join(' ').toLowerCase();
     if(/\b(pouch|bag|packet|sachet|wrapper|jerky|granola|chips)\b/.test(s)) return 'pouch';
     if(/\b(can|soda|spritz|seltzer|rtd)\b/.test(s)) return 'can';
-    if(/\b(bottle|shooter|squeeze|jar|vial)\b/.test(s)) return 'bottle';
+    if(/\b(tub|jar|canister|pre-workout|supplement tub|powder container)\b/.test(s)) return 'tub';
+    if(/\b(bottle|shooter|squeeze|vial)\b/.test(s)) return 'bottle';
     if(/\b(box|carton|case)\b/.test(s)) return 'box';
     return 'package';
   }
@@ -87,7 +93,8 @@
     const p=c(pkg&&pkg.integration_treatment&&pkg.integration_treatment.profile);
     if(p) return p;
     const s=[pkg&&pkg.meta&&pkg.meta.chosen_direction,pkg&&pkg.scene_brief&&pkg.scene_brief.world_description,pkg&&pkg.prompts&&pkg.prompts.positive].map(c).join(' ').toLowerCase();
-    if(/trail|field|outdoor|mountain|ranger|gear|camp|forest|lake|dock|vehicle|tailgate|stone|dust|road/.test(s)) return 'field_outdoor';
+    if(/home workout|pre-gym|workout corner|fitness studio|training prep|playlist|earbuds|resistance band|shaker bottle|gym bag|kitchen counter/.test(s) && !/trail|mountain|forest|camp|gravel|dock|expedition|mud|storm|wet ground/.test(s)) return 'active_lifestyle';
+    if(/trail|field|outdoor expedition|mountain|ranger|camp|forest|lake|dock|vehicle|tailgate|dust|road/.test(s)) return 'field_outdoor';
     if(/cooler|condensation|cold|ice|pool|beverage|can|spritz/.test(s)) return 'cold_beverage';
     if(/kitchen|production|prep|bottling|workstation|steam|oil|flour|skillet|counter/.test(s)) return 'kitchen_production';
     if(/retail|display|glass|store|shelf|premium|boutique|gallery/.test(s)) return 'premium_retail';
@@ -150,8 +157,11 @@
 
   function sceneNativeIntegration(pkg, profile, format, profileInfo){
     const s=sceneText(pkg);
-    const formatPhrase = format==='pouch' ? 'minor pouch crinkle' : format==='can' ? 'clean rim highlight' : format==='bottle' ? 'subtle edge reflection' : 'slight edge texture';
+    const formatPhrase = format==='pouch' ? 'minor pouch crinkle' : format==='can' ? 'clean rim highlight' : format==='tub' ? 'clean lid and rim highlight with exact open or closed state preserved' : format==='bottle' ? 'subtle edge reflection' : 'slight edge texture';
 
+    if(profile==='active_lifestyle'){
+      return uniq(['natural contact shadow','soft counter or floor reflection','warm practical or daylight color spill','subtle fingerprints only where plausible','clean readable label face','exact product state preserved']).join(', ');
+    }
     if(profile==='field_outdoor'){
       const terrain = /stone|rock|granite/.test(s) ? 'warm reflected light from stone' : /snow|alpine|cold/.test(s) ? 'cool alpine light spill' : /road|trail|dust|gravel/.test(s) ? 'dry trail dust' : 'dry outdoor dust';
       const shadow = /rope|gear|bag|boot|bike/.test(s) ? 'soft gear shadow' : 'soft local shadow from nearby field objects';
@@ -173,7 +183,7 @@
   function compressedNegative(positive, pkg, profileInfo, removed){
     let terms=[];
     terms=terms.concat([
-      'redrawn packaging','retyped label','altered label hierarchy','changed package format','recolored packaging','warped logo','invented product text','generated duplicate products','extra branded packages','readable third-party branding','people or hands unless explicitly allowed','tabletop fallback','cluttered set dressing','too many props','generic stock-photo styling','product pasted on after the fact','environmental effects covering logo or product name','fake sponsor marks','competing brand identities'
+      'redrawn packaging','retyped label','altered label hierarchy','changed package format','recolored packaging','warped logo','invented product text','changed product state','removed lid or cap','added scoop','exposed contents','changed fill state','readable phone UI','readable screen text','pseudo-text','generated duplicate products','extra branded packages','readable third-party branding','people or hands unless explicitly allowed','tabletop fallback','cluttered set dressing','too many props','generic stock-photo styling','product pasted on after the fact','environmental effects covering logo or product name','fake sponsor marks','competing brand identities'
     ]);
     terms=terms.concat(l(profileInfo.avoid));
     terms=terms.concat(splitTerms(pkg&&pkg.prompts&&pkg.prompts.negative));
@@ -245,7 +255,8 @@
       lighting && ('lighting: '+lighting),
       atmosphere && ('atmosphere: '+atmosphere),
       'physical integration: apply scene-matched non-destructive effects only where plausible, such as '+allowedEffects.join(', '),
-      'environmental signage, maps, route cards, shelf tags, labels, utility markings, or operational symbols must be generic, non-branded, and not readable as a real or invented third-party identity',
+      'environmental signage, maps, route cards, shelf tags, labels, utility markings, screens, phones, or displays must be blank, abstract, cropped, or unreadable; no pseudo-text or readable interface copy',
+      'product state fidelity: preserve the exact supplied open or closed state; do not remove or add lids or caps, add scoops, expose contents, pour, unwrap, change fill state, or invent accessories',
       'product fidelity: identity-locked packaging; preserve package format ('+format+'), '+formatTerms.join(', ')+', logo, label hierarchy, text, color relationships, proportions, SKU or flavor identity, and primary graphic system unchanged'
     ];
     const compiled_positive=compactPrompt(positiveParts);
@@ -299,7 +310,8 @@
       'lighting: '+light,
       atmosphere,
       'physical integration: '+integration,
-      'all environmental markings are generic and unreadable; no third-party logos, patches, agency names, store names, or invented brand systems',
+      'all environmental markings and screens are blank, abstract, cropped, or unreadable; no readable phone UI, interface copy, menu text, pseudo-text, third-party logos, patches, agency names, store names, or invented brand systems',
+      'product state fidelity: preserve the exact supplied open or closed state; do not remove or add lids or caps, add scoops, expose contents, pour, unwrap, change fill state, or invent accessories',
       'product fidelity: preserve identity-locked '+format+' packaging, '+formatTerms.join(', ')+', logo, label hierarchy, typography, product text, color relationships, proportions, SKU or flavor identity, primary graphic system, and silhouette unchanged'
     ];
     const compiled_positive=compactPrompt(positiveParts);
