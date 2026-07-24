@@ -319,16 +319,16 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
         <span class="workflow-summary" id="stepRenderSummary">Waiting for the direction</span>
       </button>
       <div class="workflow-body" id="stepRenderBody">
-        <div class="footer-cta">
-          <button class="cta" id="cta" disabled>Bring it to life</button>
-          <span class="hint" id="ctaHint">We’ll enable this when the direction is ready.</span>
-        </div>
         <div class="render-progress" id="renderProgress" role="status" aria-live="polite">
           <span class="pulse" aria-hidden="true"></span>
           <div>
             <p class="rp-title" id="renderProgressTitle">Rendering your product world</p>
             <p class="rp-detail" id="renderProgressDetail">This usually takes a little while. Your image will appear here when ready.</p>
           </div>
+        </div>
+        <div class="footer-cta">
+          <button class="cta" id="cta" disabled>Bring it to life</button>
+          <span class="hint" id="ctaHint">We’ll enable this when the direction is ready.</span>
         </div>
       </div>
     </section>
@@ -449,7 +449,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-three-step-auto-render-v1';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-three-step-auto-render-v2';
 const PWP_BUILD_NOTE = 'three-step collapsible end-user flow; product selection advances to direction; direction advances to render; final action submits render automatically; dev UI hidden';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
