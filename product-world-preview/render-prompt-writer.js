@@ -37,19 +37,64 @@
     return c(str).split(/,|;|\n|\|/g).map(x=>x.trim()).filter(Boolean);
   }
 
-  const FORMAT_NOUN = { can:'can', pouch:'pouch', tub:'tub', bottle:'bottle', box:'carton', package:'package' };
+  const FORMAT_NOUN = { can:'can', pouch:'pouch', tub:'tub', jar:'jar', bottle:'bottle', box:'carton', package:'package' };
 
   function inferFormat(pkg){
     const existing=c(pkg&&pkg.package_format)||c(pkg&&pkg.fidelity_contract&&pkg.fidelity_contract.package_format)||c(pkg&&pkg.integration_treatment&&pkg.integration_treatment.package_format);
     if(existing) return existing==='carton'?'box':existing;
     const a=(pkg&&pkg.locked_asset)||{};
     const s=[a.asset_name,a.asset_type,a.image_ref,a.source_image_url,a.asset_url,a.media_type].map(c).join(' ').toLowerCase();
+    // Jar (gummies, edibles) distinguished from tub (powders) so downstream
+    // logic can hold shelf-stable, non-refrigerated behavior for both.
+    if(/\b(jar|gummy|gummies|edible|edibles|softgel|softgels|capsule|capsules|honey|jam|preserves|salve|balm)\b/.test(s)) return 'jar';
     if(/\b(pouch|bag|packet|sachet|wrapper|jerky|granola|chips)\b/.test(s)) return 'pouch';
     if(/\b(can|soda|spritz|seltzer|rtd)\b/.test(s)) return 'can';
-    if(/\b(tub|jar|canister|pre-workout|supplement tub|powder container)\b/.test(s)) return 'tub';
-    if(/\b(bottle|shooter|squeeze|vial)\b/.test(s)) return 'bottle';
+    if(/\b(tub|canister|pre[- ]?workout|supplement tub|powder container|protein tub)\b/.test(s)) return 'tub';
+    if(/\b(bottle|shooter|squeeze|dropper|tincture|drops|vial|flask)\b/.test(s)) return 'bottle';
     if(/\b(box|carton|case)\b/.test(s)) return 'box';
     return 'package';
+  }
+
+  /* State-lock neutralization. The art-director prompt tells the scene author
+     that product state is locked; this is the belt-and-suspenders enforcement.
+     If the authored prose describes the product as opened, uncapped, unwrapped,
+     tipped, poured, or spilled, we neutralize the phrasing at compile time so
+     the rendered prompt never contradicts the fidelity contract. Returns the
+     rewritten prose plus the list of phrases we changed for the warning log. */
+  // Note on regex construction: 'opened?' matches 'opene' or 'opened', NOT 'open'
+  // (the ? applies only to the immediately preceding character). We use the
+  // explicit '(?:open|opened)' alternation everywhere to catch both forms.
+  const OPEN_WORD = '(?:open|opened)';
+  const STATE_LOCK_PATTERNS = [
+    [new RegExp('\\b(jar|bottle|can|pouch|tub|box|package|container)s?\\s+'+OPEN_WORD+'\\b','gi'), '$1 closed and sealed'],
+    [new RegExp('\\bsits?\\s+'+OPEN_WORD+'\\b','gi'), 'sits'],
+    [new RegExp('\\bstands?\\s+'+OPEN_WORD+'\\b','gi'), 'stands'],
+    [new RegExp('\\brests?\\s+'+OPEN_WORD+'\\b','gi'), 'rests'],
+    [new RegExp('\\bsitting\\s+'+OPEN_WORD+'\\b','gi'), 'sitting'],
+    [new RegExp('\\bstanding\\s+'+OPEN_WORD+'\\b','gi'), 'standing'],
+    [/\b(the\s+)?lid\s+(?:is\s+)?(?:off|removed|open)\b/gi, 'the lid on'],
+    [/\b(the\s+)?cap\s+(?:is\s+)?(?:off|removed|open)\b/gi, 'the cap on'],
+    [/\bwith\s+(the\s+)?(lid|cap)\s+(?:off|removed)\b/gi, 'with the $2 on'],
+    [/\buncapped\b/gi, 'capped'],
+    [/\bunsealed\b/gi, 'sealed'],
+    [/\bunwrapped\b/gi, 'wrapped'],
+    [/\bpoured\s+out\b/gi, 'held ready'],
+    [/\bspilled\b/gi, 'settled'],
+    [/\btipped\s+over\b/gi, 'upright'],
+    [/\bcontents\s+visible\b/gi, 'contents held inside'],
+    [/\bcontents\s+spilling\b/gi, 'contents held inside']
+  ];
+  function neutralizeStateLanguage(s){
+    let out=c(s), changed=[];
+    STATE_LOCK_PATTERNS.forEach(pair=>{
+      const [pat,repl]=pair;
+      const found=out.match(pat);
+      if(found){
+        changed=changed.concat(found);
+        out=out.replace(pat,repl);
+      }
+    });
+    return {out, changed};
   }
 
   /* Cleanup only. Removes markdown, meta labels, stray numeric placement
@@ -104,11 +149,18 @@
 
   function protectionBlock(pkg, format){
     const noun=FORMAT_NOUN[format]||'package';
+    // Formats with a state (lid, cap, seal, wrapper) get an explicit closed-state
+    // assertion. This is the second half of the state-lock belt-and-suspenders,
+    // downstream of the authored-prose neutralization above.
+    const statefulFormats=new Set(['jar','tub','bottle','box','pouch']);
     const lines=[
-      'Preserve the supplied '+noun+' exactly as pictured: logo, label hierarchy, typography, colors, proportions, silhouette, and open or closed state unchanged, fully readable.',
-      integrationSentence(pkg, format),
-      'Any environmental surface that would carry writing (signs, screens, menus, posters, other packaging) is blank, abstract, cropped, or defocused beyond reading, with no pseudo-text or letter-like marks anywhere.'
+      'Preserve the supplied '+noun+' exactly as pictured: logo, label hierarchy, typography, colors, proportions, silhouette, and open or closed state unchanged, fully readable.'
     ];
+    if(statefulFormats.has(format)){
+      lines.push('The '+noun+' is closed and sealed exactly as supplied: lid on, cap on, wrapper intact, contents not exposed. Do not render the '+noun+' as opened, tipped, or with contents visible.');
+    }
+    lines.push(integrationSentence(pkg, format));
+    lines.push('Any environmental surface that would carry writing (signs, screens, menus, posters, other packaging) is blank, abstract, cropped, or defocused beyond reading, with no pseudo-text or letter-like marks anywhere.');
     if(peopleExcluded(pkg)) lines.push('No people or hands appear in the frame.');
     return lines.join(' ');
   }
@@ -133,6 +185,14 @@
     if(!world){ world=assembleFallbackProse(sd); source='field_assembly'; warnings.push('No authored_prompt or prompt_seed reached the compiler; assembled minimal prose from scene fields.'); }
     if(!world){ world='A cinematic brand-world photograph with real environmental depth built around the supplied product.'; source='generic'; warnings.push('Scene brief was empty; compiled a generic world line.'); }
     if(source!=='authored_prompt') warnings.push('World prose source: '+source+'.');
+
+    // State-lock enforcement: neutralize opened/uncapped/unwrapped/poured/etc.
+    // phrases the scene author may have slipped in against the fidelity contract.
+    const stateFix=neutralizeStateLanguage(world);
+    if(stateFix.changed.length){
+      world=stateFix.out;
+      warnings.push('State-lock neutralized authored phrasing: '+stateFix.changed.slice(0,5).join(' | '));
+    }
 
     const compiled_positive=[
       'A wide cinematic campaign-film still in landscape framing, a real environment with depth and atmosphere, not a tabletop product photo.',

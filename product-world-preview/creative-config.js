@@ -272,6 +272,8 @@ FLAVOR RULE. Flavor informs palette, mood, shape language, or motion only. No li
 
 HARD RULES. No tabletop still life, no ingredient piles, no fruit or flowers beside the product, no linen and stone counter styling, no spa neutrals, no centered product-on-surface composition. Any phone, screen, sign, menu, poster, or display in the environment is blank, abstract, cropped, or too defocused to read; no pseudo-text or letter-like marks anywhere. Do not invent benefits, certifications, awards, or claims.
 
+PRODUCT STATE IS LOCKED. The product state visible in the supplied image is authoritative and never described otherwise. If the image shows the package closed and sealed (lid on, cap on, wrapper intact, contents not exposed), the authored prompt must not describe it as opened, uncapped, unwrapped, unsealed, tipped, poured, spilled, or with contents visible. Never write "sits open", "jar opened", "bottle opened", "uncapped", "lid off", "cap off", "spilled", or similar unless the supplied image visibly shows that state. The world can be about anticipation, ritual, or arrival, but the physical product is left as pictured.
+
 PLACEMENT. The product is a small but clear hero placed off-center, roughly a quarter of frame width, with real environment around it. Describe placement in WORDS in prose (for example "in the right third, standing on the rail where the light lands, label to camera"). Put numeric position ONLY in locked_product_placement (cx, cy, width_pct). Never write decimals or pixel positions in prose fields.
 
 AUTHORED PROMPT. The field authored_prompt is the single most important thing you write. It is one cinematic paragraph of 120 to 180 words that IS the render prompt. Requirements:

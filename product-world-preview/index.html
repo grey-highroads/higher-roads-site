@@ -565,17 +565,23 @@ function inferPackageFormat(asset){
   asset=asset||{};
   const s=[asset.asset_name,asset.name,asset.asset_type,asset.type,asset.bucket,asset.analysis_summary,asset.prompt_instruction,asset.source_image_url,asset.asset_url,asset.stored_asset_url,asset.image_ref]
     .filter(Boolean).join(' ').toLowerCase();
+  // Jar-family (gummies, edibles, honey, jam) is a distinct format from tub
+  // (powders, supplements). Both are shelf-stable containers; splitting keeps
+  // the report label accurate and lets downstream logic guard against
+  // beverage-profile misclassification.
+  if(/\b(jar|gummy|gummies|edible|edibles|softgel|softgels|capsule|capsules|honey|jam|preserves|salve|balm)\b/.test(s)) return 'jar';
   if(/\b(pouch|bag|packet|sachet|stand[- ]?up|jerky|granola|chips|mix)\b/.test(s)) return 'pouch';
   if(/\b(can|soda|seltzer|spritz|sparkling|ready[- ]?to[- ]?drink|rtd)\b/.test(s)) return 'can';
-  if(/\b(tub|jar|canister|powder container|supplement tub|pre-workout)\b/.test(s)) return 'tub';
-  if(/\b(bottle|shooter|shot|squeeze|dropper|vial|flask)\b/.test(s)) return 'bottle';
+  if(/\b(tub|canister|powder container|supplement tub|pre[- ]?workout|protein tub)\b/.test(s)) return 'tub';
+  if(/\b(bottle|shooter|shot|squeeze|dropper|tincture|drops|vial|flask)\b/.test(s)) return 'bottle';
   if(/\b(box|carton|case|tin)\b/.test(s)) return 'box';
   return 'package';
 }
 const PACKAGE_FORMAT_INFO={
   pouch:{label:'pouch',structure:['sealed pouch structure','top seal','hang hole if present','gusset if present','product window if present','front face','pack silhouette'],avoid:['torn pouch','crushed pouch proportions','fake wrinkles through typography','mud or scuffs covering logo or product name']},
   can:{label:'can',structure:['can body','can top','pull tab','rim','label wrap','cylindrical proportions'],avoid:['warped cylinder','fake pull tab changes','dented can that distorts label hierarchy','condensation obscuring logo or product name']},
-  tub:{label:'tub/jar',structure:['tub body','lid','rim','label wrap','cylindrical proportions','closed or open state exactly as supplied'],avoid:['removed lid unless supplied removed','opened tub unless supplied open','added scoop','visible powder unless supplied visible','changed fill state','warped cylinder','fake lid details']},
+  tub:{label:'tub',structure:['tub body','lid','rim','label wrap','cylindrical proportions','closed or open state exactly as supplied'],avoid:['removed lid unless supplied removed','opened tub unless supplied open','added scoop','visible powder unless supplied visible','changed fill state','warped cylinder','fake lid details']},
+  jar:{label:'jar',structure:['jar body','lid','rim','threading','label wrap','cylindrical or facetted proportions','closed lid and sealed state exactly as supplied'],avoid:['removed lid unless supplied removed','opened jar unless supplied open','visible contents unless supplied visible','loose gummies, edibles, or contents outside the jar','added scoop or utensil','changed fill level','warped jar body','fake lid details','condensation beads treating a shelf-stable jar as a cold beverage','wet contact base as a cold-beverage cue']},
   bottle:{label:'bottle',structure:['bottle body','cap','neck','shoulder','label wrap','bottle silhouette','closed or open state exactly as supplied'],avoid:['changed cap','warped neck','opened bottle unless supplied open','fake fluid level or label wrap changes']},
   box:{label:'box/carton',structure:['carton panels','front face','folds','closure','edges','box proportions','closed or open state exactly as supplied'],avoid:['crushed carton proportions','opened closure unless supplied open','fake panel text','damaged front face']},
   package:{label:'package',structure:['package structure','front face','silhouette','proportions','closed or open state exactly as supplied'],avoid:['changed package structure','crushed silhouette','fake package details','opened or altered package state']}
@@ -672,7 +678,10 @@ function buildIntegrationTreatment(h){
     profile='field'; level='field';
     effects=effects.concat(['light_dust','dirt_speckling','minor_surface_scuffs','edge_wear','minor_pouch_wrinkles','wetness','condensation','gear_shadow','partial_foreground_obstruction']);
     notes='Field/outdoor integration: allow light dust or dirt on lower edges, minor '+packageInfo.label+' wrinkles or deformation if applicable, wetness or condensation when physically motivated, shadow from nearby gear, subtle edge wear, and cool/warm environmental light spill. Do not make the product look destroyed, unreadable, or redesigned.';
-  }else if(hasAny(txt,['cooler','ice','cold','pool','water','condensation','beverage','can','bottle','hydration','sparkling','soda','drink','spritz','shooter'])){
+  }else if((packageInfo.format==='can'||packageInfo.format==='bottle') && hasAny(txt,['cooler','ice','cold','condensation','beverage','hydration','sparkling','soda','drink','spritz','shooter'])){
+    // Cold-beverage integration is now format-gated: only cans and bottles can
+    // pick up condensation beads, wet contact base, and cooler-reflection cues.
+    // A gummy jar, tub, or box in a wet scene must not be treated as refrigerated.
     profile='cold_beverage'; level='light';
     effects=effects.concat(['condensation_beads','wet_contact_base','cold_highlights','cooler_reflections','subtle_label_gloss','small_water_droplets']);
     notes='Cold beverage integration: allow condensation beads, a wet contact base, cold highlights, cooler/glass reflections, and small water droplets. Do not warp the label, invent droplets as printed graphics, or obscure the product name.';
@@ -684,6 +693,17 @@ function buildIntegrationTreatment(h){
     profile='premium_controlled'; level='clean';
     effects=effects.concat(['controlled_reflections','glass_refraction','soft_contact_shadow','subtle_surface_reflection']);
     notes='Premium/controlled integration: keep the product mostly clean, using controlled reflections, glass refraction, color spill, and precise contact shadow. Avoid grime unless the brand/world specifically earns it.';
+  }
+  // Shelf-stable container safety net: if the pack is a jar, tub, or box and
+  // the scene has wet or humid cues, allow scene-matched moisture on the
+  // surface AROUND the container without treating the container itself as cold.
+  // Applied as a final overlay so it corrects any residual misclassification.
+  const shelfStableSet=new Set(['jar','tub','box']);
+  if(shelfStableSet.has(packageInfo.format) && hasAny(txt,['wet','rain','humid','damp','condensation','mist','fog','dew','porch rail'])){
+    profile='shelf_stable_container'; level='light';
+    effects=effects.filter(e=>!/condensation_beads|wet_contact_base|cold_highlights|cooler_reflections|small_water_droplets/.test(e));
+    effects=effects.concat(['scene_matched_surface_moisture_around_base','restrained_ambient_reflection_on_container','soft_contact_shadow','local_color_spill']);
+    notes='Shelf-stable container ('+packageInfo.label+') in a wet or humid scene: allow scene-matched moisture on the surface AROUND the container, restrained ambient reflection on the container itself where scene light rakes across it, believable contact shadow, and local color spill. The container is not a cold beverage: do not add condensation beads on its surface, wet contact base as a cold cue, refrigerated highlights, or cooler-glass reflections.';
   }
   const protectedDefaults=['brand_logo','product_name','flavor_or_sku_name','primary_graphic_system','label_hierarchy','typography','key_claims_or_regulatory_copy','pack_shape','pack_proportions','package_format','color_blocking','barcode_or_required_markings_if_visible'].concat(packageInfo.structure);
   const preserve=_l(la.preserve_elements).map(x=>x.toLowerCase().replace(/[^a-z0-9]+/g,'_')).filter(Boolean);
