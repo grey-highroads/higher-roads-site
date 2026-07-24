@@ -449,8 +449,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-brand-first-director-grammar-v1';
-const PWP_BUILD_NOTE = 'brand read owns world thesis and scene territory; director layer refines cinematic grammar only; full brand intelligence passed to selector; no-fit director path supported';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-brand-specificity-gate-v1';
+const PWP_BUILD_NOTE = 'campaign signals passed through brand-first scene authority; deterministic specificity gate blocks vague scenes and runs one repair call before rendering';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -838,7 +838,8 @@ function brandWorldAuthority(data){
       visual_territory:ix.visual_territory||{},
       sensory:ix.sensory||{},
       competitive:ix.competitive||{},
-      assets:ix.assets||{}
+      assets:ix.assets||{},
+      campaign_signals:ix.campaign_signals||{}
     },
     product_facts:{
       name:_c(f.name),
@@ -865,6 +866,7 @@ function directorSelectionInput(data){
       sensory:ix.sensory||{},
       competitive:ix.competitive||{},
       assets:ix.assets||{},
+      campaign_signals:ix.campaign_signals||{},
       primary_direction:v.primary||{},
       source_scene_direction:v.scene_direction||{}
     },
@@ -1062,6 +1064,16 @@ function sceneFromDirectorSelection(data, directorSelection){
   const sourceLighting=_c(source.lighting)||'Motivated brand-appropriate light with controlled product readability.';
   const sourceProps=_l(source.props);
   const sourceAvoid=_l(source.avoid);
+  const campaign=(v.intake_expressive&&v.intake_expressive.campaign_signals)||{};
+  const campaignCues=_dedupe([].concat(
+    _l(campaign.cultural_codes),
+    _l(campaign.locations),
+    _l(campaign.actions_and_motion),
+    _l(campaign.signature_objects),
+    _l(campaign.exact_phrases)
+  ));
+  const useOccasion=_c(source.use_occasion)||_l(campaign.use_occasions)[0]||'a concrete brand-relevant use occasion';
+  const impliedAction=_c(source.implied_action)||_l(campaign.actions_and_motion)[0]||'recent or imminent human activity implied through the environment';
 
   // The brand read owns world, place family, emotional posture, campaign cues,
   // props, and palette. Director selection contributes photographic grammar only.
@@ -1096,7 +1108,10 @@ function sceneFromDirectorSelection(data, directorSelection){
   const promptSeed=[
     'authoritative brand world: '+sourceWorld,
     'brand scene: '+sourceName,
+    campaignCues.length&&('campaign evidence: '+campaignCues.slice(0,8).join(', ')),
     sourceProps.length&&('brand-specific props and cues: '+sourceProps.join(', ')),
+    'use occasion: '+useOccasion,
+    'implied action: '+impliedAction,
     'composition: '+composition,
     'lighting: '+lighting,
     camera&&('camera: '+camera),
@@ -1111,7 +1126,11 @@ function sceneFromDirectorSelection(data, directorSelection){
     product_placement_intent:objectTreatment,
     composition,
     lighting,
-    props:sourceProps,
+    use_occasion:useOccasion,
+    implied_action:impliedAction,
+    evidence_cues:_dedupe([].concat(_l(source.evidence_cues),campaignCues)).slice(0,10),
+    signature_objects:_dedupe([].concat(_l(source.signature_objects),_l(campaign.signature_objects))).slice(0,8),
+    props:_dedupe([].concat(sourceProps,_l(campaign.signature_objects))).slice(0,10),
     avoid:_dedupe([].concat(sourceAvoid,_l(sel.avoid),[
       'category-default field readiness unless brand-authored',
       'generic spa or pool resort unless brand-authored',
@@ -1189,6 +1208,10 @@ function mapSceneDirectionToSd(d, meta){
     product_placement_intent:intent||_c(d.composition),
     composition:_c(d.composition),
     lighting:_c(d.lighting),
+    use_occasion:_c(d.use_occasion),
+    implied_action:_c(d.implied_action),
+    evidence_cues:_l(d.evidence_cues),
+    signature_objects:_l(d.signature_objects),
     props:_l(d.props),
     avoid:avoids,
     render_path:'composite',
@@ -1459,7 +1482,17 @@ function mockPreviewData(){
         visual_territory:{ closest_to:['sun-worn resort'], stay_away_from:['neon','pharmacy'], ownable:'golden-hour patio light' },
         sensory:{ color_palette:'sunset amber', textures_and_materials:['linen','ceramic'], forbidden_colors:'clinical white, hazard green' },
         competitive:{ admires:'Cutwater', avoid_resembling:'dispensary brands' },
-        assets:{ brand_intent:'a calm social ritual' }
+        assets:{ brand_intent:'a calm social ritual' },
+        campaign_signals:{
+          exact_phrases:['golden hour'],
+          cultural_codes:['sun-worn social ritual'],
+          use_occasions:['relaxed social occasion'],
+          locations:['sun-worn patio'],
+          actions_and_motion:['friends arriving and setting down drinks'],
+          signature_objects:['linen','ceramic','stone'],
+          campaign_energy:'warm and easygoing',
+          evidence_notes:['derived from supplied demo copy']
+        }
       },
       scene_direction:{
         scene_name:'Golden patio',
@@ -2300,6 +2333,103 @@ const KEY_STORE='pwp_anthropic_key';
 function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ return ''; } }
 function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
+
+const GENERIC_SCENE_CUE_RE=/\b(pink|sunset|golden hour|fabric|linen|stone|water|pool|spa|soft light|glossy surface|wellness|fitness|luxury|resort|gritty|industrial|outdoor gear)\b/i;
+function sceneSpecificityReport(scene, campaignSignals){
+  const s=scene||{};
+  const campaign=campaignSignals||{};
+  const all=_dedupe([].concat(
+    _l(s.evidence_cues),
+    _l(s.signature_objects),
+    _l(s.props),
+    _l(campaign.cultural_codes),
+    _l(campaign.locations),
+    _l(campaign.signature_objects)
+  ));
+  const distinctive=all.filter(cue=>!GENERIC_SCENE_CUE_RE.test(_c(cue)));
+  const hasSpecificLocation=!!_c(s.world_description)&&!/^a (real|brand-specific|concrete) environment/i.test(_c(s.world_description));
+  const hasUseOccasion=!!_c(s.use_occasion);
+  const hasAction=!!_c(s.implied_action);
+  const hasNonMoodCue=distinctive.length>=3;
+  return {
+    distinctive_cues:distinctive,
+    distinctive_count:distinctive.length,
+    has_specific_location:hasSpecificLocation,
+    has_use_occasion:hasUseOccasion,
+    has_action:hasAction,
+    passes:hasSpecificLocation&&hasUseOccasion&&hasAction&&hasNonMoodCue
+  };
+}
+function buildSceneRepairPrompt(data, scene, report){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  return [
+    'Repair this scene brief without changing the product, brand world, palette, or core emotional posture.',
+    'The current scene is too generic.',
+    'Replace generic set dressing with at least three concrete cues traceable to the supplied campaign evidence.',
+    'Add one specific use occasion, one implied action, and one recognizable location.',
+    'At least one cue must be more specific than color, lighting, texture, fabric, water, stone, pool, spa, sunset, or generic fitness styling.',
+    'Do not introduce tactical, field-readiness, grungy outdoor, spa, resort, hospitality, archive, institutional, or service-counter clichés unless the campaign evidence explicitly supports them.',
+    'Return only valid JSON matching the existing scene_direction shape.',
+    'Campaign signals:',
+    JSON.stringify(ix.campaign_signals||{},null,2),
+    'Brand read:',
+    JSON.stringify({
+      product_truth:ix.product_truth||{},
+      audience:ix.audience||{},
+      brand_state:ix.brand_state||{},
+      visual_territory:ix.visual_territory||{},
+      sensory:ix.sensory||{},
+      assets:ix.assets||{}
+    },null,2),
+    'Current scene:',
+    JSON.stringify(scene||{},null,2),
+    'Specificity report:',
+    JSON.stringify(report||{},null,2)
+  ].join('\n\n');
+}
+async function repairSceneSpecificity(data, apiKey, scene, report){
+  if(!apiKey) return scene;
+  const system=[
+    'You are a senior commercial art director repairing a weak scene brief.',
+    'Preserve brand truth and product fidelity.',
+    'Increase campaign specificity without inventing unsupported claims or changing the brand world.',
+    'Output only one JSON object representing scene_direction.',
+    'Required fields: scene_name, world_description, use_occasion, implied_action, evidence_cues, signature_objects, product_placement_intent, composition, lighting, props, avoid, claim_rules, render_path.',
+    'render_path must be "composite".'
+  ].join('\n');
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key':apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:ANTHROPIC_MODEL,
+      max_tokens:2200,
+      system,
+      messages:[{role:'user',content:buildSceneRepairPrompt(data,scene,report)}]
+    })
+  });
+  if(!res.ok){
+    const t=await res.text().catch(()=>'');
+    throw new Error('Scene specificity repair '+res.status+(t?': '+t.slice(0,160):''));
+  }
+  const payload=await res.json();
+  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  const repaired=extractJson(text);
+  if(!repaired||typeof repaired!=='object') throw new Error('Scene specificity repair returned no usable scene');
+  repaired.render_path='composite';
+  repaired.evidence_cues=_l(repaired.evidence_cues);
+  repaired.signature_objects=_l(repaired.signature_objects);
+  repaired.props=_l(repaired.props);
+  repaired.avoid=_l(repaired.avoid);
+  repaired.claim_rules=_l(repaired.claim_rules);
+  return repaired;
+}
+
 async function completeCreativePipeline(brandData, apiKey){
   DATA.brand=brandData.brand||DATA.brand;
   DATA.factual=Object.assign({},DATA.factual||{},brandData.factual||{});
@@ -2359,9 +2489,33 @@ async function completeCreativePipeline(brandData, apiKey){
       console.warn('scene builder failed; using brand-read scene',sceneErr);
     }
   }
+  const campaignSignals=(DATA.vibes&&DATA.vibes.intake_expressive&&DATA.vibes.intake_expressive.campaign_signals)||{};
+  let specificity=sceneSpecificityReport(DATA.vibes.master_scene||DATA.vibes.scene_direction||{},campaignSignals);
+  PERF.log('scene_specificity_check',specificity);
+  if(!specificity.passes){
+    try{
+      PERF.start('scene_specificity_repair');
+      const repaired=await repairSceneSpecificity(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},specificity);
+      DATA.vibes.master_scene=repaired;
+      specificity=sceneSpecificityReport(repaired,campaignSignals);
+      DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
+        specificity_repaired:true,
+        specificity_report:specificity
+      });
+      PERF.end('scene_specificity_repair',{passes:specificity.passes,distinctive_count:specificity.distinctive_count});
+    }catch(repairErr){
+      PERF.end('scene_specificity_repair',{error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)});
+      DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
+        specificity_repaired:false,
+        specificity_report:specificity,
+        specificity_repair_error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)
+      });
+      console.warn('scene specificity repair failed',repairErr);
+    }
+  }
   PREVIEW_FLOW_STATE.scene='ready';
   refresh();
-  PERF.log('scene_ready',{});
+  PERF.log('scene_ready',{specificity_passes:specificity.passes,distinctive_count:specificity.distinctive_count});
 }
 
 async function generate(){
