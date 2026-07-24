@@ -229,6 +229,18 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   .workflow-summary{display:none}
 }
 
+
+.brand-progress.error{border-color:rgba(232,120,42,.55);background:rgba(232,120,42,.08)}
+.brand-progress.error .pulse{animation:none;box-shadow:none}
+.direction-retry{
+  display:none;margin-top:12px;font-family:'Rajdhani',sans-serif;font-weight:700;
+  letter-spacing:.06em;font-size:12px;text-transform:uppercase;padding:9px 14px;
+  border-radius:9px;border:1px solid var(--accent-line);background:transparent;
+  color:var(--white);cursor:pointer
+}
+.direction-retry.on{display:inline-flex}
+.direction-retry:hover{background:var(--accent-soft)}
+
 </style>
 </head>
 <body>
@@ -307,6 +319,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
             <p class="progress-label" id="brandProgressLabel">Preparing your direction</p>
             <p class="progress-message" id="brandProgressMessage">Reading the vibe of your brand</p>
             <p class="progress-detail" id="brandProgressDetail">Your product is locked. We are finishing the direction before you continue.</p>
+            <button class="direction-retry" id="retryDirectionBtn" type="button">Try direction again</button>
           </div>
         </div>
       </div>
@@ -449,8 +462,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-evidence-gated-scenes-v1';
-const PWP_BUILD_NOTE = 'scene location, use occasion, and distinctive cues require direct or strong brand evidence; unsupported lifestyle concepts are repaired before rendering';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-evidence-gated-scenes-state-fix-v1';
+const PWP_BUILD_NOTE = 'direction workflow has explicit loading, repair, error, retry, and ready states; Step 2 never collapses into a blank panel';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -1612,6 +1625,10 @@ const brandProgress=document.getElementById('brandProgress');
 const brandProgressLabel=document.getElementById('brandProgressLabel');
 const brandProgressMessage=document.getElementById('brandProgressMessage');
 const brandProgressDetail=document.getElementById('brandProgressDetail');
+const retryDirectionBtn=document.getElementById('retryDirectionBtn');
+let LAST_BRAND_DATA=null;
+let LAST_BRAND_API_KEY='';
+let directionRetryInFlight=false;
 const stepProduct=document.getElementById('stepProduct');
 const stepDirection=document.getElementById('stepDirection');
 const stepRender=document.getElementById('stepRender');
@@ -1641,6 +1658,8 @@ function resetWorkflow(){
   if(stepDirectionSummary) stepDirectionSummary.textContent='Waiting for product selection';
   if(stepRenderSummary) stepRenderSummary.textContent='Waiting for the direction';
   if(renderProgress) renderProgress.classList.remove('on');
+  if(retryDirectionBtn){ retryDirectionBtn.classList.remove('on'); retryDirectionBtn.disabled=false; }
+  directionRetryInFlight=false;
   renderInFlight=false;
 }
 function advanceAfterProductSelection(){
@@ -1702,7 +1721,11 @@ function setBrandProgressMessage(message, immediate){
 function stopBrandProgress(){
   if(brandProgressTimer){ clearInterval(brandProgressTimer); brandProgressTimer=null; }
   brandProgressPhase=''; brandProgressIndex=0;
-  if(brandProgress) brandProgress.classList.remove('on');
+  if(brandProgress){
+    brandProgress.classList.remove('on');
+    brandProgress.classList.remove('error');
+  }
+  if(retryDirectionBtn) retryDirectionBtn.classList.remove('on');
 }
 function startBrandProgress(phase){
   if(!brandProgress) return;
@@ -1720,14 +1743,57 @@ function startBrandProgress(phase){
     setBrandProgressMessage(copy[brandProgressIndex],false);
   },4200);
 }
+function showDirectionError(){
+  if(brandProgressTimer){ clearInterval(brandProgressTimer); brandProgressTimer=null; }
+  brandProgressPhase='error';
+  if(brandProgress){
+    brandProgress.classList.add('on');
+    brandProgress.classList.add('error');
+  }
+  if(brandProgressLabel) brandProgressLabel.textContent='Direction needs another pass';
+  setBrandProgressMessage('We could not finish a defensible brand direction',true);
+  if(brandProgressDetail){
+    const msg=PREVIEW_FLOW_STATE.brandError&&PREVIEW_FLOW_STATE.brandError.message
+      ? PREVIEW_FLOW_STATE.brandError.message
+      : 'The evidence check did not pass. Try the direction again.';
+    brandProgressDetail.textContent=msg;
+  }
+  if(retryDirectionBtn) retryDirectionBtn.classList.add('on');
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Direction needs another pass';
+}
 function syncBrandProgress(){
-  // The progress sequence is a post-selection cue. Brand work starts earlier in
-  // the background, but the loader appears only after the user locks a product
-  // and needs context for why the primary action is still disabled.
   if(!selectedAssetId){ stopBrandProgress(); return; }
-  if(PREVIEW_FLOW_STATE.brand==='loading') startBrandProgress('brand');
-  else if(PREVIEW_FLOW_STATE.scene==='loading') startBrandProgress('scene');
-  else stopBrandProgress();
+
+  if(PREVIEW_FLOW_STATE.brand==='loading'){
+    if(brandProgress) brandProgress.classList.remove('error');
+    if(retryDirectionBtn) retryDirectionBtn.classList.remove('on');
+    if(stepDirectionSummary) stepDirectionSummary.textContent='Reading the brand';
+    startBrandProgress('brand');
+    return;
+  }
+
+  if(PREVIEW_FLOW_STATE.scene==='loading'){
+    if(brandProgress) brandProgress.classList.remove('error');
+    if(retryDirectionBtn) retryDirectionBtn.classList.remove('on');
+    if(stepDirectionSummary) stepDirectionSummary.textContent='Shaping and checking the direction';
+    startBrandProgress('scene');
+    return;
+  }
+
+  if(PREVIEW_FLOW_STATE.scene==='error'){
+    showDirectionError();
+    return;
+  }
+
+  if(PREVIEW_FLOW_STATE.scene==='ready'){
+    stopBrandProgress();
+    return;
+  }
+
+  // Defensive fallback. A selected product should never leave Step 2 blank
+  // while the pipeline is between named states.
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Preparing the direction';
+  startBrandProgress('scene');
 }
 const handoff=document.getElementById('handoff');
 const handoffBody=document.getElementById('handoffBody');
@@ -1779,7 +1845,7 @@ function refresh(){
   }else if(PREVIEW_FLOW_STATE.scene==='loading'||PREVIEW_FLOW_STATE.brand==='loading'){
     ctaHint.textContent='Your product is locked. We’ll enable this when the direction is ready.';
   }else if(PREVIEW_FLOW_STATE.scene==='error'){
-    ctaHint.textContent='Your product is locked, but scene preparation failed. Start over to retry.';
+    ctaHint.textContent='Your product is locked. Retry the direction in Step 2.';
   }else{
     ctaHint.textContent='Your packaging stays exactly as it is.';
     advanceAfterDirectionReady();
@@ -2637,6 +2703,8 @@ async function generate(){
     if(!brandResult.ok) throw brandResult.error;
     const brandData=brandResult.data;
     PERF.end('brand_read_worker',{brand:brandData&&brandData.brand,timing:brandData&&brandData.timing||null});
+    LAST_BRAND_DATA=brandData;
+    LAST_BRAND_API_KEY=apiKey;
     await completeCreativePipeline(brandData,apiKey);
   }catch(err){
     PREVIEW_FLOW_STATE.brand='error';
@@ -2647,6 +2715,35 @@ async function generate(){
     refresh();
   }
   PERF.summary();
+}
+if(retryDirectionBtn){
+  retryDirectionBtn.addEventListener('click',async()=>{
+    if(directionRetryInFlight||!LAST_BRAND_DATA||!selectedAssetId) return;
+    directionRetryInFlight=true;
+    retryDirectionBtn.disabled=true;
+    PREVIEW_FLOW_STATE.brand='ready';
+    PREVIEW_FLOW_STATE.scene='loading';
+    PREVIEW_FLOW_STATE.brandError=null;
+    if(stepDirection){
+      stepDirection.classList.add('open','active');
+      stepDirection.classList.remove('complete');
+    }
+    if(stepRender){
+      stepRender.classList.remove('open','active','complete');
+    }
+    refresh();
+    try{
+      PERF.log('direction_retry_requested',{});
+      await completeCreativePipeline(LAST_BRAND_DATA,LAST_BRAND_API_KEY);
+    }catch(err){
+      PREVIEW_FLOW_STATE.scene='error';
+      PREVIEW_FLOW_STATE.brandError=err;
+      refresh();
+    }finally{
+      directionRetryInFlight=false;
+      retryDirectionBtn.disabled=false;
+    }
+  });
 }
 document.getElementById('generateBtn').addEventListener('click',generate);
 document.getElementById('productUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
