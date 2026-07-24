@@ -189,6 +189,46 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .advanced-home summary{cursor:pointer;color:var(--accent);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:12px}
 .advanced-home .advanced-body{margin-top:10px}
 
+
+.workflow{display:flex;flex-direction:column;gap:16px;margin-top:8px}
+.workflow-step{
+  border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.012);
+  overflow:hidden;transition:border-color .22s ease,background .22s ease;
+}
+.workflow-step.active{border-color:var(--accent-line);background:rgba(232,120,42,.035)}
+.workflow-step.complete{border-color:rgba(232,120,42,.28)}
+.workflow-head{
+  width:100%;display:flex;align-items:center;gap:14px;padding:18px 20px;
+  border:0;background:transparent;color:inherit;text-align:left;font:inherit;
+}
+.workflow-head:disabled{cursor:default}
+.workflow-num{
+  width:30px;height:30px;flex:0 0 30px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid var(--accent-line);font-family:'Rajdhani',sans-serif;font-weight:700;
+  font-size:13px;color:var(--accent);background:var(--accent-soft)
+}
+.workflow-title{font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
+.workflow-summary{margin-left:auto;font-size:12.5px;color:var(--muted);text-align:right}
+.workflow-body{display:none;padding:0 20px 22px}
+.workflow-step.open .workflow-body{display:block}
+.workflow-step.complete .workflow-num{background:var(--accent);color:#1a1305}
+.render-progress{
+  display:none;padding:18px;border:1px solid var(--border);border-left:2px solid var(--accent);
+  border-radius:12px;background:rgba(232,120,42,.055);align-items:center;gap:14px
+}
+.render-progress.on{display:flex}
+.render-progress .pulse{
+  width:11px;height:11px;flex:0 0 11px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 0 rgba(232,120,42,.45);animation:brandPulse 1.9s ease-out infinite
+}
+.render-progress .rp-title{font-family:'Playfair Display',serif;font-size:18px;margin:0 0 4px}
+.render-progress .rp-detail{font-size:12.5px;color:var(--muted);margin:0}
+.end-user-hidden{display:none!important}
+@media (max-width:620px){
+  .workflow-head{align-items:flex-start}
+  .workflow-summary{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -202,24 +242,16 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 
   <section id="entryView">
     <p class="eyebrow">Product World Preview</p>
-    <h1>Paste your product. See it in a world built for your brand.</h1>
-    <p class="sub">Drop a link to your product page. We read your product and your brand, then build a scene around your real packaging without ever redrawing it.</p>
+    <h1>Drop a product link, we’ll build a world around it.</h1>
+    <p class="sub">We read your site, understand your brand, then translate it into a visual world.</p>
     <div class="entryform">
       <label class="fieldlabel" for="productUrl">Product page or product listing URL</label>
       <input class="urlinput" id="productUrl" type="url" inputmode="url" placeholder="https://yourbrand.com/products/your-product" autocomplete="off">
-      <p class="entryhint" style="margin-top:6px">We’ll infer the brand homepage from this URL. Marketplace links can be used; the parser will try to resolve the official brand site.</p>
-      <details class="advanced-home" id="advancedHome">
-        <summary>Advanced: override brand homepage</summary>
-        <div class="advanced-body">
-          <label class="fieldlabel" for="homeUrl">Brand homepage override <span class="opt">rarely needed</span></label>
-          <input class="urlinput" id="homeUrl" type="url" inputmode="url" placeholder="https://yourbrand.com" autocomplete="off">
-        </div>
-      </details>
-      <div id="keyRow" hidden>
+      <div id="keyRow" hidden style="display:none!important">
         <label class="fieldlabel" for="apiKey">Anthropic API key <span class="opt">used only for the brand read, same as the Builder</span></label>
         <input class="urlinput" id="apiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
       </div>
-      <button class="cta" id="generateBtn" type="button">Generate preview</button>
+      <button class="cta" id="generateBtn" type="button">BUILD MY WORLD!</button>
       <p class="entryhint" id="entryHint"></p>
     </div>
   </section>
@@ -238,36 +270,71 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   </section>
 
   <section id="pickView" hidden>
-  <p class="eyebrow">Your product</p>
-  <h1>Which one do you want to bring to life?</h1>
-  <p class="sub" id="sub">We pulled these from your site. Pick your product and we build the world around it, with your packaging kept exactly as it is.</p>
+  <p class="eyebrow">Product World Preview</p>
+  <h1>Your product. Your brand. Your world.</h1>
+  <p class="sub">Move through three steps. We keep the product locked while the direction and final image take shape.</p>
 
-  <div class="grid" id="grid" role="group" aria-label="Product candidates"></div>
+  <div class="workflow" id="workflow">
+    <section class="workflow-step open active" id="stepProduct">
+      <button class="workflow-head" type="button" id="stepProductHead" disabled>
+        <span class="workflow-num">1</span>
+        <span class="workflow-title">Choose your product</span>
+        <span class="workflow-summary" id="stepProductSummary">Select the exact package to preserve</span>
+      </button>
+      <div class="workflow-body" id="stepProductBody">
+        <p class="sub" id="sub">We pulled these from your site. Pick the product you want to bring to life.</p>
+        <div class="grid" id="grid" role="group" aria-label="Product candidates"></div>
+        <div class="protect" id="protect">
+          <b>Packaging locked.</b> We will preserve the product identity while matching the world around it.
+        </div>
+        <div class="fallback">
+          <button class="linkbtn" id="uploadBtn">Don't see it? Upload your product</button>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+      </div>
+    </section>
 
-  <div class="protect" id="protect">
-    <b>Packaging locked.</b> We will not redraw, retype, or recolor this. The world gets generated around it and your real product is composited in untouched.
+    <section class="workflow-step" id="stepDirection">
+      <button class="workflow-head" type="button" id="stepDirectionHead" disabled>
+        <span class="workflow-num">2</span>
+        <span class="workflow-title">Build the direction</span>
+        <span class="workflow-summary" id="stepDirectionSummary">Waiting for product selection</span>
+      </button>
+      <div class="workflow-body" id="stepDirectionBody">
+        <div class="brand-progress" id="brandProgress" role="status" aria-live="polite">
+          <span class="pulse" aria-hidden="true"></span>
+          <div class="progress-copy">
+            <p class="progress-label" id="brandProgressLabel">Preparing your direction</p>
+            <p class="progress-message" id="brandProgressMessage">Reading the vibe of your brand</p>
+            <p class="progress-detail" id="brandProgressDetail">Your product is locked. We are finishing the direction before you continue.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow-step" id="stepRender">
+      <button class="workflow-head" type="button" id="stepRenderHead" disabled>
+        <span class="workflow-num">3</span>
+        <span class="workflow-title">Render your world</span>
+        <span class="workflow-summary" id="stepRenderSummary">Waiting for the direction</span>
+      </button>
+      <div class="workflow-body" id="stepRenderBody">
+        <div class="footer-cta">
+          <button class="cta" id="cta" disabled>Bring it to life</button>
+          <span class="hint" id="ctaHint">We’ll enable this when the direction is ready.</span>
+        </div>
+        <div class="render-progress" id="renderProgress" role="status" aria-live="polite">
+          <span class="pulse" aria-hidden="true"></span>
+          <div>
+            <p class="rp-title" id="renderProgressTitle">Rendering your product world</p>
+            <p class="rp-detail" id="renderProgressDetail">This usually takes a little while. Your image will appear here when ready.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <div class="fallback">
-    <button class="linkbtn" id="uploadBtn">Don't see it? Upload your product</button>
-    <input type="file" id="fileInput" accept="image/*" hidden>
-  </div>
-
-  <div class="brand-progress" id="brandProgress" role="status" aria-live="polite">
-    <span class="pulse" aria-hidden="true"></span>
-    <div class="progress-copy">
-      <p class="progress-label" id="brandProgressLabel">Preparing your direction</p>
-      <p class="progress-message" id="brandProgressMessage">Reading the vibe of your brand</p>
-      <p class="progress-detail" id="brandProgressDetail">Your product is locked. We are finishing the direction before you continue.</p>
-    </div>
-  </div>
-
-  <div class="footer-cta">
-    <button class="cta" id="cta" disabled>Bring it to life</button>
-    <span class="hint" id="ctaHint">Pick your product to continue.</span>
-  </div>
-
-  <section class="handoff" id="handoff" aria-live="polite">
+  <section class="handoff end-user-hidden" id="handoff" aria-live="polite">
     <h2>Render package</h2>
     <p>This is the complete package to test across render engines. It is engine-agnostic and wired to no renderer. Copy or download it, run the same locked product through each engine, then score with the rubric.</p>
     <div class="pkgbtns">
@@ -301,9 +368,9 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <button class="linkbtn" id="startOver2" type="button" style="margin-top:20px">Start over with a new URL</button>
   </section>
 
-  <pre id="jobStatusPanel" class="job-status" hidden></pre>
+  <pre id="jobStatusPanel" class="job-status end-user-hidden" hidden></pre>
 
-  <div class="devbar">
+  <div class="devbar end-user-hidden">
     <span>DEV</span>
     <button id="toggleConf">Toggle brand confidence (now: HIGH)</button>
     <span id="modeReadout">mode: none</span>
@@ -382,8 +449,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-selection-triggered-progress-v2';
-const PWP_BUILD_NOTE = 'staged asset discovery plus visible brand-read and scene-direction progress messaging; downstream prompt compiler and render behavior unchanged';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-three-step-auto-render-v1';
+const PWP_BUILD_NOTE = 'three-step collapsible end-user flow; product selection advances to direction; direction advances to render; final action submits render automatically; dev UI hidden';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -1338,6 +1405,65 @@ const brandProgress=document.getElementById('brandProgress');
 const brandProgressLabel=document.getElementById('brandProgressLabel');
 const brandProgressMessage=document.getElementById('brandProgressMessage');
 const brandProgressDetail=document.getElementById('brandProgressDetail');
+const stepProduct=document.getElementById('stepProduct');
+const stepDirection=document.getElementById('stepDirection');
+const stepRender=document.getElementById('stepRender');
+const stepProductSummary=document.getElementById('stepProductSummary');
+const stepDirectionSummary=document.getElementById('stepDirectionSummary');
+const stepRenderSummary=document.getElementById('stepRenderSummary');
+const renderProgress=document.getElementById('renderProgress');
+let renderInFlight=false;
+function scrollWorkflowStep(el){
+  if(!el) return;
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),180);
+}
+function openWorkflowStep(target){
+  [stepProduct,stepDirection,stepRender].forEach(el=>{
+    if(!el) return;
+    el.classList.toggle('open',el===target);
+    el.classList.toggle('active',el===target);
+  });
+}
+function resetWorkflow(){
+  [stepProduct,stepDirection,stepRender].forEach(el=>{
+    if(!el) return;
+    el.classList.remove('complete','open','active');
+  });
+  if(stepProduct) stepProduct.classList.add('open','active');
+  if(stepProductSummary) stepProductSummary.textContent='Select the exact package to preserve';
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Waiting for product selection';
+  if(stepRenderSummary) stepRenderSummary.textContent='Waiting for the direction';
+  if(renderProgress) renderProgress.classList.remove('on');
+  renderInFlight=false;
+}
+function advanceAfterProductSelection(){
+  if(stepProduct){
+    stepProduct.classList.add('complete');
+    stepProduct.classList.remove('open','active');
+  }
+  if(stepProductSummary) stepProductSummary.textContent='Product locked';
+  if(stepDirection){
+    stepDirection.classList.add('open','active');
+    stepDirection.classList.remove('complete');
+  }
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Reading the brand and shaping the world';
+  scrollWorkflowStep(stepDirection);
+}
+function advanceAfterDirectionReady(){
+  if(!selectedAssetId||PREVIEW_FLOW_STATE.scene!=='ready') return;
+  if(stepDirection){
+    stepDirection.classList.add('complete');
+    stepDirection.classList.remove('open','active');
+  }
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Direction ready';
+  if(stepRender){
+    stepRender.classList.add('open','active');
+    stepRender.classList.remove('complete');
+  }
+  if(stepRenderSummary) stepRenderSummary.textContent='Ready to render';
+  scrollWorkflowStep(stepRender);
+}
+
 let brandProgressTimer=null;
 let brandProgressPhase='';
 let brandProgressIndex=0;
@@ -1425,6 +1551,7 @@ function pick(i){
   } });
   [...grid.children].forEach((el,idx)=>el.setAttribute('aria-pressed', idx===i?'true':'false'));
   protect.classList.add('on');
+  advanceAfterProductSelection();
   refresh();
   ensureSelectedProductImageData({silent:true})
     .then(()=>PERF.log('selected_asset_prefetched',{}))
@@ -1448,6 +1575,7 @@ function refresh(){
     ctaHint.textContent='Your product is locked, but scene preparation failed. Start over to retry.';
   }else{
     ctaHint.textContent='Your packaging stays exactly as it is.';
+    advanceAfterDirectionReady();
   }
 }
 let CURRENT_PKG=null, CURRENT_MD='';
@@ -1478,7 +1606,12 @@ function buildHandoff(){
   };
 }
 cta.addEventListener('click',async()=>{
-  if(!canProceed()) return;
+  if(!canProceed()||renderInFlight) return;
+  renderInFlight=true;
+  cta.disabled=true;
+  cta.textContent='Rendering...';
+  if(renderProgress) renderProgress.classList.add('on');
+  if(stepRenderSummary) stepRenderSummary.textContent='Rendering in progress';
   PERF.start('bring_it_to_life_total',{asset_id:selectedAssetId});
   try{
     PERF.start('materialize_locked_product_image',{silent:true});
@@ -1498,15 +1631,20 @@ cta.addEventListener('click',async()=>{
   handoffBody.textContent=CURRENT_MD;
   renderCreativeDirectionPanel();
   renderPromptWriterPanel();
-  handoff.classList.add('on');
-  handoff.scrollIntoView({behavior:'smooth',block:'nearest'});
   PERF.end('bring_it_to_life_total');
   PERF.summary();
+  try{
+    await submitRenderBundle();
+  }finally{
+    renderInFlight=false;
+    cta.textContent='Bring it to life';
+    refresh();
+  }
 });
 
 const renderPreviewBtn=document.getElementById('renderPreview');
 if(renderPreviewBtn){
-  renderPreviewBtn.hidden = !ENABLE_RENDER;
+  renderPreviewBtn.hidden = true;
   renderPreviewBtn.addEventListener('click',async()=>{
     if(!CURRENT_PKG || !canProceed()) return;
     await submitRenderBundle();
@@ -1706,8 +1844,9 @@ async function submitRenderBundle(){
     createForm.append('request_json', JSON.stringify(CURRENT_PKG));
     createForm.append('locked_product_image', blob, 'locked-product.png');
 
-    document.getElementById('loadingLine').textContent='Creating render job';
-    showView('loading');
+    if(renderProgress) renderProgress.classList.add('on');
+    if(document.getElementById('renderProgressTitle')) document.getElementById('renderProgressTitle').textContent='Creating your render';
+    if(document.getElementById('renderProgressDetail')) document.getElementById('renderProgressDetail').textContent='Packaging the direction and preparing the image model.';
 
     PERF.start('render_job_create_upload');
     const createRes=await fetch(JOBS_ENDPOINT+'/render-jobs',{ method:'POST', body:createForm });
@@ -1721,7 +1860,8 @@ async function submitRenderBundle(){
 
     // 2. Trigger the render. This enqueues the job and returns immediately;
     //    the worker renders in the background off the request path.
-    document.getElementById('loadingLine').textContent='Rendering product world';
+    if(document.getElementById('renderProgressTitle')) document.getElementById('renderProgressTitle').textContent='Rendering your product world';
+    if(document.getElementById('renderProgressDetail')) document.getElementById('renderProgressDetail').textContent='The scene, lighting, integration, and product fidelity are being resolved.';
     PERF.start('render_job_start');
     const startRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST' });
     PERF.end('render_job_start',{status:startRes.status});
@@ -1800,7 +1940,7 @@ async function pollJobUntilDone(jobId, opts){
     }
     if(job.status==='complete'||job.status==='error') return job;
     dots=(dots+1)%4;
-    document.getElementById('loadingLine').textContent='Rendering product world'+'.'.repeat(dots);
+    if(document.getElementById('renderProgressTitle')) document.getElementById('renderProgressTitle').textContent='Rendering your product world'+'.'.repeat(dots);
   }
   const elapsedMs=Date.now()-start;
   const message='Render timed out after '+Math.round(timeoutMs/1000)+'s. Job '+jobId+' may still finish; use Check last render job shortly.';
@@ -1930,7 +2070,7 @@ document.getElementById('fileInput').addEventListener('change',e=>{
   r.onload=()=>{
     selectProduct({ product:DATA.factual, image:{ base64:String(r.result).split(',')[1]||'', media_type:f.type||'image/jpeg', source_image_url:f.name } });
     [...grid.children].forEach(el=>el.setAttribute('aria-pressed','false'));
-    protect.classList.add('on'); refresh();
+    protect.classList.add('on'); advanceAfterProductSelection(); refresh();
   };
   r.readAsDataURL(f);
 });
@@ -1948,6 +2088,7 @@ function showView(name){ const id=name.endsWith('View')?name:name+'View'; VIEWS.
 
 function renderPick(){
   assets=[]; assetIdCounter=0; selectedAssetId=null; chosenDirection=null;
+  resetWorkflow();
   document.getElementById('sub').textContent='We pulled these from '+(DATA.brand||'your site')+'. Pick your product and we build the world around it, with your packaging kept exactly as it is.';
   protect.classList.remove('on'); handoff.classList.remove('on');
   renderCandidates(); renderDirections(); refresh();
@@ -2084,7 +2225,7 @@ async function completeCreativePipeline(brandData, apiKey){
 
 async function generate(){
   const productUrl=document.getElementById('productUrl').value.trim();
-  const explicitHomeUrl=(document.getElementById('homeUrl')&&document.getElementById('homeUrl').value.trim())||'';
+  const explicitHomeUrl='';
   const hint=document.getElementById('entryHint');
   if(!validUrl(productUrl)){ hint.textContent='Enter a valid product or listing URL, starting with https://'; return; }
   if(explicitHomeUrl&&!validUrl(explicitHomeUrl)){ hint.textContent='The advanced homepage override needs to start with https://'; return; }
@@ -2092,8 +2233,8 @@ async function generate(){
   const homeUrl=urlResolution.home_url;
   let apiKey='';
   if(PREVIEW_ENDPOINT){
-    apiKey=document.getElementById('apiKey').value.trim()||readKey();
-    if(!apiKey){ hint.textContent='Add your Anthropic API key to run the brand read.'; return; }
+    apiKey=readKey();
+    if(!apiKey){ hint.textContent='The brand-reading service is not configured for this preview.'; return; }
     saveKey(apiKey);
   }
 
@@ -2158,7 +2299,7 @@ async function generate(){
 }
 document.getElementById('generateBtn').addEventListener('click',generate);
 document.getElementById('productUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
-document.getElementById('homeUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+
 document.getElementById('errorBack').addEventListener('click',()=>showView('entry'));
 const copyTimingBtn=document.getElementById('copyTiming');
 if(copyTimingBtn){ copyTimingBtn.addEventListener('click',async()=>{ try{ await PERF.copy(); copyTimingBtn.textContent='Timing copied'; setTimeout(()=>copyTimingBtn.textContent='Copy timing log',1200); }catch(e){ console.warn('copy timing failed',e); } }); }
@@ -2166,12 +2307,12 @@ const clearCacheBtn=document.getElementById('clearPreviewCache');
 if(clearCacheBtn){ clearCacheBtn.addEventListener('click',()=>{ clearPreviewCache(); clearCacheBtn.textContent='Cache cleared'; setTimeout(()=>clearCacheBtn.textContent='Clear URL cache',1200); }); }
 const checkLastRenderJobBtn=document.getElementById('checkLastRenderJob');
 if(checkLastRenderJobBtn){ checkLastRenderJobBtn.addEventListener('click',async()=>{ try{ checkLastRenderJobBtn.textContent='Checking job'; await checkLastRenderJob(); checkLastRenderJobBtn.textContent='Checked'; setTimeout(()=>checkLastRenderJobBtn.textContent='Check last render job',1400); }catch(e){ setRenderJobStatus('Manual check failed',{job_id:CURRENT_RENDER_JOB_ID,error:String((e&&e.message)||e).slice(0,220)}); checkLastRenderJobBtn.textContent='Check failed'; setTimeout(()=>checkLastRenderJobBtn.textContent='Check last render job',1600); } }); }
-document.getElementById('startOver').addEventListener('click',()=>{ handoff.classList.remove('on'); showView('entry'); });
+document.getElementById('startOver').addEventListener('click',()=>{ handoff.classList.remove('on'); resetWorkflow(); showView('entry'); });
 
 // honest demo banner from the first screen when no backend is configured
 document.getElementById('demoBanner').hidden = !!PREVIEW_ENDPOINT;
-document.getElementById('keyRow').hidden = !PREVIEW_ENDPOINT;
-if(PREVIEW_ENDPOINT){ const k=readKey(); if(k) document.getElementById('apiKey').value=k; }
+document.getElementById('keyRow').hidden = true;
+if(PREVIEW_ENDPOINT){ const k=readKey(); if(k&&document.getElementById('apiKey')) document.getElementById('apiKey').value=k; }
 showView('entry');
 </script>
 </body>
