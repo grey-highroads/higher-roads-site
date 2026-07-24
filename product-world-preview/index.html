@@ -449,8 +449,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-three-step-auto-render-v2';
-const PWP_BUILD_NOTE = 'three-step collapsible end-user flow; product selection advances to direction; direction advances to render; final action submits render automatically; dev UI hidden';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-brand-first-director-grammar-v1';
+const PWP_BUILD_NOTE = 'brand read owns world thesis and scene territory; director layer refines cinematic grammar only; full brand intelligence passed to selector; no-fit director path supported';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -795,28 +795,101 @@ function _posReference(h){
 const DEBUG_CREATIVE_DIRECTION = true; // internal review panel, this is an internal tool
 const DIRECTOR_BANK = HR_CREATIVE_CONFIG.directorBank;
 
-const DIRECTOR_SELECTION_PROMPT = HR_CREATIVE_CONFIG.directorSelectionPrompt;
+const DIRECTOR_SELECTION_PROMPT = [
+  HR_CREATIVE_CONFIG.directorSelectionPrompt||'',
+  '',
+  'BRAND-FIRST AUTHORITY OVERRIDE:',
+  'The supplied brand_world_thesis and brand_scene_authority are authoritative. Do not replace their world, place family, emotional posture, campaign cues, use occasion, or color logic.',
+  'Your role is to refine cinematic grammar inside the supplied brand territory: camera, light behavior, atmosphere, material emphasis, composition, depth, motion, and object treatment.',
+  'Do not choose a director because the product category appears in best_for. Category is weak evidence. Brand-specific language, campaign signals, audience state, and visual territory are stronger evidence.',
+  'If none of the directors fits the authoritative brand world without distorting it, return primary_influence as "none", primary_weight as 0, secondary_influence as null, secondary_weight as 0, no_fit as true, and explain why in selection_reason.',
+  'When no_fit is true, prompt_variables should preserve the brand scene directly and add only neutral photographic guidance.',
+  'Never turn a bright, playful, nostalgic, pop, social, fashion, beauty, candy, or youth-oriented brand into a field-readiness, industrial, tactical, grungy, spa, resort, hospitality, noir, archive, or service-counter world unless the brand evidence explicitly calls for it.',
+  'Return the existing required JSON schema, plus "no_fit": boolean and "brand_world_preserved": string.'
+].join('\\n');
+
+function brandWorldAuthority(data){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  const sd=v.scene_direction||{};
+  const primary=v.primary||{};
+  const f=(data&&data.factual)||{};
+  const worldThesis=_c(sd.world_thesis)||_c(primary.world_description)||_c(sd.world_description)||[
+    _c(ix.brand_state&&ix.brand_state.make_people_feel),
+    _c(ix.visual_territory&&ix.visual_territory.ownable),
+    _c(ix.assets&&ix.assets.brand_intent)
+  ].filter(Boolean).join('; ');
+  return {
+    brand_world_thesis:worldThesis,
+    brand_scene_authority:{
+      scene_name:_c(sd.scene_name)||_c(primary.scene_name),
+      world_description:_c(sd.world_description)||_c(primary.world_description),
+      product_placement_intent:_c(sd.product_placement_intent),
+      composition:_c(sd.composition),
+      lighting:_c(sd.lighting),
+      props:_l(sd.props),
+      avoid:_l(sd.avoid),
+      claim_rules:_l(sd.claim_rules)
+    },
+    brand_signals:{
+      product_truth:ix.product_truth||{},
+      audience:ix.audience||{},
+      brand_state:ix.brand_state||{},
+      visual_territory:ix.visual_territory||{},
+      sensory:ix.sensory||{},
+      competitive:ix.competitive||{},
+      assets:ix.assets||{}
+    },
+    product_facts:{
+      name:_c(f.name),
+      category:_c(f.category),
+      sku:_c(f.flavor_sku),
+      price:f.price||{}
+    }
+  };
+}
 
 function directorSelectionInput(data){
   const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
   const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
+  const authority=brandWorldAuthority(data);
   return {
+    brand_world_thesis:authority.brand_world_thesis,
+    brand_scene_authority:authority.brand_scene_authority,
     brand_read:{
       brand_name:data.brand||'',
+      product_truth:ix.product_truth||{},
+      audience:ix.audience||{},
       brand_state:ix.brand_state||{},
       visual_territory:ix.visual_territory||{},
-      competitive:ix.competitive||{}
+      sensory:ix.sensory||{},
+      competitive:ix.competitive||{},
+      assets:ix.assets||{},
+      primary_direction:v.primary||{},
+      source_scene_direction:v.scene_direction||{}
     },
     product_read:{
       product_name:f.name||la.asset_name||'',
       category:f.category||'',
-      sensory:ix.sensory||{}
+      flavor_sku:f.flavor_sku||'',
+      sensory:ix.sensory||{},
+      product_truth:ix.product_truth||{}
     },
     category:f.category||'',
-    product_cues:{ visual_territory:ix.visual_territory||{}, sensory:ix.sensory||{} },
-    category_cliches_to_avoid:(v.master_scene_meta&&v.master_scene_meta.category_cliches_to_avoid)||[],
+    product_cues:{
+      visual_territory:ix.visual_territory||{},
+      sensory:ix.sensory||{},
+      audience:ix.audience||{},
+      product_truth:ix.product_truth||{}
+    },
+    category_cliches_to_avoid:_dedupe([].concat(
+      _l(v.scene_direction&&v.scene_direction.avoid),
+      _l(ix.visual_territory&&ix.visual_territory.stay_away_from),
+      _l(ix.brand_state&&ix.brand_state.avoid_states)
+    )),
     higher_roads_rules:DIRECTOR_BANK.global_rules||[],
-    read_confidence:v.confidence||'unknown'
+    read_confidence:v.confidence||'unknown',
+    instruction:'Preserve the authoritative brand world. Select only cinematic grammar that fits inside it, or return no_fit.'
   };
 }
 
@@ -842,11 +915,23 @@ async function selectDirector(data, apiKey){
   sel.brand_posture=_c(sel.brand_posture);
   sel.category_risk=_c(sel.category_risk);
   sel.brand_fit_check=_c(sel.brand_fit_check);
+  sel.no_fit=sel.no_fit===true||_c(sel.primary_influence).toLowerCase()==='none';
+  sel.brand_world_preserved=_c(sel.brand_world_preserved);
+  if(sel.no_fit){
+    sel.primary_influence='none';
+    sel.primary_weight=0;
+    sel.secondary_influence=null;
+    sel.secondary_weight=0;
+    sel.borrow_from_primary=[];
+    sel.borrow_from_secondary=[];
+  }
   // Clamp weights defensively so a stray value never lets director grammar dominate.
   const clampW=(w,lo,hi,d)=>{ const n=Number(w); return (isFinite(n)&&n>0)?Math.min(hi,Math.max(lo,n)):d; };
-  sel.primary_weight=clampW(sel.primary_weight,0.10,0.60,0.35);
-  sel.secondary_influence=_c(sel.secondary_influence)||null;
-  sel.secondary_weight=sel.secondary_influence?clampW(sel.secondary_weight,0.05,0.20,0.12):0;
+  if(!sel.no_fit){
+    sel.primary_weight=clampW(sel.primary_weight,0.10,0.45,0.25);
+    sel.secondary_influence=_c(sel.secondary_influence)||null;
+    sel.secondary_weight=sel.secondary_influence?clampW(sel.secondary_weight,0.05,0.18,0.10):0;
+  }
   sel.borrow_from_primary=_l(sel.borrow_from_primary);
   sel.borrow_from_secondary=_l(sel.borrow_from_secondary);
   sel.avoid=_l(sel.avoid);
@@ -887,7 +972,7 @@ function buildCreativeDirectionBlock(h, finalPrompt, negStr){
   const st=(h&&h.scene_translation)||{};
   const sd=(h&&h.scene_direction)||{};
   const negRules=String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean);
-  if(sel){
+  if(sel && !sel.no_fit && _c(sel.primary_influence).toLowerCase()!=='none'){
     // Director layer succeeded: guarantee the acceptance fields. Prefer the
     // scene builder's narrative, fall back to the selection so nothing is empty.
     const pv=sel.prompt_variables||{};
@@ -937,7 +1022,12 @@ function renderCreativeDirectionPanel(){
   const chips=(label,arr)=>(arr&&arr.length)?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+arr.map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>'):'';
   let html='<div class="cd-head">Creative direction <span class="cd-tag">internal</span></div>';
   if(!sel){
-    html+='<div class="cd-row"><span class="cd-k">Director layer</span><span class="cd-v">fallback (selection unavailable, using current render prompt flow)</span></div>';
+    html+='<div class="cd-row"><span class="cd-k">Director layer</span><span class="cd-v">fallback (selection unavailable, using brand-read scene)</span></div>';
+  }else if(sel.no_fit||_c(sel.primary_influence).toLowerCase()==='none'){
+    html+='<div class="cd-row"><span class="cd-k">Director layer</span><span class="cd-v">no fit, preserving the brand-read world without director influence</span></div>';
+    html+=row('Brand posture',sel.brand_posture);
+    html+=row('Brand fit check',sel.brand_fit_check);
+    html+=row('Selection reason',sel.selection_reason);
   }else{
     html+=row('Primary influence',sel.primary_influence+'  ·  weight '+(sel.primary_weight||0));
     if(sel.secondary_influence) html+=row('Secondary influence',sel.secondary_influence+'  ·  weight '+(sel.secondary_weight||0));
@@ -959,45 +1049,96 @@ const ART_DIRECTOR_PROMPT = HR_CREATIVE_CONFIG.artDirectorPrompt;
 
 function sceneFromDirectorSelection(data, directorSelection){
   const v=(data&&data.vibes)||{}, f=(data&&data.factual)||{};
+  const source=v.scene_direction||{};
+  const primary=v.primary||{};
   const sel=directorSelection||{};
   const pv=sel.prompt_variables||{};
-  const name=_c(sel.scene_archetype)||_c(v.scene_direction&&v.scene_direction.scene_name)||'brand world preview';
-  const place=_c(pv.place)||_c(v.scene_direction&&v.scene_direction.world_description)||'a real environment with physical rules and brand-specific context';
-  const material=_c(pv.material);
-  const composition=_c(pv.composition)||_c(v.scene_direction&&v.scene_direction.composition)||'Product locked as sharp hero in foreground or strong middle ground, with enough environment to show scale, context, and use.';
-  const lighting=_c(pv.light)||_c(v.scene_direction&&v.scene_direction.lighting)||'Motivated natural or practical light with controlled hero readability on the product label.';
-  const atmosphere=_c(pv.atmosphere);
-  const camera=_c(pv.camera);
-  const objectTreatment=_c(pv.object_treatment)||'Product treated as a useful, desired, brand-defining object within the world.';
-  const world=[place, material&&('Materials: '+material), atmosphere&&('Atmosphere: '+atmosphere)].filter(Boolean).join(' ');
+  const noFit=!!sel.no_fit||_c(sel.primary_influence).toLowerCase()==='none';
+
+  const sourceName=_c(source.scene_name)||_c(primary.scene_name)||'brand world preview';
+  const sourceWorld=_c(source.world_description)||_c(primary.world_description)||'a brand-specific real environment with physical rules and a clear use occasion';
+  const sourcePlacement=_c(source.product_placement_intent)||'The locked product remains the readable hero inside the brand world.';
+  const sourceComposition=_c(source.composition)||'Product readable in the foreground or strong middle ground, with enough environment to communicate the brand world.';
+  const sourceLighting=_c(source.lighting)||'Motivated brand-appropriate light with controlled product readability.';
+  const sourceProps=_l(source.props);
+  const sourceAvoid=_l(source.avoid);
+
+  // The brand read owns world, place family, emotional posture, campaign cues,
+  // props, and palette. Director selection contributes photographic grammar only.
+  const camera=noFit?'brand-appropriate commercial camera with readable environmental depth':_c(pv.camera);
+  const grammarLight=noFit?'':_c(pv.light);
+  const grammarAtmosphere=noFit?'':_c(pv.atmosphere);
+  const grammarMaterial=noFit?'':_c(pv.material);
+  const grammarComposition=noFit?'':_c(pv.composition);
+  const grammarObject=noFit?'':_c(pv.object_treatment);
+
+  const world=[
+    sourceWorld,
+    grammarMaterial&&('Material emphasis: '+grammarMaterial),
+    grammarAtmosphere&&('Atmospheric treatment: '+grammarAtmosphere)
+  ].filter(Boolean).join(' ');
+
+  const composition=[
+    sourceComposition,
+    grammarComposition&&('Cinematic refinement: '+grammarComposition)
+  ].filter(Boolean).join(' ');
+
+  const lighting=[
+    sourceLighting,
+    grammarLight&&('Cinematic refinement: '+grammarLight)
+  ].filter(Boolean).join(' ');
+
+  const objectTreatment=[
+    sourcePlacement,
+    grammarObject&&('Object treatment: '+grammarObject)
+  ].filter(Boolean).join(' ');
+
   const promptSeed=[
-    'scene: '+name+'.',
-    'setting: '+place,
-    material&&('materials: '+material),
+    'authoritative brand world: '+sourceWorld,
+    'brand scene: '+sourceName,
+    sourceProps.length&&('brand-specific props and cues: '+sourceProps.join(', ')),
     'composition: '+composition,
     'lighting: '+lighting,
-    atmosphere&&('atmosphere: '+atmosphere),
     camera&&('camera: '+camera),
-    'the product reads as '+objectTreatment,
-    sel.selection_reason&&('brand fit: '+_c(sel.selection_reason))
-  ].filter(Boolean).join(' ');
+    objectTreatment&&('product role: '+objectTreatment),
+    !noFit&&sel.selection_reason&&('cinematic grammar rationale: '+_c(sel.selection_reason)),
+    'Do not replace the brand world with a category cliché or director-default location.'
+  ].filter(Boolean).join('. ');
+
   return {
-    scene_name:name,
+    scene_name:sourceName,
     world_description:world,
     product_placement_intent:objectTreatment,
-    composition:composition,
-    lighting:lighting,
-    props:[],
-    avoid:_dedupe([].concat(_l(sel.avoid), _l(v.scene_direction&&v.scene_direction.avoid))),
+    composition,
+    lighting,
+    props:sourceProps,
+    avoid:_dedupe([].concat(sourceAvoid,_l(sel.avoid),[
+      'category-default field readiness unless brand-authored',
+      'generic spa or pool resort unless brand-authored',
+      'generic grungy outdoor gear world unless brand-authored',
+      'generic service counter, archive, or institutional room unless brand-authored'
+    ])),
     render_path:'composite',
     prompt_seed:promptSeed,
-    surface:_c(pv.surface)||'',
-    background:place,
-    materials:material?[material]:[],
-    color_palette:[],
-    camera:camera?{framing:camera}:null,
-    brand_specific_cues:_dedupe([_c(sel.brand_posture), _c(sel.brand_fit_check), _c(f.category)]),
-    locked_product_placement:{anchor:'foreground or strong middle ground', scale_notes:'clear readable hero; packaging unchanged', light_match:'controlled hero light matched to the scene'}
+    surface:_c(source.surface)||'',
+    background:_c(source.background)||sourceWorld,
+    materials:_dedupe([].concat(_l(source.materials),grammarMaterial?[grammarMaterial]:[])),
+    color_palette:_l(source.color_palette),
+    camera:camera?{framing:camera}:source.camera||null,
+    brand_specific_cues:_dedupe([
+      _c(sel.brand_posture),
+      _c(sel.brand_fit_check),
+      _c(sel.brand_world_preserved),
+      _c(f.category),
+      _c(source.scene_name)
+    ]),
+    locked_product_placement:source.locked_product_placement||{
+      anchor:'foreground or strong middle ground',
+      scale_notes:'clear readable hero; packaging unchanged',
+      light_match:'controlled hero light matched to the brand scene'
+    },
+    source_authority:'brand_read',
+    director_grammar_status:noFit?'no_fit_brand_only':'grammar_refinement_only'
   };
 }
 
@@ -1092,7 +1233,7 @@ function buildRenderPackage(h){
   const creativeDirection=buildCreativeDirectionBlock(h,positiveComposite,negStr);
   const sel=h.director_selection||null;
   const pv=(sel&&sel.prompt_variables)||{};
-  const directorLayerOk=!!(creativeDirection&&creativeDirection.director_layer_status==='ok'&&sel);
+  const directorLayerOk=!!(creativeDirection&&creativeDirection.director_layer_status==='ok'&&sel&&!sel.no_fit&&_c(sel.primary_influence).toLowerCase()!=='none');
   const effectiveChosenDirection=directorLayerOk?(_c(sel.scene_archetype)||_c(sd.scene_name)):(_c(h.chosen_direction)||_c(sd.scene_name));
   const effectiveSceneBrief=directorLayerOk?{
     world_description:_c(creativeDirection.scene_translation&&creativeDirection.scene_translation.scene_brief)||_c(sd.world_description)||_c(pv.place),
@@ -2191,13 +2332,13 @@ async function completeCreativePipeline(brandData, apiKey){
     const fastScene=sceneFromDirectorSelection(DATA,directorSelection);
     DATA.vibes.master_scene=fastScene;
     DATA.vibes.master_scene_meta={
-      brand_world_read:'fast mode: derived from director selection and brand read',
+      brand_world_read:'brand-first fast mode: authoritative brand-read scene refined by optional director grammar',
       world_thesis:_c(directorSelection&&directorSelection.selection_reason)||_c(directorSelection&&directorSelection.brand_fit_check)||'',
-      cinematic_translation:'fast mode scene built from director prompt_variables; master scene call skipped',
+      cinematic_translation:'brand-read world preserved; director prompt_variables used only for camera, light, atmosphere, material emphasis, composition, and object treatment; master scene call skipped',
       category_cliches_to_avoid:_l(directorSelection&&directorSelection.avoid),
       anti_tabletop_rules:['no tabletop fallback','use a real world with physical rules']
     };
-    DATA.vibes.scene_diagnostics={fast_mode:true,skipped_master_scene:true};
+    DATA.vibes.scene_diagnostics={fast_mode:true,skipped_master_scene:true,brand_authority_preserved:true,director_no_fit:!!(directorSelection&&directorSelection.no_fit)};
     DATA.vibes.scene_translation={
       world_thesis:DATA.vibes.master_scene_meta.world_thesis,
       cinematic_translation:DATA.vibes.master_scene_meta.cinematic_translation,
