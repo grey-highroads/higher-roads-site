@@ -1237,30 +1237,54 @@ function mockPreviewData(){
   };
 }
 
-async function fetchPreviewData(productUrl, homeUrl, apiKey, urlResolution){
-  const cached=readPreviewCache(productUrl, homeUrl);
-  if(cached){
-    PERF.log('parse_and_brand_read_cache_hit',{age_seconds:cached.age_seconds});
-    return { demo:false, cached:true, data:cached.data };
+async function postPreviewAction(action, payload){
+  if(!PREVIEW_ENDPOINT) throw new Error('No preview Worker endpoint configured.');
+  const res=await fetch(PREVIEW_ENDPOINT,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(Object.assign({action},payload||{}))
+  });
+  if(!res.ok){
+    const text=await res.text().catch(()=>'');
+    throw new Error(action+' returned '+res.status+(text?': '+text.slice(0,180):''));
   }
-  PERF.log('parse_and_brand_read_cache_miss',{});
+  return res.json();
+}
+
+async function fetchAssetDiscovery(productUrl, urlResolution){
   if(!PREVIEW_ENDPOINT){
-    await new Promise(r=>setTimeout(r,700)); // demo only: let the loading state render
-    const data=mockPreviewData();
-    writePreviewCache(productUrl, homeUrl, data);
-    return { demo:true, cached:false, data:data };
+    await new Promise(r=>setTimeout(r,250));
+    const demo=mockPreviewData();
+    return {brand_hint:demo.brand,factual:demo.factual,candidates:demo.candidates,diagnostics:{demo:true}};
   }
-  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ product_url:productUrl, home_url:homeUrl, api_key:apiKey, home_url_source:urlResolution&&urlResolution.home_url_source, input_url_host:urlResolution&&urlResolution.product_host, marketplace_detected:!!(urlResolution&&urlResolution.marketplace_detected), marketplace_fallback_search:!!(urlResolution&&urlResolution.marketplace_fallback_search) }) });
-  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Parser returned '+res.status+(t?': '+t.slice(0,140):'')); }
-  const payload=await res.json();
-  if(!payload||!Array.isArray(payload.candidates)||!payload.candidates.length) throw new Error('No product image was found on that page. Try the direct product URL, or upload the image after this.');
-  writePreviewCache(productUrl, homeUrl, payload);
-  return { demo:false, cached:false, data:payload };
+  return postPreviewAction('discover_assets',{
+    product_url:productUrl,
+    input_url_host:urlResolution&&urlResolution.product_host,
+    marketplace_detected:!!(urlResolution&&urlResolution.marketplace_detected)
+  });
+}
+
+async function fetchBrandRead(productUrl, homeUrl, apiKey, urlResolution){
+  if(!PREVIEW_ENDPOINT){
+    await new Promise(r=>setTimeout(r,500));
+    const demo=mockPreviewData();
+    return {brand:demo.brand,factual:demo.factual,vibes:demo.vibes,diagnostics:{demo:true}};
+  }
+  return postPreviewAction('brand_read',{
+    product_url:productUrl,
+    home_url:homeUrl,
+    api_key:apiKey,
+    home_url_source:urlResolution&&urlResolution.home_url_source,
+    input_url_host:urlResolution&&urlResolution.product_host,
+    marketplace_detected:!!(urlResolution&&urlResolution.marketplace_detected),
+    marketplace_fallback_search:!!(urlResolution&&urlResolution.marketplace_fallback_search)
+  });
 }
 
 // --- pick controller (mirrors pick-state.js) ---
 let DEV_CONF='high';
 let selectedAssetId=null, chosenDirection=null, DATA=null;
+const PREVIEW_FLOW_STATE={brand:'idle',scene:'idle',brandError:null};
 
 function removeProduct(){ for(let i=assets.length-1;i>=0;i--) if(assets[i].__pwp_product) assets.splice(i,1); }
 function selectProduct(parsed){
@@ -1270,7 +1294,7 @@ function selectProduct(parsed){
   if(mode!=='product_accurate'){ removeProduct(); throw new Error('not product_accurate: '+mode); }
   selectedAssetId=a.asset_id; return a;
 }
-function canProceed(){ return !!selectedAssetId; }
+function canProceed(){ return !!selectedAssetId && PREVIEW_FLOW_STATE.scene==='ready'; }
 
 // --- render ---
 const grid=document.getElementById('grid');
@@ -1309,6 +1333,9 @@ function pick(i){
   [...grid.children].forEach((el,idx)=>el.setAttribute('aria-pressed', idx===i?'true':'false'));
   protect.classList.add('on');
   refresh();
+  ensureSelectedProductImageData({silent:true})
+    .then(()=>PERF.log('selected_asset_prefetched',{}))
+    .catch(err=>PERF.log('selected_asset_prefetch_failed',{error:String((err&&err.message)||err).slice(0,160)}));
 }
 function renderDirections(){
   // Scene selection removed. One master scene is generated automatically and
@@ -1319,7 +1346,15 @@ function renderDirections(){
 function refresh(){
   modeReadout.textContent='mode: '+getOverallMode();
   cta.disabled=!canProceed();
-  ctaHint.textContent = selectedAssetId ? 'Your packaging stays exactly as it is.' : 'Pick your product to continue.';
+  if(!selectedAssetId){
+    ctaHint.textContent='Pick your product to continue.';
+  }else if(PREVIEW_FLOW_STATE.scene==='loading'||PREVIEW_FLOW_STATE.brand==='loading'){
+    ctaHint.textContent='Your product is locked. Reading the brand while you choose.';
+  }else if(PREVIEW_FLOW_STATE.scene==='error'){
+    ctaHint.textContent='Your product is locked, but scene preparation failed. Start over to retry.';
+  }else{
+    ctaHint.textContent='Your packaging stays exactly as it is.';
+  }
 }
 let CURRENT_PKG=null, CURRENT_MD='';
 function buildHandoff(){
@@ -1889,13 +1924,77 @@ const KEY_STORE='pwp_anthropic_key';
 function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ return ''; } }
 function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
+async function completeCreativePipeline(brandData, apiKey){
+  DATA.brand=brandData.brand||DATA.brand;
+  DATA.factual=Object.assign({},DATA.factual||{},brandData.factual||{});
+  DATA.vibes=brandData.vibes||{};
+  DATA.vibes.confidence=DATA.vibes.confidence||DEV_CONF;
+  PREVIEW_FLOW_STATE.brand='ready';
+  PREVIEW_FLOW_STATE.scene='loading';
+  refresh();
+
+  if(!apiKey){
+    PREVIEW_FLOW_STATE.scene='ready';
+    refresh();
+    PERF.log('scene_ready',{demo:true});
+    return;
+  }
+
+  let directorSelection=null;
+  try{
+    PERF.start('director_selection_anthropic');
+    directorSelection=await selectDirector(DATA,apiKey);
+    PERF.end('director_selection_anthropic',{primary:directorSelection&&directorSelection.primary_influence,archetype:directorSelection&&directorSelection.scene_archetype});
+  }catch(dirErr){
+    PERF.end('director_selection_anthropic',{error:String((dirErr&&dirErr.message)||dirErr).slice(0,160)});
+    console.warn('director layer failed; using current render prompt flow',dirErr);
+  }
+  DATA.vibes.director_selection=directorSelection;
+
+  if(PWP_FAST_MODE){
+    PERF.log('master_scene_anthropic_skipped',{reason:'PWP_FAST_MODE',source:'director_selection_prompt_variables'});
+    const fastScene=sceneFromDirectorSelection(DATA,directorSelection);
+    DATA.vibes.master_scene=fastScene;
+    DATA.vibes.master_scene_meta={
+      brand_world_read:'fast mode: derived from director selection and brand read',
+      world_thesis:_c(directorSelection&&directorSelection.selection_reason)||_c(directorSelection&&directorSelection.brand_fit_check)||'',
+      cinematic_translation:'fast mode scene built from director prompt_variables; master scene call skipped',
+      category_cliches_to_avoid:_l(directorSelection&&directorSelection.avoid),
+      anti_tabletop_rules:['no tabletop fallback','use a real world with physical rules']
+    };
+    DATA.vibes.scene_diagnostics={fast_mode:true,skipped_master_scene:true};
+    DATA.vibes.scene_translation={
+      world_thesis:DATA.vibes.master_scene_meta.world_thesis,
+      cinematic_translation:DATA.vibes.master_scene_meta.cinematic_translation,
+      borrowed_visual_grammar:_dedupe([].concat(_l(directorSelection&&directorSelection.borrow_from_primary),_l(directorSelection&&directorSelection.borrow_from_secondary))),
+      excluded_visual_grammar:_l(directorSelection&&directorSelection.avoid)
+    };
+  }else{
+    try{
+      PERF.start('master_scene_anthropic');
+      const built=await buildMasterScene(DATA,apiKey,directorSelection);
+      PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name});
+      DATA.vibes.master_scene=built.scene_direction;
+      DATA.vibes.master_scene_meta={brand_world_read:built.brand_world_read||'',world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',category_cliches_to_avoid:built.category_cliches_to_avoid||[],anti_tabletop_rules:built.anti_tabletop_rules||[]};
+      DATA.vibes.scene_diagnostics=built.diagnostics||null;
+      DATA.vibes.scene_translation={world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',borrowed_visual_grammar:built.borrowed_visual_grammar||[],excluded_visual_grammar:built.excluded_visual_grammar||[]};
+    }catch(sceneErr){
+      PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
+      console.warn('scene builder failed; using brand-read scene',sceneErr);
+    }
+  }
+  PREVIEW_FLOW_STATE.scene='ready';
+  refresh();
+  PERF.log('scene_ready',{});
+}
+
 async function generate(){
   const productUrl=document.getElementById('productUrl').value.trim();
   const explicitHomeUrl=(document.getElementById('homeUrl')&&document.getElementById('homeUrl').value.trim())||'';
   const hint=document.getElementById('entryHint');
   if(!validUrl(productUrl)){ hint.textContent='Enter a valid product or listing URL, starting with https://'; return; }
   if(explicitHomeUrl&&!validUrl(explicitHomeUrl)){ hint.textContent='The advanced homepage override needs to start with https://'; return; }
-  const urlResolution=resolveHomeUrlForProduct(productUrl, explicitHomeUrl);
+  const urlResolution=resolveHomeUrlForProduct(productUrl,explicitHomeUrl);
   const homeUrl=urlResolution.home_url;
   let apiKey='';
   if(PREVIEW_ENDPOINT){
@@ -1903,76 +2002,65 @@ async function generate(){
     if(!apiKey){ hint.textContent='Add your Anthropic API key to run the brand read.'; return; }
     saveKey(apiKey);
   }
-  PERF.reset('generate_preview');
-  PERF.start('total_generate_to_pick_view',{product_url:productUrl, home_url:homeUrl||null, home_url_source:urlResolution.home_url_source, marketplace_detected:!!urlResolution.marketplace_detected, build:PWP_BUILD_ID});
-  PERF.log('home_url_resolved', urlResolution);
-  hint.textContent=''; document.getElementById('loadingLine').textContent='Fetching your product'; showView('loading');
-  try{
-    PERF.start('parse_and_brand_read_worker');
-    const preview=await fetchPreviewData(productUrl, homeUrl, apiKey, urlResolution);
-    const data=preview.data;
-    PERF.end('parse_and_brand_read_worker',{brand:data&&data.brand, candidates:data&&data.candidates?data.candidates.length:0, has_vibes:!!(data&&data.vibes), cached:!!preview.cached});
 
-    DATA=data; DATA.url_resolution=urlResolution; DATA.vibes.confidence = DATA.vibes.confidence || DEV_CONF;
-    if(apiKey){
-      document.getElementById('loadingLine').textContent='Designing the scene';
-      // Creative-direction pass: pick hidden cinematic grammar for the brand.
-      // Best-effort. On failure we fall back to the current render prompt flow.
-      let directorSelection=null;
-      try{
-        PERF.start('director_selection_anthropic');
-        directorSelection=await selectDirector(DATA, apiKey);
-        PERF.end('director_selection_anthropic',{primary:directorSelection&&directorSelection.primary_influence, archetype:directorSelection&&directorSelection.scene_archetype});
-      }
-      catch(dirErr){
-        PERF.end('director_selection_anthropic',{error:String((dirErr&&dirErr.message)||dirErr).slice(0,160)});
-        console.warn('director layer failed; using current render prompt flow', dirErr); directorSelection=null;
-      }
-      DATA.vibes.director_selection=directorSelection;
-      if(PWP_FAST_MODE){
-        PERF.log('master_scene_anthropic_skipped',{reason:'PWP_FAST_MODE', source:'director_selection_prompt_variables'});
-        const fastScene=sceneFromDirectorSelection(DATA, directorSelection);
-        DATA.vibes.master_scene=fastScene;
-        DATA.vibes.master_scene_meta={
-          brand_world_read:'fast mode: derived from director selection and brand read',
-          world_thesis:_c(directorSelection&&directorSelection.selection_reason)||_c(directorSelection&&directorSelection.brand_fit_check)||'',
-          cinematic_translation:'fast mode scene built from director prompt_variables; master scene call skipped',
-          category_cliches_to_avoid:_l(directorSelection&&directorSelection.avoid),
-          anti_tabletop_rules:['no tabletop fallback','use a real world with physical rules']
-        };
-        DATA.vibes.scene_diagnostics={fast_mode:true, skipped_master_scene:true};
-        DATA.vibes.scene_translation={
-          world_thesis:DATA.vibes.master_scene_meta.world_thesis,
-          cinematic_translation:DATA.vibes.master_scene_meta.cinematic_translation,
-          borrowed_visual_grammar:_dedupe([].concat(_l(directorSelection&&directorSelection.borrow_from_primary),_l(directorSelection&&directorSelection.borrow_from_secondary))),
-          excluded_visual_grammar:_l(directorSelection&&directorSelection.avoid)
-        };
-      }else{
-        try{
-          PERF.start('master_scene_anthropic');
-          const built=await buildMasterScene(DATA, apiKey, directorSelection);
-          PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name});
-          DATA.vibes.master_scene=built.scene_direction;
-          DATA.vibes.master_scene_meta={ brand_world_read:built.brand_world_read||'', world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', category_cliches_to_avoid:built.category_cliches_to_avoid||[], anti_tabletop_rules:built.anti_tabletop_rules||[] };
-          DATA.vibes.scene_diagnostics=built.diagnostics||null; // confidence + low-confidence alternates, for a future Create variations feature
-          DATA.vibes.scene_translation={ world_thesis:built.world_thesis||'', cinematic_translation:built.cinematic_translation||'', borrowed_visual_grammar:built.borrowed_visual_grammar||[], excluded_visual_grammar:built.excluded_visual_grammar||[] };
-        }catch(sceneErr){
-          PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
-          console.warn('scene builder failed; using brand-read scene', sceneErr);
-        }
-      }
-    }
+  PREVIEW_FLOW_STATE.brand='loading';
+  PREVIEW_FLOW_STATE.scene='loading';
+  PREVIEW_FLOW_STATE.brandError=null;
+  selectedAssetId=null;
+  removeProduct();
+  PERF.reset('generate_preview');
+  PERF.start('total_generate_to_picker',{product_url:productUrl,home_url:homeUrl||null,home_url_source:urlResolution.home_url_source,marketplace_detected:!!urlResolution.marketplace_detected,build:PWP_BUILD_ID});
+  PERF.log('home_url_resolved',urlResolution);
+  hint.textContent='';
+  document.getElementById('loadingLine').textContent='Finding your product';
+  showView('loading');
+
+  const brandPromise=fetchBrandRead(productUrl,homeUrl,apiKey,urlResolution)
+    .then(data=>({ok:true,data}),error=>({ok:false,error}));
+
+  try{
+    PERF.start('asset_discovery_worker');
+    const assetsData=await fetchAssetDiscovery(productUrl,urlResolution);
+    PERF.end('asset_discovery_worker',{brand:assetsData&&assetsData.brand_hint,candidates:assetsData&&assetsData.candidates?assetsData.candidates.length:0,timing:assetsData&&assetsData.timing||null});
+    DATA={
+      brand:assetsData.brand_hint||'',
+      factual:assetsData.factual||{},
+      candidates:Array.isArray(assetsData.candidates)?assetsData.candidates:[],
+      vibes:{confidence:'pending',primary:{},alternates:[],intake_expressive:{},scene_direction:null},
+      diagnostics:assetsData.diagnostics||{},
+      url_resolution:urlResolution
+    };
     PERF.start('render_pick_ui');
-    renderPick(); showView('pick');
-    PERF.end('render_pick_ui',{assets:assets.length});
-    PERF.end('total_generate_to_pick_view');
-    PERF.summary();
+    renderPick();
+    showView('pick');
+    PERF.end('render_pick_ui',{candidates:DATA.candidates.length});
+    PERF.end('total_generate_to_picker');
+    refresh();
   }catch(err){
-    PERF.end('total_generate_to_pick_view',{error:String((err&&err.message)||err).slice(0,200)});
-    PERF.summary();
+    PERF.end('total_generate_to_picker',{error:String((err&&err.message)||err).slice(0,200)});
     document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
     showView('error');
+    await brandPromise;
+    PERF.summary();
+    return;
   }
+
+  try{
+    PERF.start('brand_read_worker');
+    const brandResult=await brandPromise;
+    if(!brandResult.ok) throw brandResult.error;
+    const brandData=brandResult.data;
+    PERF.end('brand_read_worker',{brand:brandData&&brandData.brand,timing:brandData&&brandData.timing||null});
+    await completeCreativePipeline(brandData,apiKey);
+  }catch(err){
+    PREVIEW_FLOW_STATE.brand='error';
+    PREVIEW_FLOW_STATE.scene='error';
+    PREVIEW_FLOW_STATE.brandError=err;
+    PERF.end('brand_read_worker',{error:String((err&&err.message)||err).slice(0,200)});
+    console.warn('brand read failed after asset picker loaded',err);
+    refresh();
+  }
+  PERF.summary();
 }
 document.getElementById('generateBtn').addEventListener('click',generate);
 document.getElementById('productUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
