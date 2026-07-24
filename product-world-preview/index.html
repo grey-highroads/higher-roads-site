@@ -242,15 +242,6 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   <h1>Which one do you want to bring to life?</h1>
   <p class="sub" id="sub">We pulled these from your site. Pick your product and we build the world around it, with your packaging kept exactly as it is.</p>
 
-  <div class="brand-progress" id="brandProgress" role="status" aria-live="polite">
-    <span class="pulse" aria-hidden="true"></span>
-    <div class="progress-copy">
-      <p class="progress-label" id="brandProgressLabel">Reading your brand</p>
-      <p class="progress-message" id="brandProgressMessage">Reading the vibe of your brand</p>
-      <p class="progress-detail" id="brandProgressDetail">Your product picker stays active while this finishes.</p>
-    </div>
-  </div>
-
   <div class="grid" id="grid" role="group" aria-label="Product candidates"></div>
 
   <div class="protect" id="protect">
@@ -260,6 +251,15 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   <div class="fallback">
     <button class="linkbtn" id="uploadBtn">Don't see it? Upload your product</button>
     <input type="file" id="fileInput" accept="image/*" hidden>
+  </div>
+
+  <div class="brand-progress" id="brandProgress" role="status" aria-live="polite">
+    <span class="pulse" aria-hidden="true"></span>
+    <div class="progress-copy">
+      <p class="progress-label" id="brandProgressLabel">Preparing your direction</p>
+      <p class="progress-message" id="brandProgressMessage">Reading the vibe of your brand</p>
+      <p class="progress-detail" id="brandProgressDetail">Your product is locked. We are finishing the direction before you continue.</p>
+    </div>
   </div>
 
   <div class="footer-cta">
@@ -382,7 +382,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-staged-brand-progress-v1';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-selection-triggered-progress-v2';
 const PWP_BUILD_NOTE = 'staged asset discovery plus visible brand-read and scene-direction progress messaging; downstream prompt compiler and render behavior unchanged';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
@@ -1379,7 +1379,7 @@ function startBrandProgress(phase){
   if(brandProgressTimer) clearInterval(brandProgressTimer);
   brandProgressPhase=nextPhase; brandProgressIndex=0;
   if(brandProgressLabel) brandProgressLabel.textContent=nextPhase==='brand'?'Reading your brand':'Shaping the direction';
-  if(brandProgressDetail) brandProgressDetail.textContent=nextPhase==='brand'?'Your product picker stays active while this finishes.':'Your selected packaging remains locked and unchanged.';
+  if(brandProgressDetail) brandProgressDetail.textContent=nextPhase==='brand'?'Your product is locked. We are reading the brand before you continue.':'Your selected packaging remains locked while we finish the visual direction.';
   setBrandProgressMessage(BRAND_PROGRESS_COPY[nextPhase][0],true);
   brandProgressTimer=setInterval(()=>{
     const copy=BRAND_PROGRESS_COPY[brandProgressPhase]||BRAND_PROGRESS_COPY.brand;
@@ -1388,6 +1388,10 @@ function startBrandProgress(phase){
   },4200);
 }
 function syncBrandProgress(){
+  // The progress sequence is a post-selection cue. Brand work starts earlier in
+  // the background, but the loader appears only after the user locks a product
+  // and needs context for why the primary action is still disabled.
+  if(!selectedAssetId){ stopBrandProgress(); return; }
   if(PREVIEW_FLOW_STATE.brand==='loading') startBrandProgress('brand');
   else if(PREVIEW_FLOW_STATE.scene==='loading') startBrandProgress('scene');
   else stopBrandProgress();
