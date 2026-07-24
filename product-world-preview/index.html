@@ -462,8 +462,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-creative-first-world-builder-v1';
-const PWP_BUILD_NOTE = 'creative scene building restored as primary authority; evidence advisory; creative critic improves brand specificity, originality, cinematic ambition, coherence, director influence, and cliché risk';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-creative-first-scene-handoff-repair-v1';
+const PWP_BUILD_NOTE = 'creative-first scene output normalized and validated; malformed master scenes receive schema repair; Worker scene is validated fallback; empty scenes cannot reach critic, prompt writer, or renderer';
 const PWP_FAST_MODE = false; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -1190,6 +1190,193 @@ function sceneFromDirectorSelection(data, directorSelection){
   };
 }
 
+
+function normalizeSceneObject(raw){
+  if(!raw||typeof raw!=='object') return null;
+
+  const candidates=[
+    raw.scene_direction,
+    raw.master_scene,
+    raw.scene,
+    raw.creative_scene,
+    raw.direction,
+    raw
+  ].filter(x=>x&&typeof x==='object'&&!Array.isArray(x));
+
+  const source=candidates.find(x=>
+    _c(x.world_description)||
+    _c(x.scene_name)||
+    _c(x.composition)||
+    _c(x.product_placement_intent)||
+    _c(x.render_prompt)
+  );
+
+  if(!source) return null;
+
+  const locked=source.locked_product_placement&&typeof source.locked_product_placement==='object'
+    ? source.locked_product_placement
+    : {};
+
+  const scene={
+    scene_name:_c(source.scene_name)||_c(source.title)||_c(source.direction_name),
+    world_description:_c(source.world_description)||_c(source.world)||_c(source.setting)||_c(source.environment),
+    product_placement_intent:_c(source.product_placement_intent)||_c(source.placement)||[
+      _c(locked.anchor),
+      _c(locked.scale_notes),
+      _c(locked.light_match)
+    ].filter(Boolean).join(', '),
+    composition:_c(source.composition)||_c(source.framing)||_c(source.camera_composition),
+    lighting:_c(source.lighting)||_c(source.light)||_c(source.light_direction),
+    use_occasion:_c(source.use_occasion)||_c(source.occasion)||_c(source.moment),
+    implied_action:_c(source.implied_action)||_c(source.action)||_c(source.activity),
+    evidence_cues:_l(source.evidence_cues),
+    signature_objects:_l(source.signature_objects),
+    creative_rationale:_c(source.creative_rationale)||_c(raw.creative_rationale)||_c(raw.world_thesis),
+    props:_dedupe([].concat(_l(source.props),_l(source.visual_anchors),_l(source.objects))),
+    avoid:_l(source.avoid),
+    claim_rules:_l(source.claim_rules),
+    render_path:'composite',
+    prompt_seed:_c(source.prompt_seed)||_c(source.render_prompt),
+    surface:_c(source.surface),
+    background:_c(source.background),
+    materials:_l(source.materials),
+    color_palette:_l(source.color_palette),
+    camera:source.camera||null,
+    brand_specific_cues:_l(source.brand_specific_cues),
+    locked_product_placement:locked
+  };
+
+  if(!scene.product_placement_intent&&scene.composition){
+    scene.product_placement_intent='Product integrated as the readable hero within the approved composition.';
+  }
+
+  return scene;
+}
+
+function sceneUsabilityReport(scene){
+  const s=scene||{};
+  const cues=_dedupe([].concat(
+    _l(s.props),
+    _l(s.evidence_cues),
+    _l(s.signature_objects),
+    _l(s.materials),
+    _l(s.brand_specific_cues)
+  )).filter(x=>_c(x).length>2);
+
+  const missing=[];
+  if(!_c(s.scene_name)) missing.push('scene_name');
+  if(_c(s.world_description).length<60) missing.push('world_description');
+  if(_c(s.product_placement_intent).length<20) missing.push('product_placement_intent');
+  if(_c(s.composition).length<30) missing.push('composition');
+  if(_c(s.lighting).length<20) missing.push('lighting');
+  if(cues.length<2) missing.push('scene_cues');
+
+  return {
+    usable:missing.length===0,
+    missing,
+    cue_count:cues.length
+  };
+}
+
+function usableSceneOrNull(raw){
+  const scene=normalizeSceneObject(raw);
+  if(!scene) return null;
+  return sceneUsabilityReport(scene).usable?scene:null;
+}
+
+function buildSceneNormalizationPrompt(data,raw){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  return [
+    'Normalize the supplied creative direction into one complete scene JSON object.',
+    'Do not change the creative concept, location, emotional posture, director grammar, or visual thesis.',
+    'Recover missing fields from the supplied output and brand intelligence only.',
+    'Do not replace the concept with generic category imagery.',
+    'Return JSON only.',
+    'Required fields:',
+    'scene_name, world_description, product_placement_intent, composition, lighting, use_occasion, implied_action, evidence_cues, signature_objects, creative_rationale, props, avoid, claim_rules, render_path.',
+    'world_description must describe a concrete cinematic environment in at least two sentences.',
+    'composition and lighting must contain actionable visual direction.',
+    'props must include only objects already present or clearly implied by the original creative concept.',
+    'render_path must be composite.',
+    'Brand intelligence:',
+    JSON.stringify({
+      product_truth:ix.product_truth||{},
+      audience:ix.audience||{},
+      brand_state:ix.brand_state||{},
+      visual_territory:ix.visual_territory||{},
+      sensory:ix.sensory||{},
+      campaign_signals:ix.campaign_signals||{},
+      brand_intent:ix.assets&&ix.assets.brand_intent||''
+    },null,2),
+    'Original scene output:',
+    typeof raw==='string'?raw:JSON.stringify(raw||{},null,2)
+  ].join('\n\n');
+}
+
+async function repairSceneSchema(data,apiKey,raw){
+  if(!apiKey) throw new Error('Scene schema repair requires the creative service key');
+
+  const system=[
+    'You are a scene-output normalizer for a commercial art-direction system.',
+    'Preserve the authored creative idea.',
+    'Repair structure and missing fields only.',
+    'Do not simplify, sanitize, or replace the scene with category conventions.',
+    'Return one JSON object and no commentary.'
+  ].join('\n');
+
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key':apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:ANTHROPIC_MODEL,
+      max_tokens:2600,
+      system,
+      messages:[{role:'user',content:buildSceneNormalizationPrompt(data,raw)}]
+    })
+  });
+
+  if(!res.ok){
+    const t=await res.text().catch(()=>'');
+    throw new Error('Scene schema repair '+res.status+(t?': '+t.slice(0,160):''));
+  }
+
+  const payload=await res.json();
+  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  const parsed=extractJson(text);
+  const scene=normalizeSceneObject(parsed);
+  const report=sceneUsabilityReport(scene);
+
+  if(!report.usable){
+    throw new Error('Scene schema repair remained incomplete: '+report.missing.join(', '));
+  }
+
+  return scene;
+}
+
+function workerFallbackScene(data){
+  const v=(data&&data.vibes)||{};
+  const candidates=[
+    v.scene_direction,
+    v.primary&&{
+      scene_name:v.primary.scene_name,
+      world_description:v.primary.world_description,
+      product_placement_intent:'Product integrated as the readable hero inside the brand-authored world.'
+    }
+  ];
+
+  for(const candidate of candidates){
+    const scene=normalizeSceneObject(candidate);
+    if(scene&&sceneUsabilityReport(scene).usable) return scene;
+  }
+  return null;
+}
+
 async function buildMasterScene(data, apiKey, directorSelection){
   const v=data.vibes||{}, ix=v.intake_expressive||{}, f=data.factual||{};
   const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
@@ -1213,9 +1400,41 @@ async function buildMasterScene(data, apiKey, directorSelection){
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
   const payload=await res.json();
   const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  const parsed=extractJson(text);
-  if(!parsed||!parsed.scene_direction||typeof parsed.scene_direction!=='object') throw new Error('Scene builder returned no scene_direction');
-  return parsed;
+
+  let parsed=null;
+  try{
+    parsed=extractJson(text);
+  }catch(parseErr){
+    parsed={raw_text:text,parse_error:String((parseErr&&parseErr.message)||parseErr)};
+  }
+
+  let scene=normalizeSceneObject(parsed);
+  let report=sceneUsabilityReport(scene);
+
+  if(!report.usable){
+    PERF.log('master_scene_normalization_needed',{missing:report.missing});
+    scene=await repairSceneSchema(data,apiKey,parsed&&parsed.raw_text?parsed.raw_text:parsed);
+    report=sceneUsabilityReport(scene);
+  }
+
+  if(!report.usable){
+    throw new Error('Scene builder returned an incomplete scene: '+report.missing.join(', '));
+  }
+
+  return {
+    scene_direction:scene,
+    brand_world_read:_c(parsed&&parsed.brand_world_read),
+    world_thesis:_c(parsed&&parsed.world_thesis)||_c(scene.creative_rationale),
+    cinematic_translation:_c(parsed&&parsed.cinematic_translation),
+    category_cliches_to_avoid:_l(parsed&&parsed.category_cliches_to_avoid),
+    anti_tabletop_rules:_l(parsed&&parsed.anti_tabletop_rules),
+    borrowed_visual_grammar:_l(parsed&&parsed.borrowed_visual_grammar),
+    excluded_visual_grammar:_l(parsed&&parsed.excluded_visual_grammar),
+    diagnostics:Object.assign({},parsed&&parsed.diagnostics||{},{
+      scene_normalized:true,
+      scene_usability:report
+    })
+  };
 }
 function extractJson(text){
   let s=String(text||'').trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
@@ -1241,7 +1460,7 @@ function mapSceneDirectionToSd(d, meta){
     implied_action:_c(d.implied_action),
     evidence_cues:_l(d.evidence_cues),
     signature_objects:_l(d.signature_objects),
-    evidence_map:Array.isArray(d.evidence_map)?d.evidence_map:[],
+    creative_rationale:_c(d.creative_rationale),
     props:_l(d.props),
     avoid:avoids,
     render_path:'composite',
@@ -1839,17 +2058,22 @@ let CURRENT_PKG=null, CURRENT_MD='';
 function buildHandoff(){
   const a=assets.find(x=>x.asset_id===selectedAssetId);
   const v=DATA.vibes;
-  const master=v.master_scene||null;
-  let sceneDir, chosenName;
-  if(master){
-    sceneDir=mapSceneDirectionToSd(master, v.master_scene_meta);
-    chosenName=_c(master.scene_name);
-  }else{
-    // Fallback when the scene builder was skipped (demo) or failed: use the
-    // thin brand-read scene so the flow still produces a package.
-    sceneDir=v.scene_direction;
-    chosenName=(v.scene_direction&&v.scene_direction.scene_name)||(v.primary&&v.primary.scene_name)||'';
+  const master=usableSceneOrNull(v.master_scene);
+  const fallback=master?null:workerFallbackScene(DATA);
+  const approved=master||fallback;
+
+  if(!approved){
+    throw new Error('No complete approved creative scene is available for rendering.');
   }
+
+  const sceneDir=mapSceneDirectionToSd(approved,v.master_scene_meta);
+  const handoffReport=sceneUsabilityReport(sceneDir);
+
+  if(!handoffReport.usable){
+    throw new Error('Approved scene became incomplete during render handoff: '+handoffReport.missing.join(', '));
+  }
+
+  const chosenName=_c(approved.scene_name);
   return {
     mode:getOverallMode(),
     locked_asset:{ asset_id:a.asset_id, asset_name:a.asset_name, asset_type:a.asset_type, lock_status:a.lock_status, preserve_elements:a.preserve_elements, image_ref:a.asset_url||a.source_image_url||a.name, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'', media_type:a.mediaType||'', base64:a.base64||'' },
@@ -1880,7 +2104,26 @@ cta.addEventListener('click',async()=>{
     console.warn('locked product image was not materialized', e);
   }
   PERF.start('build_render_package');
-  CURRENT_PKG=buildRenderPackage(buildHandoff());
+  try{
+    CURRENT_PKG=buildRenderPackage(buildHandoff());
+  }catch(handoffErr){
+    PERF.end('build_render_package',{status:'error',error:String((handoffErr&&handoffErr.message)||handoffErr).slice(0,180)});
+    PREVIEW_FLOW_STATE.scene='error';
+    PREVIEW_FLOW_STATE.brandError=handoffErr;
+    renderInFlight=false;
+    cta.textContent='Bring it to life';
+    if(renderProgress) renderProgress.classList.remove('on');
+    if(stepRender){
+      stepRender.classList.remove('open','active');
+    }
+    if(stepDirection){
+      stepDirection.classList.add('open','active');
+      stepDirection.classList.remove('complete');
+    }
+    refresh();
+    scrollWorkflowStep(stepDirection);
+    return;
+  }
   applyPromptWriterToPackage(CURRENT_PKG);
   CURRENT_PKG.performance_timing=PERF.summary();
   CURRENT_PKG.build_id=PWP_BUILD_ID;
@@ -2535,9 +2778,48 @@ async function completeCreativePipeline(brandData, apiKey){
       DATA.vibes.scene_translation={world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',borrowed_visual_grammar:built.borrowed_visual_grammar||[],excluded_visual_grammar:built.excluded_visual_grammar||[]};
     }catch(sceneErr){
       PERF.end('master_scene_anthropic',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,160)});
-      console.warn('scene builder failed; using brand-read scene',sceneErr);
+      console.warn('scene builder failed; validating brand-read fallback',sceneErr);
+
+      const fallback=workerFallbackScene(DATA);
+      if(fallback){
+        DATA.vibes.master_scene=fallback;
+        DATA.vibes.master_scene_meta={
+          brand_world_read:'validated Worker brand-read fallback',
+          world_thesis:_c(fallback.creative_rationale)||_c(DATA.vibes.primary&&DATA.vibes.primary.world_description),
+          cinematic_translation:'master scene failed; preserved complete Worker scene without prompt-writer invention',
+          category_cliches_to_avoid:[],
+          anti_tabletop_rules:['no generic tabletop fallback']
+        };
+        DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
+          master_scene_failed:true,
+          fallback_source:'worker_scene_direction',
+          master_scene_error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)
+        });
+      }else{
+        PREVIEW_FLOW_STATE.scene='error';
+        PREVIEW_FLOW_STATE.brandError=new Error('The creative scene did not return a complete world. Try the direction again.');
+        DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
+          master_scene_failed:true,
+          fallback_source:null,
+          master_scene_error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)
+        });
+        refresh();
+        PERF.log('scene_blocked_incomplete_creative_direction',{error:String((sceneErr&&sceneErr.message)||sceneErr).slice(0,180)});
+        return;
+      }
     }
   }
+
+  const approvedScene=usableSceneOrNull(DATA.vibes.master_scene)||workerFallbackScene(DATA);
+  if(!approvedScene){
+    PREVIEW_FLOW_STATE.scene='error';
+    PREVIEW_FLOW_STATE.brandError=new Error('The creative scene was incomplete and could not be safely rendered.');
+    refresh();
+    PERF.log('scene_blocked_before_critic',{});
+    return;
+  }
+  DATA.vibes.master_scene=approvedScene;
+
   let creativeReview=null;
   try{
     PERF.start('creative_critic');
@@ -2552,7 +2834,14 @@ async function completeCreativePipeline(brandData, apiKey){
   if(creativeReview.verdict!=='approve'){
     try{
       PERF.start('creative_scene_revision');
-      const revised=await reviseCreativeScene(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},creativeReview);
+      const revisedRaw=await reviseCreativeScene(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},creativeReview);
+      let revised=usableSceneOrNull(revisedRaw);
+      if(!revised){
+        revised=await repairSceneSchema(DATA,apiKey,revisedRaw);
+      }
+      if(!sceneUsabilityReport(revised).usable){
+        throw new Error('Creative revision returned an incomplete scene');
+      }
       DATA.vibes.master_scene=revised;
       const secondReview=await reviewCreativeScene(DATA,apiKey,revised);
       DATA.vibes.creative_review_initial=creativeReview;
