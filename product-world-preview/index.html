@@ -449,8 +449,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-generalized-scene-fidelity-v1';
-const PWP_BUILD_NOTE = 'full scene pass retained; product state locked; readable screens and signage banned; brand evidence outranks category ritual; tub and jar formats detected; domestic fitness scenes separated from field profiles';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-evidence-gated-scenes-v1';
+const PWP_BUILD_NOTE = 'scene location, use occasion, and distinctive cues require direct or strong brand evidence; unsupported lifestyle concepts are repaired before rendering';
 const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
@@ -1070,7 +1070,14 @@ const ART_DIRECTOR_PROMPT = [
   'Any phone, tablet, computer, TV, sign, menu, poster, label, package, screen, or display must be blank, abstract, cropped, or too defocused to read. Never generate pseudo-text, interface copy, fake menu items, invented words, or letter-like markings.',
   'Do not default to shaker bottles, scoops, yoga mats, gym bags, kitchen counters, spa objects, pools, fruit, tactical equipment, or outdoor gear because of product category alone.',
   'Create a specific brand-authored moment with a concrete use occasion, implied action, recognizable location, and at least three cues traceable to brand or campaign evidence.',
-  'If a prop is merely a category cliché and not supported by brand evidence, exclude it.'
+  'If a prop is merely a category cliché and not supported by brand evidence, exclude it.',
+  'Return evidence_map as an array of objects with decision, evidence, source, confidence, and evidence_level.',
+  'evidence_level must be direct, strong_inference, or category_inference.',
+  'The main location and use occasion each require direct or strong-inference support.',
+  'At least two distinctive visual cues each require direct or strong-inference support.',
+  'Category inference may support minor set dressing only and must not define the scene.',
+  'Generic emotional words do not count as evidence unless tied to concrete source language.',
+  'Restrictions such as no text, no people, or no screens do not count as positive evidence cues.'
 ].join('\n');
 
 function sceneFromDirectorSelection(data, directorSelection){
@@ -1154,6 +1161,7 @@ function sceneFromDirectorSelection(data, directorSelection){
     implied_action:impliedAction,
     evidence_cues:_dedupe([].concat(_l(source.evidence_cues),campaignCues)).slice(0,10),
     signature_objects:_dedupe([].concat(_l(source.signature_objects),_l(campaign.signature_objects))).slice(0,8),
+    evidence_map:Array.isArray(source.evidence_map)?source.evidence_map:[],
     props:_dedupe([].concat(sourceProps,_l(campaign.signature_objects))).slice(0,10),
     avoid:_dedupe([].concat(sourceAvoid,_l(sel.avoid),[
       'category-default field readiness unless brand-authored',
@@ -1236,6 +1244,7 @@ function mapSceneDirectionToSd(d, meta){
     implied_action:_c(d.implied_action),
     evidence_cues:_l(d.evidence_cues),
     signature_objects:_l(d.signature_objects),
+    evidence_map:Array.isArray(d.evidence_map)?d.evidence_map:[],
     props:_l(d.props),
     avoid:avoids,
     render_path:'composite',
@@ -2360,51 +2369,55 @@ function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
 
 const GENERIC_SCENE_CUE_RE=/\b(pink|sunset|golden hour|fabric|linen|stone|water|pool|spa|soft light|glossy surface|wellness|fitness|luxury|resort|gritty|industrial|outdoor gear|shaker bottle|scoop|yoga mat|gym bag|kitchen counter|fruit|ingredient|succulent|motivational print)\b/i;
 const FLAVOR_LITERAL_RE=/\b(fruit|berry|berries|cherry|lime|lemon|orange|grapefruit|dragon fruit|mango|peach|watermelon|coconut|vanilla|chocolate|mint|botanical|flower|powder pile|ingredient pile|splash)\b/i;
-function sceneSpecificityReport(scene, campaignSignals){
+function sceneEvidenceReport(scene, campaignSignals){
   const s=scene||{};
   const campaign=campaignSignals||{};
-  const all=_dedupe([].concat(
-    _l(s.evidence_cues),
-    _l(s.signature_objects),
-    _l(s.props),
-    _l(campaign.cultural_codes),
-    _l(campaign.locations),
-    _l(campaign.signature_objects)
-  ));
-  const campaignEvidenceText=JSON.stringify(campaign||{}).toLowerCase();
-  const distinctive=all.filter(cue=>{
-    const text=_c(cue);
-    if(GENERIC_SCENE_CUE_RE.test(text)) return false;
-    if(FLAVOR_LITERAL_RE.test(text) && !campaignEvidenceText.includes(text.toLowerCase())) return false;
-    return true;
+  const map=Array.isArray(s.evidence_map)?s.evidence_map:[];
+  const supported=map.filter(item=>{
+    const level=_c(item&&item.evidence_level);
+    return level==='direct'||level==='strong_inference';
   });
-  const hasSpecificLocation=!!_c(s.world_description)&&!/^a (real|brand-specific|concrete) environment/i.test(_c(s.world_description));
-  const hasUseOccasion=!!_c(s.use_occasion);
-  const hasAction=!!_c(s.implied_action);
-  const hasNonMoodCue=distinctive.length>=3;
+  const categoryOnly=map.filter(item=>_c(item&&item.evidence_level)==='category_inference');
+  const supportedLocation=supported.filter(item=>/location|setting|place|environment/i.test(_c(item.decision)));
+  const supportedOccasion=supported.filter(item=>/use occasion|occasion|moment|behavior/i.test(_c(item.decision)));
+  const supportedCues=supported.filter(item=>/visual cue|object|material|cultural cue|behavioral cue|prop/i.test(_c(item.decision)));
+  const invalidPositiveEvidence=map.filter(item=>/no text|no people|no screen|no signage|unreadable|blank screen|no clutter/i.test(_c(item.decision)+' '+_c(item.evidence)));
+  const vagueEvidence=map.filter(item=>/freedom|momentum|confidence|energy|ritual|premium|elevated|effortless/i.test(_c(item.evidence))&&!/exact phrase|campaign|product page|homepage|visual territory|audience|brand state/i.test(_c(item.source)));
+  const passes=
+    supportedLocation.length>=1 &&
+    supportedOccasion.length>=1 &&
+    supportedCues.length>=2 &&
+    invalidPositiveEvidence.length===0 &&
+    vagueEvidence.length===0;
   return {
-    distinctive_cues:distinctive,
-    distinctive_count:distinctive.length,
-    has_specific_location:hasSpecificLocation,
-    has_use_occasion:hasUseOccasion,
-    has_action:hasAction,
-    passes:hasSpecificLocation&&hasUseOccasion&&hasAction&&hasNonMoodCue
+    supported_location:supportedLocation,
+    supported_use_occasion:supportedOccasion,
+    supported_distinctive_cues:supportedCues,
+    category_only_decisions:categoryOnly,
+    invalid_positive_evidence:invalidPositiveEvidence,
+    vague_evidence:vagueEvidence,
+    evidence_count:map.length,
+    passes
   };
 }
-function buildSceneRepairPrompt(data, scene, report){
+function buildSceneEvidenceRepairPrompt(data, scene, report){
   const v=(data&&data.vibes)||{};
   const ix=v.intake_expressive||{};
   return [
-    'Repair this scene brief without changing the product, brand world, palette, or core emotional posture.',
-    'The current scene is too generic.',
-    'Replace generic set dressing with at least three concrete cues traceable to the supplied campaign evidence.',
-    'Add one specific use occasion, one implied action, and one recognizable location.',
-    'At least one cue must be more specific than color, lighting, texture, fabric, water, stone, pool, spa, sunset, or generic fitness styling.',
+    'Repair this scene brief without changing the product, brand truth, campaign evidence, or fidelity rules.',
+    'The current scene lacks a defensible evidence chain.',
+    'Every major scene decision must cite supporting brand evidence.',
+    'The main location must have direct or strong-inference support.',
+    'The use occasion must have direct or strong-inference support.',
+    'At least two distinctive visual cues must each have direct or strong-inference support.',
+    'Category inference may support minor set dressing only.',
+    'Do not use generic emotional language as evidence.',
+    'Do not count restrictions such as no text, no people, or no screens as positive evidence.',
     'Do not introduce tactical, field-readiness, grungy outdoor, spa, resort, hospitality, archive, institutional, or service-counter clichés unless the campaign evidence explicitly supports them.',
     'Do not use literal flavor ingredients, fruit, botanicals, powders, splashes, or ingredient piles unless campaign evidence explicitly supports them.',
     'Preserve the exact supplied product state. Do not open, close, unwrap, pour, remove lids or caps, add scoops, expose contents, or change fill state.',
     'Any phone, screen, sign, menu, poster, label, or display must be blank, abstract, cropped, or unreadable.',
-    'Return only valid JSON matching the existing scene_direction shape.',
+    'Return only valid JSON matching the existing scene_direction shape, including evidence_map.',
     'Campaign signals:',
     JSON.stringify(ix.campaign_signals||{},null,2),
     'Brand read:',
@@ -2422,14 +2435,15 @@ function buildSceneRepairPrompt(data, scene, report){
     JSON.stringify(report||{},null,2)
   ].join('\n\n');
 }
-async function repairSceneSpecificity(data, apiKey, scene, report){
+async function repairSceneEvidence(data, apiKey, scene, report){
   if(!apiKey) return scene;
   const system=[
     'You are a senior commercial art director repairing a weak scene brief.',
     'Preserve brand truth and product fidelity.',
     'Increase campaign specificity without inventing unsupported claims or changing the brand world.',
     'Output only one JSON object representing scene_direction.',
-    'Required fields: scene_name, world_description, use_occasion, implied_action, evidence_cues, signature_objects, product_placement_intent, composition, lighting, props, avoid, claim_rules, render_path.',
+    'Required fields: scene_name, world_description, use_occasion, implied_action, evidence_cues, signature_objects, evidence_map, product_placement_intent, composition, lighting, props, avoid, claim_rules, render_path.',
+    'Each evidence_map item must include decision, evidence, source, confidence, and evidence_level.',
     'render_path must be "composite".'
   ].join('\n');
   const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -2444,7 +2458,7 @@ async function repairSceneSpecificity(data, apiKey, scene, report){
       model:ANTHROPIC_MODEL,
       max_tokens:2200,
       system,
-      messages:[{role:'user',content:buildSceneRepairPrompt(data,scene,report)}]
+      messages:[{role:'user',content:buildSceneEvidenceRepairPrompt(data,scene,report)}]
     })
   });
   if(!res.ok){
@@ -2458,6 +2472,7 @@ async function repairSceneSpecificity(data, apiKey, scene, report){
   repaired.render_path='composite';
   repaired.evidence_cues=_l(repaired.evidence_cues);
   repaired.signature_objects=_l(repaired.signature_objects);
+  repaired.evidence_map=Array.isArray(repaired.evidence_map)?repaired.evidence_map:[];
   repaired.props=_l(repaired.props);
   repaired.avoid=_l(repaired.avoid);
   repaired.claim_rules=_l(repaired.claim_rules);
@@ -2524,32 +2539,39 @@ async function completeCreativePipeline(brandData, apiKey){
     }
   }
   const campaignSignals=(DATA.vibes&&DATA.vibes.intake_expressive&&DATA.vibes.intake_expressive.campaign_signals)||{};
-  let specificity=sceneSpecificityReport(DATA.vibes.master_scene||DATA.vibes.scene_direction||{},campaignSignals);
-  PERF.log('scene_specificity_check',specificity);
-  if(!specificity.passes){
+  let evidenceReport=sceneEvidenceReport(DATA.vibes.master_scene||DATA.vibes.scene_direction||{},campaignSignals);
+  PERF.log('scene_evidence_check',evidenceReport);
+  if(!evidenceReport.passes){
     try{
-      PERF.start('scene_specificity_repair');
-      const repaired=await repairSceneSpecificity(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},specificity);
+      PERF.start('scene_evidence_repair');
+      const repaired=await repairSceneEvidence(DATA,apiKey,DATA.vibes.master_scene||DATA.vibes.scene_direction||{},evidenceReport);
       DATA.vibes.master_scene=repaired;
-      specificity=sceneSpecificityReport(repaired,campaignSignals);
+      evidenceReport=sceneEvidenceReport(repaired,campaignSignals);
       DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-        specificity_repaired:true,
-        specificity_report:specificity
+        evidence_repaired:true,
+        evidence_report:evidenceReport
       });
-      PERF.end('scene_specificity_repair',{passes:specificity.passes,distinctive_count:specificity.distinctive_count});
+      PERF.end('scene_evidence_repair',{passes:evidenceReport.passes,evidence_count:evidenceReport.evidence_count});
     }catch(repairErr){
-      PERF.end('scene_specificity_repair',{error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)});
+      PERF.end('scene_evidence_repair',{error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)});
       DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
-        specificity_repaired:false,
-        specificity_report:specificity,
-        specificity_repair_error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)
+        evidence_repaired:false,
+        evidence_report:evidenceReport,
+        evidence_repair_error:String((repairErr&&repairErr.message)||repairErr).slice(0,180)
       });
-      console.warn('scene specificity repair failed',repairErr);
+      console.warn('scene evidence repair failed',repairErr);
     }
+  }
+  if(!evidenceReport.passes){
+    PREVIEW_FLOW_STATE.scene='error';
+    PREVIEW_FLOW_STATE.brandError=new Error('The scene could not be tied closely enough to brand evidence.');
+    refresh();
+    PERF.log('scene_blocked_by_evidence_gate',{evidence_report:evidenceReport});
+    return;
   }
   PREVIEW_FLOW_STATE.scene='ready';
   refresh();
-  PERF.log('scene_ready',{specificity_passes:specificity.passes,distinctive_count:specificity.distinctive_count});
+  PERF.log('scene_ready',{evidence_passes:true,evidence_count:evidenceReport.evidence_count});
 }
 
 async function generate(){
