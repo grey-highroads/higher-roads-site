@@ -451,7 +451,7 @@ if(!HR_CREATIVE_CONFIG.directorBank || !HR_CREATIVE_CONFIG.directorSelectionProm
 
 const PWP_BUILD_ID = 'pwp-index-2026-07-24-brand-specificity-gate-v1';
 const PWP_BUILD_NOTE = 'campaign signals passed through brand-first scene authority; deterministic specificity gate blocks vague scenes and runs one repair call before rendering';
-const PWP_FAST_MODE = true; // skip slow/brittle master scene call; build package from director selection + brand read
+const PWP_FAST_MODE = false; // skip slow/brittle master scene call; build package from director selection + brand read
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
 function setBuildStamp(){
   const el=document.getElementById('buildStamp');
