@@ -460,10 +460,10 @@ function buildLockedProductAsset(parsed){
 /* --- Step 4 render-package exporter (mirrored from render-package.js). Engine-agnostic,
    no renderer integration. render_path is a test label, not a gate. --- */
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
-if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the grammar pipeline.'); }
+if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-grammar-pipeline-v2';
-const PWP_BUILD_NOTE = 'grammar pipeline: full brand dossier (incl. campaign signals and visual identity) feeds three divergent world theses, comparative selection with modular cinematic grammar replaces director selection and score-then-revise criticism, the approved master scene is the sole source of the render prompt via authored_prompt prose, and director-variable substitution in compilation is removed';
+const PWP_BUILD_ID = 'pwp-index-2026-07-24-aesthetic-mode-v3';
+const PWP_BUILD_NOTE = 'aesthetic mode as first-class variable: ideation, selection, and the scene author all operate in a chosen mode (cinematic / documentary / editorial / vernacular) picked from brand evidence; ideation now requires at least one brand-native-use thesis and rebalances human presence away from trace-only default; the compiler prepends a mode-specific opening line and adds a safe-face-framing addendum when people are primary; cinematic is no longer the pipeline default';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
@@ -574,6 +574,10 @@ function inferPackageFormat(asset){
   if(/\b(can|soda|seltzer|spritz|sparkling|ready[- ]?to[- ]?drink|rtd)\b/.test(s)) return 'can';
   if(/\b(tub|canister|powder container|supplement tub|pre[- ]?workout|protein tub)\b/.test(s)) return 'tub';
   if(/\b(bottle|shooter|shot|squeeze|dropper|tincture|drops|vial|flask)\b/.test(s)) return 'bottle';
+  // Cooler-family: rigid hard-shell containers with hinged lids, closest to the
+  // box bucket for state protection. Matched before the generic box regex so
+  // "cooler" doesn't fall through to package.
+  if(/\b(cooler|hard[- ]?cooler|soft[- ]?cooler|ice[- ]?chest|hard[- ]?sided|hard[- ]?side)\b/.test(s)) return 'cooler';
   if(/\b(box|carton|case|tin)\b/.test(s)) return 'box';
   return 'package';
 }
@@ -584,6 +588,7 @@ const PACKAGE_FORMAT_INFO={
   jar:{label:'jar',structure:['jar body','lid','rim','threading','label wrap','cylindrical or facetted proportions','closed lid and sealed state exactly as supplied'],avoid:['removed lid unless supplied removed','opened jar unless supplied open','visible contents unless supplied visible','loose gummies, edibles, or contents outside the jar','added scoop or utensil','changed fill level','warped jar body','fake lid details','condensation beads treating a shelf-stable jar as a cold beverage','wet contact base as a cold-beverage cue']},
   bottle:{label:'bottle',structure:['bottle body','cap','neck','shoulder','label wrap','bottle silhouette','closed or open state exactly as supplied'],avoid:['changed cap','warped neck','opened bottle unless supplied open','fake fluid level or label wrap changes']},
   box:{label:'box/carton',structure:['carton panels','front face','folds','closure','edges','box proportions','closed or open state exactly as supplied'],avoid:['crushed carton proportions','opened closure unless supplied open','fake panel text','damaged front face']},
+  cooler:{label:'cooler',structure:['rigid cooler body','hinged lid','latches','handles','molded features','logo badge','closed lid state exactly as supplied'],avoid:['warped cooler body','opened lid unless supplied open','soft crush deformation','fake latches or hinges','condensation beads treating a rigid cooler as a cold beverage','wet contact base as a cold-beverage cue','mud or grime covering the logo badge']},
   package:{label:'package',structure:['package structure','front face','silhouette','proportions','closed or open state exactly as supplied'],avoid:['changed package structure','crushed silhouette','fake package details','opened or altered package state']}
 };
 function packageFormatInfo(asset){
@@ -660,6 +665,7 @@ function textBlobForIntegration(h){
   parts.push(_c(f.category), _c(f.name), _c((h&&h.locked_asset&&h.locked_asset.asset_name)||''));
   parts.push(_c(sd.scene_name), _c(sd.world_description), _c(sd.authored_prompt), _c(sd.surface), _c(sd.background), _c(sd.lighting), _l(sd.materials).join(' '), _l(sd.props).join(' '));
   parts.push(_c(thesis.world_thesis), _c(thesis.memorable_image), _c(cs.brand_posture));
+  parts.push(_c(sd.aesthetic_mode), _c(sd.human_activity), _c(cs.aesthetic_mode));
   return parts.join(' ').toLowerCase();
 }
 function hasAny(hay, words){ return words.some(w=>hay.indexOf(w)>=0); }
@@ -698,7 +704,11 @@ function buildIntegrationTreatment(h){
   // the scene has wet or humid cues, allow scene-matched moisture on the
   // surface AROUND the container without treating the container itself as cold.
   // Applied as a final overlay so it corrects any residual misclassification.
-  const shelfStableSet=new Set(['jar','tub','box']);
+  // Rigid containers (jar, tub, box, cooler) get the shelf-stable safety net
+  // when the scene is wet or humid: scene-matched surface moisture around the
+  // base, restrained ambient reflection, no false condensation beads treating
+  // the container as a cold beverage.
+  const shelfStableSet=new Set(['jar','tub','box','cooler']);
   if(shelfStableSet.has(packageInfo.format) && hasAny(txt,['wet','rain','humid','damp','condensation','mist','fog','dew','porch rail'])){
     profile='shelf_stable_container'; level='light';
     effects=effects.filter(e=>!/condensation_beads|wet_contact_base|cold_highlights|cooler_reflections|small_water_droplets/.test(e));
@@ -764,14 +774,22 @@ function _grammarRefinementSegs(h){
 }
 function _posSceneCore(h){
   const sd=h.scene_direction||{};
-  // The authored prose is the world. Everything else is supplementary structure
-  // for engines or reviewers that want it; the prose leads.
+  const cs=(h&&h.creative_selection)||{};
+  // The authored prose is the world. The compiler downstream prepends the
+  // mode-specific opening framing sentence; here we surface it as an
+  // enrichment segment so the render package reads coherently even without
+  // the compiler. Human presence is likewise surfaced.
   const authored=_c(sd.authored_prompt)||_c(sd.prompt_seed);
   const base=authored?_stripProductFreeLines(authored):_firstSentences(_stripProductFreeLines(sd.world_description),5);
   const props=_l(sd.props).slice(0,5);
+  const mode=resolvedAestheticMode(cs);
+  const opening=modeOpeningLine(mode);
+  const presence=_c(cs.human_presence)||_c(sd.human_presence)||(mode&&mode.human_presence_default)||'trace_only';
+  const activity=_c(sd.human_activity);
   return [
-    'a wide cinematic brand-world photograph in landscape framing with real environmental depth, scale, and atmosphere, shot like a still from a campaign film, not a tabletop product photo',
+    opening,
     base,
+    presence==='primary_scale'&&activity&&('a person in the frame '+activity+', with safe face framing: hat brim, hair, hand-to-face, downward gaze, three-quarter away, motion, or partial defocus; no centered close frontal face'),
     !authored&&_c(sd.surface)&&'ground: '+_c(sd.surface),
     !authored&&_c(sd.background)&&'background: '+_c(sd.background),
     !authored&&_l(sd.materials).length&&'materials: '+_l(sd.materials).slice(0,6).join(', '),
@@ -818,8 +836,19 @@ function _posReference(h){
    as before. [ASSUMED, verify in browser] CORS on direct access, as previously. */
 const DEBUG_CREATIVE_DIRECTION = true; // internal review panel, this is an internal tool
 const GRAMMAR_MODULES = _objs(HR_CREATIVE_CONFIG.grammarModules);
+const AESTHETIC_MODES = _objs(HR_CREATIVE_CONFIG.aestheticModes);
 const WORLD_IDEATION_PROMPT = HR_CREATIVE_CONFIG.worldIdeationPrompt||'';
 const THESIS_SELECTION_PROMPT = HR_CREATIVE_CONFIG.thesisSelectionPrompt||'';
+
+function resolvedAestheticMode(selection){
+  // Falls back to cinematic when nothing has been chosen; this preserves prior
+  // behavior for older scenes while making mode a real, changeable variable.
+  const id=_c(selection&&selection.aesthetic_mode)||'cinematic_film_still';
+  return AESTHETIC_MODES.find(m=>m.id===id) || AESTHETIC_MODES.find(m=>m.id==='cinematic_film_still') || AESTHETIC_MODES[0] || null;
+}
+function modeOpeningLine(mode){
+  return _c(mode&&mode.opening_line) || 'A wide cinematic campaign-film still in landscape framing, a real environment with depth and atmosphere, not a tabletop product photo.';
+}
 
 function fullBrandDossier(data){
   // The complete brand read. Every creative call receives all of it; the
@@ -865,33 +894,52 @@ async function callAnthropicJson(system, userText, apiKey, maxTokens){
 }
 
 async function ideateWorldTheses(data, apiKey){
+  // Pass both the grammar module summary and the aesthetic mode library, so the
+  // ideation model can pick a mode per thesis rather than defaulting to cinema.
+  const modesShort=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when}));
   const parsed=await callAnthropicJson(
     WORLD_IDEATION_PROMPT,
-    'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2),
-    apiKey, 2200);
+    'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2)+
+    '\n\nAesthetic mode library:\n'+JSON.stringify(modesShort,null,2),
+    apiKey, 2600);
+  const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
   const theses=(parsed&&Array.isArray(parsed.theses)?parsed.theses:[])
     .map(t=>({
       thesis_name:_c(t&&t.thesis_name),
       world_thesis:_c(t&&t.world_thesis),
       memorable_image:_c(t&&t.memorable_image),
       belongs_because:_c(t&&t.belongs_because),
-      human_trace:_c(t&&t.human_trace),
+      brand_native_use_evidence:_c(t&&t.brand_native_use_evidence),
+      human_presence:validHumanPresence(_c(t&&t.human_presence)),
+      human_activity:_c(t&&t.human_activity),
+      aesthetic_mode:validModeIds.has(_c(t&&t.aesthetic_mode))?_c(t.aesthetic_mode):'cinematic_film_still',
+      aesthetic_mode_reason:_c(t&&t.aesthetic_mode_reason),
       divergence_axis:_c(t&&t.divergence_axis)
     }))
     .filter(t=>t.thesis_name&&t.world_thesis);
   if(theses.length<2) throw new Error('World ideation returned fewer than two usable theses');
   return theses.slice(0,3);
 }
+function validHumanPresence(x){
+  const v=_c(x).toLowerCase();
+  return (v==='primary_scale'||v==='trace_only'||v==='prohibited')?v:'trace_only';
+}
 
 async function selectThesisAndGrammar(data, apiKey, theses){
   const moduleLibrary=GRAMMAR_MODULES.map(m=>({id:m.id,name:m.name,grammar:m.grammar,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
+  const modeLibrary=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
   const parsed=await callAnthropicJson(
     THESIS_SELECTION_PROMPT,
     'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2)+
-    '\n\nCandidate world theses:\n'+JSON.stringify(theses,null,2)+
-    '\n\nGrammar module library:\n'+JSON.stringify(moduleLibrary,null,2),
-    apiKey, 1600);
+    '\n\nCandidate world theses (each carries a proposed aesthetic_mode and human_presence):\n'+JSON.stringify(theses,null,2)+
+    '\n\nGrammar module library:\n'+JSON.stringify(moduleLibrary,null,2)+
+    '\n\nAesthetic mode library:\n'+JSON.stringify(modeLibrary,null,2),
+    apiKey, 1800);
   if(!parsed||!_c(parsed.selected_thesis_name)) throw new Error('Thesis selection returned no usable choice');
+  const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
+  const winner=theses.find(t=>t.thesis_name.toLowerCase()===_c(parsed.selected_thesis_name).toLowerCase())||theses[0];
+  const chosenMode=validModeIds.has(_c(parsed.aesthetic_mode))?_c(parsed.aesthetic_mode):(winner&&winner.aesthetic_mode)||'cinematic_film_still';
+  const chosenPresence=validHumanPresence(_c(parsed.human_presence)||(winner&&winner.human_presence));
   const sel={
     selected_thesis_name:_c(parsed.selected_thesis_name),
     selection_reason:_c(parsed.selection_reason),
@@ -903,10 +951,12 @@ async function selectThesisAndGrammar(data, apiKey, theses){
       .filter(g=>g.id&&GRAMMAR_MODULES.some(m=>m.id===g.id))
       .slice(0,3),
     no_grammar_fit:parsed.no_grammar_fit===true,
+    aesthetic_mode:chosenMode,
+    aesthetic_mode_reason:_c(parsed.aesthetic_mode_reason),
+    human_presence:chosenPresence,
     avoid:_l(parsed.avoid).slice(0,10)
   };
   if(sel.no_grammar_fit) sel.grammar_modules=[];
-  const winner=theses.find(t=>t.thesis_name.toLowerCase()===sel.selected_thesis_name.toLowerCase())||theses[0];
   return {selection:sel, thesis:winner};
 }
 
@@ -922,12 +972,37 @@ function grammarGuidanceBlock(selection, thesis){
     'SELECTED WORLD THESIS (this is the world; develop it, never replace it):',
     JSON.stringify(thesis||{},null,2)
   ];
+  // Aesthetic mode is now first-class guidance for the scene author.
+  const mode=resolvedAestheticMode(selection);
+  if(mode){
+    lines.push('SELECTED AESTHETIC MODE (this is the register you write in):');
+    lines.push(JSON.stringify({
+      id:mode.id, name:mode.name,
+      scene_grammar:mode.scene_grammar,
+      framing_notes:mode.framing_notes,
+      human_presence_default:mode.human_presence_default,
+      people_framing_rules:mode.people_framing_rules,
+      traps:mode.traps,
+      selection_reason:_c(selection&&selection.aesthetic_mode_reason)
+    },null,2));
+    lines.push('Do not open the authored_prompt with a framing declaration ("wide cinematic film still..." and similar). The compiler prepends the correct framing sentence for this mode. Start the authored_prompt with the specific world.');
+  }
+  // Human presence guidance for the author.
+  const presence=_c(selection&&selection.human_presence)||(mode&&mode.human_presence_default)||'trace_only';
+  lines.push('HUMAN PRESENCE for this scene: '+presence+'.');
+  if(presence==='primary_scale'){
+    lines.push('A person IS in the frame doing the specific activity from the thesis. Use SAFE FACE FRAMING: hat or cap brim shading the face, hair falling forward, hand-to-mouth or hand-to-face gestures, downward gaze at the task, three-quarter turn away from camera, motion, or partial defocus. Never center a full frontal close face.');
+  } else if(presence==='trace_only'){
+    lines.push('No full people. Human trace only: objects mid-use, a hand leaving frame, warmth of recent presence.');
+  } else if(presence==='prohibited'){
+    lines.push('No people or hands in the frame.');
+  }
   const mods=resolvedGrammarModules(selection);
   if(mods.length){
     lines.push('CINEMATIC GRAMMAR MODULES (how the frame behaves, never where the world is):');
     lines.push(JSON.stringify(mods,null,2));
   }else{
-    lines.push('No grammar module fits this world. Use neutral high-quality commercial grammar: strong composition, motivated light, material specificity, and a memorable point of view.');
+    lines.push('No grammar module fits this world. Use neutral high-quality commercial grammar for the selected mode: strong composition, motivated light, material specificity, and a memorable point of view.');
   }
   if(selection){
     if(_c(selection.brand_posture)) lines.push('Brand posture: '+_c(selection.brand_posture));
@@ -944,12 +1019,15 @@ function buildCreativeDirectionBlock(h, finalPrompt, negStr){
   const st=(h&&h.scene_translation)||{};
   const sd=(h&&h.scene_direction)||{};
   const mods=resolvedGrammarModules(cs);
+  const mode=resolvedAestheticMode(cs);
   const negRules=String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean);
   return {
-    creative_layer_status:cs?'grammar_pipeline':'brand_read_fallback',
+    creative_layer_status:cs?'aesthetic_mode_pipeline':'brand_read_fallback',
     world_theses:theses,
     world_thesis_selected:thesis,
     creative_selection:cs,
+    aesthetic_mode_applied:mode?{id:mode.id,name:mode.name,short:mode.short,reason:_c(cs&&cs.aesthetic_mode_reason)}:null,
+    human_presence_applied:_c(cs&&cs.human_presence)||_c(sd.human_presence)||(mode&&mode.human_presence_default)||'trace_only',
     grammar_modules_applied:mods.map(m=>({id:m.id,name:m.name})),
     scene_translation:{
       world_thesis:_c(thesis&&thesis.world_thesis)||_c(st.world_thesis)||_c(sd.creative_rationale),
@@ -974,11 +1052,16 @@ function renderCreativeDirectionPanel(){
   const chips=(label,arr)=>(arr&&arr.length)?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+arr.map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>'):'';
   let html='<div class="cd-head">Creative direction <span class="cd-tag">internal</span></div>';
   if(!cs){
-    html+='<div class="cd-row"><span class="cd-k">Pipeline</span><span class="cd-v">fallback (grammar pipeline unavailable, using brand-read scene)</span></div>';
+    html+='<div class="cd-row"><span class="cd-k">Pipeline</span><span class="cd-v">fallback (aesthetic mode pipeline unavailable, using brand-read scene)</span></div>';
   }else{
     const theses=_objs(cd.world_theses);
-    if(theses.length) html+=chips('Candidate worlds',theses.map(t=>t.thesis_name));
+    if(theses.length){
+      const chipsWithMode=theses.map(t=>t.thesis_name+(t.aesthetic_mode?' ['+t.aesthetic_mode.replace(/_/g,' ')+']':''));
+      html+=chips('Candidate worlds',chipsWithMode);
+    }
     html+=row('Selected world',_c(cd.world_thesis_selected&&cd.world_thesis_selected.thesis_name));
+    if(cd.aesthetic_mode_applied) html+=row('Aesthetic mode',cd.aesthetic_mode_applied.name+(cd.aesthetic_mode_applied.reason?' — '+cd.aesthetic_mode_applied.reason:''));
+    if(cd.human_presence_applied) html+=row('Human presence',cd.human_presence_applied.replace(/_/g,' '));
     html+=row('Why it won',cs.selection_reason);
     html+=row('Why the others lost',cs.comparative_notes);
     html+=row('Brand posture',cs.brand_posture);
@@ -1050,6 +1133,9 @@ function normalizeSceneObject(raw){
     render_path:'composite',
     authored_prompt:_c(source.authored_prompt),
     prompt_seed:_c(source.prompt_seed)||_c(source.render_prompt)||_c(source.authored_prompt),
+    aesthetic_mode:_c(source.aesthetic_mode),
+    human_presence:_c(source.human_presence),
+    human_activity:_c(source.human_activity),
     surface:_c(source.surface),
     background:_c(source.background),
     materials:_l(source.materials),
@@ -1274,6 +1360,9 @@ function mapSceneDirectionToSd(d, meta){
     render_path:'composite',
     authored_prompt:_c(d.authored_prompt),
     prompt_seed:_c(d.prompt_seed)||_c(d.render_prompt)||_c(d.authored_prompt),
+    aesthetic_mode:_c(d.aesthetic_mode),
+    human_presence:_c(d.human_presence),
+    human_activity:_c(d.human_activity),
     surface:_c(d.surface),
     background:_c(d.background),
     materials:_l(d.materials),
@@ -1318,10 +1407,16 @@ function buildRenderPackage(h){
   // which discarded the most creative call in the pipeline. Grammar refinement
   // now appends inside the prompt builders instead.
   const effectiveChosenDirection=_c(h.chosen_direction)||_c(sd.scene_name);
+  const cs2=h.creative_selection||{};
+  const mode2=resolvedAestheticMode(cs2);
   const effectiveSceneBrief={
     world_description:_c(sd.world_description),
     authored_prompt:_c(sd.authored_prompt),
     prompt_seed:_c(sd.prompt_seed),
+    aesthetic_mode:_c(sd.aesthetic_mode)||_c(cs2.aesthetic_mode)||'cinematic_film_still',
+    opening_line:modeOpeningLine(mode2),
+    human_presence:_c(sd.human_presence)||_c(cs2.human_presence)||(mode2&&mode2.human_presence_default)||'trace_only',
+    human_activity:_c(sd.human_activity),
     product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),
     composition:_c(sd.composition),
     lighting:_c(sd.lighting),

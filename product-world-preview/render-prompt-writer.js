@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const VERSION = 'prompt-writer-2026-07-24-prose-preserving-v3';
+  const VERSION = 'prompt-writer-2026-07-24-mode-aware-v4';
   /*
    * Prose-preserving compiler.
    *
@@ -37,7 +37,7 @@
     return c(str).split(/,|;|\n|\|/g).map(x=>x.trim()).filter(Boolean);
   }
 
-  const FORMAT_NOUN = { can:'can', pouch:'pouch', tub:'tub', jar:'jar', bottle:'bottle', box:'carton', package:'package' };
+  const FORMAT_NOUN = { can:'can', pouch:'pouch', tub:'tub', jar:'jar', bottle:'bottle', box:'carton', cooler:'cooler', package:'package' };
 
   function inferFormat(pkg){
     const existing=c(pkg&&pkg.package_format)||c(pkg&&pkg.fidelity_contract&&pkg.fidelity_contract.package_format)||c(pkg&&pkg.integration_treatment&&pkg.integration_treatment.package_format);
@@ -51,6 +51,7 @@
     if(/\b(can|soda|spritz|seltzer|rtd)\b/.test(s)) return 'can';
     if(/\b(tub|canister|pre[- ]?workout|supplement tub|powder container|protein tub)\b/.test(s)) return 'tub';
     if(/\b(bottle|shooter|squeeze|dropper|tincture|drops|vial|flask)\b/.test(s)) return 'bottle';
+    if(/\b(cooler|hard[- ]?cooler|soft[- ]?cooler|ice[- ]?chest|hard[- ]?sided|hard[- ]?side)\b/.test(s)) return 'cooler';
     if(/\b(box|carton|case)\b/.test(s)) return 'box';
     return 'package';
   }
@@ -152,7 +153,7 @@
     // Formats with a state (lid, cap, seal, wrapper) get an explicit closed-state
     // assertion. This is the second half of the state-lock belt-and-suspenders,
     // downstream of the authored-prose neutralization above.
-    const statefulFormats=new Set(['jar','tub','bottle','box','pouch']);
+    const statefulFormats=new Set(['jar','tub','bottle','box','pouch','cooler']);
     const lines=[
       'Preserve the supplied '+noun+' exactly as pictured: logo, label hierarchy, typography, colors, proportions, silhouette, and open or closed state unchanged, fully readable.'
     ];
@@ -171,6 +172,35 @@
       'redrawn or retyped packaging','warped logo','recolored packaging','changed package proportions or silhouette','duplicate or extra branded products','readable environmental text or screen UI','pseudo-text or gibberish lettering','people or hands unless the scene allows them','category-default props not in the approved scene','product pasted on after the fact','placeholder frames or placement guides'
     ], splitTerms(pkg&&pkg.prompts&&pkg.prompts.negative).slice(0,6)));
     return terms.join(', ');
+  }
+
+  /* Mode-aware opening line. The compiler prepends the framing sentence
+     appropriate to the selected aesthetic mode, so the scene author never
+     has to write it and never accidentally defaults to cinematic prose when
+     the mode is documentary, editorial, or vernacular. Falls back to
+     cinematic if no mode is provided. */
+  const MODE_OPENING_LINES = {
+    cinematic_film_still: 'A wide cinematic campaign-film still in landscape framing, a real environment with depth and atmosphere, not a tabletop product photo.',
+    documentary_lifestyle: 'An eye-level documentary photograph in the tradition of outdoor and lifestyle editorial, real and observed rather than staged.',
+    editorial_commercial: 'A composed editorial photograph in the tradition of magazine-cover lifestyle work, considered light and considered framing without cinematic drama.',
+    vernacular_ugc: 'A vernacular photograph in the register of a phone camera in daily life, incidental and immediate, not a commercial frame.'
+  };
+  function openingLineForMode(pkg){
+    const sb=(pkg&&pkg.scene_brief)||{};
+    const explicit=c(sb.opening_line);
+    if(explicit) return explicit;
+    const modeId=c(sb.aesthetic_mode)||c(pkg&&pkg.aesthetic_mode)||'cinematic_film_still';
+    return MODE_OPENING_LINES[modeId] || MODE_OPENING_LINES.cinematic_film_still;
+  }
+
+  /* Safe-face-framing addendum. When people are permitted at primary scale,
+     append one compact instruction that reduces face-model failure risk
+     without constraining the artistic choice. */
+  function safeFaceFramingAddendum(pkg){
+    const sb=(pkg&&pkg.scene_brief)||{};
+    const level=c(sb.human_presence);
+    if(level!=='primary_scale') return '';
+    return 'People appear with faces framed safely: a hat or cap brim shading the face, hair falling forward, hand-to-mouth or hand-to-face gestures, downward gaze at a task, three-quarter turn away from camera, motion, or partial defocus. No centered close frontal faces.';
   }
 
   function proseCompile(renderPackage){
@@ -194,17 +224,20 @@
       warnings.push('State-lock neutralized authored phrasing: '+stateFix.changed.slice(0,5).join(' | '));
     }
 
+    const opening=openingLineForMode(pkg);
+    const safeFace=safeFaceFramingAddendum(pkg);
     const compiled_positive=[
-      'A wide cinematic campaign-film still in landscape framing, a real environment with depth and atmosphere, not a tabletop product photo.',
+      opening,
       world,
-      protectionBlock(pkg, format)
-    ].join(' ');
+      protectionBlock(pkg, format),
+      safeFace
+    ].filter(Boolean).join(' ');
 
     const compiled_negative=canonicalNegative(pkg);
 
     const worldChars=world.length, totalChars=compiled_positive.length;
     return {
-      prompt_writer_id:'prose_preserving_compiler_v3',
+      prompt_writer_id:'prose_preserving_compiler_v4',
       prompt_writer_version:VERSION,
       compiled_positive,
       compiled_negative,
@@ -215,18 +248,20 @@
         negative_chars:compiled_negative.length,
         world_chars:worldChars,
         world_share:totalChars?Math.round(100*worldChars/totalChars):0,
-        world_source:source
+        world_source:source,
+        aesthetic_mode:c((pkg&&pkg.scene_brief&&pkg.scene_brief.aesthetic_mode))||'cinematic_film_still',
+        human_presence:c((pkg&&pkg.scene_brief&&pkg.scene_brief.human_presence))||'trace_only'
       }
     };
   }
 
   window.HR_PROMPT_WRITER_CONFIG={
     version:VERSION,
-    defaultWriterId:'prose_preserving_compiler_v3',
+    defaultWriterId:'prose_preserving_compiler_v4',
     writers:{
-      prose_preserving_compiler_v3:{
-        id:'prose_preserving_compiler_v3',
-        label:'Prose-Preserving Compiler v3',
+      prose_preserving_compiler_v4:{
+        id:'prose_preserving_compiler_v4',
+        label:'Prose-Preserving Compiler v4 (mode-aware)',
         supports:{engines:['generic'],modes:['product_accurate','composite','reference']},
         compile:proseCompile
       }
