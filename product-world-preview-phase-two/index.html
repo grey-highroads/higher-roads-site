@@ -341,8 +341,6 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
       <textarea class="urlinput" id="artifactReferenceFocus" placeholder="Example: retain the hand gesture, ring, warm light, and shallow focal depth."></textarea>
       <label class="fieldlabel" for="artifactExclusions">Exclusions <span class="opt">optional · only named exclusions become hard negatives</span></label>
       <textarea class="urlinput" id="artifactExclusions" placeholder="Example: no grass, wheat, grain, prairie, or rural field settings."></textarea>
-      <label class="fieldlabel" for="artifactApiKey">Anthropic API key <span class="opt">uses the same internal-testing path as the current brand read</span></label>
-      <input class="urlinput" id="artifactApiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
       <button class="cta" id="runArtifactDiagnostic" type="button" style="margin-top:24px">Run diagnostic</button>
       <p class="entryhint" id="artifactDiagnosticStatus"></p>
     </div>
@@ -398,8 +396,6 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
           </div>
           <label class="fieldlabel" for="unifiedExclusions">Exclusions <span class="opt">optional</span></label>
           <textarea class="urlinput" id="unifiedExclusions" placeholder="Example: no grass, wheat, grain, prairie, or rural field settings."></textarea>
-          <label class="fieldlabel" for="unifiedApiKey">Anthropic API key <span class="opt">required only when the pipeline runs</span></label>
-          <input class="urlinput" id="unifiedApiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
           <div class="brief-actions">
             <button class="cta" id="reviewUnifiedBrief" type="button">Review brief</button>
             <span class="brief-dirty" id="unifiedDirtyStatus"></span>
@@ -428,10 +424,6 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
     <div class="entryform">
       <label class="fieldlabel" for="productUrl">Product page or product listing URL</label>
       <input class="urlinput" id="productUrl" type="url" inputmode="url" placeholder="https://yourbrand.com/products/your-product" autocomplete="off">
-      <div id="keyRow" hidden style="display:none!important">
-        <label class="fieldlabel" for="apiKey">Anthropic API key <span class="opt">used only for the brand read, same as the Builder</span></label>
-        <input class="urlinput" id="apiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
-      </div>
       <button class="cta" id="generateBtn" type="button">BUILD MY WORLD!</button>
       <p class="entryhint" id="entryHint"></p>
     </div>
@@ -631,8 +623,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.deliveryContexts || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the delivery-aware aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-25-phase-seven-unified-intake-v3';
-const PWP_BUILD_NOTE = 'Phase Seven unified creative intake: typed anchors normalize into one reviewable brief, user authority is preserved, and transient transport failures remain distinct from structural coupling';
+const PWP_BUILD_ID = 'pwp-index-2026-07-26-phase-eight-security-floor-v1';
+const PWP_BUILD_NOTE = 'Phase Eight security floor: Anthropic API key moved to Worker secret behind Cloudflare Access, browser-direct Anthropic calls removed, URL-parameter Worker override removed, credential transport fallbacks removed';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
@@ -1133,27 +1125,32 @@ function fullCreativeDossier(data){
   return dossier;
 }
 
-async function callAnthropicJson(system, userText, apiKey, maxTokens){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:maxTokens||2000, system, messages:[{role:'user',content:userText}] })
+// Phase Eight security floor: callAnthropicJson removed. All Anthropic model
+// calls now route through the Worker via the run_model_stage action. The
+// Anthropic API key lives only in the Worker's secrets and is not exposed to
+// the browser. The Worker enforces Cloudflare Access, so only authenticated
+// Higher Roads users can invoke this endpoint.
+async function runModelStage(stage, system, userText, maxTokens){
+  const res=await postPreviewAction('run_model_stage',{
+    stage,
+    system_prompt:system,
+    user_text:userText,
+    max_tokens:maxTokens||3200
   });
-  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Model call '+res.status+(t?': '+t.slice(0,160):'')); }
-  const payload=await res.json();
-  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
+  const text=String((res&&res.text)||'').trim();
   return extractJson(text);
 }
 
-async function ideateWorldTheses(data, apiKey){
+async function ideateWorldTheses(data){
   // Pass both the grammar module summary and the aesthetic mode library, so the
   // ideation model can pick a mode per thesis rather than defaulting to cinema.
   const modesShort=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when}));
-  const parsed=await callAnthropicJson(
+  const parsed=await runModelStage(
+    'ideation',
     WORLD_IDEATION_PROMPT,
     'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data),null,2)+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modesShort,null,2),
-    apiKey, 2600);
+    2600);
   const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
   const theses=(parsed&&Array.isArray(parsed.theses)?parsed.theses:[])
     .map(t=>({
@@ -1186,16 +1183,17 @@ function normalizeConstraintAudit(value){
   })).filter(entry=>entry.rule);
 }
 
-async function selectThesisAndGrammar(data, apiKey, theses){
+async function selectThesisAndGrammar(data, theses){
   const moduleLibrary=GRAMMAR_MODULES.map(m=>({id:m.id,name:m.name,grammar:m.grammar,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
   const modeLibrary=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
-  const parsed=await callAnthropicJson(
+  const parsed=await runModelStage(
+    'selection',
     THESIS_SELECTION_PROMPT,
     'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data),null,2)+
     '\n\nCandidate world theses (each carries a proposed aesthetic_mode and human_presence):\n'+JSON.stringify(theses,null,2)+
     '\n\nGrammar module library:\n'+JSON.stringify(moduleLibrary,null,2)+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modeLibrary,null,2),
-    apiKey, 2600);
+    2600);
   if(!parsed||!_c(parsed.selected_thesis_name)) throw new Error('Thesis selection returned no usable choice');
   const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
   const winner=theses.find(t=>t.thesis_name.toLowerCase()===_c(parsed.selected_thesis_name).toLowerCase())||theses[0];
@@ -1544,54 +1542,29 @@ function transientDiagnosticTransportError(error){
   return /(failed to fetch|networkerror|network error|load failed)/i.test(_c(error&&error.message||error));
 }
 
-async function diagnosticSceneTextDirect(system,userText,apiKey,maxTokens,requestKind){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'content-type':'application/json',
-      'x-api-key':apiKey,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model:ANTHROPIC_MODEL,
-      max_tokens:maxTokens,
-      system,
-      messages:[{role:'user',content:userText}]
-    })
-  });
-  if(!res.ok){
-    const body=await res.text().catch(()=>'');
-    throw new Error('Diagnostic direct scene request '+res.status+(body?': '+body.slice(0,160):''));
-  }
-  const payload=await res.json();
-  const text=(payload.content||[]).filter(block=>block&&block.type==='text').map(block=>block.text).join('\n');
-  if(!_c(text)) throw new Error('Diagnostic direct scene request returned no model text');
-  DIAGNOSTIC_SCENE_TRANSPORT_TRACE.push({
-    request_kind:requestKind,
-    transport:'browser_direct_anthropic',
-    attempt:1,
-    status:'completed'
-  });
-  return text;
-}
-
-async function diagnosticSceneTextThroughWorker(system,userText,apiKey,maxTokens,requestKind){
+// Phase Eight security floor: browser-direct Anthropic path removed.
+// diagnosticSceneTextDirect is gone. diagnosticSceneTextThroughWorker is the
+// only transport for scene text calls and it retries transient errors twice
+// before surfacing failure. There is no fallback to browser-direct Anthropic.
+// The transport trace is preserved so operators can see which path fired and
+// how many attempts were needed.
+async function diagnosticSceneTextThroughWorker(system,userText,maxTokens,requestKind){
+  const stage=requestKind==='scene_schema_repair'?'scene_repair':'master_scene';
   let lastError=null;
   for(let attempt=1;attempt<=2;attempt++){
     try{
-      const response=await postPreviewAction('diagnostic_master_scene_proxy',{
+      const response=await postPreviewAction('run_model_stage',{
         diagnostic:activeVisualDiagnosticId(),
         request_kind:requestKind,
+        stage,
         system_prompt:system,
         user_text:userText,
-        max_tokens:maxTokens,
-        api_key:apiKey
+        max_tokens:maxTokens
       });
-      if(!response||!_c(response.text)) throw new Error('Diagnostic Worker returned no model text');
+      if(!response||!_c(response.text)) throw new Error('Worker returned no model text');
       DIAGNOSTIC_SCENE_TRANSPORT_TRACE.push({
         request_kind:requestKind,
-        transport:'diagnostic_worker_proxy',
+        transport:'worker_run_model_stage',
         attempt,
         status:'completed'
       });
@@ -1600,7 +1573,7 @@ async function diagnosticSceneTextThroughWorker(system,userText,apiKey,maxTokens
       lastError=error;
       DIAGNOSTIC_SCENE_TRANSPORT_TRACE.push({
         request_kind:requestKind,
-        transport:'diagnostic_worker_proxy',
+        transport:'worker_run_model_stage',
         attempt,
         status:'failed',
         error:_c(error&&error.message||error).slice(0,180)
@@ -1609,23 +1582,10 @@ async function diagnosticSceneTextThroughWorker(system,userText,apiKey,maxTokens
       if(attempt<2) await new Promise(resolve=>setTimeout(resolve,400));
     }
   }
-  try{
-    return await diagnosticSceneTextDirect(system,userText,apiKey,maxTokens,requestKind);
-  }catch(error){
-    DIAGNOSTIC_SCENE_TRANSPORT_TRACE.push({
-      request_kind:requestKind,
-      transport:'browser_direct_anthropic',
-      attempt:1,
-      status:'failed',
-      error:_c(error&&error.message||error).slice(0,180)
-    });
-    throw new Error('Diagnostic scene transports failed: '+_c(error&&error.message||error||lastError));
-  }
+  throw new Error('Scene text transport failed after retries: '+_c(lastError&&lastError.message||lastError));
 }
 
-async function repairSceneSchema(data,apiKey,raw,options){
-  if(!apiKey) throw new Error('Scene schema repair requires the creative service key');
-
+async function repairSceneSchema(data,raw,options){
   const system=[
     'You are a scene-output normalizer for a commercial art-direction system.',
     'Preserve the authored creative idea.',
@@ -1635,36 +1595,8 @@ async function repairSceneSchema(data,apiKey,raw,options){
   ].join('\n');
 
   const userText=buildSceneNormalizationPrompt(data,raw);
-  let parsed;
-  if(options&&options.diagnosticWorkerTransport){
-    const text=await diagnosticSceneTextThroughWorker(system,userText,apiKey,3200,'scene_schema_repair');
-    parsed=extractJson(text);
-  }else{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'content-type':'application/json',
-        'x-api-key':apiKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:ANTHROPIC_MODEL,
-        max_tokens:3200,
-        system,
-        messages:[{role:'user',content:userText}]
-      })
-    });
-
-    if(!res.ok){
-      const t=await res.text().catch(()=>'');
-      throw new Error('Scene schema repair '+res.status+(t?': '+t.slice(0,160):''));
-    }
-
-    const payload=await res.json();
-    const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-    parsed=extractJson(text);
-  }
+  const text=await diagnosticSceneTextThroughWorker(system,userText,3200,'scene_schema_repair');
+  const parsed=extractJson(text);
   const scene=normalizeSceneObject(parsed);
   const report=sceneUsabilityReport(scene,resolvedDeliveryContext(data&&data.brief));
 
@@ -1692,13 +1624,15 @@ function workerFallbackScene(data){
   return null;
 }
 
-async function buildMasterScene(data, apiKey, creativeSelection, winningThesis, options){
-  // The scene author receives the COMPLETE dossier. The previous build passed
+async function buildMasterScene(data, creativeSelection, winningThesis, options){
+  // The scene author receives the COMPLETE dossier. Previous builds passed
   // only brand_tone, visual_territory, sensory, and competitive, withholding
   // campaign_signals, audience, product_truth, and brand_intent from the one
   // call that authors the world.
   const dossier=fullCreativeDossier(data);
-  if(options&&options.diagnosticWorkerTransport) DIAGNOSTIC_SCENE_TRANSPORT_TRACE.length=0;
+  // Clear the transport trace at the start of a master-scene run so operators
+  // see the current run's transport activity, not accumulated history.
+  DIAGNOSTIC_SCENE_TRANSPORT_TRACE.length=0;
   const input={
     dossier,
     delivery_context_contract:resolvedDeliveryContext(dossier.brief.delivery_context)
@@ -1711,27 +1645,11 @@ async function buildMasterScene(data, apiKey, creativeSelection, winningThesis, 
   let parsed=null;
   const system=ART_DIRECTOR_PROMPT+grammarGuidanceBlock(creativeSelection, winningThesis,dossier.brief.delivery_context);
   const userText='Creative brief and evidence:\n'+JSON.stringify(input,null,2);
-  if(options&&options.diagnosticWorkerTransport){
-    const text=await diagnosticSceneTextThroughWorker(system,userText,apiKey,4000,'master_scene');
-    try{
-      parsed=extractJson(text);
-    }catch(parseErr){
-      parsed={raw_text:text,parse_error:String((parseErr&&parseErr.message)||parseErr)};
-    }
-  }else{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-      body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:4000, system, messages:[{role:'user',content:userText}] })
-    });
-    if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
-    const payload=await res.json();
-    const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-    try{
-      parsed=extractJson(text);
-    }catch(parseErr){
-      parsed={raw_text:text,parse_error:String((parseErr&&parseErr.message)||parseErr)};
-    }
+  const text=await diagnosticSceneTextThroughWorker(system,userText,4000,'master_scene');
+  try{
+    parsed=extractJson(text);
+  }catch(parseErr){
+    parsed={raw_text:text,parse_error:String((parseErr&&parseErr.message)||parseErr)};
   }
 
   let scene=normalizeSceneObject(parsed);
@@ -1739,7 +1657,7 @@ async function buildMasterScene(data, apiKey, creativeSelection, winningThesis, 
 
   if(!report.usable){
     PERF.log('master_scene_normalization_needed',{missing:report.missing});
-    scene=await repairSceneSchema(data,apiKey,parsed&&parsed.raw_text?parsed.raw_text:parsed,options);
+    scene=await repairSceneSchema(data,parsed&&parsed.raw_text?parsed.raw_text:parsed,options);
     report=sceneUsabilityReport(scene,dossier.brief.delivery_context);
   }
 
@@ -2108,16 +2026,22 @@ const CANDS=[
    and step-2 vibes pipeline. Those modules are built and unit-tested; the deployed
    endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
    (8.1), are not yet proven and must be checked against live brands. */
-const DEPLOYED_PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/';
+// Phase Eight security floor: PREVIEW_ENDPOINT is a compile-time constant.
+// The URL-parameter Worker override was removed; a malicious link cannot
+// redirect this page's Worker calls to an attacker-controlled endpoint.
+// The phase-two build targets world-preview-phase2-diagnostic. The CPG
+// production Worker (world-preview) is kept on its own lifecycle and is not
+// used by this page.
+const PREVIEW_ENDPOINT = 'https://world-preview-phase2-diagnostic.grey-4fe.workers.dev/';
 function diagnosticUrlParams(){
+  // Retained for prototype-view routing (which anchor screen to show). The
+  // return value cannot influence which Worker is called; PREVIEW_ENDPOINT is
+  // a constant. The default prototype is 'creative-intake' when no param is set.
   const searchParams=new URLSearchParams(window.location.search);
   if(searchParams.get('prototype')) return searchParams;
   const hashParams=new URLSearchParams(String(window.location.hash||'').replace(/^#/,''));
   if(hashParams.get('prototype')) return hashParams;
-  return new URLSearchParams({
-    prototype:'creative-intake',
-    worker:'https://world-preview-phase2-diagnostic.grey-4fe.workers.dev/'
-  });
+  return new URLSearchParams({prototype:'creative-intake'});
 }
 function activeVisualAnchorType(){
   const prototype=diagnosticUrlParams().get('prototype');
@@ -2131,19 +2055,6 @@ function activeVisualDiagnosticId(){
   if(anchorType==='grid_capture') return 'phase_five_grid_capture_reader';
   return 'phase_four_image_upload_anchor_reader';
 }
-function artifactPrototypeWorkerOverride(){
-  const params=diagnosticUrlParams();
-  if(!['artifact-reference','image-upload','grid-capture','multi-anchor','creative-intake'].includes(params.get('prototype'))) return '';
-  const candidate=_c(params.get('worker'));
-  if(!candidate) return '';
-  try{
-    const parsed=new URL(candidate);
-    return parsed.protocol==='https:'?parsed.toString():'';
-  }catch{
-    return '';
-  }
-}
-const PREVIEW_ENDPOINT = artifactPrototypeWorkerOverride()||DEPLOYED_PREVIEW_ENDPOINT;
 const JOBS_ENDPOINT = 'https://render-jobs.grey-4fe.workers.dev'; // render job service: create job, render, persist to R2/D1
 // The padded input aspect should match the Worker's OPENAI_IMAGE_SIZE so the
 // output is a true 16:9 cinematic frame. gpt-image-2 accepts arbitrary sizes
@@ -2226,7 +2137,7 @@ async function fetchAssetDiscovery(productUrl, urlResolution){
   });
 }
 
-async function fetchBrandRead(productUrl, homeUrl, apiKey, urlResolution){
+async function fetchBrandRead(productUrl, homeUrl, urlResolution){
   if(!PREVIEW_ENDPOINT){
     await new Promise(r=>setTimeout(r,500));
     const demo=mockPreviewData();
@@ -2235,7 +2146,6 @@ async function fetchBrandRead(productUrl, homeUrl, apiKey, urlResolution){
   return postPreviewAction('brand_read',{
     product_url:productUrl,
     home_url:homeUrl,
-    api_key:apiKey,
     home_url_source:urlResolution&&urlResolution.home_url_source,
     input_url_host:urlResolution&&urlResolution.product_host,
     marketplace_detected:!!(urlResolution&&urlResolution.marketplace_detected),
@@ -2271,7 +2181,6 @@ const brandProgressMessage=document.getElementById('brandProgressMessage');
 const brandProgressDetail=document.getElementById('brandProgressDetail');
 const retryDirectionBtn=document.getElementById('retryDirectionBtn');
 let LAST_BRAND_DATA=null;
-let LAST_BRAND_API_KEY='';
 let directionRetryInFlight=false;
 const stepProduct=document.getElementById('stepProduct');
 const stepDirection=document.getElementById('stepDirection');
@@ -3109,13 +3018,11 @@ function resolveHomeUrlForProduct(productUrl, explicitHomeUrl){
   };
 }
 
-// guarded key persistence (localStorage works on the deployed page; guarded so the
-// in-chat preview never throws). For an internal testing tool this mirrors the Builder.
-// [ASSUMED, verify before public] a public self-serve version must move the key to a
-// Worker secret instead of collecting it in the browser.
-const KEY_STORE='pwp_anthropic_key';
-function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ return ''; } }
-function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
+// Phase Eight security floor: the Anthropic API key lives in the Worker's
+// secrets and is not collected in the browser. Any legacy key previously
+// stored during internal testing is removed on load so browsers do not carry
+// a stale credential.
+try{ localStorage.removeItem('pwp_anthropic_key'); }catch{}
 
 function splitArtifactConstraintPolarity(fragment){
   const requirements=_dedupe(_l(fragment&&fragment.requirements_added));
@@ -3536,7 +3443,6 @@ async function runVisualAnchorDiagnostic(){
       byte_length:file.size
     }:null
   };
-  const apiKey=_c(document.getElementById('artifactApiKey').value)||readKey();
   if(!input.intent||!file||(multiAnchor&&!input.artifact_reference.reference)){
     status.textContent=multiAnchor
       ?'Intent, one grid screenshot, and one artifact reference are required.'
@@ -3551,11 +3457,6 @@ async function runVisualAnchorDiagnostic(){
     status.textContent='The visual reference must be 5 MB or smaller.';
     return;
   }
-  if(!apiKey){
-    status.textContent='Enter the internal-testing Anthropic key to run the diagnostic.';
-    return;
-  }
-  saveKey(apiKey);
   button.disabled=true;
   output.hidden=true;
   status.textContent='Preparing the image and running the vision reader…';
@@ -3564,7 +3465,7 @@ async function runVisualAnchorDiagnostic(){
     build:PWP_BUILD_ID,
     input,
     worker_endpoint:PREVIEW_ENDPOINT,
-    credential_path:'existing pwp_anthropic_key → postPreviewAction → Worker api_key',
+    credential_path:'server-side Worker secret behind Cloudflare Access',
     renderer_invoked:false,
     stages:{}
   };
@@ -3580,8 +3481,7 @@ async function runVisualAnchorDiagnostic(){
       filename:input.image.filename,
       user_context:input.user_context,
       reference_focus:input.reference_focus,
-      explicit_exclusions:input.explicit_exclusions,
-      api_key:apiKey
+      explicit_exclusions:input.explicit_exclusions
     });
     report.credential_smoke_test='passed';
     const fragments=[];
@@ -3592,8 +3492,7 @@ async function runVisualAnchorDiagnostic(){
       status.textContent='Grid reader passed. Reading the artifact reference…';
       const artifactReaderResponse=await postPreviewAction('read_artifact_reference',{
         reference:input.artifact_reference.reference,
-        user_context:input.artifact_reference.user_context,
-        api_key:apiKey
+        user_context:input.artifact_reference.user_context
       });
       const artifactFragment=artifactReaderResponse&&artifactReaderResponse.fragment;
       if(!artifactFragment) throw new Error('Artifact reader returned no dossier fragment.');
@@ -3618,7 +3517,7 @@ async function runVisualAnchorDiagnostic(){
 
     let theses=null,selection=null,winningThesis=null,scene=null;
     try{
-      theses=await ideateWorldTheses(diagnosticData,apiKey);
+      theses=await ideateWorldTheses(diagnosticData);
       report.stages.ideation={status:'completed',output:theses};
       diagnosticData.vibes.world_theses=theses;
     }catch(e){
@@ -3628,7 +3527,7 @@ async function runVisualAnchorDiagnostic(){
     if(theses&&theses.length){
       status.textContent='Ideation completed. Running evidence-neutral comparative selection…';
       try{
-        const selected=await selectThesisAndGrammar(diagnosticData,apiKey,theses);
+        const selected=await selectThesisAndGrammar(diagnosticData,theses);
         selection=selected.selection;
         winningThesis=selected.thesis;
         report.stages.selection={status:'completed',output:selection,winning_thesis:winningThesis};
@@ -3644,7 +3543,7 @@ async function runVisualAnchorDiagnostic(){
     if(selection&&winningThesis){
       status.textContent='Selection completed. Running conditional master-scene authoring…';
       try{
-        const built=await buildMasterScene(diagnosticData,apiKey,selection,winningThesis,{diagnosticWorkerTransport:true});
+        const built=await buildMasterScene(diagnosticData,selection,winningThesis);
         scene=built.scene_direction;
         report.stages.master_scene={status:'completed',output:built};
         diagnosticData.vibes.master_scene=scene;
@@ -4043,14 +3942,13 @@ function reviewUnifiedBrief(){
     :'Brief normalized. Review it, then run the creative pipeline.';
 }
 
-async function readUnifiedAnchor(card,anchor,brief,apiKey){
+async function readUnifiedAnchor(card,anchor,brief){
   const sharedContext=_sentenceJoin([brief.user_context,anchor.user_context]);
   let response;
   if(anchor.type==='artifact_reference'){
     response=await postPreviewAction('read_artifact_reference',{
       reference:anchor.source,
-      user_context:sharedContext,
-      api_key:apiKey
+      user_context:sharedContext
     });
   }else{
     const fileInput=card&&card.querySelector('[data-field="source"]');
@@ -4065,8 +3963,7 @@ async function readUnifiedAnchor(card,anchor,brief,apiKey){
       filename:file.name,
       user_context:sharedContext,
       reference_focus:anchor.user_context,
-      explicit_exclusions:brief.avoid.join('. '),
-      api_key:apiKey
+      explicit_exclusions:brief.avoid.join('. ')
     });
   }
   const fragment=response&&response.fragment;
@@ -4081,7 +3978,7 @@ async function readUnifiedAnchor(card,anchor,brief,apiKey){
   });
 }
 
-async function executeUnifiedCreativePipeline(input,fragments,apiKey,report,status){
+async function executeUnifiedCreativePipeline(input,fragments,report,status){
   const diagnosticData=assembleAnchorDiagnosticData(input,fragments);
   DATA=diagnosticData;
   assets=[];
@@ -4091,7 +3988,7 @@ async function executeUnifiedCreativePipeline(input,fragments,apiKey,report,stat
   let theses=null,selection=null,winningThesis=null,scene=null;
   try{
     status.textContent='Running source-neutral ideation…';
-    theses=await ideateWorldTheses(diagnosticData,apiKey);
+    theses=await ideateWorldTheses(diagnosticData);
     report.stages.ideation={status:'completed',output:theses};
     diagnosticData.vibes.world_theses=theses;
   }catch(e){
@@ -4100,7 +3997,7 @@ async function executeUnifiedCreativePipeline(input,fragments,apiKey,report,stat
   if(theses&&theses.length){
     try{
       status.textContent='Ideation completed. Selecting the strongest supported direction…';
-      const selected=await selectThesisAndGrammar(diagnosticData,apiKey,theses);
+      const selected=await selectThesisAndGrammar(diagnosticData,theses);
       selection=selected.selection;
       winningThesis=selected.thesis;
       report.stages.selection={status:'completed',output:selection,winning_thesis:winningThesis};
@@ -4115,7 +4012,7 @@ async function executeUnifiedCreativePipeline(input,fragments,apiKey,report,stat
   if(selection&&winningThesis){
     try{
       status.textContent='Selection completed. Authoring one master scene…';
-      const built=await buildMasterScene(diagnosticData,apiKey,selection,winningThesis,{diagnosticWorkerTransport:true});
+      const built=await buildMasterScene(diagnosticData,selection,winningThesis);
       scene=built.scene_direction;
       report.stages.master_scene={status:'completed',output:built};
       diagnosticData.vibes.master_scene=scene;
@@ -4243,7 +4140,7 @@ async function runUnifiedBrief(){
     build:PWP_BUILD_ID,
     normalized_brief:brief,
     worker_endpoint:PREVIEW_ENDPOINT,
-    credential_path:'existing pwp_anthropic_key → postPreviewAction → Worker api_key',
+    credential_path:'server-side Worker secret behind Cloudflare Access',
     renderer_invoked:false,
     stages:{}
   };
@@ -4256,12 +4153,6 @@ async function runUnifiedBrief(){
     status.textContent='Schema review complete. Protected-asset execution was intentionally not run.';
     return;
   }
-  const apiKey=_c(document.getElementById('unifiedApiKey').value)||readKey();
-  if(!apiKey){
-    status.textContent='Enter the internal-testing Anthropic key to run the pipeline.';
-    return;
-  }
-  saveKey(apiKey);
   button.disabled=true;
   output.hidden=true;
   try{
@@ -4273,7 +4164,7 @@ async function runUnifiedBrief(){
     for(let index=0;index<brief.anchors.length;index++){
       const anchor=brief.anchors[index];
       status.textContent='Reading anchor '+(index+1)+' of '+brief.anchors.length+'…';
-      fragments.push(await readUnifiedAnchor(cardsById.get(anchor.anchor_id),anchor,brief,apiKey));
+      fragments.push(await readUnifiedAnchor(cardsById.get(anchor.anchor_id),anchor,brief));
     }
     report.readers_completed=fragments.map(fragment=>({
       anchor_id:_c(fragment&&fragment._pwp_anchor_id),
@@ -4289,7 +4180,7 @@ async function runUnifiedBrief(){
       delivery_context:brief.delivery_context,
       normalized_brief:brief
     };
-    await executeUnifiedCreativePipeline(input,fragments,apiKey,report,status);
+    await executeUnifiedCreativePipeline(input,fragments,report,status);
   }catch(e){
     report.classification='inconclusive_runtime_failure';
     report.fatal_error=String(e&&e.message||e);
@@ -4302,7 +4193,7 @@ async function runUnifiedBrief(){
 }
 
 
-async function completeCreativePipeline(brandData, apiKey){
+async function completeCreativePipeline(brandData){
   DATA.brand=brandData.brand||DATA.brand;
   DATA.factual=Object.assign({},DATA.factual||{},brandData.factual||{});
   DATA.vibes=brandData.vibes||{};
@@ -4311,18 +4202,15 @@ async function completeCreativePipeline(brandData, apiKey){
   PREVIEW_FLOW_STATE.scene='loading';
   refresh();
 
-  if(!apiKey){
-    PREVIEW_FLOW_STATE.scene='ready';
-    refresh();
-    PERF.log('scene_ready',{demo:true});
-    return;
-  }
+  // Phase Eight security floor: Anthropic credentials live server-side. The
+  // pipeline is always live when PREVIEW_ENDPOINT is set; the previous
+  // "demo mode when apiKey is empty" branch is gone.
 
   // Stage 3: three divergent world theses from the full dossier.
   let theses=null;
   try{
     PERF.start('world_ideation_anthropic');
-    theses=await ideateWorldTheses(DATA,apiKey);
+    theses=await ideateWorldTheses(DATA);
     PERF.end('world_ideation_anthropic',{count:theses.length,names:theses.map(t=>t.thesis_name).join(' | ')});
   }catch(ideaErr){
     PERF.end('world_ideation_anthropic',{error:String((ideaErr&&ideaErr.message)||ideaErr).slice(0,160)});
@@ -4337,7 +4225,7 @@ async function completeCreativePipeline(brandData, apiKey){
   if(theses&&theses.length){
     try{
       PERF.start('thesis_selection_anthropic');
-      const picked=await selectThesisAndGrammar(DATA,apiKey,theses);
+      const picked=await selectThesisAndGrammar(DATA,theses);
       creativeSelection=picked.selection;
       winningThesis=picked.thesis;
       PERF.end('thesis_selection_anthropic',{selected:creativeSelection.selected_thesis_name,modules:(creativeSelection.grammar_modules||[]).map(g=>g.id).join(',')});
@@ -4353,7 +4241,7 @@ async function completeCreativePipeline(brandData, apiKey){
   // Stage 6: one authored master scene from the winner, with everything in hand.
   try{
     PERF.start('master_scene_anthropic');
-    const built=await buildMasterScene(DATA,apiKey,creativeSelection,winningThesis);
+    const built=await buildMasterScene(DATA,creativeSelection,winningThesis);
     PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name,authored_prompt:!!(built&&built.scene_direction&&built.scene_direction.authored_prompt)});
     DATA.vibes.master_scene=built.scene_direction;
     DATA.vibes.master_scene_meta={brand_world_read:built.brand_world_read||'',world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',category_cliches_to_avoid:built.category_cliches_to_avoid||[],anti_tabletop_rules:built.anti_tabletop_rules||[]};
@@ -4416,12 +4304,11 @@ async function generate(){
   if(explicitHomeUrl&&!validUrl(explicitHomeUrl)){ hint.textContent='The advanced homepage override needs to start with https://'; return; }
   const urlResolution=resolveHomeUrlForProduct(productUrl,explicitHomeUrl);
   const homeUrl=urlResolution.home_url;
-  let apiKey='';
-  if(PREVIEW_ENDPOINT){
-    apiKey=readKey();
-    if(!apiKey){ hint.textContent='The brand-reading service is not configured for this preview.'; return; }
-    saveKey(apiKey);
-  }
+  // Phase Eight security floor: no browser-held API key. The Worker holds
+  // Anthropic credentials in secrets and enforces Cloudflare Access. When the
+  // page is served in a preview context without PREVIEW_ENDPOINT (dev sandbox),
+  // fetchBrandRead returns a mock payload; when the endpoint is set, calls go
+  // to the Worker and Access authenticates the user.
 
   PREVIEW_FLOW_STATE.brand='loading';
   PREVIEW_FLOW_STATE.scene='loading';
@@ -4435,7 +4322,7 @@ async function generate(){
   document.getElementById('loadingLine').textContent='Finding your product';
   showView('loading');
 
-  const brandPromise=fetchBrandRead(productUrl,homeUrl,apiKey,urlResolution)
+  const brandPromise=fetchBrandRead(productUrl,homeUrl,urlResolution)
     .then(data=>({ok:true,data}),error=>({ok:false,error}));
 
   try{
@@ -4472,8 +4359,7 @@ async function generate(){
     const brandData=brandResult.data;
     PERF.end('brand_read_worker',{brand:brandData&&brandData.brand,timing:brandData&&brandData.timing||null});
     LAST_BRAND_DATA=brandData;
-    LAST_BRAND_API_KEY=apiKey;
-    await completeCreativePipeline(brandData,apiKey);
+    await completeCreativePipeline(brandData);
   }catch(err){
     PREVIEW_FLOW_STATE.brand='error';
     PREVIEW_FLOW_STATE.scene='error';
@@ -4502,7 +4388,7 @@ if(retryDirectionBtn){
     refresh();
     try{
       PERF.log('direction_retry_requested',{});
-      await completeCreativePipeline(LAST_BRAND_DATA,LAST_BRAND_API_KEY);
+      await completeCreativePipeline(LAST_BRAND_DATA);
     }catch(err){
       PREVIEW_FLOW_STATE.scene='error';
       PREVIEW_FLOW_STATE.brandError=err;
@@ -4519,11 +4405,11 @@ document.getElementById('runArtifactDiagnostic').addEventListener('click',runVis
 document.getElementById('addUnifiedAnchor').addEventListener('click',()=>addUnifiedAnchor());
 document.getElementById('reviewUnifiedBrief').addEventListener('click',reviewUnifiedBrief);
 document.getElementById('runUnifiedBrief').addEventListener('click',runUnifiedBrief);
-document.getElementById('creativeBriefView').addEventListener('input',event=>{
-  if(event.target&&event.target.id!=='unifiedApiKey') invalidateUnifiedReview();
+document.getElementById('creativeBriefView').addEventListener('input',()=>{
+  invalidateUnifiedReview();
 });
-document.getElementById('creativeBriefView').addEventListener('change',event=>{
-  if(event.target&&event.target.id!=='unifiedApiKey') invalidateUnifiedReview();
+document.getElementById('creativeBriefView').addEventListener('change',()=>{
+  invalidateUnifiedReview();
 });
 let diagnosticImagePreviewUrl='';
 document.getElementById('artifactImage').addEventListener('change',event=>{
@@ -4556,8 +4442,6 @@ document.getElementById('startOver').addEventListener('click',()=>{ handoff.clas
 const ANCHOR_PROTOTYPE_ACTIVE=['artifact-reference','image-upload','grid-capture','multi-anchor'].includes(diagnosticUrlParams().get('prototype'));
 const CREATIVE_INTAKE_ACTIVE=diagnosticUrlParams().get('prototype')==='creative-intake';
 document.getElementById('demoBanner').hidden = !!PREVIEW_ENDPOINT||ANCHOR_PROTOTYPE_ACTIVE||CREATIVE_INTAKE_ACTIVE;
-document.getElementById('keyRow').hidden = true;
-if(PREVIEW_ENDPOINT){ const k=readKey(); if(k&&document.getElementById('apiKey')) document.getElementById('apiKey').value=k; }
 if(CREATIVE_INTAKE_ACTIVE){
   addUnifiedAnchor({
     type:'grid_capture',
@@ -4570,8 +4454,6 @@ if(CREATIVE_INTAKE_ACTIVE){
     source:'The wheat-field afterlife sequence in Gladiator',
     guidance:'Use this artifact as an emotional and cinematic behavior reference. Read its supported emotional register, gesture, light behavior, pacing, and spatial or temporal grammar as flexible evidence.'
   });
-  const k=readKey();
-  if(k) document.getElementById('unifiedApiKey').value=k;
   showView('creativeBrief');
 }else if(ANCHOR_PROTOTYPE_ACTIVE){
   if(activeVisualAnchorType()==='multi_anchor'){
@@ -4587,8 +4469,6 @@ if(CREATIVE_INTAKE_ACTIVE){
     document.getElementById('visualDiagnosticTitle').textContent='Grid-capture pipeline test';
     document.getElementById('visualDiagnosticSubtitle').textContent='Upload one screenshot of a social, portfolio, or campaign grid. The grid is read as a layout-preserved body of visual evidence—not as a locked asset—and carried through the proven LED-wall pipeline. Optional focus and exclusions remain user-authored. This compiles an execution brief but does not render.';
   }
-  const k=readKey();
-  if(k) document.getElementById('artifactApiKey').value=k;
   showView('artifactPrototype');
 }else{
   showView('entry');
