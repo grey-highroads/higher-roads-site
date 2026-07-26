@@ -2112,7 +2112,12 @@ const DEPLOYED_PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/';
 function diagnosticUrlParams(){
   const searchParams=new URLSearchParams(window.location.search);
   if(searchParams.get('prototype')) return searchParams;
-  return new URLSearchParams(String(window.location.hash||'').replace(/^#/,''));
+  const hashParams=new URLSearchParams(String(window.location.hash||'').replace(/^#/,''));
+  if(hashParams.get('prototype')) return hashParams;
+  return new URLSearchParams({
+    prototype:'creative-intake',
+    worker:'https://world-preview-phase2-diagnostic.grey-4fe.workers.dev/'
+  });
 }
 function activeVisualAnchorType(){
   const prototype=diagnosticUrlParams().get('prototype');
