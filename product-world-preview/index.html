@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-27-production-world-builder-v6';
+const PWP_BUILD_ID = 'pwp-index-2026-07-27-scene-recovery-v7';
 const PWP_BUILD_NOTE = 'production integration: one stackable intake accepts notes, accessible URLs, images, grids, named references, and an optional protected asset; every creative source retains user-authored usage guidance, relative influence, reader evidence, and provenance through prompt compilation; the default deliverable is a reusable prompt plus generated 16:9 still';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -983,14 +983,20 @@ function fullCreativeDossier(data){
   return dossier;
 }
 
-async function runModelStage(stage,system,userText,maxTokens){
+async function requestModelStageText(stage,system,userText,maxTokens){
   const response=await postPreviewAction('run_model_stage',{
     stage,
     system_prompt:system,
     user_text:userText,
     max_tokens:maxTokens||3200
   });
-  return extractJson(String(response&&response.text||''));
+  const text=String(response&&response.text||'').trim();
+  if(!text) throw new Error(stage+' returned an empty model response');
+  return text;
+}
+
+async function runModelStage(stage,system,userText,maxTokens){
+  return extractJson(await requestModelStageText(stage,system,userText,maxTokens));
 }
 
 async function ideateWorldTheses(data){
@@ -1370,7 +1376,13 @@ async function repairSceneSchema(data,raw){
     'Return one JSON object and no commentary.'
   ].join('\n');
 
-  const parsed=await runModelStage('scene_repair',system,buildSceneNormalizationPrompt(data,raw),3200);
+  const repairedText=await requestModelStageText('scene_repair',system,buildSceneNormalizationPrompt(data,raw),4500);
+  let parsed;
+  try{
+    parsed=extractJson(repairedText);
+  }catch(parseErr){
+    throw new Error('Scene schema repair returned invalid JSON: '+String((parseErr&&parseErr.message)||parseErr));
+  }
   const scene=normalizeSceneObject(parsed);
   const report=sceneUsabilityReport(scene);
 
@@ -1411,15 +1423,24 @@ async function buildMasterScene(data,creativeSelection,winningThesis){
       :'No locked asset is supplied. Author the world without inventing a product, package, label, logo, placeholder, or reserved hero-object area.'
   };
   let parsed=null;
+  let rawSceneText='';
   try{
-    parsed=await runModelStage(
+    rawSceneText=await requestModelStageText(
       'master_scene',
       ART_DIRECTOR_PROMPT+grammarGuidanceBlock(creativeSelection,winningThesis),
       'Creative intelligence:\n'+JSON.stringify(input,null,2),
-      3200
+      4500
     );
+  }catch(requestErr){
+    throw new Error('Scene builder request failed: '+String((requestErr&&requestErr.message)||requestErr));
+  }
+  try{
+    parsed=extractJson(rawSceneText);
   }catch(parseErr){
-    throw new Error('Scene builder returned invalid output: '+String((parseErr&&parseErr.message)||parseErr));
+    PERF.log('master_scene_json_repair_needed',{
+      error:String((parseErr&&parseErr.message)||parseErr).slice(0,180),
+      response_chars:rawSceneText.length
+    });
   }
 
   let scene=normalizeSceneObject(parsed);
@@ -1427,7 +1448,7 @@ async function buildMasterScene(data,creativeSelection,winningThesis){
 
   if(!report.usable){
     PERF.log('master_scene_normalization_needed',{missing:report.missing});
-    scene=await repairSceneSchema(data,parsed&&parsed.raw_text?parsed.raw_text:parsed);
+    scene=await repairSceneSchema(data,rawSceneText||parsed);
     report=sceneUsabilityReport(scene);
   }
 
@@ -2924,7 +2945,8 @@ async function completeCreativePipeline(brandData){
       });
     }else{
       PREVIEW_FLOW_STATE.scene='error';
-      PREVIEW_FLOW_STATE.brandError=new Error('The creative scene did not return a complete world. Try the direction again.');
+      const sceneErrorDetail=String((sceneErr&&sceneErr.message)||sceneErr).slice(0,240);
+      PREVIEW_FLOW_STATE.brandError=new Error('Direction repair failed: '+sceneErrorDetail);
       DATA.vibes.scene_diagnostics=Object.assign({},DATA.vibes.scene_diagnostics||{},{
         master_scene_failed:true,
         fallback_source:null,
