@@ -75,7 +75,7 @@
     const ambiguousPatterns=[
       ['package',/\bpackag(?:e|ed|ing)\b/i],
       ['branding',/\bbranded\b|\bbrand mark\b/i],
-      ['label',/\blabel(?:ed|ling)?\b|\blabel hierarchy\b/i],
+      ['label',/\blabel(?:s|ed|ling)?\b|\blabel hierarchy\b/i],
       ['supplement',/\bsupplement\b/i],
       ['gummy product',/\bgumm(?:y|ies)\b/i]
     ];

@@ -523,7 +523,7 @@ const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
 const PWP_BUILD_ID = 'pwp-index-2026-07-27-lean-dossier-v10';
-const PWP_BUILD_NOTE = 'lean dossier: anchors are the single evidence carrier with role, influence, and usage notes in structure; duplicated tagged evidence removed from intake_expressive; model payloads use compact JSON; dossier confidence follows the highest-influence source; the zero-asset boundary check warns without blocking or triggering repair';
+const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
