@@ -42,6 +42,44 @@
     });
   }
 
+  function sceneAssetBoundary(scene,lockedAssetCount){
+    const count=Number(lockedAssetCount)||0;
+    if(count>0) return {valid:true,signals:[]};
+    const source=scene&&typeof scene==='object'?scene:{};
+    const placementText=[
+      text(source.locked_asset_placement_intent),
+      text(source.product_placement_intent)
+    ].filter(Boolean);
+    const sceneText=[
+      text(source.authored_prompt),
+      text(source.prompt_seed),
+      text(source.world_description),
+      text(source.composition),
+      text(source.creative_rationale),
+      list(source.props).join(' '),
+      list(source.signature_objects).join(' '),
+      list(source.source_specific_cues).join(' ')
+    ].join(' ');
+    const patterns=[
+      ['product',/\bproduct\b/i],
+      ['package',/\bpackag(?:e|ed|ing)\b|\bpackshot\b/i],
+      ['branding',/\bbranded\b|\bbrand mark\b/i],
+      ['logo',/\blogo(?:type)?\b/i],
+      ['label',/\blabel(?:ed|ling)?\b|\blabel hierarchy\b/i],
+      ['sku',/\bsku\b/i],
+      ['supplement',/\bsupplement\b/i],
+      ['gummy product',/\bgumm(?:y|ies)\b/i]
+    ];
+    const signals=[];
+    if(placementText.length) signals.push('asset_placement');
+    patterns.forEach(([name,pattern])=>{ if(pattern.test(sceneText)) signals.push(name); });
+    if(Array.isArray(source.locked_asset_placements)&&source.locked_asset_placements.length){
+      signals.push('locked_asset_placements');
+    }
+    if(text(source.render_path).toLowerCase()==='composite') signals.push('composite_render_path');
+    return {valid:signals.length===0,signals:list(signals)};
+  }
+
   function deliveryContext(value){
     const key=text(value)||'still_image';
     return Object.assign({},DELIVERY_CONTEXTS[key]||DELIVERY_CONTEXTS.still_image);
@@ -398,6 +436,7 @@
     filePayload,
     influenceRecord,
     lockedAssetRecord,
+    sceneAssetBoundary,
     readInput
   };
 });

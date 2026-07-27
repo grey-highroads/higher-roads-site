@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-27-scene-recovery-v7';
+const PWP_BUILD_ID = 'pwp-index-2026-07-27-zero-asset-boundary-v8';
 const PWP_BUILD_NOTE = 'production integration: one stackable intake accepts notes, accessible URLs, images, grids, named references, and an optional protected asset; every creative source retains user-authored usage guidance, relative influence, reader evidence, and provenance through prompt compilation; the default deliverable is a reusable prompt plus generated 16:9 still';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -1298,6 +1298,7 @@ function normalizeSceneObject(raw){
 function sceneUsabilityReport(scene){
   const s=scene||{};
   const hasLockedAssets=normalizedLockedAssets(DATA||{}).length>0;
+  const assetBoundary=HR_CREATIVE_INTAKE.sceneAssetBoundary(s,hasLockedAssets?1:0);
   const context=resolvedDeliveryContext((DATA&&DATA.brief)||s.delivery_context);
   const cues=_dedupe([].concat(
     _l(s.props),
@@ -1315,6 +1316,7 @@ function sceneUsabilityReport(scene){
   if(_c(s.composition).length<30) missing.push('composition');
   if(_c(s.lighting).length<20) missing.push('lighting');
   if(cues.length<2) missing.push('scene_cues');
+  if(!assetBoundary.valid) missing.push('world_only_asset_boundary:'+assetBoundary.signals.join('|'));
   if(context.type==='led_wall'){
     if(_c(s.delivery_context&&s.delivery_context.type)!=='led_wall') missing.push('delivery_context');
     if(_c(s.distance_legibility&&s.distance_legibility.primary_read).length<12) missing.push('distance_legibility.primary_read');
@@ -1327,7 +1329,8 @@ function sceneUsabilityReport(scene){
   return {
     usable:missing.length===0,
     missing,
-    cue_count:cues.length
+    cue_count:cues.length,
+    asset_boundary:assetBoundary
   };
 }
 
@@ -1352,7 +1355,7 @@ function buildSceneNormalizationPrompt(data,raw){
     'authored_prompt is one prose paragraph of 120 to 200 words in the selected aesthetic mode: world and action first, spatial hierarchy in prose, supplied locked assets only when present, light and atmosphere last. If the original output lacks it, write it faithfully without changing the idea.',
     hasLockedAssets
       ?'The dossier contains locked assets. Preserve them and make locked_asset_placement_intent describe their placement without changing identity.'
-      :'The dossier contains zero locked assets. Do not invent a product, package, label, logo, placeholder, or hero asset. product_placement_intent may be empty.',
+      :'The dossier contains zero locked assets. Ordinary websites, mood boards, image grids, and reference images are creative evidence only; they are not renderable assets. Remove any product, package, branded object, label, logo, SKU, placeholder, or hero asset from the original output. product_placement_intent and locked_asset_placements must be empty.',
     deliveryContext.type==='led_wall'
       ?'This is an LED-wall motion loop. Preserve the panoramic dimensions and far viewing distance. Return one dominant distance_legibility.primary_read, protected_zones including the performer clear zone, temporal_behavior.loop true, one concrete motion_cycle, and an invisible loop_seam with no hard cut.'
       :'This is a still image. Return delivery_context.type still_image and temporal_behavior.loop false.',

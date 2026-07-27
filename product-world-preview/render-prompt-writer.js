@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const VERSION = 'prompt-writer-2026-07-24-mode-aware-v4';
+  const VERSION = 'prompt-writer-2026-07-27-zero-asset-boundary-v10';
   /*
    * Prose-preserving compiler.
    *
@@ -121,6 +121,7 @@
     sd=sd||{};
     const parts=[
       c(sd.world_description),
+      c(sd.locked_asset_placement_intent),
       c(sd.product_placement_intent)&&('The product '+c(sd.product_placement_intent).replace(/^the product\s*/i,'')),
       c(sd.composition),
       c(sd.lighting)
@@ -137,6 +138,78 @@
     return /\bno people\b|\bpeople or hands\b|\bno humans\b/.test(hay);
   }
 
+  /* Gate Two optional locked-asset contract. Existing CPG packages still use
+     locked_asset and receive the protection block below. World-only briefs pass
+     locked_assets:[] and receive global scene protections without package
+     language. */
+  function hasLockedAsset(pkg){
+    if(Array.isArray(pkg&&pkg.locked_assets)) return pkg.locked_assets.length>0;
+    const asset=(pkg&&pkg.locked_asset)||{};
+    return !![
+      asset.asset_id,
+      asset.asset_name,
+      asset.image_ref,
+      asset.source_image_url,
+      asset.asset_url,
+      asset.stored_asset_url,
+      asset.image_data
+    ].map(c).find(Boolean);
+  }
+
+  function primaryLockedAsset(pkg){
+    if(Array.isArray(pkg&&pkg.locked_assets)&&pkg.locked_assets.length) return pkg.locked_assets[0]||{};
+    return (pkg&&pkg.locked_asset)||{};
+  }
+
+  function isProductLockedAsset(pkg){
+    if(!hasLockedAsset(pkg)) return false;
+    return /^(packaging|product|product_photo|product_render)$/i.test(c(primaryLockedAsset(pkg).asset_type));
+  }
+
+  function protectedAssetName(pkg){
+    const asset=primaryLockedAsset(pkg);
+    return c(asset.asset_name)||c(asset.asset_type).replace(/_/g,' ')||'protected asset';
+  }
+
+  function deliveryContext(pkg){
+    const sb=(pkg&&pkg.scene_brief)||{};
+    const meta=(pkg&&pkg.meta)||{};
+    const raw=(sb.delivery_context&&typeof sb.delivery_context==='object')
+      ?sb.delivery_context
+      :((meta.delivery_context&&typeof meta.delivery_context==='object')?meta.delivery_context:{});
+    return {
+      type:c(raw.type)||'still_image',
+      width_px:Number(raw.width_px)||null,
+      height_px:Number(raw.height_px)||null,
+      duration_ms:Number(raw.duration_ms)||null,
+      viewing_distance:c(raw.viewing_distance),
+      loop:raw.loop===true,
+      performer_clear_zone:c(raw.performer_clear_zone)
+    };
+  }
+
+  function deliveryContextBlock(pkg){
+    const context=deliveryContext(pkg);
+    if(context.type!=='led_wall') return '';
+    const sb=(pkg&&pkg.scene_brief)||{};
+    const legibility=(sb.distance_legibility&&typeof sb.distance_legibility==='object')?sb.distance_legibility:{};
+    const temporal=(sb.temporal_behavior&&typeof sb.temporal_behavior==='object')?sb.temporal_behavior:{};
+    const dimensions=context.width_px&&context.height_px
+      ?context.width_px+' by '+context.height_px+' pixels'
+      :'the supplied panoramic dimensions';
+    const durationMs=Number(temporal.duration_ms)||context.duration_ms||8000;
+    const seconds=Math.max(1,Math.round(durationMs/1000));
+    const zone=context.performer_clear_zone||'lower-center';
+    const lines=[
+      'Compose across the full panoramic '+dimensions+' LED wall with one dominant visual read that remains legible from far viewing distance.',
+      c(legibility.primary_read)?'The primary read is '+c(legibility.primary_read)+'.':'Keep the primary read large, singular, and immediately recognizable.',
+      'Protect the '+zone.replace(/_/g,' ')+' performer clear zone from dense detail, high-contrast edges, faces, text, and competing focal events.',
+      c(temporal.motion_cycle)?'Over '+seconds+' seconds, '+c(temporal.motion_cycle).replace(/^[A-Z]/,m=>m.toLowerCase()).replace(/[.!?]?$/,'.'):'Use one slow, coherent motion cycle across the full duration.',
+      c(temporal.loop_seam)?'The seamless loop reconnects invisibly because '+c(temporal.loop_seam).replace(/^[A-Z]/,m=>m.toLowerCase()).replace(/[.!?]?$/,'.'):'The seamless loop returns invisibly to its opening state with no hard cut, flash, or continuity jump.'
+    ];
+    return lines.join(' ');
+  }
+
   function integrationSentence(pkg, format){
     const it=(pkg&&pkg.integration_treatment)||{};
     const allowed=uniq(l(it.allowed_effects)).map(e=>e.replace(/_/g,' ')).slice(0,6);
@@ -149,6 +222,25 @@
   }
 
   function protectionBlock(pkg, format){
+    if(!hasLockedAsset(pkg)){
+      const globalLines=[
+        'Render only the authored environment and its explicitly approved unbranded environmental objects; introduce no additional focal object or readable identity mark.',
+        'Any environmental surface that would carry writing (signs, screens, menus, posters, or displays) is blank, abstract, cropped, or defocused beyond reading, with no pseudo-text or letter-like marks anywhere.'
+      ];
+      if(peopleExcluded(pkg)) globalLines.push('No people or hands appear in the frame.');
+      return globalLines.join(' ');
+    }
+    if(!isProductLockedAsset(pkg)){
+      const preserve=uniq(l(pkg&&pkg.fidelity_contract&&pkg.fidelity_contract.preserve));
+      const lines=[
+        'Use the supplied '+protectedAssetName(pkg)+' as the identity source of truth; preserve its protected subject, artifact, anatomy, marks, proportions, and visible structure unchanged.',
+        preserve.length?'Preserve exactly: '+preserve.join(', ')+'.':'Do not redraw, replace, or reinterpret the protected identity.',
+        'Integrate it only through non-destructive environmental light, contact shadow, reflected color, atmosphere, occlusion, and depth effects that do not alter protected identity.',
+        'Any environmental surface that would carry writing (signs, screens, menus, posters, or displays) is blank, abstract, cropped, or defocused beyond reading, with no pseudo-text or letter-like marks anywhere.'
+      ];
+      if(peopleExcluded(pkg)) lines.push('No additional people or hands appear in the frame.');
+      return lines.join(' ');
+    }
     const noun=FORMAT_NOUN[format]||'package';
     // Formats with a state (lid, cap, seal, wrapper) get an explicit closed-state
     // assertion. This is the second half of the state-lock belt-and-suspenders,
@@ -168,9 +260,21 @@
 
   /* Canonical compact negative, retained for future backends only. */
   function canonicalNegative(pkg){
-    const terms=uniq([].concat([
-      'redrawn or retyped packaging','warped logo','recolored packaging','changed package proportions or silhouette','duplicate or extra branded products','readable environmental text or screen UI','pseudo-text or gibberish lettering','people or hands unless the scene allows them','category-default props not in the approved scene','product pasted on after the fact','placeholder frames or placement guides'
-    ], splitTerms(pkg&&pkg.prompts&&pkg.prompts.negative).slice(0,6)));
+    const base=isProductLockedAsset(pkg)
+      ?['redrawn or retyped packaging','warped logo','recolored packaging','changed package proportions or silhouette','duplicate or extra branded products','readable environmental text or screen UI','pseudo-text or gibberish lettering','people or hands unless the scene allows them','category-default props not in the approved scene','product pasted on after the fact','placeholder frames or placement guides']
+      :hasLockedAsset(pkg)
+      ?['redrawn or replaced protected asset','altered protected identity or anatomy','changed protected marks or proportions','duplicate protected subject','readable environmental text or screen UI','pseudo-text or gibberish lettering','additional people or hands unless the scene allows them','category-default props not in the approved scene','protected asset pasted on after the fact','placeholder frames or placement guides']
+      :['invented product or package','invented logo, label, SKU, or branded object','readable environmental text or screen UI','pseudo-text or gibberish lettering','people or hands unless the scene allows them','category-default props not in the approved scene','placeholder frames or placement guides'];
+    const deliveryNegatives=deliveryContext(pkg).type==='led_wall'
+      ?['hard cuts or montage','visible loop jump','fine unreadable detail','small focal subjects','full-frame high-frequency motion','content competing with the performer clear zone']
+      :[];
+    const userExclusions=uniq(l(pkg&&pkg.user_constraints&&pkg.user_constraints.exclusions));
+    const terms=uniq([].concat(
+      base,
+      deliveryNegatives,
+      userExclusions,
+      splitTerms(pkg&&pkg.prompts&&pkg.prompts.negative).slice(0,6)
+    ));
     return terms.join(', ');
   }
 
@@ -187,10 +291,18 @@
   };
   function openingLineForMode(pkg){
     const sb=(pkg&&pkg.scene_brief)||{};
+    const context=deliveryContext(pkg);
+    if(context.type==='led_wall'){
+      const dimensions=context.width_px&&context.height_px
+        ?context.width_px+' by '+context.height_px
+        :'ultra-wide';
+      return 'A panoramic LED-wall motion composition across a '+dimensions+' canvas, designed for a live performance and far-distance legibility.';
+    }
     const explicit=c(sb.opening_line);
-    if(explicit) return explicit;
+    if(explicit) return isProductLockedAsset(pkg)?explicit:explicit.replace(/,\s*not a tabletop product photo\.?$/i,'.');
     const modeId=c(sb.aesthetic_mode)||c(pkg&&pkg.aesthetic_mode)||'cinematic_film_still';
-    return MODE_OPENING_LINES[modeId] || MODE_OPENING_LINES.cinematic_film_still;
+    const line=MODE_OPENING_LINES[modeId] || MODE_OPENING_LINES.cinematic_film_still;
+    return isProductLockedAsset(pkg)?line:line.replace(/,\s*not a tabletop product photo\.?$/i,'.');
   }
 
   /* Safe-face-framing addendum. When people are permitted at primary scale,
@@ -200,6 +312,10 @@
     const sb=(pkg&&pkg.scene_brief)||{};
     const level=c(sb.human_presence);
     if(level!=='primary_scale') return '';
+    // A generic protected asset may itself be a person or portrait. Do not add
+    // hats, hair, gestures, gaze, motion, or reframing that could contradict
+    // the unchanged-identity contract.
+    if(hasLockedAsset(pkg)&&!isProductLockedAsset(pkg)) return '';
     return 'People appear with faces framed safely: a hat or cap brim shading the face, hair falling forward, hand-to-mouth or hand-to-face gestures, downward gaze at a task, three-quarter turn away from camera, motion, or partial defocus. No centered close frontal faces.';
   }
 
@@ -213,23 +329,31 @@
     let source='authored_prompt';
     if(!world){ world=sanitizeAuthoredProse(sd.prompt_seed); source='prompt_seed'; }
     if(!world){ world=assembleFallbackProse(sd); source='field_assembly'; warnings.push('No authored_prompt or prompt_seed reached the compiler; assembled minimal prose from scene fields.'); }
-    if(!world){ world='A cinematic brand-world photograph with real environmental depth built around the supplied product.'; source='generic'; warnings.push('Scene brief was empty; compiled a generic world line.'); }
+    if(!world){
+      world=hasLockedAsset(pkg)
+        ?'A cinematic world with real environmental depth built around the supplied protected asset.'
+        :'A cinematic still with a specific environment, clear spatial depth, and motivated light.';
+      source='generic';
+      warnings.push('Scene brief was empty; compiled a generic world line.');
+    }
     if(source!=='authored_prompt') warnings.push('World prose source: '+source+'.');
 
     // State-lock enforcement: neutralize opened/uncapped/unwrapped/poured/etc.
     // phrases the scene author may have slipped in against the fidelity contract.
-    const stateFix=neutralizeStateLanguage(world);
+    const stateFix=isProductLockedAsset(pkg)?neutralizeStateLanguage(world):{out:world,changed:[]};
     if(stateFix.changed.length){
       world=stateFix.out;
       warnings.push('State-lock neutralized authored phrasing: '+stateFix.changed.slice(0,5).join(' | '));
     }
 
     const opening=openingLineForMode(pkg);
+    const contextBlock=deliveryContextBlock(pkg);
     const safeFace=safeFaceFramingAddendum(pkg);
     const compiled_positive=[
       opening,
       world,
       protectionBlock(pkg, format),
+      contextBlock,
       safeFace
     ].filter(Boolean).join(' ');
 
@@ -249,6 +373,7 @@
         world_chars:worldChars,
         world_share:totalChars?Math.round(100*worldChars/totalChars):0,
         world_source:source,
+        delivery_context:deliveryContext(pkg).type,
         aesthetic_mode:c((pkg&&pkg.scene_brief&&pkg.scene_brief.aesthetic_mode))||'cinematic_film_still',
         human_presence:c((pkg&&pkg.scene_brief&&pkg.scene_brief.human_presence))||'trace_only'
       }
@@ -261,8 +386,8 @@
     writers:{
       prose_preserving_compiler_v4:{
         id:'prose_preserving_compiler_v4',
-        label:'Prose-Preserving Compiler v4 (mode-aware)',
-        supports:{engines:['generic'],modes:['product_accurate','composite','reference']},
+        label:'Prose-Preserving Compiler v4 (mode- and delivery-aware)',
+        supports:{engines:['generic'],modes:['world_exploration','protected_asset','product_accurate','composite','reference']},
         compile:proseCompile
       }
     }

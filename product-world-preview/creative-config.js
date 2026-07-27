@@ -14,8 +14,8 @@
 //   3. artDirectorPrompt     -> one authored master scene in the selected mode's register
 (function(){
   window.HR_CREATIVE_CONFIG = {
-    config_version: 'creative-config-2026-07-27-source-stack-weighting-v9',
-    version: 'creative-config-2026-07-27-source-stack-weighting-v9',
+    config_version: 'creative-config-2026-07-27-zero-asset-boundary-v10',
+    version: 'creative-config-2026-07-27-zero-asset-boundary-v10',
 
     fidelityNegatives: ['redrawn packaging','retyped label','altered label hierarchy','distorted pack proportions','recolored packaging','generated or fake product','warped logo','invented text on label'],
 
@@ -454,6 +454,8 @@ IMAGE-REFERENCE ADAPTATION. When the dossier includes an image_upload anchor, us
 GRID AND ARTIFACT ADAPTATION. Use grid_capture evidence as cross-image patterns rather than as a literal grid layout. Use artifact_reference evidence as supported cinematic, tonal, structural, gesture, light, or pacing behavior rather than as a literal scene recreation. Both remain flexible reference evidence; neither creates binding constraints.
 
 URL-REFERENCE ADAPTATION. Use url_reference evidence only to the extent the page reader could access it. Follow the anchor usage_note and influence. Do not invent content hidden behind authentication or client-side rendering, and do not turn a competitor, portfolio, product page, or mood-board URL into a locked asset unless it is separately supplied as one.
+
+SOURCE ROLE BOUNDARY. A website, mood board, image grid, single reference image, or named cultural reference contributes creative evidence only. It does not authorize placing a product, package, logo, label, branded object, or other asset from that source into the scene. Only a separately supplied locked asset may appear as a protected branded object. When locked_assets is empty, the scene is world-only and contains no product or invented branding.
 
 PRODUCT RULES, WHEN PRESENT. If product_facts and a locked packaging asset exist, flavor may influence palette or motion but not literal ingredient styling without direct evidence. Avoid generic tabletop, ingredient-pile, spa-neutral, and centered product-on-surface compositions unless the selected thesis explicitly earns them.
 
