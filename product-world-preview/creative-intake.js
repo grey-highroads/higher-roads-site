@@ -44,7 +44,7 @@
 
   function sceneAssetBoundary(scene,lockedAssetCount){
     const count=Number(lockedAssetCount)||0;
-    if(count>0) return {valid:true,signals:[]};
+    if(count>0) return {valid:true,hard:[],ambiguous:[],signals:[]};
     const source=scene&&typeof scene==='object'?scene:{};
     const placementText=[
       text(source.locked_asset_placement_intent),
@@ -60,24 +60,37 @@
       list(source.signature_objects).join(' '),
       list(source.source_specific_cues).join(' ')
     ].join(' ');
-    const patterns=[
+    // Hard signals: structural fields or terms that unambiguously indicate
+    // an invented product. These always trigger repair.
+    const hardPatterns=[
       ['product',/\bproduct\b/i],
-      ['package',/\bpackag(?:e|ed|ing)\b|\bpackshot\b/i],
-      ['branding',/\bbranded\b|\bbrand mark\b/i],
       ['logo',/\blogo(?:type)?\b/i],
-      ['label',/\blabel(?:ed|ling)?\b|\blabel hierarchy\b/i],
       ['sku',/\bsku\b/i],
+      ['packshot',/\bpackshot\b/i]
+    ];
+    // Ambiguous signals: terms that may appear in legitimate creative prose
+    // (a gnome workshop with packing crates, a labeled potion jar). A single
+    // ambiguous hit warns. Two or more together trigger repair, since the
+    // combination pattern is strong evidence of an invented product.
+    const ambiguousPatterns=[
+      ['package',/\bpackag(?:e|ed|ing)\b/i],
+      ['branding',/\bbranded\b|\bbrand mark\b/i],
+      ['label',/\blabel(?:ed|ling)?\b|\blabel hierarchy\b/i],
       ['supplement',/\bsupplement\b/i],
       ['gummy product',/\bgumm(?:y|ies)\b/i]
     ];
-    const signals=[];
-    if(placementText.length) signals.push('asset_placement');
-    patterns.forEach(([name,pattern])=>{ if(pattern.test(sceneText)) signals.push(name); });
+    const hard=[];
+    const ambiguous=[];
+    if(placementText.length) hard.push('asset_placement');
+    hardPatterns.forEach(([name,pattern])=>{ if(pattern.test(sceneText)) hard.push(name); });
+    ambiguousPatterns.forEach(([name,pattern])=>{ if(pattern.test(sceneText)) ambiguous.push(name); });
     if(Array.isArray(source.locked_asset_placements)&&source.locked_asset_placements.length){
-      signals.push('locked_asset_placements');
+      hard.push('locked_asset_placements');
     }
-    if(text(source.render_path).toLowerCase()==='composite') signals.push('composite_render_path');
-    return {valid:signals.length===0,signals:list(signals)};
+    if(text(source.render_path).toLowerCase()==='composite') hard.push('composite_render_path');
+    // Hard signals always fail. Multiple ambiguous signals together also fail.
+    const valid=hard.length===0&&ambiguous.length<2;
+    return {valid,hard:list(hard),ambiguous:list(ambiguous),signals:list(hard.concat(ambiguous))};
   }
 
   function deliveryContext(value){
@@ -142,6 +155,8 @@
       role:type==='text_brief'?'creative_brief':'visual_system',
       polarity:text(evidence.polarity)||'reference_only',
       user_context:text(input&&input.user_context),
+      confidence:text(evidence.confidence)||'unknown',
+      read_notes:text(evidence.read_notes),
       evidence:{
         territory:list(evidence.territory),
         visual_evidence:list(evidence.visual_evidence),
@@ -271,6 +286,8 @@
       reference_focus:text(input.reference_focus),
       usage_note:text(input.usage_note)||text(input.reference_focus),
       influence:influenceRecord(input),
+      confidence:text(fragment.confidence)||'unknown',
+      read_notes:text(fragment.read_notes),
       evidence:{
         territory:list(fragment.territory),
         visual_evidence:list(fragment.visual_evidence),
@@ -299,33 +316,43 @@
   function assembleDossierDataFromSources(input,primaryFragment,referenceRecords,lockedAsset){
     const data=assembleDossierData(input,primaryFragment,lockedAsset);
     const references=Array.isArray(referenceRecords)?referenceRecords.filter(Boolean):[];
-    const anchors=references.map(referenceAnchor);
+    const referenceAnchors=references.map(referenceAnchor);
+    // The primary anchor is assembled by assembleDossierData and lives at
+    // data.brief.anchors[0]. Keep it and append reference anchors so both
+    // the primary reader's evidence and every reference's evidence reach
+    // ideation, selection, and scene authoring through one structure.
+    const primaryAnchor=data.brief.anchors[0];
+    const primaryFragment_=primaryFragment&&typeof primaryFragment==='object'?primaryFragment:{};
+    // Per-anchor confidence and read_notes so the model knows which evidence
+    // was uncertain, even when the aggregate confidence follows the lead source.
+    primaryAnchor.confidence=text(primaryFragment_.confidence)||'unknown';
+    primaryAnchor.read_notes=text(primaryFragment_.read_notes);
+    referenceAnchors.forEach((anchor,index)=>{
+      const frag=references[index]&&references[index].fragment||{};
+      anchor.confidence=text(frag.confidence)||'unknown';
+      anchor.read_notes=text(frag.read_notes);
+    });
+    data.brief.anchors=[primaryAnchor].concat(referenceAnchors);
+
     const primaryRecord={
       role:'creative_brief',
       influence:{level:'authority',weight:100},
-      fragment:primaryFragment&&typeof primaryFragment==='object'?primaryFragment:{}
+      fragment:primaryFragment_
     };
     const evidenceRecords=[primaryRecord].concat(references.map((record,index)=>({
-      role:anchors[index].role,
-      influence:anchors[index].influence,
+      role:referenceAnchors[index].role,
+      influence:referenceAnchors[index].influence,
       fragment:record.fragment&&typeof record.fragment==='object'?record.fragment:{}
     })));
     const ix=data.vibes.intake_expressive;
 
     // Evidence lives in exactly one place: the anchors array. Each anchor
-    // already carries its role, influence, usage note, and evidence in
-    // structure, so provenance needs no string tags and no copies. The
-    // intake_expressive fields that previously mirrored tagged evidence into
-    // eight parallel slots are left empty on the multi-source path; the
-    // ideation, selection, and scene stages read anchors directly. This
-    // removes the token duplication that inflated every model call and
-    // accidentally re-weighted repeated strings against the explicit
-    // influence percentages.
+    // carries its role, influence, usage note, confidence, read_notes, and
+    // structured evidence. No tagged copies in intake_expressive.
     data.brief.source_kind='brief';
-    data.brief.source_name=anchors.length
+    data.brief.source_name=referenceAnchors.length
       ?'multi-source creative brief'
       :(text(input&&input.source_name)||'User-authored creative brief');
-    data.brief.anchors=anchors;
     data.brief.requirements=list([].concat(
       data.brief.requirements,
       references
@@ -339,34 +366,34 @@
         .flatMap(record=>list(record.fragment&&record.fragment.avoid_added))
     ));
     data.vibes.confidence=confidenceAcross(evidenceRecords);
-    // Primary-brief evidence stays in its original untagged single locations
-    // from assembleDossierData. Only the read notes and the composed intent
-    // summary are multi-source aware.
     ix.campaign_signals.evidence_notes=evidenceRecords.flatMap((record,index)=>[
       (index===0?'creative_brief':record.role)+' reader output preserved in the multi-source dossier.',
       text(record.fragment.read_notes)
     ]).filter(Boolean);
-    ix.visual_identity.cultural_reference_points=list(anchors.map(anchor=>anchor.source));
+    ix.visual_identity.cultural_reference_points=list(
+      [primaryAnchor].concat(referenceAnchors).map(anchor=>anchor.source)
+    );
     ix.assets.brand_intent=[
       text(input&&input.raw_text),
       text(input&&input.user_context),
-      ...anchors.flatMap(anchor=>[
+      ...referenceAnchors.flatMap(anchor=>[
         anchor.source,
         anchor.usage_note,
         anchor.influence.level+' influence at '+anchor.influence.weight+'%'
       ])
     ].filter(Boolean).join('. ');
     data.diagnostics.intake_version='universal_creative_intake_v3';
-    data.diagnostics.input_type=anchors.length?'multi_source_brief':'text_brief';
+    data.diagnostics.input_type=referenceAnchors.length?'multi_source_brief':'text_brief';
     data.diagnostics.evidence_carrier='brief.anchors_only';
     data.diagnostics.reader_fragments=evidenceRecords.map(record=>record.fragment);
-    data.diagnostics.anchor_roles=anchors.map(anchor=>({
+    data.diagnostics.anchor_roles=[primaryAnchor].concat(referenceAnchors).map(anchor=>({
       anchor_id:anchor.anchor_id,
       type:anchor.type,
       role:anchor.role,
       source:anchor.source,
       usage_note:anchor.usage_note,
-      influence:anchor.influence
+      influence:anchor.influence,
+      confidence:anchor.confidence
     }));
     return data;
   }

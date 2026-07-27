@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-27-lean-dossier-v9';
+const PWP_BUILD_ID = 'pwp-index-2026-07-27-lean-dossier-v10';
 const PWP_BUILD_NOTE = 'lean dossier: anchors are the single evidence carrier with role, influence, and usage notes in structure; duplicated tagged evidence removed from intake_expressive; model payloads use compact JSON; dossier confidence follows the highest-influence source; the zero-asset boundary check warns without blocking or triggering repair';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -1317,11 +1317,18 @@ function sceneUsabilityReport(scene){
   if(_c(s.composition).length<30) missing.push('composition');
   if(_c(s.lighting).length<20) missing.push('lighting');
   if(cues.length<2) missing.push('scene_cues');
-  // The zero-asset boundary check is regex over authored prose and can flag
-  // legitimate creative language (a gnome workshop with packing crates reads
-  // as "packaging"). It warns for operator review and never blocks or
-  // triggers a repair pass on its own.
-  if(!assetBoundary.valid) warnings.push('world_only_asset_boundary:'+assetBoundary.signals.join('|'));
+  // Tiered asset boundary: hard signals (product, logo, packshot, SKU,
+  // structural placement fields) always trigger repair. A single ambiguous
+  // signal (package, label, supplement, gummy, branding) warns without
+  // blocking. Two or more ambiguous signals together also trigger repair
+  // since the combination pattern strongly suggests an invented product.
+  if(assetBoundary.hard.length){
+    missing.push('world_only_asset_boundary_hard:'+assetBoundary.hard.join('|'));
+  }else if(assetBoundary.ambiguous.length>=2){
+    missing.push('world_only_asset_boundary_multi_ambiguous:'+assetBoundary.ambiguous.join('|'));
+  }else if(assetBoundary.ambiguous.length===1){
+    warnings.push('world_only_asset_boundary_ambiguous:'+assetBoundary.ambiguous[0]);
+  }
   if(context.type==='led_wall'){
     if(_c(s.delivery_context&&s.delivery_context.type)!=='led_wall') missing.push('delivery_context');
     if(_c(s.distance_legibility&&s.distance_legibility.primary_read).length<12) missing.push('distance_legibility.primary_read');
@@ -2062,7 +2069,16 @@ function advanceAfterDirectionReady(){
     stepDirection.classList.add('complete');
     stepDirection.classList.remove('open','active');
   }
-  if(stepDirectionSummary) stepDirectionSummary.textContent='Direction ready';
+  // Surface asset-boundary warnings visibly so operators know when
+  // ambiguous product language slipped through without triggering repair.
+  const sceneDir=DATA&&DATA.vibes&&DATA.vibes.master_scene;
+  const hasLocked=normalizedLockedAssets(DATA||{}).length>0;
+  const boundary=HR_CREATIVE_INTAKE.sceneAssetBoundary(sceneDir,hasLocked?1:0);
+  if(boundary.ambiguous&&boundary.ambiguous.length===1){
+    if(stepDirectionSummary) stepDirectionSummary.textContent='Direction ready (warning: "'+boundary.ambiguous[0]+'" in scene text, verify no invented product)';
+  }else{
+    if(stepDirectionSummary) stepDirectionSummary.textContent='Direction ready';
+  }
   if(stepRender){
     stepRender.classList.add('open','active');
     stepRender.classList.remove('complete');
@@ -2254,6 +2270,7 @@ function buildHandoff(){
     throw new Error('Approved scene became incomplete during render handoff: '+handoffReport.missing.join(', '));
   }
 
+  const boundaryWarnings=handoffReport.warnings||[];
   const chosenName=_c(approved.scene_name);
   const lockedAssets=[];
   if(a){
@@ -2283,7 +2300,8 @@ function buildHandoff(){
     world_theses:(DATA.vibes&&DATA.vibes.world_theses)||[],
     world_thesis_selected:(DATA.vibes&&DATA.vibes.world_thesis_selected)||null,
     scene_translation:(DATA.vibes&&DATA.vibes.scene_translation)||null,
-    chosen_direction:chosenName
+    chosen_direction:chosenName,
+    boundary_warnings:boundaryWarnings
   };
   if(lockedAssets.length) handoff.locked_asset=lockedAssets[0];
   return handoff;
