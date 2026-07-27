@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product World Preview</title>
-<meta name="description" content="Pick your product and we build the world around it, with your packaging kept exactly as it is.">
+<meta name="description" content="Turn a site, written brief, or visual reference into a renderer-ready creative world.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
@@ -129,6 +129,41 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .urlinput::placeholder{color:var(--muted)}
 .urlinput:focus{outline:none; border-color:var(--accent)}
 .urlinput:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.textinput{min-height:132px;resize:vertical;line-height:1.5}
+.input-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 20px}
+.input-mode{
+  border:1px solid var(--border);border-radius:10px;background:var(--dark-card);color:var(--white);
+  padding:10px 8px;font:600 12px 'Rajdhani',sans-serif;letter-spacing:.05em;text-transform:uppercase;cursor:pointer
+}
+.input-mode[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.input-panel[hidden]{display:none}
+.input-note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.reference-builder{margin-top:22px;padding-top:4px;border-top:1px solid var(--border)}
+.reference-builder-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.reference-builder-head .fieldlabel{margin-bottom:2px}
+.reference-list{display:flex;flex-direction:column;gap:12px;margin-top:13px}
+.reference-card{padding:15px;border:1px solid var(--border);border-radius:12px;background:#0a0905}
+.reference-card-head{display:flex;align-items:center;gap:10px}
+.reference-number{font:700 12px 'Rajdhani',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.reference-remove{margin-left:auto;border:0;background:transparent;color:var(--muted);cursor:pointer;font:600 11px 'Rajdhani',sans-serif;letter-spacing:.07em;text-transform:uppercase}
+.reference-remove:hover{color:var(--white)}
+.reference-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:0 12px}
+.secondary-action{padding:9px 13px;border:1px solid var(--accent-line);border-radius:9px;background:transparent;color:var(--white);font:700 11px 'Rajdhani',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.secondary-action:hover{background:var(--accent-soft)}
+.secondary-action:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.reference-source-note{margin:7px 0 0;color:var(--muted);font-size:12px}
+.output-assumption{margin-top:22px;padding:14px 15px;border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:11px;background:var(--accent-soft)}
+.output-assumption span{display:block;color:var(--accent);font:700 10px 'Rajdhani',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.output-assumption strong{display:block;margin-top:4px;font-size:14px;color:var(--white)}
+.output-assumption p{margin:5px 0 0;color:var(--muted);font-size:12.5px;line-height:1.45}
+.optional-asset{margin-top:20px;padding-top:4px;border-top:1px solid var(--border)}
+.optional-asset summary{cursor:pointer;color:var(--accent);font:600 12px 'Rajdhani',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.source-ready{
+  margin:0;padding:18px;border:1px solid var(--border);border-left:2px solid var(--accent);
+  border-radius:12px;background:rgba(232,120,42,.055)
+}
+.source-ready strong{display:block;font-family:'Playfair Display',serif;font-size:19px;margin-bottom:5px}
+.source-ready span{font-size:13px;color:var(--muted)}
 #generateBtn{margin-top:24px}
 .entryhint{font-size:13px; color:var(--accent); margin:14px 0 0; min-height:18px}
 .brand-progress{
@@ -168,6 +203,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 .devbar button:hover{border-color:var(--accent-line); color:var(--white)}
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+@media (max-width:620px){ .input-modes,.reference-grid{grid-template-columns:1fr} }
 @media (max-width:520px){ .wrap{padding:32px 18px 72px} .brandbar{margin-bottom:40px} }
 
 .creative-direction{margin-top:14px;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--accent-soft);font-family:'Barlow',sans-serif;font-size:13px;line-height:1.5}
@@ -253,53 +289,76 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   <div class="demobanner" id="demoBanner" hidden>Demo mode: no parser backend is connected, so this shows sample data so you can see the full flow end to end. Connect the parser Worker for real results.</div>
 
   <section id="entryView">
-    <p class="eyebrow">Product World Preview</p>
-    <h1>Drop a product link, we’ll build a world around it.</h1>
-    <p class="sub">We read your site, understand your brand, then translate it into a visual world.</p>
+    <p class="eyebrow">World Preview</p>
+    <h1>Bring what you have. We’ll build the world.</h1>
+    <p class="sub">Stack notes, URLs, images, grids, and cultural references in any combination. Tell us what each source should contribute and how closely to follow it.</p>
     <div class="entryform">
-      <label class="fieldlabel" for="productUrl">Product page or product listing URL</label>
-      <input class="urlinput" id="productUrl" type="url" inputmode="url" placeholder="https://yourbrand.com/products/your-product" autocomplete="off">
-      <div id="keyRow" hidden style="display:none!important">
-        <label class="fieldlabel" for="apiKey">Anthropic API key <span class="opt">used only for the brand read, same as the Builder</span></label>
-        <input class="urlinput" id="apiKey" type="password" placeholder="sk-ant-..." autocomplete="off">
+      <label class="fieldlabel" for="textBrief">What are we making?</label>
+      <textarea class="urlinput textinput" id="textBrief" placeholder="Describe the outcome. A sentence is enough; add meeting notes or a full brief as sources below."></textarea>
+      <label class="fieldlabel" for="creativeContext">Project context <span class="opt">optional</span></label>
+      <textarea class="urlinput" id="creativeContext" placeholder="Audience, campaign, venue, use case, or other context shared across the project."></textarea>
+
+      <div class="reference-builder">
+        <div class="reference-builder-head">
+          <div>
+            <label class="fieldlabel">Source stack <span class="opt">optional</span></label>
+            <p class="input-note">Every source is read independently. Influence expresses decision priority—not a mathematical image blend.</p>
+          </div>
+          <button class="secondary-action" id="addReferenceAnchor" type="button">Add source</button>
+        </div>
+        <div class="reference-list" id="referenceAnchorList"></div>
       </div>
-      <button class="cta" id="generateBtn" type="button">BUILD MY WORLD!</button>
+
+      <label class="fieldlabel" for="sourceExclusions">Explicit exclusions <span class="opt">optional</span></label>
+      <textarea class="urlinput" id="sourceExclusions" placeholder="Example: no wheat or grass"></textarea>
+
+      <input id="deliveryContext" type="hidden" value="still_image">
+      <div class="output-assumption">
+        <span>Current output</span>
+        <strong>Reusable creative prompt + generated 16:9 still</strong>
+        <p>The prompt and source provenance stay attached for downstream production workflows. Additional output formats can be added later.</p>
+      </div>
+      <button class="cta" id="generateBtn" type="button">Build my world</button>
       <p class="entryhint" id="entryHint"></p>
     </div>
   </section>
 
   <section id="loadingView" hidden>
-    <p class="eyebrow">Reading your brand</p>
-    <h1 id="loadingLine">Fetching your product</h1>
-    <p class="sub">This takes a few seconds. We pull your product image and read your site copy.</p>
+    <p class="eyebrow">Reading your source</p>
+    <h1 id="loadingLine">Structuring the brief</h1>
+    <p class="sub">We read the source into a shared creative dossier before any world direction is authored.</p>
   </section>
 
   <section id="errorView" hidden>
     <p class="eyebrow">Something got in the way</p>
-    <h1 id="errorLine">We could not read that page</h1>
+    <h1 id="errorLine">We could not complete that input</h1>
     <p class="sub" id="errorDetail"></p>
-    <button class="cta" id="errorBack" type="button">Try another URL</button>
+    <button class="cta" id="errorBack" type="button">Try another input</button>
   </section>
 
   <section id="pickView" hidden>
-  <p class="eyebrow">Product World Preview</p>
-  <h1>Your product. Your brand. Your world.</h1>
-  <p class="sub">Move through three steps. We keep the product locked while the direction and final image take shape.</p>
+  <p class="eyebrow">World Preview</p>
+  <h1>Your brief. A direction. A world.</h1>
+  <p class="sub">Every input follows the same path from evidence to creative direction to renderer-ready execution.</p>
 
   <div class="workflow" id="workflow">
     <section class="workflow-step open active" id="stepProduct">
       <button class="workflow-head" type="button" id="stepProductHead" disabled>
         <span class="workflow-num">1</span>
-        <span class="workflow-title">Choose your product</span>
-        <span class="workflow-summary" id="stepProductSummary">Select the exact package to preserve</span>
+        <span class="workflow-title" id="stepOneTitle">Confirm the source</span>
+        <span class="workflow-summary" id="stepProductSummary">Review the source and any protected asset</span>
       </button>
       <div class="workflow-body" id="stepProductBody">
-        <p class="sub" id="sub">We pulled these from your site. Pick the product you want to bring to life.</p>
+        <p class="sub" id="sub">We read your source into a structured creative dossier.</p>
+        <div class="source-ready" id="sourceReady" hidden>
+          <strong id="sourceReadyTitle">Source understood</strong>
+          <span id="sourceReadyDetail">No protected asset is required for this world.</span>
+        </div>
         <div class="grid" id="grid" role="group" aria-label="Product candidates"></div>
         <div class="protect" id="protect">
           <b>Packaging locked.</b> We will preserve the product identity while matching the world around it.
         </div>
-        <div class="fallback">
+        <div class="fallback" id="productUploadFallback">
           <button class="linkbtn" id="uploadBtn">Don't see it? Upload your product</button>
           <input type="file" id="fileInput" accept="image/*" hidden>
         </div>
@@ -310,15 +369,15 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
       <button class="workflow-head" type="button" id="stepDirectionHead" disabled>
         <span class="workflow-num">2</span>
         <span class="workflow-title">Build the direction</span>
-        <span class="workflow-summary" id="stepDirectionSummary">Waiting for product selection</span>
+        <span class="workflow-summary" id="stepDirectionSummary">Waiting for source confirmation</span>
       </button>
       <div class="workflow-body" id="stepDirectionBody">
         <div class="brand-progress" id="brandProgress" role="status" aria-live="polite">
           <span class="pulse" aria-hidden="true"></span>
           <div class="progress-copy">
             <p class="progress-label" id="brandProgressLabel">Preparing your direction</p>
-            <p class="progress-message" id="brandProgressMessage">Reading the vibe of your brand</p>
-            <p class="progress-detail" id="brandProgressDetail">Your product is locked. We are finishing the direction before you continue.</p>
+            <p class="progress-message" id="brandProgressMessage">Reading the creative evidence</p>
+            <p class="progress-detail" id="brandProgressDetail">We are structuring the source before any direction is authored.</p>
             <button class="direction-retry" id="retryDirectionBtn" type="button">Try direction again</button>
           </div>
         </div>
@@ -335,7 +394,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
         <div class="render-progress" id="renderProgress" role="status" aria-live="polite">
           <span class="pulse" aria-hidden="true"></span>
           <div>
-            <p class="rp-title" id="renderProgressTitle">Rendering your product world</p>
+            <p class="rp-title" id="renderProgressTitle">Rendering your world</p>
             <p class="rp-detail" id="renderProgressDetail">This usually takes a little while. Your image will appear here when ready.</p>
           </div>
         </div>
@@ -349,7 +408,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 
   <section class="handoff end-user-hidden" id="handoff" aria-live="polite">
     <h2>Render package</h2>
-    <p>This is the complete package to test across render engines. It is engine-agnostic and wired to no renderer. Copy or download it, run the same locked product through each engine, then score with the rubric.</p>
+    <p>This is the renderer-ready execution package. LED-wall briefs stop here until a motion renderer is selected; still-image briefs continue into the current render service.</p>
     <div class="pkgbtns">
       <button class="pkgbtn" id="copyPkg" type="button">Copy package</button>
       <button class="pkgbtn" id="dlMd" type="button">Download .md</button>
@@ -371,14 +430,14 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 
   <section id="resultView" hidden>
     <p class="eyebrow">Your preview</p>
-    <h1>Your product in its world</h1>
+    <h1>Your world, rendered.</h1>
     <canvas id="resultCanvas" width="1536" height="1024" style="max-width:100%;height:auto;border-radius:14px;border:1px solid var(--border);display:block;margin:8px 0 0"></canvas>
-    <p class="sub">Your supplied product image was used as the locked reference for the render. Check label fidelity before sharing.</p>
+    <p class="sub">Review the authored world and, when one was supplied, confirm that the protected asset remains unchanged.</p>
     <div class="pkgbtns">
       <button class="pkgbtn" id="dlImg" type="button">Download image</button>
       <button class="pkgbtn" id="copyPkg2" type="button">Copy package</button>
     </div>
-    <button class="linkbtn" id="startOver2" type="button" style="margin-top:20px">Start over with a new URL</button>
+    <button class="linkbtn" id="startOver2" type="button" style="margin-top:20px">Start over with a new input</button>
   </section>
 
   <pre id="jobStatusPanel" class="job-status end-user-hidden" hidden></pre>
@@ -396,6 +455,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
 
 <script src="./creative-config.js"></script>
 <script src="./render-prompt-writer.js"></script>
+<script src="./creative-intake.js"></script>
 <script>
 /* ============================================================================
    MIRRORED LOGIC. This standalone Preview page mirrors, verbatim, three things
@@ -462,8 +522,8 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-24-aesthetic-mode-v3';
-const PWP_BUILD_NOTE = 'aesthetic mode as first-class variable: ideation, selection, and the scene author all operate in a chosen mode (cinematic / documentary / editorial / vernacular) picked from brand evidence; ideation now requires at least one brand-native-use thesis and rebalances human presence away from trace-only default; the compiler prepends a mode-specific opening line and adds a safe-face-framing addendum when people are primary; cinematic is no longer the pipeline default';
+const PWP_BUILD_ID = 'pwp-index-2026-07-27-production-world-builder-v6';
+const PWP_BUILD_NOTE = 'production integration: one stackable intake accepts notes, accessible URLs, images, grids, named references, and an optional protected asset; every creative source retains user-authored usage guidance, relative influence, reader evidence, and provenance through prompt compilation; the default deliverable is a reusable prompt plus generated 16:9 still';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
 const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser/brand-read results
@@ -783,7 +843,7 @@ function _posSceneCore(h){
   const base=authored?_stripProductFreeLines(authored):_firstSentences(_stripProductFreeLines(sd.world_description),5);
   const props=_l(sd.props).slice(0,5);
   const mode=resolvedAestheticMode(cs);
-  const opening=modeOpeningLine(mode);
+  const opening=modeOpeningLine(mode,!!(h&&h.locked_asset));
   const presence=_c(cs.human_presence)||_c(sd.human_presence)||(mode&&mode.human_presence_default)||'trace_only';
   const activity=_c(sd.human_activity);
   return [
@@ -837,6 +897,7 @@ function _posReference(h){
 const DEBUG_CREATIVE_DIRECTION = true; // internal review panel, this is an internal tool
 const GRAMMAR_MODULES = _objs(HR_CREATIVE_CONFIG.grammarModules);
 const AESTHETIC_MODES = _objs(HR_CREATIVE_CONFIG.aestheticModes);
+const DELIVERY_CONTEXTS = _objs(HR_CREATIVE_CONFIG.deliveryContexts);
 const WORLD_IDEATION_PROMPT = HR_CREATIVE_CONFIG.worldIdeationPrompt||'';
 const THESIS_SELECTION_PROMPT = HR_CREATIVE_CONFIG.thesisSelectionPrompt||'';
 
@@ -846,62 +907,102 @@ function resolvedAestheticMode(selection){
   const id=_c(selection&&selection.aesthetic_mode)||'cinematic_film_still';
   return AESTHETIC_MODES.find(m=>m.id===id) || AESTHETIC_MODES.find(m=>m.id==='cinematic_film_still') || AESTHETIC_MODES[0] || null;
 }
-function modeOpeningLine(mode){
-  return _c(mode&&mode.opening_line) || 'A wide cinematic campaign-film still in landscape framing, a real environment with depth and atmosphere, not a tabletop product photo.';
+function modeOpeningLine(mode,hasLockedAssets){
+  const line=_c(mode&&mode.opening_line) || 'A wide cinematic still in landscape framing, a real environment with depth and atmosphere.';
+  return hasLockedAssets?line:line.replace(/,\s*not a tabletop product photo\.?$/i,'.');
 }
 
-function fullBrandDossier(data){
-  // The complete brand read. Every creative call receives all of it; the
-  // previous build withheld campaign_signals, audience, product_truth, and
-  // brand_intent from the scene author, which was the single largest
-  // specificity leak in the pipeline.
+function resolvedDeliveryContext(value){
+  const raw=value&&value.delivery_context&&typeof value.delivery_context==='object'
+    ?value.delivery_context
+    :(value&&typeof value==='object'?value:{});
+  const requested=_c(raw.type)||'still_image';
+  const definition=DELIVERY_CONTEXTS.find(context=>context.id===requested)
+    ||DELIVERY_CONTEXTS.find(context=>context.id==='still_image')
+    ||{id:'still_image',name:'Still image',output_kind:'static_frame',defaults:{loop:false},authoring_guidance:[]};
+  return Object.assign({},definition.defaults||{},raw,{
+    type:definition.id,
+    name:definition.name,
+    output_kind:definition.output_kind,
+    authoring_guidance:_l(definition.authoring_guidance)
+  });
+}
+
+function normalizedLockedAssets(data){
+  const explicit=data&&data.brief&&Array.isArray(data.brief.locked_assets)
+    ?data.brief.locked_assets
+    :null;
+  const source=explicit!==null?explicit:assets.filter(item=>item&&item.asset_id===selectedAssetId);
+  return source.map((asset,index)=>({
+    asset_id:_c(asset&&asset.asset_id)||('locked_asset_'+(index+1)),
+    asset_name:_c(asset&&asset.asset_name)||_c(asset&&asset.name),
+    asset_type:_c(asset&&asset.asset_type)||'artifact',
+    media_type:_c(asset&&asset.media_type)||_c(asset&&asset.mediaType),
+    lock_status:_c(asset&&asset.lock_status)||'locked',
+    preserve_elements:_l(asset&&asset.preserve_elements)
+  }));
+}
+
+function fullCreativeDossier(data){
   const v=(data&&data.vibes)||{};
   const ix=v.intake_expressive||{};
   const f=(data&&data.factual)||{};
-  const la=assets.find(x=>x.asset_id===selectedAssetId)||{};
-  return {
-    brand_name:data.brand||'',
-    product_facts:{ name:_c(f.name)||_c(la.asset_name), category:_c(f.category), flavor_sku:_c(f.flavor_sku), price:f.price||{} },
-    locked_asset:{ asset_name:la.asset_name||'', media_type:la.mediaType||'' },
+  const brief=(data&&data.brief)||{};
+  const lockedAssets=normalizedLockedAssets(data);
+  const dossier={
+    dossier_type:'universal_creative_dossier',
+    brief:{
+      intent:_c(brief.intent)||_c(ix.assets&&ix.assets.brand_intent),
+      anchors:Array.isArray(brief.anchors)?brief.anchors:[],
+      delivery_context:resolvedDeliveryContext(brief),
+      requirements:_dedupe(_l(brief.requirements)),
+      avoid:_dedupe([].concat(_l(brief.avoid),_l(ix.visual_identity&&ix.visual_identity.never_world)))
+    },
+    locked_assets:lockedAssets,
+    source_identity:_c(brief.intent)
+      ?{name:_c(brief.source_name)||'creative brief',kind:_c(brief.source_kind)||'brief'}
+      :{name:_c(data&&data.brand)||'creative brief',kind:'brand'},
     product_truth:ix.product_truth||{},
     audience:ix.audience||{},
-    brand_state:ix.brand_state||{},
+    creative_state:ix.brand_state||{},
     visual_territory:ix.visual_territory||{},
     sensory:ix.sensory||{},
     competitive:ix.competitive||{},
     visual_identity:ix.visual_identity||{},
     campaign_signals:ix.campaign_signals||{},
-    brand_intent:(ix.assets&&ix.assets.brand_intent)||'',
-    never_world:_l(ix.visual_identity&&ix.visual_identity.never_world),
+    never_world:_dedupe([].concat(_l(brief.avoid),_l(ix.visual_identity&&ix.visual_identity.never_world))),
     read_confidence:v.confidence||'unknown',
-    worker_scene_sketch:{
+    source_scene_sketch:{
       scene_name:_c(v.scene_direction&&v.scene_direction.scene_name),
       world_description:_c(v.scene_direction&&v.scene_direction.world_description)
     }
   };
+  if(_c(f.name)||_c(f.category)||_c(f.flavor_sku)){
+    dossier.product_facts={name:_c(f.name),category:_c(f.category),flavor_sku:_c(f.flavor_sku),price:f.price||{}};
+  }
+  return dossier;
 }
 
-async function callAnthropicJson(system, userText, apiKey, maxTokens){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:maxTokens||2000, system, messages:[{role:'user',content:userText}] })
+async function runModelStage(stage,system,userText,maxTokens){
+  const response=await postPreviewAction('run_model_stage',{
+    stage,
+    system_prompt:system,
+    user_text:userText,
+    max_tokens:maxTokens||3200
   });
-  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Model call '+res.status+(t?': '+t.slice(0,160):'')); }
-  const payload=await res.json();
-  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  return extractJson(text);
+  return extractJson(String(response&&response.text||''));
 }
 
-async function ideateWorldTheses(data, apiKey){
+async function ideateWorldTheses(data){
   // Pass both the grammar module summary and the aesthetic mode library, so the
   // ideation model can pick a mode per thesis rather than defaulting to cinema.
   const modesShort=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when}));
-  const parsed=await callAnthropicJson(
+  const parsed=await runModelStage(
+    'ideation',
     WORLD_IDEATION_PROMPT,
-    'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2)+
+    'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data),null,2)+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modesShort,null,2),
-    apiKey, 2600);
+    2600);
   const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
   const theses=(parsed&&Array.isArray(parsed.theses)?parsed.theses:[])
     .map(t=>({
@@ -925,16 +1026,17 @@ function validHumanPresence(x){
   return (v==='primary_scale'||v==='trace_only'||v==='prohibited')?v:'trace_only';
 }
 
-async function selectThesisAndGrammar(data, apiKey, theses){
+async function selectThesisAndGrammar(data, theses){
   const moduleLibrary=GRAMMAR_MODULES.map(m=>({id:m.id,name:m.name,grammar:m.grammar,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
   const modeLibrary=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
-  const parsed=await callAnthropicJson(
+  const parsed=await runModelStage(
+    'selection',
     THESIS_SELECTION_PROMPT,
-    'Brand dossier:\n'+JSON.stringify(fullBrandDossier(data),null,2)+
+    'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data),null,2)+
     '\n\nCandidate world theses (each carries a proposed aesthetic_mode and human_presence):\n'+JSON.stringify(theses,null,2)+
     '\n\nGrammar module library:\n'+JSON.stringify(moduleLibrary,null,2)+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modeLibrary,null,2),
-    apiKey, 1800);
+    2600);
   if(!parsed||!_c(parsed.selected_thesis_name)) throw new Error('Thesis selection returned no usable choice');
   const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
   const winner=theses.find(t=>t.thesis_name.toLowerCase()===_c(parsed.selected_thesis_name).toLowerCase())||theses[0];
@@ -1075,14 +1177,13 @@ function renderCreativeDirectionPanel(){
   el.hidden=false;
 }
 
-const ANTHROPIC_MODEL='claude-sonnet-4-5'; // match the brand read; bump for richer scenes
 const ART_DIRECTOR_PROMPT = [
   HR_CREATIVE_CONFIG.artDirectorPrompt||'',
   '',
   'CREATIVE-FIRST AUTHORITY:',
   'The selected world thesis is authoritative. Develop it into one authored master scene; never relocate it, dilute it toward category convention, or replace it with a grammar-default location.',
-  'Use the full brand dossier, including campaign signals and visual identity, as creative source material, not as a compliance checklist.',
-  'authored_prompt is the deliverable: one 120-180 word cinematic paragraph that will be sent to the renderer nearly verbatim. Write it to be read as prose, world first, product inside it, light and atmosphere last.',
+  'Use the full creative dossier, including source evidence and visual identity when present, as creative source material, not as a compliance checklist.',
+  'authored_prompt is the deliverable: one 120-200 word paragraph in the selected aesthetic mode that will be sent to the renderer nearly verbatim. Write it as prose, world and action first, supplied locked assets only when present, light and atmosphere last.',
   'Return only the required JSON schema.'
 ].join('\n');
 
@@ -1111,15 +1212,29 @@ function normalizeSceneObject(raw){
   const locked=source.locked_product_placement&&typeof source.locked_product_placement==='object'
     ? source.locked_product_placement
     : {};
+  const placements=(Array.isArray(source.locked_asset_placements)?source.locked_asset_placements:[])
+    .filter(item=>item&&typeof item==='object')
+    .map(item=>({
+      asset_id:_c(item.asset_id),
+      placement_intent:_c(item.placement_intent)||_c(item.anchor),
+      anchor:_c(item.anchor),
+      scale_notes:_c(item.scale_notes),
+      contact_shadow:_c(item.contact_shadow),
+      light_match:_c(item.light_match)
+    }));
+  const delivery=source.delivery_context&&typeof source.delivery_context==='object'?source.delivery_context:{};
+  const legibility=source.distance_legibility&&typeof source.distance_legibility==='object'?source.distance_legibility:{};
+  const temporal=source.temporal_behavior&&typeof source.temporal_behavior==='object'?source.temporal_behavior:{};
 
   const scene={
     scene_name:_c(source.scene_name)||_c(source.title)||_c(source.direction_name),
     world_description:_c(source.world_description)||_c(source.world)||_c(source.setting)||_c(source.environment),
-    product_placement_intent:_c(source.product_placement_intent)||_c(source.placement)||[
+    locked_asset_placement_intent:_c(source.locked_asset_placement_intent)||_c(source.placement_intent)||_c(source.product_placement_intent)||_c(source.placement)||[
       _c(locked.anchor),
       _c(locked.scale_notes),
       _c(locked.light_match)
     ].filter(Boolean).join(', '),
+    product_placement_intent:_c(source.product_placement_intent),
     composition:_c(source.composition)||_c(source.framing)||_c(source.camera_composition),
     lighting:_c(source.lighting)||_c(source.light)||_c(source.light_direction),
     use_occasion:_c(source.use_occasion)||_c(source.occasion)||_c(source.moment),
@@ -1130,23 +1245,45 @@ function normalizeSceneObject(raw){
     props:_dedupe([].concat(_l(source.props),_l(source.visual_anchors),_l(source.objects))),
     avoid:_l(source.avoid),
     claim_rules:_l(source.claim_rules),
-    render_path:'composite',
+    render_path:normalizedLockedAssets(DATA||{}).length?'composite':'world_only',
     authored_prompt:_c(source.authored_prompt),
     prompt_seed:_c(source.prompt_seed)||_c(source.render_prompt)||_c(source.authored_prompt),
     aesthetic_mode:_c(source.aesthetic_mode),
     human_presence:_c(source.human_presence),
     human_activity:_c(source.human_activity),
+    delivery_context:{
+      type:_c(delivery.type),
+      width_px:Number(delivery.width_px)||null,
+      height_px:Number(delivery.height_px)||null,
+      duration_ms:Number(delivery.duration_ms)||null,
+      viewing_distance:_c(delivery.viewing_distance),
+      loop:delivery.loop===true,
+      performer_clear_zone:_c(delivery.performer_clear_zone)
+    },
+    distance_legibility:{
+      primary_read:_c(legibility.primary_read),
+      secondary_read:_c(legibility.secondary_read),
+      protected_zones:_l(legibility.protected_zones)
+    },
+    temporal_behavior:{
+      duration_ms:Number(temporal.duration_ms)||null,
+      loop:temporal.loop===true,
+      motion_cycle:_c(temporal.motion_cycle),
+      loop_seam:_c(temporal.loop_seam)
+    },
     surface:_c(source.surface),
     background:_c(source.background),
     materials:_l(source.materials),
     color_palette:_l(source.color_palette),
     camera:source.camera||null,
+    source_specific_cues:_dedupe([].concat(_l(source.source_specific_cues),_l(source.brand_specific_cues))),
     brand_specific_cues:_l(source.brand_specific_cues),
+    locked_asset_placements:placements,
     locked_product_placement:locked
   };
 
-  if(!scene.product_placement_intent&&scene.composition){
-    scene.product_placement_intent='Product integrated as the readable hero within the approved composition.';
+  if(normalizedLockedAssets(DATA||{}).length&&!scene.locked_asset_placement_intent&&scene.composition){
+    scene.locked_asset_placement_intent='Protected asset integrated within the approved composition without changing identity.';
   }
 
   return scene;
@@ -1154,21 +1291,32 @@ function normalizeSceneObject(raw){
 
 function sceneUsabilityReport(scene){
   const s=scene||{};
+  const hasLockedAssets=normalizedLockedAssets(DATA||{}).length>0;
+  const context=resolvedDeliveryContext((DATA&&DATA.brief)||s.delivery_context);
   const cues=_dedupe([].concat(
     _l(s.props),
     _l(s.evidence_cues),
     _l(s.signature_objects),
     _l(s.materials),
-    _l(s.brand_specific_cues)
+    _l(s.brand_specific_cues),
+    _l(s.source_specific_cues)
   )).filter(x=>_c(x).length>2);
 
   const missing=[];
   if(!_c(s.scene_name)) missing.push('scene_name');
   if(_c(s.world_description).length<60) missing.push('world_description');
-  if(_c(s.product_placement_intent).length<20) missing.push('product_placement_intent');
+  if(hasLockedAssets&&_c(s.locked_asset_placement_intent).length<20) missing.push('locked_asset_placement_intent');
   if(_c(s.composition).length<30) missing.push('composition');
   if(_c(s.lighting).length<20) missing.push('lighting');
   if(cues.length<2) missing.push('scene_cues');
+  if(context.type==='led_wall'){
+    if(_c(s.delivery_context&&s.delivery_context.type)!=='led_wall') missing.push('delivery_context');
+    if(_c(s.distance_legibility&&s.distance_legibility.primary_read).length<12) missing.push('distance_legibility.primary_read');
+    if(!_l(s.distance_legibility&&s.distance_legibility.protected_zones).length) missing.push('distance_legibility.protected_zones');
+    if(!s.temporal_behavior||s.temporal_behavior.loop!==true) missing.push('temporal_behavior.loop');
+    if(_c(s.temporal_behavior&&s.temporal_behavior.motion_cycle).length<20) missing.push('temporal_behavior.motion_cycle');
+    if(_c(s.temporal_behavior&&s.temporal_behavior.loop_seam).length<12) missing.push('temporal_behavior.loop_seam');
+  }
 
   return {
     usable:missing.length===0,
@@ -1184,39 +1332,36 @@ function usableSceneOrNull(raw){
 }
 
 function buildSceneNormalizationPrompt(data,raw){
-  const v=(data&&data.vibes)||{};
-  const ix=v.intake_expressive||{};
+  const dossier=fullCreativeDossier(data);
+  const hasLockedAssets=dossier.locked_assets.length>0;
+  const deliveryContext=resolvedDeliveryContext(dossier.brief.delivery_context);
   return [
     'Normalize the supplied creative direction into one complete scene JSON object.',
     'Do not change the creative concept, location, emotional posture, director grammar, or visual thesis.',
-    'Recover missing fields from the supplied output and brand intelligence only.',
+    'Recover missing fields from the supplied output and creative dossier only.',
     'Do not replace the concept with generic category imagery.',
     'Return JSON only.',
     'Required fields:',
-    'scene_name, authored_prompt, world_description, product_placement_intent, composition, lighting, use_occasion, implied_action, evidence_cues, signature_objects, creative_rationale, props, avoid, claim_rules, render_path.',
-    'authored_prompt is one cinematic prose paragraph of 120 to 180 words: world first, spatial hierarchy in prose, the product inside it off-center, light and atmosphere last, no labels or numbers. If the original output lacks it, write it faithfully from the original concept without changing the idea.',
+    'scene_name, authored_prompt, world_description, locked_asset_placement_intent, product_placement_intent, composition, lighting, use_occasion, implied_action, evidence_cues, signature_objects, creative_rationale, props, avoid, claim_rules, render_path, delivery_context, distance_legibility, temporal_behavior.',
+    'authored_prompt is one prose paragraph of 120 to 200 words in the selected aesthetic mode: world and action first, spatial hierarchy in prose, supplied locked assets only when present, light and atmosphere last. If the original output lacks it, write it faithfully without changing the idea.',
+    hasLockedAssets
+      ?'The dossier contains locked assets. Preserve them and make locked_asset_placement_intent describe their placement without changing identity.'
+      :'The dossier contains zero locked assets. Do not invent a product, package, label, logo, placeholder, or hero asset. product_placement_intent may be empty.',
+    deliveryContext.type==='led_wall'
+      ?'This is an LED-wall motion loop. Preserve the panoramic dimensions and far viewing distance. Return one dominant distance_legibility.primary_read, protected_zones including the performer clear zone, temporal_behavior.loop true, one concrete motion_cycle, and an invisible loop_seam with no hard cut.'
+      :'This is a still image. Return delivery_context.type still_image and temporal_behavior.loop false.',
     'world_description must describe a concrete cinematic environment in at least two sentences.',
     'composition and lighting must contain actionable visual direction.',
     'props must include only objects already present or clearly implied by the original creative concept.',
-    'render_path must be composite.',
-    'Brand intelligence:',
-    JSON.stringify({
-      product_truth:ix.product_truth||{},
-      audience:ix.audience||{},
-      brand_state:ix.brand_state||{},
-      visual_territory:ix.visual_territory||{},
-      sensory:ix.sensory||{},
-      campaign_signals:ix.campaign_signals||{},
-      brand_intent:ix.assets&&ix.assets.brand_intent||''
-    },null,2),
+    hasLockedAssets?'render_path must be composite.':'render_path must be world_only.',
+    'Creative dossier:',
+    JSON.stringify(dossier,null,2),
     'Original scene output:',
     typeof raw==='string'?raw:JSON.stringify(raw||{},null,2)
   ].join('\n\n');
 }
 
-async function repairSceneSchema(data,apiKey,raw){
-  if(!apiKey) throw new Error('Scene schema repair requires the creative service key');
-
+async function repairSceneSchema(data,raw){
   const system=[
     'You are a scene-output normalizer for a commercial art-direction system.',
     'Preserve the authored creative idea.',
@@ -1225,30 +1370,7 @@ async function repairSceneSchema(data,apiKey,raw){
     'Return one JSON object and no commentary.'
   ].join('\n');
 
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'content-type':'application/json',
-      'x-api-key':apiKey,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model:ANTHROPIC_MODEL,
-      max_tokens:2600,
-      system,
-      messages:[{role:'user',content:buildSceneNormalizationPrompt(data,raw)}]
-    })
-  });
-
-  if(!res.ok){
-    const t=await res.text().catch(()=>'');
-    throw new Error('Scene schema repair '+res.status+(t?': '+t.slice(0,160):''));
-  }
-
-  const payload=await res.json();
-  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-  const parsed=extractJson(text);
+  const parsed=await runModelStage('scene_repair',system,buildSceneNormalizationPrompt(data,raw),3200);
   const scene=normalizeSceneObject(parsed);
   const report=sceneUsabilityReport(scene);
 
@@ -1277,29 +1399,27 @@ function workerFallbackScene(data){
   return null;
 }
 
-async function buildMasterScene(data, apiKey, creativeSelection, winningThesis){
+async function buildMasterScene(data,creativeSelection,winningThesis){
   // The scene author receives the COMPLETE dossier. The previous build passed
   // only brand_tone, visual_territory, sensory, and competitive, withholding
   // campaign_signals, audience, product_truth, and brand_intent from the one
   // call that authors the world.
   const input={
-    dossier:fullBrandDossier(data),
-    fidelity_rule:'The product image is identity-locked and state-locked. The scene must be built around the product. Do not redraw, retype, recolor, relabel, reshape, crop, open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or reinterpret the product packaging. Any screens, signs, posters, menus, labels, or displays in the environment must be blank, abstract, cropped, or unreadable.'
+    dossier:fullCreativeDossier(data),
+    locked_asset_rule:normalizedLockedAssets(data).length
+      ?'Supplied locked assets are identity-locked and state-locked. Integrate them without redrawing, retyping, recoloring, relabeling, reshaping, cropping, opening, closing, removing, adding, or reinterpreting protected identity.'
+      :'No locked asset is supplied. Author the world without inventing a product, package, label, logo, placeholder, or reserved hero-object area.'
   };
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:ANTHROPIC_MODEL, max_tokens:3200, system:ART_DIRECTOR_PROMPT+grammarGuidanceBlock(creativeSelection, winningThesis), messages:[{role:'user',content:'Brand and product intelligence:\n'+JSON.stringify(input,null,2)}] })
-  });
-  if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Scene builder '+res.status+(t?': '+t.slice(0,160):'')); }
-  const payload=await res.json();
-  const text=(payload.content||[]).filter(b=>b&&b.type==='text').map(b=>b.text).join('\n');
-
   let parsed=null;
   try{
-    parsed=extractJson(text);
+    parsed=await runModelStage(
+      'master_scene',
+      ART_DIRECTOR_PROMPT+grammarGuidanceBlock(creativeSelection,winningThesis),
+      'Creative intelligence:\n'+JSON.stringify(input,null,2),
+      3200
+    );
   }catch(parseErr){
-    parsed={raw_text:text,parse_error:String((parseErr&&parseErr.message)||parseErr)};
+    throw new Error('Scene builder returned invalid output: '+String((parseErr&&parseErr.message)||parseErr));
   }
 
   let scene=normalizeSceneObject(parsed);
@@ -1307,7 +1427,7 @@ async function buildMasterScene(data, apiKey, creativeSelection, winningThesis){
 
   if(!report.usable){
     PERF.log('master_scene_normalization_needed',{missing:report.missing});
-    scene=await repairSceneSchema(data,apiKey,parsed&&parsed.raw_text?parsed.raw_text:parsed);
+    scene=await repairSceneSchema(data,parsed&&parsed.raw_text?parsed.raw_text:parsed);
     report=sceneUsabilityReport(scene);
   }
 
@@ -1341,13 +1461,17 @@ function cameraToText(cam){ if(!cam||typeof cam!=='object') return ''; const p=[
 function mapSceneDirectionToSd(d, meta){
   meta=meta||{};
   const lp=d.locked_product_placement||{};
-  const intent=[_c(lp.anchor),_c(lp.scale_notes),_c(lp.light_match)].filter(Boolean).join(', ');
+  const placements=Array.isArray(d.locked_asset_placements)?d.locked_asset_placements:[];
+  const intent=_c(d.locked_asset_placement_intent)||placements.map(item=>
+    _c(item&&item.placement_intent)||[_c(item&&item.anchor),_c(item&&item.scale_notes),_c(item&&item.light_match)].filter(Boolean).join(', ')
+  ).filter(Boolean).join('; ')||[_c(lp.anchor),_c(lp.scale_notes),_c(lp.light_match)].filter(Boolean).join(', ');
   const avoids=_dedupe([].concat(_l(d.avoid), _l(meta.category_cliches_to_avoid), _l(meta.anti_tabletop_rules)));
   return {
     scene_name:_c(d.scene_name),
     world_description:_c(d.world_description),
     world_thesis:_c(meta.world_thesis),
-    product_placement_intent:intent||_c(d.composition),
+    locked_asset_placement_intent:intent,
+    product_placement_intent:_c(d.product_placement_intent),
     composition:_c(d.composition),
     lighting:_c(d.lighting),
     use_occasion:_c(d.use_occasion),
@@ -1357,18 +1481,23 @@ function mapSceneDirectionToSd(d, meta){
     creative_rationale:_c(d.creative_rationale),
     props:_l(d.props),
     avoid:avoids,
-    render_path:'composite',
+    render_path:_c(d.render_path)||'world_only',
     authored_prompt:_c(d.authored_prompt),
     prompt_seed:_c(d.prompt_seed)||_c(d.render_prompt)||_c(d.authored_prompt),
     aesthetic_mode:_c(d.aesthetic_mode),
     human_presence:_c(d.human_presence),
     human_activity:_c(d.human_activity),
+    delivery_context:d.delivery_context||null,
+    distance_legibility:d.distance_legibility||null,
+    temporal_behavior:d.temporal_behavior||null,
     surface:_c(d.surface),
     background:_c(d.background),
     materials:_l(d.materials),
     color_palette:_l(d.color_palette),
     camera:d.camera||null,
+    source_specific_cues:_l(d.source_specific_cues),
     brand_specific_cues:_l(d.brand_specific_cues),
+    locked_asset_placements:placements,
     locked_product_placement:lp
   };
 }
@@ -1392,15 +1521,56 @@ function buildLockedAssetRecord(la){
   if(DEBUG_EMBED_BASE64 && _c(la.base64)){ rec.has_image_data=true; rec.image_data='data:'+media+';base64,'+_c(la.base64); }
   return rec;
 }
+const WORLD_RUBRIC_CRITERIA=[
+  {key:'world_specificity',label:'World specificity',ask:'Could this world only have come from the supplied brief and evidence?'},
+  {key:'evidence_fidelity',label:'Evidence fidelity',ask:'Do source-specific visual and tonal signals survive without literal copying?'},
+  {key:'composition',label:'Composition',ask:'Is the spatial hierarchy decisive and appropriate to the delivery context?'},
+  {key:'lighting',label:'Lighting',ask:'Does the light behavior support the authored emotional and visual posture?'},
+  {key:'constraint_adherence',label:'Constraint adherence',ask:'Are explicit user requirements present and explicit exclusions absent?'},
+  {key:'shippable',label:'Shippable',ask:'Would you show this result to a creative lead or client?'}
+];
+const PROTECTED_ASSET_RUBRIC_CRITERIA=[
+  {key:'protected_identity',label:'Protected-asset identity',ask:'Is the protected person, artifact, or object unchanged and recognizably the supplied asset?'},
+  ...WORLD_RUBRIC_CRITERIA,
+  {key:'integration',label:'Integration',ask:'Does the protected asset belong physically in the authored light, space, and atmosphere?'}
+];
 function buildRenderPackage(h){
   if(!h||!h.scene_direction) throw new Error('handoff missing scene_direction');
-  const la=h.locked_asset||{}, sd=h.scene_direction, neg=[...FIDELITY_NEGATIVES,...assembleBrandNegatives(h),...((h.creative_selection&&_l(h.creative_selection.avoid))||[])];
+  const suppliedLockedAssets=Array.isArray(h.locked_assets)
+    ?h.locked_assets.filter(Boolean)
+    :(h.locked_asset?[h.locked_asset]:[]);
+  const hasLockedAssets=suppliedLockedAssets.length>0;
+  const la=suppliedLockedAssets[0]||{};
+  const isProductAsset=['packaging','product','product_photo','product_render'].includes(_c(la.asset_type));
+  const sd=h.scene_direction;
+  const deliveryContext=resolvedDeliveryContext(h.delivery_context||sd.delivery_context);
+  const userConstraints={
+    requirements:_dedupe(_l(h&&h.user_constraints&&h.user_constraints.requirements)),
+    exclusions:_dedupe(_l(h&&h.user_constraints&&h.user_constraints.exclusions))
+  };
+  const sourceAnchors=_objs(h&&h.source_anchors).map((anchor,index)=>({
+    anchor_id:_c(anchor&&anchor.anchor_id)||('anchor_'+(index+1)),
+    type:_c(anchor&&anchor.type),
+    source:_c(anchor&&anchor.source),
+    role:_c(anchor&&anchor.role),
+    polarity:_c(anchor&&anchor.polarity)||'reference_only',
+    user_context:_c(anchor&&anchor.user_context),
+    reference_focus:_c(anchor&&anchor.reference_focus),
+    usage_note:_c(anchor&&anchor.usage_note),
+    influence:{
+      level:_c(anchor&&anchor.influence&&anchor.influence.level),
+      weight:Number(anchor&&anchor.influence&&anchor.influence.weight)||0,
+      interpretation:_c(anchor&&anchor.influence&&anchor.influence.interpretation)
+    },
+    evidence:{
+      territory:_l(anchor&&anchor.evidence&&anchor.evidence.territory),
+      visual_evidence:_l(anchor&&anchor.evidence&&anchor.evidence.visual_evidence),
+      tonal_evidence:_l(anchor&&anchor.evidence&&anchor.evidence.tonal_evidence),
+      reference_points:_l(anchor&&anchor.evidence&&anchor.evidence.reference_points)
+    }
+  }));
+  const neg=[...(hasLockedAssets?FIDELITY_NEGATIVES:[]),...userConstraints.exclusions,...assembleBrandNegatives(h)];
   const negStr=_dedupe(neg).join(', ');
-  const packageInfo=packageFormatInfo(la);
-  const integrationTreatment=buildIntegrationTreatment(h);
-  const positiveComposite=_posComposite(h);
-  const positiveReference=_posReference(h);
-  const creativeDirection=buildCreativeDirectionBlock(h,positiveComposite,negStr);
   // The approved master scene is the sole source of world content. The previous
   // build substituted director-selection prompt_variables for the authored
   // world, composition, and lighting whenever the director layer succeeded,
@@ -1414,18 +1584,85 @@ function buildRenderPackage(h){
     authored_prompt:_c(sd.authored_prompt),
     prompt_seed:_c(sd.prompt_seed),
     aesthetic_mode:_c(sd.aesthetic_mode)||_c(cs2.aesthetic_mode)||'cinematic_film_still',
-    opening_line:modeOpeningLine(mode2),
+    opening_line:modeOpeningLine(mode2,isProductAsset),
     human_presence:_c(sd.human_presence)||_c(cs2.human_presence)||(mode2&&mode2.human_presence_default)||'trace_only',
     human_activity:_c(sd.human_activity),
-    product_placement_intent:sanitizeProductPlacement(sd.product_placement_intent),
+    delivery_context:deliveryContext,
+    distance_legibility:sd.distance_legibility||null,
+    temporal_behavior:sd.temporal_behavior||null,
+    locked_asset_placement_intent:_c(sd.locked_asset_placement_intent)||_c(sd.product_placement_intent),
     composition:_c(sd.composition),
     lighting:_c(sd.lighting),
-    props:_l(sd.props)
+    props:_l(sd.props),
+    avoid:userConstraints.exclusions.slice()
   };
+  const confidenceNotes={score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]};
+
+  if(!hasLockedAssets){
+    const positive=_c(sd.authored_prompt)||_c(sd.prompt_seed)||_c(sd.world_description);
+    return {
+      meta:{package_version:'0.3',brief_name:_c(h.brief_name)||'creative brief',mode:'world_exploration',chosen_direction:effectiveChosenDirection,render_path_recommendation:'world_only',delivery_context:deliveryContext,creative_config_version:CREATIVE_CONFIG_VERSION},
+      locked_assets:[],
+      source_anchors:sourceAnchors,
+      user_constraints:userConstraints,
+      fidelity_contract:null,
+      integration_treatment:null,
+      scene_brief:effectiveSceneBrief,
+      placement_spec:null,
+      prompts:{positive,negative:negStr},
+      variants:[{render_path:'world_only',label:'World-only render',instructions:'Render the authored world without inventing or reserving space for a locked asset.',positive,negative:negStr}],
+      confidence_notes:confidenceNotes,
+      creative_direction:buildCreativeDirectionBlock(h,positive,negStr),
+      test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:WORLD_RUBRIC_CRITERIA.slice(),instructions:'Score the authored world against source evidence, user constraints, and delivery context. No locked-asset fidelity score applies.'}
+    };
+  }
+
+  if(!isProductAsset){
+    const positive=_sentenceJoin([
+      _c(sd.authored_prompt)||_c(sd.prompt_seed)||_c(sd.world_description),
+      'Integrate the supplied protected asset as the source of truth.',
+      _l(la.preserve_elements).length?'Preserve exactly: '+_l(la.preserve_elements).join(', '):'Preserve the supplied asset identity and visible structure unchanged.'
+    ]);
+    const lockedAssetRecords=suppliedLockedAssets.map(buildLockedAssetRecord);
+    return {
+      meta:{package_version:'0.3',brief_name:_c(h.brief_name)||'creative brief',mode:'protected_asset',chosen_direction:effectiveChosenDirection,render_path_recommendation:'reference',delivery_context:deliveryContext,creative_config_version:CREATIVE_CONFIG_VERSION},
+      locked_assets:lockedAssetRecords,
+      locked_asset:lockedAssetRecords[0],
+      source_anchors:sourceAnchors,
+      user_constraints:userConstraints,
+      fidelity_contract:{
+        statement:'The supplied asset is identity-locked. Preserve the protected subject, artifact, or object exactly as supplied; do not redraw or reinterpret protected identity.',
+        preserve:_dedupe(_l(la.preserve_elements)),
+        rules:[
+          'Use the supplied file as the source of truth.',
+          'Do not alter protected identity, anatomy, typography, marks, proportions, or named details.',
+          'Environmental light, contact shadow, atmosphere, and depth effects may integrate the asset only when they do not change protected identity.'
+        ]
+      },
+      integration_treatment:null,
+      scene_brief:effectiveSceneBrief,
+      placement_spec:null,
+      prompts:{positive,negative:negStr},
+      variants:[{render_path:'reference',label:'Protected-asset reference render',instructions:'Render the authored world using the supplied protected asset as an unchanged reference.',positive,negative:negStr}],
+      confidence_notes:confidenceNotes,
+      creative_direction:buildCreativeDirectionBlock(h,positive,negStr),
+      test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:PROTECTED_ASSET_RUBRIC_CRITERIA.slice(),instructions:'Protected-asset identity is a pass-or-fail gate. Also score world specificity, evidence fidelity, composition, lighting, and integration.'}
+    };
+  }
+
+  effectiveSceneBrief.product_placement_intent=sanitizeProductPlacement(sd.product_placement_intent||sd.locked_asset_placement_intent);
+  const packageInfo=packageFormatInfo(la);
+  const integrationTreatment=buildIntegrationTreatment(h);
+  const positiveComposite=_posComposite(h);
+  const positiveReference=_posReference(h);
+  const creativeDirection=buildCreativeDirectionBlock(h,positiveComposite,negStr);
   return {
-    meta:{package_version:'0.2',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:effectiveChosenDirection,render_path_recommendation:_c(sd.render_path)||'composite',creative_config_version:CREATIVE_CONFIG_VERSION},
+    meta:{package_version:'0.2',product_name:_c(la.asset_name)||'product',mode:_c(h.mode)||'product_accurate',chosen_direction:effectiveChosenDirection,render_path_recommendation:_c(sd.render_path)||'composite',delivery_context:deliveryContext,creative_config_version:CREATIVE_CONFIG_VERSION},
     fidelity_contract:{statement:'The product image is identity-locked and state-locked. Do not redraw, retype, recolor, relabel, reshape, resize, crop, open, close, unwrap, pour, remove or add parts, expose contents, change fill state, or reinterpret the brand-critical packaging structure. Use the supplied product image as the source of truth.',package_format:packageInfo.format,package_format_label:packageInfo.label,format_protection:packageInfo.structure.slice(),preserve:_dedupe(_l(la.preserve_elements).filter(x=>!/^can format$/i.test(x)).concat(['package format']).concat(packageInfo.structure)),rules:['Brand-critical identity must be preserved: logo, label hierarchy, typography, SKU/flavor identity, primary graphic system, color blocking, pack shape, proportions, and exact open/closed product state.','Do not open, close, unwrap, pour, remove a lid or cap, add a scoop, expose contents, change fill state, or invent accessories.','Physically plausible scene integration is allowed as a non-destructive overlay on the object: condensation, dust, dirt, grime, small wrinkles, edge wear, scuffs, wetness, contact shadows, local occlusion, reflected light, color spill, atmospheric haze, lens softness, and depth of field.','Integration effects must not obscure or alter protected identity regions beyond the integration_treatment limits.','The product is composited or referenced from the supplied image; any environmental treatment sits over the locked asset rather than replacing it.']},
+    locked_assets:suppliedLockedAssets.map(buildLockedAssetRecord),
     locked_asset:buildLockedAssetRecord(la),
+    source_anchors:sourceAnchors,
+    user_constraints:userConstraints,
     integration_treatment:integrationTreatment,
     scene_brief:effectiveSceneBrief,
     placement_spec:buildPlacementSpec(h),
@@ -1434,7 +1671,7 @@ function buildRenderPackage(h){
       {render_path:'composite',label:'Composite: generate a product-free world, then composite the locked product in',instructions:'Generate the environment only, with an empty product-shaped placement area. Composite the supplied locked product image into that area afterward. Best when the engine cannot preserve packaging reliably.',positive:positiveComposite,negative:negStr},
       {render_path:'reference',label:'Reference: engine renders the world with the locked product as an image reference',instructions:'Provide the locked product image as a reference (image input, img2img, or equivalent) and require exact packaging preservation. [ASSUMED per engine] verify the engine actually preserves the label rather than redrawing it. This is the behavior the manual test is checking.',positive:positiveReference,negative:negStr}
     ],
-    confidence_notes:{score:_c(h.confidence&&h.confidence.score)||'unknown',agreement_notes:_l(h.confidence&&h.confidence.agreement_notes),conflicts:_l(h.confidence&&h.confidence.conflicts),alternates:Array.isArray(h.alternates)?h.alternates.map(a=>({scene_name:_c(a.scene_name),world_description:_c(a.world_description),why:_c(a.why)})):[]},
+    confidence_notes:confidenceNotes,
     creative_direction:creativeDirection,
     test_rubric:{scale:'1 to 5, where 5 is ship-ready',criteria:RUBRIC_CRITERIA.slice(),instructions:'Run the same locked product through each engine using the prompts above. Score every criterion per engine. Identity fidelity, proportions, color accuracy, and scene integration are pass-or-fail gates: any score below 3 on those disqualifies the engine for product-accurate work regardless of world quality.'}
   };
@@ -1550,19 +1787,27 @@ function renderPromptWriterPanel(){
 
 function renderPackageMarkdown(p){
   const L=[];
-  L.push('# Render package: '+p.meta.product_name);
+  L.push('# Render package: '+(_c(p.meta.product_name)||_c(p.meta.brief_name)||'creative brief'));
   L.push('Mode '+p.meta.mode+' \u00b7 Direction "'+p.meta.chosen_direction+'" \u00b7 Recommended path: '+p.meta.render_path_recommendation+' (a test label, not a requirement)');
-  L.push('');L.push('## 1. Fidelity contract (non-negotiable)');L.push(p.fidelity_contract.statement);
-  if(p.fidelity_contract.preserve.length)L.push('Preserve exactly: '+p.fidelity_contract.preserve.join(', ')+'.');
-  if(p.fidelity_contract.package_format_label)L.push('Detected package format: '+p.fidelity_contract.package_format_label+'.');
-  if(_l(p.fidelity_contract.format_protection).length)L.push('Format-specific protection: '+_l(p.fidelity_contract.format_protection).join(', ')+'.');
-  p.fidelity_contract.rules.forEach(r=>L.push('- '+r));
-  L.push('');L.push('## 2. Locked product asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);if(p.locked_asset.stored_asset_url)L.push('Stored asset: '+p.locked_asset.stored_asset_url);else L.push('Locked image: attached as a file and stored server-side, not embedded in JSON');if(p.locked_asset.media_type)L.push('Media type: '+p.locked_asset.media_type);
+  if(p.fidelity_contract){
+    L.push('');L.push('## 1. Fidelity contract (non-negotiable)');L.push(p.fidelity_contract.statement);
+    if(_l(p.fidelity_contract.preserve).length)L.push('Preserve exactly: '+_l(p.fidelity_contract.preserve).join(', ')+'.');
+    if(p.fidelity_contract.package_format_label)L.push('Detected package format: '+p.fidelity_contract.package_format_label+'.');
+    if(_l(p.fidelity_contract.format_protection).length)L.push('Format-specific protection: '+_l(p.fidelity_contract.format_protection).join(', ')+'.');
+    _l(p.fidelity_contract.rules).forEach(r=>L.push('- '+r));
+  }else{
+    L.push('');L.push('## 1. Protected assets');L.push('None. This is a world-only package.');
+  }
+  if(p.locked_asset){
+    L.push('');L.push('## 2. Protected asset');L.push('Name: '+(p.locked_asset.asset_name||'(unnamed)'));L.push('Type: '+p.locked_asset.asset_type+' \u00b7 Lock: '+p.locked_asset.lock_status);L.push('Image: '+p.locked_asset.image_ref);if(p.locked_asset.stored_asset_url)L.push('Stored asset: '+p.locked_asset.stored_asset_url);else L.push('Protected file: attached and stored server-side, not embedded in JSON');if(p.locked_asset.media_type)L.push('Media type: '+p.locked_asset.media_type);
+  }
   if(p.integration_treatment){const it=p.integration_treatment;L.push('');L.push('## 3. Scene integration allowance');L.push('Level: '+it.level+' · Profile: '+it.profile+' · Package format: '+(_c(it.package_format_label)||_c(it.package_format)||'package'));L.push(it.principle);if(_l(it.allowed_effects).length)L.push('Allowed effects: '+_l(it.allowed_effects).join(', ')+'.');if(_l(it.protected_regions).length)L.push('Protected regions: '+_l(it.protected_regions).join(', ')+'.');if(it.max_obscuration)L.push('Max obscuration: '+JSON.stringify(it.max_obscuration));if(_c(it.scene_specific_notes))L.push('Scene notes: '+_c(it.scene_specific_notes));if(_l(it.avoid).length)L.push('Avoid: '+_l(it.avoid).join(', ')+'.');}
-  L.push('');L.push('## 4. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);L.push('Placement: '+p.scene_brief.product_placement_intent);
+  L.push('');L.push('## 4. Scene brief (engine-agnostic)');L.push('World: '+p.scene_brief.world_description);
+  if(p.scene_brief.locked_asset_placement_intent)L.push('Protected-asset placement: '+p.scene_brief.locked_asset_placement_intent);
+  else if(p.scene_brief.product_placement_intent)L.push('Placement: '+p.scene_brief.product_placement_intent);
   if(p.scene_brief.composition)L.push('Composition: '+p.scene_brief.composition);
   if(p.scene_brief.lighting)L.push('Lighting: '+p.scene_brief.lighting);
-  if(p.scene_brief.props.length)L.push('Props: '+p.scene_brief.props.join(', '));
+  if(_l(p.scene_brief.props).length)L.push('Props: '+_l(p.scene_brief.props).join(', '));
   if(p.placement_spec){L.push('Placement spec: '+JSON.stringify(p.placement_spec));}
   L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Rendered from: '+(p.prompt_source_for_render||'raw_prompts')+(p.raw_prompts_preserved?' (originals preserved in raw_prompts and variant raw_positive/raw_negative)':''));L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);if(p.compiled_prompts&&p.compiled_prompts.positive){L.push('');L.push('## 5.1 Compiled prompts (prompt writer)');L.push('Writer: '+((p.prompt_writer&&p.prompt_writer.label)||'unknown')+' · '+((p.prompt_writer&&p.prompt_writer.version)||'unknown'));if(p.prompt_writer&&p.prompt_writer.stats)L.push('Stats: '+JSON.stringify(p.prompt_writer.stats));if(p.prompt_writer&&p.prompt_writer.warnings&&p.prompt_writer.warnings.length)L.push('Warnings: '+p.prompt_writer.warnings.join('; '));if(p.prompt_writer&&p.prompt_writer.removed_terms&&p.prompt_writer.removed_terms.length)L.push('Removed/narrowed terms: '+p.prompt_writer.removed_terms.map(x=>typeof x==='string'?x:((x.term||'')+(x.reason?' ('+x.reason+')':''))).join('; '));L.push('Compiled positive:');L.push('> '+p.compiled_prompts.positive);L.push('Compiled negative:');L.push('> '+p.compiled_prompts.negative);}
   L.push('');L.push('## 6. Variants to test');
@@ -1604,7 +1849,7 @@ const CANDS=[
    and step-2 vibes pipeline. Those modules are built and unit-tested; the deployed
    endpoint that ties them together, plus real-brand hit-rate (8.5) and read quality
    (8.1), are not yet proven and must be checked against live brands. */
-const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/'; // e.g. 'https://higher-roads-preview.grey-4fe.workers.dev/preview'
+const PREVIEW_ENDPOINT = 'https://world-preview.grey-4fe.workers.dev/';
 const JOBS_ENDPOINT = 'https://render-jobs.grey-4fe.workers.dev'; // render job service: create job, render, persist to R2/D1
 // The padded input aspect should match the Worker's OPENAI_IMAGE_SIZE so the
 // output is a true 16:9 cinematic frame. gpt-image-2 accepts arbitrary sizes
@@ -1664,6 +1909,7 @@ async function postPreviewAction(action, payload){
   if(!PREVIEW_ENDPOINT) throw new Error('No preview Worker endpoint configured.');
   const res=await fetch(PREVIEW_ENDPOINT,{
     method:'POST',
+    credentials:'include',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify(Object.assign({action},payload||{}))
   });
@@ -1687,7 +1933,7 @@ async function fetchAssetDiscovery(productUrl, urlResolution){
   });
 }
 
-async function fetchBrandRead(productUrl, homeUrl, apiKey, urlResolution){
+async function fetchBrandRead(productUrl,homeUrl,urlResolution){
   if(!PREVIEW_ENDPOINT){
     await new Promise(r=>setTimeout(r,500));
     const demo=mockPreviewData();
@@ -1696,7 +1942,6 @@ async function fetchBrandRead(productUrl, homeUrl, apiKey, urlResolution){
   return postPreviewAction('brand_read',{
     product_url:productUrl,
     home_url:homeUrl,
-    api_key:apiKey,
     home_url_source:urlResolution&&urlResolution.home_url_source,
     input_url_host:urlResolution&&urlResolution.product_host,
     marketplace_detected:!!(urlResolution&&urlResolution.marketplace_detected),
@@ -1707,6 +1952,8 @@ async function fetchBrandRead(productUrl, homeUrl, apiKey, urlResolution){
 // --- pick controller (mirrors pick-state.js) ---
 let DEV_CONF='high';
 let selectedAssetId=null, chosenDirection=null, DATA=null;
+let CURRENT_INPUT_MODE='source_stack';
+let CURRENT_LOCKED_ASSET_FILE=null;
 const PREVIEW_FLOW_STATE={brand:'idle',scene:'idle',brandError:null};
 
 function removeProduct(){ for(let i=assets.length-1;i>=0;i--) if(assets[i].__pwp_product) assets.splice(i,1); }
@@ -1717,7 +1964,7 @@ function selectProduct(parsed){
   if(mode!=='product_accurate'){ removeProduct(); throw new Error('not product_accurate: '+mode); }
   selectedAssetId=a.asset_id; return a;
 }
-function canProceed(){ return !!selectedAssetId && PREVIEW_FLOW_STATE.scene==='ready'; }
+function canProceed(){ return PREVIEW_FLOW_STATE.scene==='ready'&&(CURRENT_INPUT_MODE!=='url'||!!selectedAssetId); }
 
 // --- render ---
 const grid=document.getElementById('grid');
@@ -1732,7 +1979,6 @@ const brandProgressMessage=document.getElementById('brandProgressMessage');
 const brandProgressDetail=document.getElementById('brandProgressDetail');
 const retryDirectionBtn=document.getElementById('retryDirectionBtn');
 let LAST_BRAND_DATA=null;
-let LAST_BRAND_API_KEY='';
 let directionRetryInFlight=false;
 const stepProduct=document.getElementById('stepProduct');
 const stepDirection=document.getElementById('stepDirection');
@@ -1759,8 +2005,8 @@ function resetWorkflow(){
     el.classList.remove('complete','open','active');
   });
   if(stepProduct) stepProduct.classList.add('open','active');
-  if(stepProductSummary) stepProductSummary.textContent='Select the exact package to preserve';
-  if(stepDirectionSummary) stepDirectionSummary.textContent='Waiting for product selection';
+  if(stepProductSummary) stepProductSummary.textContent=CURRENT_INPUT_MODE==='url'?'Select the exact package to preserve':'Review the normalized source';
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Waiting for source confirmation';
   if(stepRenderSummary) stepRenderSummary.textContent='Waiting for the direction';
   if(renderProgress) renderProgress.classList.remove('on');
   if(retryDirectionBtn){ retryDirectionBtn.classList.remove('on'); retryDirectionBtn.disabled=false; }
@@ -1772,16 +2018,16 @@ function advanceAfterProductSelection(){
     stepProduct.classList.add('complete');
     stepProduct.classList.remove('open','active');
   }
-  if(stepProductSummary) stepProductSummary.textContent='Product locked';
+  if(stepProductSummary) stepProductSummary.textContent=CURRENT_INPUT_MODE==='url'?'Product locked':(CURRENT_LOCKED_ASSET_FILE?'Source ready · asset protected':'Source ready · no protected asset');
   if(stepDirection){
     stepDirection.classList.add('open','active');
     stepDirection.classList.remove('complete');
   }
-  if(stepDirectionSummary) stepDirectionSummary.textContent='Reading the brand and shaping the world';
+  if(stepDirectionSummary) stepDirectionSummary.textContent='Reading the dossier and shaping the world';
   scrollWorkflowStep(stepDirection);
 }
 function advanceAfterDirectionReady(){
-  if(!selectedAssetId||PREVIEW_FLOW_STATE.scene!=='ready') return;
+  if(!canProceed()) return;
   if(stepDirection){
     stepDirection.classList.add('complete');
     stepDirection.classList.remove('open','active');
@@ -1800,17 +2046,17 @@ let brandProgressPhase='';
 let brandProgressIndex=0;
 const BRAND_PROGRESS_COPY={
   brand:[
-    'Reading the vibe of your brand',
-    'Finding the signals behind the packaging',
-    'Separating brand truth from category clichés',
-    'Listening for what your brand refuses to be',
-    'Turning site language into visual direction'
+    'Reading the creative evidence',
+    'Finding the strongest source-specific signals',
+    'Separating source truth from generic convention',
+    'Structuring explicit requirements and exclusions',
+    'Turning the source into a creative dossier'
   ],
   scene:[
     'Choosing the right visual grammar',
-    'Locking in your style',
-    'Building a world your product belongs in',
-    'Protecting the package while shaping the scene',
+    'Locking in the creative posture',
+    'Building a world the brief can own',
+    'Protecting any supplied asset while shaping the scene',
     'Finishing the creative direction'
   ]
 };
@@ -1839,8 +2085,10 @@ function startBrandProgress(phase){
   if(brandProgressPhase===nextPhase&&brandProgressTimer) return;
   if(brandProgressTimer) clearInterval(brandProgressTimer);
   brandProgressPhase=nextPhase; brandProgressIndex=0;
-  if(brandProgressLabel) brandProgressLabel.textContent=nextPhase==='brand'?'Reading your brand':'Shaping the direction';
-  if(brandProgressDetail) brandProgressDetail.textContent=nextPhase==='brand'?'Your product is locked. We are reading the brand before you continue.':'Your selected packaging remains locked while we finish the visual direction.';
+  if(brandProgressLabel) brandProgressLabel.textContent=nextPhase==='brand'?'Reading your source':'Shaping the direction';
+  if(brandProgressDetail) brandProgressDetail.textContent=nextPhase==='brand'
+    ?'We are structuring the source before any direction is authored.'
+    :(CURRENT_LOCKED_ASSET_FILE?'Your protected asset remains locked while we finish the direction.':'No protected asset is required for this direction.');
   setBrandProgressMessage(BRAND_PROGRESS_COPY[nextPhase][0],true);
   brandProgressTimer=setInterval(()=>{
     const copy=BRAND_PROGRESS_COPY[brandProgressPhase]||BRAND_PROGRESS_COPY.brand;
@@ -1867,12 +2115,12 @@ function showDirectionError(){
   if(stepDirectionSummary) stepDirectionSummary.textContent='Creative direction needs another pass';
 }
 function syncBrandProgress(){
-  if(!selectedAssetId){ stopBrandProgress(); return; }
+  if(CURRENT_INPUT_MODE==='url'&&!selectedAssetId){ stopBrandProgress(); return; }
 
   if(PREVIEW_FLOW_STATE.brand==='loading'){
     if(brandProgress) brandProgress.classList.remove('error');
     if(retryDirectionBtn) retryDirectionBtn.classList.remove('on');
-    if(stepDirectionSummary) stepDirectionSummary.textContent='Reading the brand';
+    if(stepDirectionSummary) stepDirectionSummary.textContent='Reading the source';
     startBrandProgress('brand');
     return;
   }
@@ -1945,20 +2193,21 @@ function refresh(){
   modeReadout.textContent='mode: '+getOverallMode();
   syncBrandProgress();
   cta.disabled=!canProceed();
-  if(!selectedAssetId){
+  if(CURRENT_INPUT_MODE==='url'&&!selectedAssetId){
     ctaHint.textContent='Pick your product to continue.';
   }else if(PREVIEW_FLOW_STATE.scene==='loading'||PREVIEW_FLOW_STATE.brand==='loading'){
-    ctaHint.textContent='Your product is locked. We’ll enable this when the direction is ready.';
+    ctaHint.textContent=CURRENT_LOCKED_ASSET_FILE?'Your asset is protected. We’ll enable this when the direction is ready.':'We’ll enable this when the direction is ready.';
   }else if(PREVIEW_FLOW_STATE.scene==='error'){
-    ctaHint.textContent='Your product is locked. Retry the direction in Step 2.';
+    ctaHint.textContent='Retry the direction in Step 2.';
   }else{
-    ctaHint.textContent='Your packaging stays exactly as it is.';
+    ctaHint.textContent=CURRENT_LOCKED_ASSET_FILE?'Your protected asset stays exactly as it is.':'This render is world-only; no protected asset is required.';
+    cta.textContent=resolvedDeliveryContext(DATA&&DATA.brief).type==='led_wall'?'Compile execution brief':'Bring it to life';
     advanceAfterDirectionReady();
   }
 }
 let CURRENT_PKG=null, CURRENT_MD='';
 function buildHandoff(){
-  const a=assets.find(x=>x.asset_id===selectedAssetId);
+  const a=assets.find(x=>x.asset_id===selectedAssetId)||null;
   const v=DATA.vibes;
   const master=usableSceneOrNull(v.master_scene);
   const fallback=master?null:workerFallbackScene(DATA);
@@ -1976,9 +2225,26 @@ function buildHandoff(){
   }
 
   const chosenName=_c(approved.scene_name);
-  return {
+  const lockedAssets=[];
+  if(a){
+    lockedAssets.push({asset_id:a.asset_id,asset_name:a.asset_name,asset_type:a.asset_type,lock_status:a.lock_status,preserve_elements:a.preserve_elements,image_ref:a.asset_url||a.source_image_url||a.name,source_image_url:a.source_image_url||'',asset_url:a.asset_url||'',media_type:a.mediaType||'',base64:a.base64||''});
+  }else if(DATA&&DATA.brief&&Array.isArray(DATA.brief.locked_assets)&&DATA.brief.locked_assets[0]){
+    const protectedAsset=DATA.brief.locked_assets[0];
+    lockedAssets.push(Object.assign({},protectedAsset,{image_ref:protectedAsset.asset_name||'protected asset attached'}));
+  }
+  const handoff={
     mode:getOverallMode(),
-    locked_asset:{ asset_id:a.asset_id, asset_name:a.asset_name, asset_type:a.asset_type, lock_status:a.lock_status, preserve_elements:a.preserve_elements, image_ref:a.asset_url||a.source_image_url||a.name, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'', media_type:a.mediaType||'', base64:a.base64||'' },
+    brief_name:_c(DATA&&DATA.brief&&DATA.brief.source_name)||_c(DATA&&DATA.brand)||'creative brief',
+    constraint_authority:_c(DATA&&DATA.diagnostics&&DATA.diagnostics.constraint_authority)||'source_and_user',
+    delivery_context:resolvedDeliveryContext(DATA&&DATA.brief),
+    locked_assets:lockedAssets,
+    source_anchors:Array.isArray(DATA&&DATA.brief&&DATA.brief.anchors)
+      ?DATA.brief.anchors
+      :[],
+    user_constraints:{
+      requirements:_dedupe(_l(DATA&&DATA.brief&&DATA.brief.requirements)),
+      exclusions:_dedupe(_l(DATA&&DATA.brief&&DATA.brief.avoid))
+    },
     intake_expressive:v.intake_expressive,
     scene_direction:sceneDir,
     confidence:{ score:v.confidence, agreement_notes:v.confidence==='low'?[]:['copy and palette agree'], conflicts:v.confidence==='low'?['copy and packaging read differently']:[] },
@@ -1989,6 +2255,8 @@ function buildHandoff(){
     scene_translation:(DATA.vibes&&DATA.vibes.scene_translation)||null,
     chosen_direction:chosenName
   };
+  if(lockedAssets.length) handoff.locked_asset=lockedAssets[0];
+  return handoff;
 }
 cta.addEventListener('click',async()=>{
   if(!canProceed()||renderInFlight) return;
@@ -1998,13 +2266,15 @@ cta.addEventListener('click',async()=>{
   if(renderProgress) renderProgress.classList.add('on');
   if(stepRenderSummary) stepRenderSummary.textContent='Rendering in progress';
   PERF.start('bring_it_to_life_total',{asset_id:selectedAssetId});
-  try{
+  if(selectedAssetId){
+    try{
     PERF.start('materialize_locked_product_image',{silent:true});
     await ensureSelectedProductImageData({silent:true});
     PERF.end('materialize_locked_product_image',{status:'ok'});
-  }catch(e){
-    PERF.end('materialize_locked_product_image',{status:'warning', error:String((e&&e.message)||e).slice(0,160)});
-    console.warn('locked product image was not materialized', e);
+    }catch(e){
+      PERF.end('materialize_locked_product_image',{status:'warning', error:String((e&&e.message)||e).slice(0,160)});
+      console.warn('locked product image was not materialized', e);
+    }
   }
   PERF.start('build_render_package');
   try{
@@ -2037,6 +2307,17 @@ cta.addEventListener('click',async()=>{
   renderPromptWriterPanel();
   PERF.end('bring_it_to_life_total');
   PERF.summary();
+  if(resolvedDeliveryContext(DATA&&DATA.brief).type==='led_wall'){
+    handoff.classList.remove('end-user-hidden');
+    handoff.classList.add('on');
+    renderInFlight=false;
+    cta.textContent='Execution brief ready';
+    cta.disabled=true;
+    if(renderProgress) renderProgress.classList.remove('on');
+    if(stepRenderSummary) stepRenderSummary.textContent='Execution brief ready · renderer not invoked';
+    scrollWorkflowStep(handoff);
+    return;
+  }
   try{
     await submitRenderBundle();
   }finally{
@@ -2072,7 +2353,7 @@ async function materializeViaWorker(a){
   if(!PREVIEW_ENDPOINT) throw new Error('No Worker endpoint configured for asset materialization');
   const imageUrl=a.asset_url||a.source_image_url||a.name||'';
   if(!imageUrl) throw new Error('No source image URL to materialize');
-  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'materialize_asset', image_url:imageUrl, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'' }) });
+  const res=await fetch(PREVIEW_ENDPOINT,{ method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'materialize_asset', image_url:imageUrl, source_image_url:a.source_image_url||'', asset_url:a.asset_url||'' }) });
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Asset materialize '+res.status+(t?': '+t.slice(0,160):'')); }
   return await res.json();
 }
@@ -2198,7 +2479,7 @@ function setRenderJobStatus(title, meta){
 }
 async function fetchRenderJob(jobId){
   if(!jobId) throw new Error('No render job id available yet');
-  const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId));
+  const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId),{credentials:'include'});
   if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Check job '+res.status+(t?': '+t.slice(0,180):'')); }
   return await res.json();
 }
@@ -2230,30 +2511,43 @@ async function submitRenderBundle(){
   PERF.reset('render_preview');
   PERF.start('render_total');
   try{
-    PERF.start('render_materialize_product');
-    const a=await ensureSelectedProductImageData();
-    PERF.end('render_materialize_product',{media_type:a.mediaType||'', has_base64:!!a.base64});
+    let renderBlob=null;
+    let renderFilename='';
+    if(selectedAssetId){
+      PERF.start('render_materialize_product');
+      const a=await ensureSelectedProductImageData();
+      PERF.end('render_materialize_product',{media_type:a.mediaType||'', has_base64:!!a.base64});
+      PERF.start('render_pad_product_to_landscape');
+      renderBlob=await padProductToLandscapeBlob(a,RENDER_W,RENDER_H,CURRENT_PKG&&CURRENT_PKG.placement_spec);
+      renderFilename='locked-product.png';
+      PERF.end('render_pad_product_to_landscape',{bytes:renderBlob&&renderBlob.size,w:RENDER_W,h:RENDER_H});
+    }else if(CURRENT_LOCKED_ASSET_FILE){
+      renderBlob=CURRENT_LOCKED_ASSET_FILE;
+      renderFilename=CURRENT_LOCKED_ASSET_FILE.name||'protected-asset';
+      PERF.log('render_protected_asset_ready',{media_type:CURRENT_LOCKED_ASSET_FILE.type||'',bytes:CURRENT_LOCKED_ASSET_FILE.size||0});
+    }else{
+      PERF.log('render_world_only_ready',{locked_assets:0});
+    }
 
     PERF.start('render_rebuild_package');
     await rebuildCurrentPackage();
     PERF.end('render_rebuild_package',{direction:CURRENT_PKG&&CURRENT_PKG.meta&&CURRENT_PKG.meta.chosen_direction});
 
-    PERF.start('render_pad_product_to_landscape');
-    const blob=await padProductToLandscapeBlob(a, RENDER_W, RENDER_H, CURRENT_PKG&&CURRENT_PKG.placement_spec);
-    PERF.end('render_pad_product_to_landscape',{bytes:blob&&blob.size, w:RENDER_W, h:RENDER_H});
-
     // 1. Create a render job. This persists the package and the locked product
     //    image to R2/D1 on the render-jobs service and returns a job id.
     const createForm=new FormData();
     createForm.append('request_json', JSON.stringify(CURRENT_PKG));
-    createForm.append('locked_product_image', blob, 'locked-product.png');
+    if(renderBlob){
+      const imageField=selectedAssetId?'locked_product_image':'protected_asset_image';
+      createForm.append(imageField,renderBlob,renderFilename);
+    }
 
     if(renderProgress) renderProgress.classList.add('on');
     if(document.getElementById('renderProgressTitle')) document.getElementById('renderProgressTitle').textContent='Creating your render';
     if(document.getElementById('renderProgressDetail')) document.getElementById('renderProgressDetail').textContent='Packaging the direction and preparing the image model.';
 
     PERF.start('render_job_create_upload');
-    const createRes=await fetch(JOBS_ENDPOINT+'/render-jobs',{ method:'POST', body:createForm });
+    const createRes=await fetch(JOBS_ENDPOINT+'/render-jobs',{ method:'POST', credentials:'include', body:createForm });
     if(!createRes.ok){ const t=await createRes.text().catch(()=>''); throw new Error('Create job '+createRes.status+(t?': '+t.slice(0,180):'')); }
     const created=await createRes.json();
     const jobId=created.job_id;
@@ -2264,10 +2558,10 @@ async function submitRenderBundle(){
 
     // 2. Trigger the render. This enqueues the job and returns immediately;
     //    the worker renders in the background off the request path.
-    if(document.getElementById('renderProgressTitle')) document.getElementById('renderProgressTitle').textContent='Rendering your product world';
-    if(document.getElementById('renderProgressDetail')) document.getElementById('renderProgressDetail').textContent='The scene, lighting, integration, and product fidelity are being resolved.';
+    if(document.getElementById('renderProgressTitle')) document.getElementById('renderProgressTitle').textContent='Rendering your world';
+    if(document.getElementById('renderProgressDetail')) document.getElementById('renderProgressDetail').textContent=renderBlob?'The scene, lighting, integration, and protected-asset fidelity are being resolved.':'The scene, lighting, and authored world are being resolved.';
     PERF.start('render_job_start');
-    const startRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST' });
+    const startRes=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId)+'/render',{ method:'POST', credentials:'include' });
     PERF.end('render_job_start',{status:startRes.status});
     if(!startRes.ok && startRes.status!==202){ const t=await startRes.text().catch(()=>''); throw new Error('Start render '+startRes.status+(t?': '+t.slice(0,180):'')); }
 
@@ -2319,7 +2613,7 @@ async function pollJobUntilDone(jobId, opts){
     attempts++;
     const elapsedMs=Date.now()-start;
     try{
-      const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId));
+      const res=await fetch(JOBS_ENDPOINT+'/render-jobs/'+encodeURIComponent(jobId),{credentials:'include'});
       if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('Poll '+res.status+(t?': '+t.slice(0,120):'')); }
       job=await res.json();
       job.__poll_attempts=attempts;
@@ -2492,7 +2786,11 @@ function showView(name){ const id=name.endsWith('View')?name:name+'View'; VIEWS.
 
 function renderPick(){
   assets=[]; assetIdCounter=0; selectedAssetId=null; chosenDirection=null;
+  CURRENT_LOCKED_ASSET_FILE=null;
   resetWorkflow();
+  grid.hidden=false;
+  document.getElementById('sourceReady').hidden=true;
+  document.getElementById('productUploadFallback').hidden=false;
   document.getElementById('sub').textContent='We pulled these from '+(DATA.brand||'your site')+'. Pick your product and we build the world around it, with your packaging kept exactly as it is.';
   protect.classList.remove('on'); handoff.classList.remove('on');
   renderCandidates(); renderDirections(); refresh();
@@ -2555,16 +2853,7 @@ function resolveHomeUrlForProduct(productUrl, explicitHomeUrl){
   };
 }
 
-// guarded key persistence (localStorage works on the deployed page; guarded so the
-// in-chat preview never throws). For an internal testing tool this mirrors the Builder.
-// [ASSUMED, verify before public] a public self-serve version must move the key to a
-// Worker secret instead of collecting it in the browser.
-const KEY_STORE='pwp_anthropic_key';
-function readKey(){ try{ return localStorage.getItem(KEY_STORE)||''; }catch{ return ''; } }
-function saveKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch{} }
-
-
-async function completeCreativePipeline(brandData, apiKey){
+async function completeCreativePipeline(brandData){
   DATA.brand=brandData.brand||DATA.brand;
   DATA.factual=Object.assign({},DATA.factual||{},brandData.factual||{});
   DATA.vibes=brandData.vibes||{};
@@ -2573,18 +2862,11 @@ async function completeCreativePipeline(brandData, apiKey){
   PREVIEW_FLOW_STATE.scene='loading';
   refresh();
 
-  if(!apiKey){
-    PREVIEW_FLOW_STATE.scene='ready';
-    refresh();
-    PERF.log('scene_ready',{demo:true});
-    return;
-  }
-
   // Stage 3: three divergent world theses from the full dossier.
   let theses=null;
   try{
     PERF.start('world_ideation_anthropic');
-    theses=await ideateWorldTheses(DATA,apiKey);
+    theses=await ideateWorldTheses(DATA);
     PERF.end('world_ideation_anthropic',{count:theses.length,names:theses.map(t=>t.thesis_name).join(' | ')});
   }catch(ideaErr){
     PERF.end('world_ideation_anthropic',{error:String((ideaErr&&ideaErr.message)||ideaErr).slice(0,160)});
@@ -2599,7 +2881,7 @@ async function completeCreativePipeline(brandData, apiKey){
   if(theses&&theses.length){
     try{
       PERF.start('thesis_selection_anthropic');
-      const picked=await selectThesisAndGrammar(DATA,apiKey,theses);
+      const picked=await selectThesisAndGrammar(DATA,theses);
       creativeSelection=picked.selection;
       winningThesis=picked.thesis;
       PERF.end('thesis_selection_anthropic',{selected:creativeSelection.selected_thesis_name,modules:(creativeSelection.grammar_modules||[]).map(g=>g.id).join(',')});
@@ -2615,7 +2897,7 @@ async function completeCreativePipeline(brandData, apiKey){
   // Stage 6: one authored master scene from the winner, with everything in hand.
   try{
     PERF.start('master_scene_anthropic');
-    const built=await buildMasterScene(DATA,apiKey,creativeSelection,winningThesis);
+    const built=await buildMasterScene(DATA,creativeSelection,winningThesis);
     PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name,authored_prompt:!!(built&&built.scene_direction&&built.scene_direction.authored_prompt)});
     DATA.vibes.master_scene=built.scene_direction;
     DATA.vibes.master_scene_meta={brand_world_read:built.brand_world_read||'',world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',category_cliches_to_avoid:built.category_cliches_to_avoid||[],anti_tabletop_rules:built.anti_tabletop_rules||[]};
@@ -2670,85 +2952,309 @@ async function completeCreativePipeline(brandData, apiKey){
   PERF.log('scene_ready',{selected_world:_c(winningThesis&&winningThesis.thesis_name)||'fallback',authored_prompt:!!_c(approvedScene.authored_prompt)});
 }
 
-async function generate(){
-  const productUrl=document.getElementById('productUrl').value.trim();
-  const explicitHomeUrl='';
-  const hint=document.getElementById('entryHint');
-  if(!validUrl(productUrl)){ hint.textContent='Enter a valid product or listing URL, starting with https://'; return; }
-  if(explicitHomeUrl&&!validUrl(explicitHomeUrl)){ hint.textContent='The advanced homepage override needs to start with https://'; return; }
-  const urlResolution=resolveHomeUrlForProduct(productUrl,explicitHomeUrl);
-  const homeUrl=urlResolution.home_url;
-  let apiKey='';
-  if(PREVIEW_ENDPOINT){
-    apiKey=readKey();
-    if(!apiKey){ hint.textContent='The brand-reading service is not configured for this preview.'; return; }
-    saveKey(apiKey);
-  }
+const SOURCE_INFLUENCE_LEVELS=[
+  {value:'lead',weight:90,label:'Lead · stay close',description:'This source sets the dominant direction. Preserve its supported character unless the project outcome conflicts.'},
+  {value:'strong',weight:70,label:'Strong influence',description:'Carry this source clearly, with room to synthesize it with stronger or equally weighted inputs.'},
+  {value:'supporting',weight:40,label:'Supporting influence',description:'Use this source to add selected character without letting it control the whole direction.'},
+  {value:'light',weight:20,label:'Light calibration',description:'Use as a subtle reference or tie-breaker. It does not need a large visible footprint.'}
+];
+let referenceAnchorCounter=0;
+let SOURCE_STACK_PROTECTED_FILE=null;
+let SOURCE_STACK_PROTECTED_INSTRUCTIONS='';
+let SOURCE_STACK_PROTECTED_TYPE='digital_artifact';
 
+function sourceInfluenceDefinition(value){
+  return SOURCE_INFLUENCE_LEVELS.find(level=>level.value===value)||SOURCE_INFLUENCE_LEVELS[1];
+}
+
+function syncReferenceNumbers(){
+  [...document.querySelectorAll('#referenceAnchorList .reference-card')].forEach((card,index)=>{
+    const number=card.querySelector('.reference-number');
+    if(number) number.textContent='Source '+(index+1);
+  });
+}
+
+function syncReferenceSourceControl(card){
+  const type=card.querySelector('[data-reference-field="type"]').value;
+  const host=card.querySelector('[data-reference-source]');
+  const remembered=host.querySelector('[data-reference-field="source"]');
+  const rememberedText=remembered&&remembered.type!=='file'?remembered.value:'';
+  host.innerHTML='';
+  const label=document.createElement('label');
+  label.className='fieldlabel';
+  label.textContent=type==='text_brief'
+    ?'Notes or brief'
+    :type==='url_reference'
+    ?'Accessible URL'
+    :type==='artifact_reference'
+    ?'Named cultural reference'
+    :type==='protected_asset'
+    ?'Protected asset file'
+    :(type==='grid_capture'?'Grid screenshot':'Reference image');
+  host.appendChild(label);
+  if(type==='text_brief'||type==='artifact_reference'){
+    const textarea=document.createElement('textarea');
+    textarea.className='urlinput';
+    textarea.dataset.referenceField='source';
+    textarea.placeholder=type==='text_brief'
+      ?'Paste meeting notes, a creative brief, or any written direction.'
+      :'Example: the visual world of the recent Dune films';
+    textarea.value=rememberedText;
+    host.appendChild(textarea);
+  }else if(type==='url_reference'){
+    const input=document.createElement('input');
+    input.className='urlinput';
+    input.dataset.referenceField='source';
+    input.type='url';
+    input.inputMode='url';
+    input.placeholder='https://…';
+    input.value=rememberedText;
+    host.appendChild(input);
+    const note=document.createElement('p');
+    note.className='reference-source-note';
+    note.textContent='The page must be publicly accessible. If a board blocks access, upload a screenshot instead.';
+    host.appendChild(note);
+  }else{
+    const input=document.createElement('input');
+    input.className='urlinput';
+    input.dataset.referenceField='source';
+    input.type='file';
+    input.accept='image/jpeg,image/png,image/webp,image/gif';
+    host.appendChild(input);
+    const note=document.createElement('p');
+    note.className='reference-source-note';
+    note.textContent='JPEG, PNG, WebP, or GIF · 5 MB maximum';
+    host.appendChild(note);
+  }
+}
+
+function addReferenceAnchor(seed){
+  seed=seed||{};
+  referenceAnchorCounter+=1;
+  const card=document.createElement('section');
+  card.className='reference-card';
+  card.dataset.anchorId='anchor_'+referenceAnchorCounter;
+  card.innerHTML=`
+    <div class="reference-card-head">
+      <span class="reference-number">Source</span>
+      <button class="reference-remove" type="button">Remove</button>
+    </div>
+    <div class="reference-grid">
+      <div>
+        <label class="fieldlabel">Source type</label>
+        <select class="urlinput" data-reference-field="type">
+          <option value="text_brief">Notes or brief</option>
+          <option value="url_reference">Website or URL</option>
+          <option value="image_upload">Single image</option>
+          <option value="grid_capture">Image grid</option>
+          <option value="artifact_reference">Named cultural reference</option>
+          <option value="protected_asset">Protected asset · preserve exactly</option>
+        </select>
+      </div>
+      <div>
+        <label class="fieldlabel">Influence</label>
+        <select class="urlinput" data-reference-field="influence">
+          ${SOURCE_INFLUENCE_LEVELS.map(level=>`<option value="${level.value}">${level.label}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div data-reference-source></div>
+    <div data-protected-kind-wrap hidden>
+      <label class="fieldlabel">Protected asset kind</label>
+      <select class="urlinput" data-reference-field="protected_kind">
+        <option value="digital_artifact">Person, photograph, artwork, or artifact</option>
+        <option value="product">Product or packaging</option>
+      </select>
+    </div>
+    <label class="fieldlabel" data-guidance-label>How should we use this source? <span class="opt">optional but useful</span></label>
+    <textarea class="urlinput" data-reference-field="guidance" placeholder="Example: use only the color temperature and material contrast; ignore the subject matter."></textarea>
+    <p class="reference-source-note" data-role-description></p>
+  `;
+  const typeControl=card.querySelector('[data-reference-field="type"]');
+  const influenceControl=card.querySelector('[data-reference-field="influence"]');
+  const guidanceControl=card.querySelector('[data-reference-field="guidance"]');
+  const guidanceLabel=card.querySelector('[data-guidance-label]');
+  const protectedKindWrap=card.querySelector('[data-protected-kind-wrap]');
+  const influenceDescription=card.querySelector('[data-role-description]');
+  typeControl.value=seed.type||'text_brief';
+  influenceControl.value=seed.influence_level||'strong';
+  guidanceControl.value=seed.guidance||'';
+  const syncInfluenceDescription=()=>{
+    if(typeControl.value==='protected_asset'){
+      influenceControl.disabled=true;
+      protectedKindWrap.hidden=false;
+      guidanceLabel.innerHTML='What must remain unchanged? <span class="opt">optional · the full asset is protected by default</span>';
+      influenceDescription.textContent='Identity-locked · this file is integrated without creative reinterpretation and is not assigned an inspiration weight.';
+      guidanceControl.placeholder='Example: preserve the product, label, proportions, and closed package state exactly.';
+      return;
+    }
+    influenceControl.disabled=false;
+    protectedKindWrap.hidden=true;
+    guidanceLabel.innerHTML='How should we use this source? <span class="opt">optional but useful</span>';
+    guidanceControl.placeholder='Example: use only the color temperature and material contrast; ignore the subject matter.';
+    const definition=sourceInfluenceDefinition(influenceControl.value);
+    influenceDescription.textContent=definition.weight+'% priority · '+definition.description;
+  };
+  typeControl.addEventListener('change',()=>{
+    syncReferenceSourceControl(card);
+    syncInfluenceDescription();
+  });
+  influenceControl.addEventListener('change',syncInfluenceDescription);
+  card.querySelector('.reference-remove').addEventListener('click',()=>{
+    card.remove();
+    syncReferenceNumbers();
+  });
+  document.getElementById('referenceAnchorList').appendChild(card);
+  syncReferenceSourceControl(card);
+  const source=card.querySelector('[data-reference-field="source"]');
+  if(source&&source.type!=='file') source.value=seed.source||'';
+  syncInfluenceDescription();
+  syncReferenceNumbers();
+  return card;
+}
+
+function collectReferenceInputs(){
+  const globalContext=document.getElementById('creativeContext').value.trim();
+  SOURCE_STACK_PROTECTED_FILE=null;
+  SOURCE_STACK_PROTECTED_INSTRUCTIONS='';
+  SOURCE_STACK_PROTECTED_TYPE='digital_artifact';
+  let protectedCount=0;
+  return [...document.querySelectorAll('#referenceAnchorList .reference-card')].map((card,index)=>{
+    const type=card.querySelector('[data-reference-field="type"]').value;
+    const influenceLevel=card.querySelector('[data-reference-field="influence"]').value;
+    const influence=sourceInfluenceDefinition(influenceLevel);
+    const guidance=card.querySelector('[data-reference-field="guidance"]').value.trim();
+    const sourceControl=card.querySelector('[data-reference-field="source"]');
+    if(type==='protected_asset'){
+      protectedCount+=1;
+      if(protectedCount>1) throw new Error('This renderer currently accepts one protected asset per world.');
+      const file=sourceControl.files&&sourceControl.files[0];
+      if(!file) throw new Error('Source '+(index+1)+' needs the protected asset file.');
+      SOURCE_STACK_PROTECTED_FILE=file;
+      SOURCE_STACK_PROTECTED_INSTRUCTIONS=guidance;
+      SOURCE_STACK_PROTECTED_TYPE=card.querySelector('[data-reference-field="protected_kind"]').value;
+      return null;
+    }
+    const sharedContext=[globalContext,guidance].filter(Boolean).join('. ');
+    const base={
+      type,
+      role:type==='text_brief'?'creative_brief':'user_directed_reference',
+      anchor_id:card.dataset.anchorId||('anchor_'+(index+1)),
+      user_context:sharedContext,
+      reference_focus:guidance,
+      usage_note:guidance,
+      influence_level:influence.value,
+      influence_weight:influence.weight
+    };
+    if(type==='text_brief'||type==='artifact_reference'){
+      const raw=sourceControl.value.trim();
+      if(!raw) throw new Error('Source '+(index+1)+' needs '+(type==='text_brief'?'written content.':'a named reference.'));
+      return Object.assign(base,{
+        raw_text:raw,
+        source_name:type==='text_brief'?'Written source '+(index+1):raw
+      });
+    }
+    if(type==='url_reference'){
+      const raw=sourceControl.value.trim();
+      let parsed;
+      try{ parsed=new URL(raw); }catch{}
+      if(!parsed||!/^https?:$/.test(parsed.protocol)) throw new Error('Source '+(index+1)+' needs a valid public URL.');
+      return Object.assign(base,{url:parsed.toString(),raw_text:parsed.toString(),source_name:parsed.toString()});
+    }
+    const file=sourceControl.files&&sourceControl.files[0];
+    if(!file) throw new Error('Source '+(index+1)+' needs an image file.');
+    return Object.assign(base,{file,source_name:file.name});
+  }).filter(Boolean);
+}
+
+function collectCreativeInput(){
+  const delivery=document.getElementById('deliveryContext').value;
+  const exclusions=document.getElementById('sourceExclusions').value.trim();
+  if(CURRENT_INPUT_MODE==='source_stack'){
+    const raw=document.getElementById('textBrief').value.trim();
+    if(!raw) throw new Error('Tell us what you are making.');
+    return {
+      type:'text_brief',
+      raw_text:raw,
+      intent:raw,
+      user_context:document.getElementById('creativeContext').value.trim(),
+      explicit_exclusions:exclusions,
+      delivery_context:delivery,
+      source_name:'Project direction'
+    };
+  }
+  throw new Error('Choose a creative input type.');
+}
+
+function renderSourceReady(){
+  resetWorkflow();
+  grid.hidden=true;
+  document.getElementById('sourceReady').hidden=false;
+  document.getElementById('sourceReadyTitle').textContent='Sources understood';
+  document.getElementById('sourceReadyDetail').textContent=CURRENT_LOCKED_ASSET_FILE
+    ?'The source stack is structured and '+CURRENT_LOCKED_ASSET_FILE.name+' is protected as an unchanged asset.'
+    :'The source stack is structured. This world does not require a protected asset.';
+  document.getElementById('productUploadFallback').hidden=true;
+  protect.classList.remove('on');
+  handoff.classList.remove('on');
+  document.getElementById('sub').textContent='The reader returned structured evidence, requirements, and exclusions. Creative ideation now consumes that dossier—not the raw input.';
+  renderDirections();
+  advanceAfterProductSelection();
+  refresh();
+}
+
+async function generateFromCreativeInput(){
+  const hint=document.getElementById('entryHint');
+  const intake=window.HR_CREATIVE_INTAKE;
+  if(!intake) throw new Error('The creative intake module did not load.');
+  const input=collectCreativeInput();
+  const referenceInputs=collectReferenceInputs();
+  const lockedFile=SOURCE_STACK_PROTECTED_FILE;
+  if(lockedFile) await intake.filePayload(lockedFile);
+  const lockedAsset=intake.lockedAssetRecord(lockedFile,SOURCE_STACK_PROTECTED_INSTRUCTIONS,SOURCE_STACK_PROTECTED_TYPE);
+  CURRENT_LOCKED_ASSET_FILE=lockedFile||null;
   PREVIEW_FLOW_STATE.brand='loading';
   PREVIEW_FLOW_STATE.scene='loading';
   PREVIEW_FLOW_STATE.brandError=null;
   selectedAssetId=null;
-  removeProduct();
-  PERF.reset('generate_preview');
-  PERF.start('total_generate_to_picker',{product_url:productUrl,home_url:homeUrl||null,home_url_source:urlResolution.home_url_source,marketplace_detected:!!urlResolution.marketplace_detected,build:PWP_BUILD_ID});
-  PERF.log('home_url_resolved',urlResolution);
+  assets=[];
   hint.textContent='';
-  document.getElementById('loadingLine').textContent='Finding your product';
+  document.getElementById('loadingLine').textContent=referenceInputs.length
+    ?'Reading '+(referenceInputs.length+1)+' creative sources'
+    :'Reading creative brief';
   showView('loading');
+  PERF.reset('generate_preview');
+  PERF.start('unified_input_to_render_ready',{input_type:CURRENT_INPUT_MODE,build:PWP_BUILD_ID});
+  const fragment=await intake.readInput(input,postPreviewAction);
+  const referenceRecords=await Promise.all(referenceInputs.map(async referenceInput=>({
+    input:referenceInput,
+    role:referenceInput.role,
+    anchor_id:referenceInput.anchor_id,
+    fragment:await intake.readInput(referenceInput,postPreviewAction)
+  })));
+  DATA=intake.assembleDossierDataFromSources(input,fragment,referenceRecords,lockedAsset);
+  LAST_BRAND_DATA=DATA;
+  renderSourceReady();
+  showView('pick');
+  await completeCreativePipeline(DATA);
+  PERF.end('unified_input_to_render_ready',{input_type:CURRENT_INPUT_MODE,scene_status:PREVIEW_FLOW_STATE.scene});
+  PERF.summary();
+}
 
-  const brandPromise=fetchBrandRead(productUrl,homeUrl,apiKey,urlResolution)
-    .then(data=>({ok:true,data}),error=>({ok:false,error}));
-
+async function generate(){
   try{
-    PERF.start('asset_discovery_worker');
-    const assetsData=await fetchAssetDiscovery(productUrl,urlResolution);
-    PERF.end('asset_discovery_worker',{brand:assetsData&&assetsData.brand_hint,candidates:assetsData&&assetsData.candidates?assetsData.candidates.length:0,timing:assetsData&&assetsData.timing||null});
-    DATA={
-      brand:assetsData.brand_hint||'',
-      factual:assetsData.factual||{},
-      candidates:Array.isArray(assetsData.candidates)?assetsData.candidates:[],
-      vibes:{confidence:'pending',primary:{},alternates:[],intake_expressive:{},scene_direction:null},
-      diagnostics:assetsData.diagnostics||{},
-      url_resolution:urlResolution
-    };
-    PERF.start('render_pick_ui');
-    renderPick();
-    showView('pick');
-    PERF.end('render_pick_ui',{candidates:DATA.candidates.length});
-    PERF.end('total_generate_to_picker');
-    refresh();
-  }catch(err){
-    PERF.end('total_generate_to_picker',{error:String((err&&err.message)||err).slice(0,200)});
-    document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
-    showView('error');
-    await brandPromise;
-    PERF.summary();
-    return;
-  }
-
-  try{
-    PERF.start('brand_read_worker');
-    const brandResult=await brandPromise;
-    if(!brandResult.ok) throw brandResult.error;
-    const brandData=brandResult.data;
-    PERF.end('brand_read_worker',{brand:brandData&&brandData.brand,timing:brandData&&brandData.timing||null});
-    LAST_BRAND_DATA=brandData;
-    LAST_BRAND_API_KEY=apiKey;
-    await completeCreativePipeline(brandData,apiKey);
+    await generateFromCreativeInput();
   }catch(err){
     PREVIEW_FLOW_STATE.brand='error';
     PREVIEW_FLOW_STATE.scene='error';
     PREVIEW_FLOW_STATE.brandError=err;
-    PERF.end('brand_read_worker',{error:String((err&&err.message)||err).slice(0,200)});
-    console.warn('brand read failed after asset picker loaded',err);
-    refresh();
+    document.getElementById('errorDetail').textContent=String((err&&err.message)||err);
+    showView('error');
   }
-  PERF.summary();
 }
 if(retryDirectionBtn){
   retryDirectionBtn.addEventListener('click',async()=>{
-    if(directionRetryInFlight||!LAST_BRAND_DATA||!selectedAssetId) return;
+    if(directionRetryInFlight||!LAST_BRAND_DATA||(CURRENT_INPUT_MODE==='url'&&!selectedAssetId)) return;
     directionRetryInFlight=true;
     retryDirectionBtn.disabled=true;
     PREVIEW_FLOW_STATE.brand='ready';
@@ -2764,7 +3270,7 @@ if(retryDirectionBtn){
     refresh();
     try{
       PERF.log('direction_retry_requested',{});
-      await completeCreativePipeline(LAST_BRAND_DATA,LAST_BRAND_API_KEY);
+      await completeCreativePipeline(LAST_BRAND_DATA);
     }catch(err){
       PREVIEW_FLOW_STATE.scene='error';
       PREVIEW_FLOW_STATE.brandError=err;
@@ -2776,7 +3282,7 @@ if(retryDirectionBtn){
   });
 }
 document.getElementById('generateBtn').addEventListener('click',generate);
-document.getElementById('productUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+document.getElementById('addReferenceAnchor').addEventListener('click',()=>addReferenceAnchor());
 
 document.getElementById('errorBack').addEventListener('click',()=>showView('entry'));
 const copyTimingBtn=document.getElementById('copyTiming');
@@ -2789,8 +3295,6 @@ document.getElementById('startOver').addEventListener('click',()=>{ handoff.clas
 
 // honest demo banner from the first screen when no backend is configured
 document.getElementById('demoBanner').hidden = !!PREVIEW_ENDPOINT;
-document.getElementById('keyRow').hidden = true;
-if(PREVIEW_ENDPOINT){ const k=readKey(); if(k&&document.getElementById('apiKey')) document.getElementById('apiKey').value=k; }
 showView('entry');
 </script>
 </body>
