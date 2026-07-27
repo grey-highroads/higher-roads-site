@@ -1368,7 +1368,7 @@ function buildSceneNormalizationPrompt(data,raw){
     'authored_prompt is one prose paragraph of 120 to 200 words in the selected aesthetic mode: world and action first, spatial hierarchy in prose, supplied locked assets only when present, light and atmosphere last. If the original output lacks it, write it faithfully without changing the idea.',
     hasLockedAssets
       ?'The dossier contains locked assets. Preserve them and make locked_asset_placement_intent describe their placement without changing identity.'
-      :'The dossier contains zero locked assets. Ordinary websites, mood boards, image grids, and reference images are creative evidence only; they are not renderable assets. Remove any product, package, branded object, label, logo, SKU, placeholder, or hero asset from the original output. product_placement_intent and locked_asset_placements must be empty.',
+      :'The dossier contains zero locked assets. This is a world-only scene. Ordinary websites, mood boards, image grids, and reference images are creative evidence for palette, composition, and tonal behavior only; they are not renderable assets and their products do not exist in this world. Remove every mention of a product, package, bottle, can, jar, pouch, container, branded object, label, logo, brand mark, SKU, placeholder, or hero asset from the scene. The word "product" must not appear anywhere in the output. product_placement_intent and locked_asset_placements must be empty strings or empty arrays.',
     deliveryContext.type==='led_wall'
       ?'This is an LED-wall motion loop. Preserve the panoramic dimensions and far viewing distance. Return one dominant distance_legibility.primary_read, protected_zones including the performer clear zone, temporal_behavior.loop true, one concrete motion_cycle, and an invisible loop_seam with no hard cut.'
       :'This is a still image. Return delivery_context.type still_image and temporal_behavior.loop false.',
@@ -1436,7 +1436,7 @@ async function buildMasterScene(data,creativeSelection,winningThesis){
     dossier:fullCreativeDossier(data),
     locked_asset_rule:normalizedLockedAssets(data).length
       ?'Supplied locked assets are identity-locked and state-locked. Integrate them without redrawing, retyping, recoloring, relabeling, reshaping, cropping, opening, closing, removing, adding, or reinterpreting protected identity.'
-      :'No locked asset is supplied. Author the world without inventing a product, package, label, logo, placeholder, or reserved hero-object area.'
+      :'No locked asset is supplied. This is a world-only scene. Do not invent, describe, place, or imply any product, package, bottle, can, jar, pouch, container, label, logo, brand mark, SKU, hero object, placeholder shape, or reserved product area anywhere in the scene. Reference URLs in the source stack are creative evidence for palette, composition, and tonal behavior only. Their products, brand names, and packaging do not exist in this world.'
   };
   let parsed=null;
   let rawSceneText='';
