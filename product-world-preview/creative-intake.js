@@ -149,9 +149,10 @@
         reference_points:list(evidence.reference_points)
       }
     };
-    const visualEvidence=anchor.evidence.visual_evidence;
-    const tonalEvidence=anchor.evidence.tonal_evidence;
-    const referencePoints=anchor.evidence.reference_points;
+    // Evidence lives once, in the anchor. The intake_expressive block keeps
+    // only content that does not exist in the anchor: user context, delivery
+    // occasion, reader notes, and the composed intent. Empty structures stay
+    // present so downstream readers of the dossier shape never branch.
     return {
       brand:sourceName,
       brief:{
@@ -178,39 +179,39 @@
           product_truth:{},
           audience:{
             primary:text(input&&input.user_context),
-            desired_state:list(evidence.territory),
+            desired_state:[],
             tired_of:[]
           },
           brand_state:{
-            make_people_feel:tonalEvidence.join(', '),
-            core_adjectives:tonalEvidence,
+            make_people_feel:'',
+            core_adjectives:[],
             avoid_states:constraints.avoid
           },
           visual_territory:{
-            closest_to:visualEvidence,
+            closest_to:[],
             stay_away_from:constraints.avoid,
             ownable:intent
           },
           sensory:{
             flavor:'',
-            textures_and_materials:visualEvidence,
+            textures_and_materials:[],
             color_palette:'',
             forbidden_colors:''
           },
           competitive:{admires:'',avoid_resembling:''},
           visual_identity:{
-            design_language_read:visualEvidence.join(' '),
-            cultural_reference_points:referencePoints,
+            design_language_read:'',
+            cultural_reference_points:[],
             never_world:constraints.avoid
           },
           campaign_signals:{
             exact_phrases:[],
-            cultural_codes:list(evidence.territory),
+            cultural_codes:[],
             use_occasions:[context.name],
             locations:[],
-            actions_and_motion:visualEvidence,
-            signature_objects:referencePoints,
-            campaign_energy:tonalEvidence.join(', '),
+            actions_and_motion:[],
+            signature_objects:[],
+            campaign_energy:'',
             evidence_notes:[
               type+' reader output mapped into the universal creative dossier.',
               text(evidence.read_notes)
@@ -221,10 +222,11 @@
         scene_direction:null
       },
       diagnostics:{
-        intake_version:'universal_creative_intake_v1',
+        intake_version:'universal_creative_intake_v3',
         input_type:type,
         reader_fragment:evidence,
-        constraint_authority:'user_authored_only'
+        constraint_authority:'user_authored_only',
+        evidence_carrier:'brief.anchors_only'
       },
       locked_asset_file:lockedAsset&&lockedAsset.source_file||null
     };
@@ -279,11 +281,19 @@
   }
 
   function confidenceAcross(records){
+    // Confidence follows influence. The highest-weight source with a known
+    // confidence sets the dossier confidence; a light-weight accent source
+    // with a low-confidence read no longer drags the whole dossier down.
+    // Unknown reads are skipped unless every source is unknown.
     const rank={unknown:0,low:1,medium:2,high:3};
-    const values=records.map(record=>text(record&&record.fragment&&record.fragment.confidence)||'unknown');
-    return values.reduce((lowest,value)=>
-      (rank[value]||0)<(rank[lowest]||0)?value:lowest
-    ,values[0]||'unknown');
+    const known=records
+      .map(record=>({
+        weight:Number(record&&record.influence&&record.influence.weight)||0,
+        value:text(record&&record.fragment&&record.fragment.confidence)||'unknown'
+      }))
+      .filter(entry=>rank[entry.value]>0)
+      .sort((a,b)=>b.weight-a.weight);
+    return known.length?known[0].value:'unknown';
   }
 
   function assembleDossierDataFromSources(input,primaryFragment,referenceRecords,lockedAsset){
@@ -300,20 +310,17 @@
       influence:anchors[index].influence,
       fragment:record.fragment&&typeof record.fragment==='object'?record.fragment:{}
     })));
-    const tagEvidence=evidenceRecords.length>1;
-    const evidenceFor=field=>list(evidenceRecords.flatMap(record=>
-      list(record.fragment[field]).map(signal=>tagEvidence
-        ?'['+record.role+' · '+record.influence.weight+'%] '+signal
-        :signal)
-    ));
-    const territory=evidenceFor('territory');
-    const visualEvidence=evidenceFor('visual_evidence');
-    const tonalEvidence=evidenceFor('tonal_evidence');
-    const referencePoints=evidenceFor('reference_points');
     const ix=data.vibes.intake_expressive;
 
-    // The authored brief remains the authority layer. Reference anchors remain
-    // provenance-labeled creative evidence and never create hard constraints.
+    // Evidence lives in exactly one place: the anchors array. Each anchor
+    // already carries its role, influence, usage note, and evidence in
+    // structure, so provenance needs no string tags and no copies. The
+    // intake_expressive fields that previously mirrored tagged evidence into
+    // eight parallel slots are left empty on the multi-source path; the
+    // ideation, selection, and scene stages read anchors directly. This
+    // removes the token duplication that inflated every model call and
+    // accidentally re-weighted repeated strings against the explicit
+    // influence percentages.
     data.brief.source_kind='brief';
     data.brief.source_name=anchors.length
       ?'multi-source creative brief'
@@ -332,23 +339,14 @@
         .flatMap(record=>list(record.fragment&&record.fragment.avoid_added))
     ));
     data.vibes.confidence=confidenceAcross(evidenceRecords);
-    ix.audience.desired_state=territory;
-    ix.brand_state.make_people_feel=tonalEvidence.join(', ');
-    ix.brand_state.core_adjectives=tonalEvidence;
-    ix.visual_territory.closest_to=visualEvidence;
-    ix.sensory.textures_and_materials=visualEvidence;
-    ix.visual_identity.design_language_read=visualEvidence.join(' ');
-    ix.visual_identity.cultural_reference_points=list(
-      anchors.map(anchor=>anchor.source).concat(referencePoints)
-    );
-    ix.campaign_signals.cultural_codes=territory;
-    ix.campaign_signals.actions_and_motion=visualEvidence;
-    ix.campaign_signals.signature_objects=referencePoints;
-    ix.campaign_signals.campaign_energy=tonalEvidence.join(', ');
+    // Primary-brief evidence stays in its original untagged single locations
+    // from assembleDossierData. Only the read notes and the composed intent
+    // summary are multi-source aware.
     ix.campaign_signals.evidence_notes=evidenceRecords.flatMap((record,index)=>[
       (index===0?'creative_brief':record.role)+' reader output preserved in the multi-source dossier.',
       text(record.fragment.read_notes)
     ]).filter(Boolean);
+    ix.visual_identity.cultural_reference_points=list(anchors.map(anchor=>anchor.source));
     ix.assets.brand_intent=[
       text(input&&input.raw_text),
       text(input&&input.user_context),
@@ -358,8 +356,9 @@
         anchor.influence.level+' influence at '+anchor.influence.weight+'%'
       ])
     ].filter(Boolean).join('. ');
-    data.diagnostics.intake_version='universal_creative_intake_v2';
+    data.diagnostics.intake_version='universal_creative_intake_v3';
     data.diagnostics.input_type=anchors.length?'multi_source_brief':'text_brief';
+    data.diagnostics.evidence_carrier='brief.anchors_only';
     data.diagnostics.reader_fragments=evidenceRecords.map(record=>record.fragment);
     data.diagnostics.anchor_roles=anchors.map(anchor=>({
       anchor_id:anchor.anchor_id,
