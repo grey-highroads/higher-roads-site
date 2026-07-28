@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-27-lean-dossier-v10';
+const PWP_BUILD_ID = 'pwp-index-2026-07-28-lived-world-v11';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -898,6 +898,7 @@ const DEBUG_CREATIVE_DIRECTION = true; // internal review panel, this is an inte
 const GRAMMAR_MODULES = _objs(HR_CREATIVE_CONFIG.grammarModules);
 const AESTHETIC_MODES = _objs(HR_CREATIVE_CONFIG.aestheticModes);
 const DELIVERY_CONTEXTS = _objs(HR_CREATIVE_CONFIG.deliveryContexts);
+const LIVED_WORLD_GENERATOR_PROMPT = HR_CREATIVE_CONFIG.livedWorldGeneratorPrompt||'';
 const WORLD_IDEATION_PROMPT = HR_CREATIVE_CONFIG.worldIdeationPrompt||'';
 const THESIS_SELECTION_PROMPT = HR_CREATIVE_CONFIG.thesisSelectionPrompt||'';
 
@@ -999,14 +1000,45 @@ async function runModelStage(stage,system,userText,maxTokens){
   return extractJson(await requestModelStageText(stage,system,userText,maxTokens));
 }
 
+/* ===================== Stage 2.5: lived-world profile ===================== */
+/* Fires for brand/product briefs when the dossier contains product_truth or
+   audience content. Purely atmospheric or event briefs skip this stage.
+   The profile becomes the human foundation that ideation consumes. */
+function shouldGenerateLivedWorld(data){
+  if(!LIVED_WORLD_GENERATOR_PROMPT) return false;
+  const ix=(data&&data.vibes&&data.vibes.intake_expressive)||{};
+  const pt=ix.product_truth||{};
+  const aud=ix.audience||{};
+  // Gate: fire when the dossier has product_truth content or audience signals
+  const hasProduct=_c(pt.product_name)||_c(pt.category)||_l(pt.key_claims).length>0;
+  const hasAudience=_c(aud.primary)||_l(aud.desired_state).length>0;
+  return hasProduct||hasAudience;
+}
+
+async function generateLivedWorldProfile(data){
+  if(!shouldGenerateLivedWorld(data)) return null;
+  const dossier=fullCreativeDossier(data);
+  const parsed=await runModelStage(
+    'lived_world_profile',
+    LIVED_WORLD_GENERATOR_PROMPT,
+    'Creative dossier:\n'+JSON.stringify(dossier),
+    2600);
+  if(!parsed||!parsed.human_subject) throw new Error('Lived-world generation returned no usable profile');
+  return parsed;
+}
+
 async function ideateWorldTheses(data){
   // Pass both the grammar module summary and the aesthetic mode library, so the
   // ideation model can pick a mode per thesis rather than defaulting to cinema.
   const modesShort=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when}));
+  const profileJson=(data&&data.vibes&&data.vibes.lived_world_profile)
+    ?'\n\nLived-world profile (derived from the dossier above):\n'+JSON.stringify(data.vibes.lived_world_profile)
+    :'';
   const parsed=await runModelStage(
     'ideation',
     WORLD_IDEATION_PROMPT,
     'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data))+
+    profileJson+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modesShort),
     2600);
   const validModeIds=new Set(AESTHETIC_MODES.map(m=>m.id));
@@ -1131,6 +1163,7 @@ function buildCreativeDirectionBlock(h, finalPrompt, negStr){
   const negRules=String(negStr||'').split(', ').map(s=>s.trim()).filter(Boolean);
   return {
     creative_layer_status:cs?'aesthetic_mode_pipeline':'brand_read_fallback',
+    lived_world_profile:(h&&h.lived_world_profile)||null,
     world_theses:theses,
     world_thesis_selected:thesis,
     creative_selection:cs,
@@ -1162,6 +1195,21 @@ function renderCreativeDirectionPanel(){
   if(!cs){
     html+='<div class="cd-row"><span class="cd-k">Pipeline</span><span class="cd-v">fallback (aesthetic mode pipeline unavailable, using brand-read scene)</span></div>';
   }else{
+    const lwp=cd.lived_world_profile;
+    if(lwp){
+      const hs=lwp.human_subject||{};
+      html+=row('Human subject',_c(hs.identity));
+      html+=chips('Aspirations',_l(hs.aspirations));
+      html+=chips('Tensions',_l(hs.tensions));
+      html+=chips('Values',_l(hs.values));
+      html+=chips('Emotional range',_l(lwp.emotional_range));
+      if(Array.isArray(lwp.earned_environments)&&lwp.earned_environments.length){
+        html+=chips('Earned environments',lwp.earned_environments.map(function(e){return _c(e.environment)+' ('+_c(e.earned_by)+')';}));
+      }
+      html+=row('World opportunity',_c(lwp.world_opportunity));
+      html+=row('Brand role',_c(lwp.brand_role));
+      html+=row('Evidence confidence',_c(lwp.evidence_confidence));
+    }
     const theses=_objs(cd.world_theses);
     if(theses.length){
       const chipsWithMode=theses.map(t=>t.thesis_name+(t.aesthetic_mode?' ['+t.aesthetic_mode.replace(/_/g,' ')+']':''));
@@ -2930,6 +2978,25 @@ async function completeCreativePipeline(brandData){
   PREVIEW_FLOW_STATE.brand='ready';
   PREVIEW_FLOW_STATE.scene='loading';
   refresh();
+
+  // Stage 2.5: lived-world profile (brand/product briefs only).
+  // Transforms the dossier into a human-centered creative context so ideation
+  // starts from a person's life instead of geography.
+  if(shouldGenerateLivedWorld(DATA)){
+    try{
+      PERF.start('lived_world_profile_anthropic');
+      const profile=await generateLivedWorldProfile(DATA);
+      DATA.vibes.lived_world_profile=profile;
+      PERF.end('lived_world_profile_anthropic',{
+        identity:_c(profile&&profile.human_subject&&profile.human_subject.identity).slice(0,80),
+        environments:(profile&&Array.isArray(profile.earned_environments)?profile.earned_environments.length:0)
+      });
+    }catch(lwErr){
+      PERF.end('lived_world_profile_anthropic',{error:String((lwErr&&lwErr.message)||lwErr).slice(0,160)});
+      console.warn('lived-world profile generation failed; ideation will work from the dossier alone',lwErr);
+      DATA.vibes.lived_world_profile=null;
+    }
+  }
 
   // Stage 3: three divergent world theses from the full dossier.
   let theses=null;

@@ -14,8 +14,8 @@
 //   3. artDirectorPrompt     -> one authored master scene in the selected mode's register
 (function(){
   window.HR_CREATIVE_CONFIG = {
-    config_version: 'creative-config-2026-07-27-zero-asset-boundary-v10',
-    version: 'creative-config-2026-07-27-zero-asset-boundary-v10',
+    config_version: 'creative-config-2026-07-28-lived-world-v11',
+    version: 'creative-config-2026-07-28-lived-world-v11',
 
     fidelityNegatives: ['redrawn packaging','retyped label','altered label hierarchy','distorted pack proportions','recolored packaging','generated or fake product','warped logo','invented text on label'],
 
@@ -307,8 +307,81 @@
       }
     ],
 
+
+    /* ===================== Stage 2.5: lived-world generation ===================== */
+    /* Sits between dossier assembly and ideation. Transforms brand evidence into
+       a human-centered creative context so ideation starts from a person's life
+       instead of geography. Fires for brand/product briefs; atmospheric and event
+       briefs skip this stage. The orchestrator gates on whether the dossier contains
+       product_truth or audience content. */
+
+    livedWorldGeneratorPrompt: `You are a creative strategist interpreting a brand dossier. Your job is to generate the human world behind this brand. Do not begin with geography. Define the people, motivations, behaviors, tensions, rituals, relationships, and environments that naturally emerge from their lives.
+
+You will receive a creative dossier containing typed anchor evidence, audience signals, product truth, visual territory, sensory language, campaign signals, and explicit requirements and avoid rules.
+
+YOUR SINGLE TASK: Produce one lived_world_profile JSON object.
+
+RULES:
+
+1. DISTINGUISH EVIDENCE FROM CREATIVE INTERPRETATION. Your job is to create the human layer the dossier does not have. Interpret freely, but be clear about it: when a claim follows directly from dossier evidence, that is evidence; when you are making a creative leap to build a richer human picture, that is interpretation. Note the distinction in evidence_confidence so reviewers can see where the profile is grounded and where it is invented.
+
+2. IDENTITY IS NOT DEMOGRAPHICS. Do not invent age ranges, income brackets, or geographic segments. Describe the person by what they do, what they value, and what pressures they manage.
+
+3. TENSIONS ARE NOT PRODUCT CLAIMS. "Wants energy without jitters" is a product benefit dressed as a tension. "Needs sustained focus but works in constant interruption" is a real pressure. Write the second kind. Tensions should describe competing demands in the person's actual life, not the problem the product solves.
+
+4. LIFE PATTERNS ARE BEHAVIORS, NOT BRAND-USE OCCASIONS. "Drinks a functional beverage" is not a behavior. "Preparing for a demanding workday" is a behavior that might include the brand. Each pattern is a candidate scene moment for visual world-building.
+
+5. EARNED ENVIRONMENTS FOLLOW FROM LIFE PATTERNS. A place appears because a behavior puts the person there. A kitchen appears because they cook. An airport appears because they travel. A coastal setting appears only when movement, climate, or lifestyle earns it. Never lead with a beautiful place and backfill a reason. An environment without an earned behavior is decorative and should not appear.
+
+6. BRAND ROLE IS ONE SENTENCE. It connects the product to the life without centering the product. The brand supports what the person is already trying to sustain, change, recover, or become.
+
+7. EMOTIONAL RANGE IS NOT ONE MOOD. The person moves through several states in a normal week. Each state is a candidate lighting, pacing, and camera condition for downstream visual work.
+
+8. SOCIAL WORLD IS OBSERVABLE. If the dossier has no social evidence, keep this field minimal. Do not invent friend groups, dinner parties, or community rituals without basis.
+
+9. NEVER INVENT PRODUCT BENEFITS, INGREDIENTS, CERTIFICATIONS, OR HEALTH CLAIMS. Use only what the dossier provides.
+
+10. NEVER MAKE COMPETITOR, MARKET-OWNABILITY, OR IDENTITY-HISTORY CLAIMS unless the dossier contains direct evidence.
+
+CATEGORY TRAPS: Before finalizing, review your earned_environments and ask whether a competitor in the same category would produce the same list. If so, the environments are not earned, they are category defaults. Replace them.
+
+THE FOUNDER TEST: If the founder of this brand read your profile, would they recognize the person? That is the bar.
+
+Return ONLY this JSON, no prose, no markdown fences:
+{
+  "brand_essence": "one sentence capturing the brand's core promise as expressed in the dossier",
+  "human_subject": {
+    "identity": "who this person is becoming, described by behavior and values, not demographics",
+    "aspirations": ["what they are building toward, 3-5 items"],
+    "tensions": ["competing demands they manage, 3-5 items, never product claims"],
+    "values": ["what they prioritize, 3-5 items"]
+  },
+  "life_patterns": [
+    {
+      "behavior": "a recurring action, daily or weekly",
+      "frequency": "daily | weekly | occasional",
+      "context": "where and when this typically happens"
+    }
+  ],
+  "emotional_range": ["states this person moves through in a normal week, 4-6 items"],
+  "social_world": ["how they relate to others, alone behaviors and together behaviors"],
+  "earned_environments": [
+    {
+      "environment": "",
+      "earned_by": "the life pattern that puts them here"
+    }
+  ],
+  "world_opportunity": "the visual territory this human context creates that would not emerge from category cues alone, stated as specific scene possibilities not abstract adjectives",
+  "brand_role": "one sentence connecting the product to the life without centering the product",
+  "evidence_confidence": "which parts of this profile rest on strong dossier evidence and which are thin or assumed"
+}`,
+
     /* ===================== Stage 3: world ideation ===================== */
-    worldIdeationPrompt: `You are a senior creative director generating candidate visual worlds from one creative dossier. The dossier may describe a brand and product, a person, an event, a cultural reference, or another creative brief. It includes structured intent, typed anchor evidence, optional locked assets, audience or context, visual territory, sensory language, and explicit requirements and avoid rules. You will also receive the library of available aesthetic modes.
+    worldIdeationPrompt: `You are a senior creative director generating candidate visual worlds. You will receive a creative dossier and, when available, a lived_world_profile derived from it. The dossier contains structured intent, typed anchor evidence, optional locked assets, audience or context, visual territory, sensory language, and explicit requirements and avoid rules. You will also receive the library of available aesthetic modes.
+
+WHEN A LIVED_WORLD_PROFILE IS PRESENT, it is your creative starting point. The profile describes the person whose life this brand inhabits: their identity, aspirations, tensions, recurring behaviors, emotional range, social world, and earned environments. Your world theses must grow from this person and their life, not from geography or category convention. Every environment you propose must connect to a life pattern or tension in the profile. Every human presence decision must follow from who this person is. The profile does not replace the dossier evidence; it synthesizes it into a human foundation. When the profile and dossier conflict, the dossier evidence governs.
+
+WHEN NO LIVED_WORLD_PROFILE IS PRESENT, proceed from the dossier alone as before.
 
 Generate exactly THREE divergent world theses. Each thesis is a candidate cinematic, documentary, editorial, or vernacular world that answers this brief, complete with its aesthetic mode and human presence declaration.
 
@@ -330,7 +403,7 @@ WHEN PEOPLE ARE AT PRIMARY SCALE, use SAFE FACE FRAMINGS in the memorable_image 
 - Motion blur or partial defocus
 Never propose a centered frontal close face at close range.
 
-DIVERGENCE IS MANDATORY. The three theses must differ along declared axes: place scale (intimate / room / landscape), interior versus exterior, time of day, cultural register, aesthetic mode, and human presence. No two theses may share a place family and an aesthetic mode. If two ideas drift toward the same territory or the same register, replace one.
+DIVERGENCE IS MANDATORY. When a lived_world_profile is present, the three theses must differ along human axes first: identity interpretation (how the person sees themselves), life rhythm (which behaviors anchor the world), brand relationship (preparation, continuity, recovery, expression), social posture (solitary mastery, intimate connection, collective belonging), and emotional register. Place scale, interior versus exterior, time of day, aesthetic mode, and human presence remain secondary divergence axes. No two theses may share an identity interpretation and a life rhythm. When no lived_world_profile is present, diverge along place scale, interior versus exterior, time of day, cultural register, aesthetic mode, and human presence as before. No two theses may share a place family and an aesthetic mode. If two ideas drift toward the same territory or the same register, replace one.
 
 EACH THESIS MUST BE TRACEABLE. The belongs_because field must name the specific intent or anchor evidence that earns the world. Do not make competitor, market-ownability, identity-history, or creator-attribution claims that are not supported in the dossier. If you cannot trace the thesis to evidence honestly, replace it.
 
