@@ -1722,13 +1722,11 @@ function getPromptWriter(){
   if(!writer||typeof writer.compile!=='function') return null;
   return {cfg,id,writer};
 }
-function makeCompiledLoadBearing(pkg, compiled){
-  // Option 1 wiring: the render worker reads variants[].positive/negative and
-  // prompts.positive/negative, in that order. Copy the compiled prompt into
-  // exactly those fields so the compiler becomes load-bearing, and preserve the
-  // originals in raw_prompts (top level) and raw_positive/raw_negative (per
-  // variant). Packages are rebuilt fresh each time, but the raw-guard keeps a
-  // second call from ever capturing already-compiled text as the raw copy.
+function makeCompiledLoadBearing(pkg, compiled, compileFunc){
+  // Per-variant compilation. Each variant gets its own compiled prompt
+  // matching its render_path: world_only strips asset language, reference
+  // keeps it, composite gets placement-area framing. The top-level
+  // prompts receive the first variant's compilation (or the default).
   const pos=_c(compiled.compiled_positive), neg=_c(compiled.compiled_negative);
   if(!pkg.raw_prompts){
     pkg.raw_prompts={
@@ -1737,7 +1735,30 @@ function makeCompiledLoadBearing(pkg, compiled){
     };
   }
   pkg.prompts={positive:pos,negative:neg};
-  if(Array.isArray(pkg.variants)){
+  if(Array.isArray(pkg.variants)&&typeof compileFunc==='function'){
+    pkg.variants=pkg.variants.map(v=>{
+      const nv=Object.assign({},v);
+      if(!('raw_positive' in nv)) nv.raw_positive=v.positive||'';
+      if(!('raw_negative' in nv)) nv.raw_negative=v.negative||'';
+      // Build a variant-specific package clone with the render_path set so
+      // the compiler's protectionBlock and canonicalNegative respond to it.
+      const variantPkg=Object.assign({},pkg);
+      variantPkg.meta=Object.assign({},pkg.meta||{},{render_path_active:nv.render_path});
+      // For world_only variants on packages that have locked assets,
+      // compile as if no locked asset exists so the protection block
+      // produces world-only language instead of asset integration language.
+      if(nv.render_path==='world_only'){
+        variantPkg.locked_assets=[];
+        variantPkg.locked_asset=null;
+        variantPkg.fidelity_contract=null;
+      }
+      const variantCompiled=compileFunc(variantPkg);
+      nv.positive=_c(variantCompiled.compiled_positive);
+      nv.negative=_c(variantCompiled.compiled_negative);
+      return nv;
+    });
+  }else if(Array.isArray(pkg.variants)){
+    // Fallback if no compile function passed: stamp the default (old behavior)
     pkg.variants=pkg.variants.map(v=>{
       const nv=Object.assign({},v);
       if(!('raw_positive' in nv)) nv.raw_positive=v.positive||'';
@@ -1791,7 +1812,7 @@ function applyPromptWriterToPackage(pkg, options){
       removed_terms:compiled.removed_terms||[],
       stats:compiled.prompt_stats||{}
     };
-    makeCompiledLoadBearing(pkg, compiled);
+    makeCompiledLoadBearing(pkg, compiled, pw.writer.compile);
   }else{
     pkg.compiled_prompts=null;
     pkg.prompt_writer={id:'raw_package_prompt',version:'none',label:'Raw Package Prompt',warnings:['Compiled prompts unavailable; using raw package prompts.'],removed_terms:[],stats:{}};
