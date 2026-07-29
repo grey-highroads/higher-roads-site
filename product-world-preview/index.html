@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13';
+const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13a';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -1264,6 +1264,8 @@ function buildCreativeDirectionBlock(h, finalPrompt, negStr){
   return {
     creative_layer_status:cs?'aesthetic_mode_pipeline':'brand_read_fallback',
     lived_world_profile:(h&&h.lived_world_profile)||null,
+    storyboard:(h&&h.storyboard)||null,
+    storyboard_error:(h&&h.storyboard_error)||null,
     world_theses:theses,
     world_thesis_selected:thesis,
     creative_selection:cs,
@@ -1309,6 +1311,16 @@ function renderCreativeDirectionPanel(){
       html+=row('World opportunity',_c(lwp.world_opportunity));
       html+=row('Brand role',_c(lwp.brand_role));
       html+=row('Evidence confidence',_c(lwp.evidence_confidence));
+    }
+    const sb=cd.storyboard;
+    if(sb&&Array.isArray(sb.scenes)&&sb.scenes.length){
+      html+=row('Protagonist',_c(sb.protagonist));
+      html+=row('Lifestyle pattern',_c(sb.lifestyle_pattern));
+      html+=row('Emotional arc',_c(sb.emotional_arc));
+      html+=chips('Scene moments',sb.scenes.map(function(s){return _c(s.moment)+' ['+_c(s.scale)+']';}));
+    }
+    if(cd.storyboard_error){
+      html+=row('Storyboard error',cd.storyboard_error);
     }
     const theses=_objs(cd.world_theses);
     if(theses.length){
@@ -3134,6 +3146,8 @@ function exportCreativeJob(){
     compressed_context: CREATIVE_JOB.compressed_context,
     dossier: fullCreativeDossier(DATA),
     lived_world_profile: (DATA.vibes&&DATA.vibes.lived_world_profile)||null,
+    storyboard: (DATA.vibes&&DATA.vibes.storyboard)||null,
+    storyboard_error: (DATA.vibes&&DATA.vibes.storyboard_error)||null,
     world_theses: (DATA.vibes&&DATA.vibes.world_theses)||[],
     selection: (DATA.vibes&&DATA.vibes.creative_selection)||null,
     winning_thesis: (DATA.vibes&&DATA.vibes.world_thesis_selected)||null,
@@ -3315,6 +3329,10 @@ async function completeCreativePipeline(brandData){
     }catch(boardErr){
       PERF.end('world_storyboard_anthropic',{error:String((boardErr&&boardErr.message)||boardErr).slice(0,160)});
       console.warn('World board generation failed; falling back to single-scene pipeline',boardErr);
+      // Reset delivery context so the single-scene pipeline compiles as still_image, not world_board.
+      // Without this, the hardcoded world_board context poisons the fallback package.
+      if(DATA.brief) DATA.brief.delivery_context={type:'still_image'};
+      DATA.vibes.storyboard_error=String((boardErr&&boardErr.message)||boardErr).slice(0,300);
       // Fall through to the normal single-image pipeline
     }
   }

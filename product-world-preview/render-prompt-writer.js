@@ -452,7 +452,13 @@
     if(dc.type==='world_board'){
       var boardScenes=(pkg&&pkg.storyboard&&Array.isArray(pkg.storyboard.scenes))?pkg.storyboard.scenes:[];
       var boardStory=(pkg&&pkg.storyboard)||null;
-      return boardAssemble(pkg, boardScenes, boardStory);
+      // Guard: only compile as board if we actually have scenes.
+      // Without scenes the board prompt is empty and produces garbage.
+      if(boardScenes.length>=2){
+        return boardAssemble(pkg, boardScenes, boardStory);
+      }
+      // Fall through to single-scene compilation if no storyboard data
+      warnings.push('world_board delivery context was set but no storyboard scenes were available; compiling as single scene instead.');
     }
 
         const opening=openingLineForMode(pkg);
