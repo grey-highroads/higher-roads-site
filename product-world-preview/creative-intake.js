@@ -24,6 +24,15 @@
       loop:true,
       viewing_distance:'arena',
       performer_clear_zone:'lower-center'
+    },
+    world_board:{
+      type:'world_board',
+      name:'Visual world board',
+      output_kind:'multi_panel_board',
+      width_px:1920,
+      height_px:1080,
+      loop:false,
+      viewing_distance:'near'
     }
   };
 

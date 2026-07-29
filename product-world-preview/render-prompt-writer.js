@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const VERSION = 'prompt-writer-2026-07-27-zero-asset-boundary-v10';
+  const VERSION = 'prompt-writer-2026-07-28-world-board-v13';
   /*
    * Prose-preserving compiler.
    *
@@ -319,6 +319,107 @@
     return 'People appear with faces framed safely: a hat or cap brim shading the face, hair falling forward, hand-to-mouth or hand-to-face gestures, downward gaze at a task, three-quarter turn away from camera, motion, or partial defocus. No centered close frontal faces.';
   }
 
+
+  /* ===================== world_board delivery context ===================== */
+
+  function boardSceneBlock(scenes){
+    if(!Array.isArray(scenes)||!scenes.length) return '';
+    const panels=scenes.map(function(s,i){
+      var parts=[];
+      if(c(s.moment)) parts.push(c(s.moment));
+      if(c(s.behavior)) parts.push(c(s.behavior));
+      if(c(s.environment)) parts.push(c(s.environment));
+      if(c(s.emotional_state)) parts.push('the feeling is '+c(s.emotional_state));
+      return parts.join(', ');
+    }).filter(Boolean);
+    if(!panels.length) return '';
+    return 'The panels show these moments from one life: '+panels.join('. Next panel: ')+'.';
+  }
+
+  function boardProtectionBlock(pkg){
+    const lines=[];
+    if(isProductLockedAsset(pkg)){
+      const noun=FORMAT_NOUN[inferFormat(pkg)]||'package';
+      lines.push('Where the supplied '+noun+' appears in a panel, preserve it exactly as pictured: logo, label hierarchy, typography, colors, proportions, and silhouette unchanged and fully readable, identical across every panel it appears in.');
+      lines.push('The '+noun+' appears in no more than two panels. The remaining panels are pure world with no product.');
+    } else if(hasLockedAsset(pkg)){
+      lines.push('Preserve the supplied protected asset unchanged wherever it appears, identical across panels.');
+    } else {
+      lines.push('No product, logo, label, or branded object appears in any panel.');
+    }
+    lines.push('No headline, caption, body copy, ingredient list, benefit tile, or infographic text anywhere on the board. Any surface that would carry writing stays blank, abstract, cropped, or defocused, with no pseudo-text or letter-like marks.');
+    if(peopleExcluded(pkg)) lines.push('No people or hands appear in any panel.');
+    return lines.join(' ');
+  }
+
+  function boardNegative(pkg){
+    var base=splitTerms(canonicalNegative(pkg));
+    var boardTerms=[
+      'benefit tiles or text cards','headline or caption text','ingredient list','infographic layout',
+      'charts or data callouts','icon grids','captioned labels','watermark text',
+      'mismatched panels from different worlds','panels in conflicting palettes or light'
+    ];
+    return uniq([].concat(base, boardTerms)).join(', ');
+  }
+
+  function boardAssemble(pkg, scenes, storyboard){
+    var sb=(pkg&&pkg.scene_brief)||{};
+    var lighting=c(sb.lighting);
+
+    var opening='A multi-panel visual world board on a single landscape canvas: several framed photographic views of one cohesive world arranged as panels, every panel sharing one palette, one quality of light, and one lens character, so the full set reads as one life seen from several distances and angles across a real stretch of time.';
+
+    var protagonist='';
+    if(storyboard&&c(storyboard.protagonist)){
+      protagonist='The person at the center of this world: '+c(storyboard.protagonist)+'.';
+    }
+
+    var pattern='';
+    if(storyboard&&c(storyboard.lifestyle_pattern)){
+      pattern='The rhythm connecting every panel: '+c(storyboard.lifestyle_pattern)+'.';
+    }
+
+    var arc='';
+    if(storyboard&&c(storyboard.emotional_arc)){
+      arc='The emotional register moves across the board: '+c(storyboard.emotional_arc)+'.';
+    }
+
+    var sceneBlock=boardSceneBlock(scenes);
+
+    var spine='Every panel matches in palette, direction of light, color grade, and lens character, as if all were observed in one session in the same world.';
+    if(lighting){
+      spine+=' The shared light throughout is '+lighting.replace(/^[A-Z]/,function(m){return m.toLowerCase();}).replace(/[.!?]?$/,'.');
+    }
+
+    var quality='Each panel is a real photographic view of one world, never a chart, diagram, icon grid, data tile, or text block. The overall quality is premium CGI product photography, photoreal, cinematic, commercially polished.';
+
+    var protection=boardProtectionBlock(pkg);
+
+    var compiled_positive=[opening,protagonist,pattern,arc,sceneBlock,spine,quality,protection].filter(Boolean).join(' ');
+    var compiled_negative=boardNegative(pkg);
+
+    var sceneChars=sceneBlock.length;
+    var totalChars=compiled_positive.length;
+    return {
+      prompt_writer_id:'prose_preserving_compiler_v4',
+      prompt_writer_version:VERSION,
+      compiled_positive:compiled_positive,
+      compiled_negative:compiled_negative,
+      warnings:[],
+      removed_terms:[],
+      prompt_stats:{
+        positive_chars:totalChars,
+        negative_chars:compiled_negative.length,
+        world_chars:sceneChars,
+        world_share:totalChars?Math.round(100*sceneChars/totalChars):0,
+        world_source:'storyboard_scenes',
+        delivery_context:'world_board',
+        board_scene_count:Array.isArray(scenes)?scenes.length:0,
+        aesthetic_mode:c(sb.aesthetic_mode)||'cinematic_film_still',
+        human_presence:c(sb.human_presence)||'trace_only'
+      }
+    };
+  }
+
   function proseCompile(renderPackage){
     const pkg=renderPackage||{};
     const warnings=[];
@@ -346,7 +447,15 @@
       warnings.push('State-lock neutralized authored phrasing: '+stateFix.changed.slice(0,5).join(' | '));
     }
 
-    const opening=openingLineForMode(pkg);
+    // Board delivery context: intercept before single-scene compilation
+    var dc=deliveryContext(pkg);
+    if(dc.type==='world_board'){
+      var boardScenes=(pkg&&pkg.storyboard&&Array.isArray(pkg.storyboard.scenes))?pkg.storyboard.scenes:[];
+      var boardStory=(pkg&&pkg.storyboard)||null;
+      return boardAssemble(pkg, boardScenes, boardStory);
+    }
+
+        const opening=openingLineForMode(pkg);
     const contextBlock=deliveryContextBlock(pkg);
     const safeFace=safeFaceFramingAddendum(pkg);
     const compiled_positive=[

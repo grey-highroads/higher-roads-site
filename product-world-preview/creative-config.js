@@ -14,8 +14,8 @@
 //   3. artDirectorPrompt     -> one authored master scene in the selected mode's register
 (function(){
   window.HR_CREATIVE_CONFIG = {
-    config_version: 'creative-config-2026-07-28-context-compression-v12',
-    version: 'creative-config-2026-07-28-context-compression-v12',
+    config_version: 'creative-config-2026-07-28-world-board-v13',
+    version: 'creative-config-2026-07-28-world-board-v13',
 
     fidelityNegatives: ['redrawn packaging','retyped label','altered label hierarchy','distorted pack proportions','recolored packaging','generated or fake product','warped logo','invented text on label'],
 
@@ -57,6 +57,24 @@
           'Translate the selected thesis into one clear motion behavior rather than a montage of unrelated actions.',
           'Describe an eight-second temporal cycle whose ending reconnects invisibly to its beginning, with no hard cut, flash, or continuity jump.',
           'Avoid fine detail, readable text, rapid cutting, small focal subjects, and full-frame high-frequency motion.'
+        ]
+      },
+      {
+        id:'world_board',
+        name:'Visual world board',
+        output_kind:'multi_panel_board',
+        defaults:{
+          width_px:1920,
+          height_px:1080,
+          viewing_distance:'near',
+          loop:false
+        },
+        authoring_guidance:[
+          'Compose a multi-panel board showing several moments from one life in one cohesive visual world.',
+          'Every panel shares palette, light quality, lens character, and color grade.',
+          'Include at least two times of day and at least two spatial scales.',
+          'No text, captions, benefit tiles, or infographic elements anywhere on the board.',
+          'The board should feel like an editorial spread or agency pitch comp, not a grid of unrelated images.'
         ]
       }
     ],
@@ -374,6 +392,58 @@ Return ONLY this JSON, no prose, no markdown fences:
   "world_opportunity": "the visual territory this human context creates that would not emerge from category cues alone, stated as specific scene possibilities not abstract adjectives",
   "brand_role": "one sentence connecting the product to the life without centering the product",
   "evidence_confidence": "which parts of this profile rest on strong dossier evidence and which are thin or assumed"
+}`,
+
+    /* ===================== Stage 2.7: world storyboard ===================== */
+    /* Takes the lived-world profile and produces a set of scene families that
+       represent one person's life across several moments. This is the creative
+       bridge between "who is this person" and "what does their world look like
+       from several angles." The output feeds the world-board compiler, which
+       assembles one multi-panel render prompt from these moments. */
+
+    worldStoryboardPrompt: `You are a creative director building a visual storyboard for a brand world. You will receive a lived-world profile describing who this person is, what they value, what pressures they manage, what they do repeatedly, and where the brand earns its place in their life.
+
+YOUR SINGLE TASK: Produce one world storyboard that captures 4-6 distinct moments from this person's life. Together these moments should feel like a day, a week, or a rhythm, not a single event. The board should convince a viewer that this person exists and that this brand belongs in their world.
+
+RULES:
+
+1. START WITH THE PERSON, NOT THE BRAND. The protagonist is described by behavior, posture, and values. Not by demographics. Not by what they consume. The viewer should recognize a specific kind of person, not a target market.
+
+2. EACH SCENE IS A MOMENT, NOT A LOCATION. "4:30 AM, preparing equipment before departure" is a moment. "Fishing dock" is a location. The moment implies the location. Write moments.
+
+3. EVERY MOMENT MUST EARN ITS PLACE. Each scene connects to a life pattern, tension, or value from the lived-world profile. If a scene exists because it looks good but no behavior puts the person there, cut it.
+
+4. COVER EMOTIONAL RANGE. The storyboard should move through at least three distinct emotional states: effort, ease, focus, social warmth, solitude, fatigue, satisfaction, anticipation. A board stuck in one mood is a poster, not a world.
+
+5. VARY TIME, LIGHT, AND SCALE. Include at least two times of day. Include at least one intimate scale (hands, objects, surfaces) and one environmental scale (room, landscape, threshold). The camera should feel like it spent a real period of time with this person.
+
+6. THE BRAND ENTERS NATURALLY. The brand is present in no more than two of the scenes, and only where the person's behavior creates a genuine moment for it. The remaining scenes are pure world. The brand earns its place by belonging, not by appearing everywhere.
+
+7. VISUAL PURPOSE IS COMPOSITIONAL, NOT NARRATIVE. Each scene's visual_purpose describes what this panel does for the board as a whole: "establishes scale and environment," "shows intimate detail and craft," "introduces social warmth," "demonstrates the rhythm of repetition." These guide the board compiler's panel logic.
+
+8. DO NOT WRITE RENDER PROMPTS. Write human-readable scene descriptions. The board compiler translates these into render language. Your job is creative direction, not prompt engineering.
+
+9. LIFESTYLE PATTERN IS THE CONNECTIVE TISSUE. Name the pattern that connects all scenes. "Preparation, performance, maintenance" is a pattern. "Premium outdoor lifestyle" is a category label. Write the first kind.
+
+10. DO NOT DEFAULT TO CATEGORY CONVENTIONS. If the scenes could belong to five competitors unchanged, the storyboard has failed. The moments should be specific enough that they could only come from this profile.
+
+Return ONLY this JSON, no prose, no markdown fences:
+{
+  "protagonist": "one sentence describing this person by behavior and values, not demographics",
+  "lifestyle_pattern": "the connective rhythm across all scenes, stated as actions not adjectives",
+  "emotional_arc": "how the emotional register moves across the storyboard, not one fixed mood",
+  "scenes": [
+    {
+      "moment": "a specific time and action, not a location name",
+      "behavior": "what the person is doing and why",
+      "environment": "where this moment happens, earned by the behavior",
+      "emotional_state": "the internal register: effort, ease, focus, fatigue, satisfaction, etc.",
+      "time_of_day": "dawn, morning, midday, afternoon, golden hour, evening, night",
+      "scale": "intimate | room | environmental | landscape",
+      "brand_present": true or false,
+      "visual_purpose": "what this panel does for the board as a composition"
+    }
+  ]
 }`,
 
     /* ===================== Stage 3: world ideation ===================== */

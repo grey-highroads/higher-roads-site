@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-28-context-compression-v12';
+const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -899,6 +899,7 @@ const GRAMMAR_MODULES = _objs(HR_CREATIVE_CONFIG.grammarModules);
 const AESTHETIC_MODES = _objs(HR_CREATIVE_CONFIG.aestheticModes);
 const DELIVERY_CONTEXTS = _objs(HR_CREATIVE_CONFIG.deliveryContexts);
 const LIVED_WORLD_GENERATOR_PROMPT = HR_CREATIVE_CONFIG.livedWorldGeneratorPrompt||'';
+const WORLD_STORYBOARD_PROMPT = HR_CREATIVE_CONFIG.worldStoryboardPrompt||'';
 const WORLD_IDEATION_PROMPT = HR_CREATIVE_CONFIG.worldIdeationPrompt||'';
 const THESIS_SELECTION_PROMPT = HR_CREATIVE_CONFIG.thesisSelectionPrompt||'';
 
@@ -1025,6 +1026,99 @@ async function generateLivedWorldProfile(data){
     2600);
   if(!parsed||!parsed.human_subject) throw new Error('Lived-world generation returned no usable profile');
   return parsed;
+}
+
+/* ===================== Stage 2.7: world storyboard ===================== */
+/* Takes the lived-world profile and produces scene families for a world board.
+   Only fires when delivery_context is world_board and a profile exists. */
+
+async function generateWorldStoryboard(data){
+  const profile=(data&&data.vibes&&data.vibes.lived_world_profile)||null;
+  if(!profile||!WORLD_STORYBOARD_PROMPT) return null;
+  const f=(data&&data.factual)||{};
+  const brief=(data&&data.brief)||{};
+  const input={
+    lived_world_profile:profile,
+    brand_essence:_c(profile.brand_essence)||_c(brief.intent),
+    product_facts:(_c(f.name)||_c(f.category))?{name:_c(f.name),category:_c(f.category),flavor_sku:_c(f.flavor_sku)}:null,
+    delivery_context:resolvedDeliveryContext(brief),
+    avoid:_dedupe([].concat(
+      _l(brief.avoid),
+      _l(data&&data.vibes&&data.vibes.intake_expressive&&data.vibes.intake_expressive.visual_identity&&data.vibes.intake_expressive.visual_identity.never_world)
+    ))
+  };
+  const parsed=await runModelStage(
+    'storyboard',
+    WORLD_STORYBOARD_PROMPT,
+    'Lived-world profile and brand context:\n'+JSON.stringify(input),
+    3200);
+  if(!parsed||!Array.isArray(parsed.scenes)||parsed.scenes.length<2){
+    throw new Error('Storyboard generation returned fewer than two usable scenes');
+  }
+  return parsed;
+}
+
+/* ===================== World board package builder ===================== */
+/* Assembles a render package for the world_board delivery context.
+   Uses the storyboard scenes instead of the single master scene. */
+
+function buildWorldBoardPackage(data, storyboard){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  const brief=(data&&data.brief)||{};
+  const lockedAssets=normalizedLockedAssets(data);
+  const hasLocked=lockedAssets.length>0;
+  const deliveryContext=resolvedDeliveryContext(brief);
+  const avoidRules=_dedupe([].concat(_l(brief.avoid),_l(ix.visual_identity&&ix.visual_identity.never_world)));
+
+  const pkg={
+    meta:{
+      package_version:'0.4',
+      brief_name:_c(brief.source_name)||_c(data&&data.brand)||'creative brief',
+      mode:hasLocked?'product_accurate':'world_exploration',
+      render_path_recommendation:hasLocked?'reference':'world_only',
+      delivery_context:Object.assign({},deliveryContext,{type:'world_board'}),
+      creative_config_version:CREATIVE_CONFIG_VERSION
+    },
+    locked_assets:lockedAssets.map(function(la){return buildLockedAssetRecord?buildLockedAssetRecord(la):la;}),
+    scene_brief:{
+      delivery_context:{type:'world_board'},
+      aesthetic_mode:'cinematic_film_still',
+      human_presence:_c(storyboard&&storyboard.protagonist)?'trace_only':'trace_only'
+    },
+    storyboard:storyboard,
+    prompts:{positive:'',negative:''},
+    user_constraints:{requirements:_dedupe(_l(brief.requirements)),exclusions:avoidRules},
+    confidence_notes:{read_confidence:v.confidence||'unknown'}
+  };
+
+  // Run through the compiler to produce the board prompt
+  var writer=getPromptWriter();
+  if(writer){
+    var compiled=writer.compile(pkg);
+    pkg.prompts.positive=compiled.compiled_positive;
+    pkg.prompts.negative=compiled.compiled_negative;
+    pkg.compiled_prompts=compiled;
+    pkg.prompt_writer={
+      id:compiled.prompt_writer_id,
+      version:compiled.prompt_writer_version,
+      stats:compiled.prompt_stats,
+      warnings:compiled.warnings
+    };
+  }
+
+  pkg.variants=[{
+    render_path:hasLocked?'reference':'world_only',
+    label:'World board render',
+    instructions:'Render the multi-panel world board as a single image.',
+    positive:pkg.prompts.positive,
+    negative:pkg.prompts.negative
+  }];
+
+  pkg.creative_direction=buildCreativeDirectionBlock(v,pkg.prompts.positive,pkg.prompts.negative);
+  pkg.creative_direction.storyboard=storyboard;
+
+  return pkg;
 }
 
 async function ideateWorldTheses(data){
@@ -3178,6 +3272,50 @@ async function completeCreativePipeline(brandData){
       PERF.end('lived_world_profile_anthropic',{error:String((lwErr&&lwErr.message)||lwErr).slice(0,160)});
       console.warn('lived-world profile generation failed; ideation will work from the dossier alone',lwErr);
       DATA.vibes.lived_world_profile=null;
+    }
+  }
+
+  // Board path: when delivery_context is world_board and we have a profile,
+  // generate the storyboard and build the board package directly. Skip the
+  // single-image chain (ideation → selection → master scene).
+  const requestedDelivery=resolvedDeliveryContext((DATA&&DATA.brief)||{});
+  if(requestedDelivery.type==='world_board' && DATA.vibes.lived_world_profile){
+    try{
+      PERF.start('world_storyboard_anthropic');
+      const storyboard=await runPipelineStage('storyboard',function(){
+        return generateWorldStoryboard(DATA);
+      });
+      DATA.vibes.storyboard=storyboard;
+      PERF.end('world_storyboard_anthropic',{
+        scenes:storyboard&&Array.isArray(storyboard.scenes)?storyboard.scenes.length:0,
+        protagonist:_c(storyboard&&storyboard.protagonist).slice(0,80)
+      });
+
+      // Build board package and compile the board prompt
+      const boardPkg=buildWorldBoardPackage(DATA, storyboard);
+      CURRENT_PKG=boardPkg;
+      CURRENT_MD='';
+      DATA.vibes.master_scene={
+        scene_name:'World Board',
+        world_description:_c(storyboard&&storyboard.lifestyle_pattern),
+        authored_prompt:boardPkg.prompts.positive,
+        render_path:boardPkg.meta.render_path_recommendation,
+        delivery_context:{type:'world_board'}
+      };
+
+      PREVIEW_FLOW_STATE.scene='ready';
+      PREVIEW_FLOW_STATE.brandError=null;
+      refresh();
+      renderCreativeDirectionPanel();
+      PERF.log('board_ready',{
+        scenes:storyboard.scenes.length,
+        prompt_chars:boardPkg.prompts.positive.length
+      });
+      return;
+    }catch(boardErr){
+      PERF.end('world_storyboard_anthropic',{error:String((boardErr&&boardErr.message)||boardErr).slice(0,160)});
+      console.warn('World board generation failed; falling back to single-scene pipeline',boardErr);
+      // Fall through to the normal single-image pipeline
     }
   }
 
