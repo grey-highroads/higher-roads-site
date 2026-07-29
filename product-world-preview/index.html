@@ -284,6 +284,7 @@ h1{font-family:'Playfair Display',serif; font-weight:600; font-size:clamp(30px,5
   <div class="brandbar">
     <span class="mark">HIGHER ROADS</span><span class="dot"></span>
     <span class="ctx">Product World Preview</span>
+    <span class="buildstamp" id="buildStampHeader" style="margin-left:auto;font-size:10px;opacity:0.7"></span>
   </div>
 
   <div class="demobanner" id="demoBanner" hidden>Demo mode: no parser backend is connected, so this shows sample data so you can see the full flow end to end. Connect the parser Worker for real results.</div>
@@ -522,7 +523,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13b';
+const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13c';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -530,6 +531,8 @@ const PWP_CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h local test cache for parser
 function setBuildStamp(){
   const el=document.getElementById('buildStamp');
   if(el) el.textContent='build: '+PWP_BUILD_ID;
+  const hdr=document.getElementById('buildStampHeader');
+  if(hdr) hdr.textContent=PWP_BUILD_ID;
   try{ window.PWP_BUILD_ID=PWP_BUILD_ID; window.PWP_BUILD_NOTE=PWP_BUILD_NOTE; }catch{}
 }
 
