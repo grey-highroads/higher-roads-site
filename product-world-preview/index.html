@@ -523,7 +523,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-29-world-board-v13d';
+const PWP_BUILD_ID = 'pwp-index-2026-07-29-world-board-v13e';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -2540,7 +2540,11 @@ cta.addEventListener('click',async()=>{
   }
   PERF.start('build_render_package');
   try{
-    CURRENT_PKG=buildRenderPackage(buildHandoff());
+    // Board path already sets CURRENT_PKG with a compiled board prompt.
+    // Skip buildHandoff (which requires a full scene object) and use it directly.
+    if(!CURRENT_PKG || !CURRENT_PKG.storyboard){
+      CURRENT_PKG=buildRenderPackage(buildHandoff());
+    }
   }catch(handoffErr){
     PERF.end('build_render_package',{status:'error',error:String((handoffErr&&handoffErr.message)||handoffErr).slice(0,180)});
     PREVIEW_FLOW_STATE.scene='error';
@@ -2659,7 +2663,9 @@ function lockedProductBlobFromAsset(a){
 }
 async function rebuildCurrentPackage(){
   PERF.start('rebuild_current_package');
-  CURRENT_PKG=buildRenderPackage(buildHandoff());
+  if(!CURRENT_PKG || !CURRENT_PKG.storyboard){
+    CURRENT_PKG=buildRenderPackage(buildHandoff());
+  }
   applyPromptWriterToPackage(CURRENT_PKG);
   CURRENT_PKG.performance_timing=PERF.summary();
   CURRENT_PKG.build_id=PWP_BUILD_ID;
