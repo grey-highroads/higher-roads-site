@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artifact Gallery · Product World Preview · Higher Roads</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../../images/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Rajdhani:wght@500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ===== TOKENS ===== */
+:root {
+  --white: #f5ede2;
+  --accent: #e8782a;
+  --accent-dim: #a04f18;
+  --dark: #181510;
+  --page: #0a0906;
+  --dark-card: #111009;
+  --border: rgba(232,120,42,0.18);
+  --border-soft: rgba(245,237,226,0.08);
+  --muted: #6b6057;
+}
+
+/* ===== RESET + BODY ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--page);
+  font-family: 'Barlow', sans-serif;
+  color: var(--white);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.028;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* Glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140vw;
+  height: 80vh;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(232,120,42,0.04) 0%, transparent 70%);
+}
+
+/* ===== FIXED NAV ===== */
+.site-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 28px;
+  background: rgba(10,9,6,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-pill {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.4;
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  transition: opacity 0.25s, border-color 0.25s, color 0.25s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nav-pill:hover { opacity: 0.7; }
+.nav-pill.active {
+  opacity: 1;
+  color: var(--accent);
+  border-color: var(--border);
+}
+
+.nav-back {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.35;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-back:hover { opacity: 0.65; }
+
+/* ===== PAGE SHELL ===== */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ===== INTRO ===== */
+.intro {
+  padding-top: 120px;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 56px;
+}
+
+.intro .eyebrow {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.intro h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: clamp(28px, 4.5vw, 38px);
+  line-height: 1.3;
+  margin-bottom: 24px;
+  max-width: 22ch;
+}
+
+.intro p {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--white);
+  opacity: 0.6;
+  max-width: 56ch;
+}
+
+.intro .brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  background: rgba(232,120,42,0.04);
+}
+.brand-badge .bb-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.45;
+}
+.brand-badge .bb-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--white);
+}
+
+/* ===== ARTIFACT SECTIONS ===== */
+.artifact-section {
+  padding-bottom: 56px;
+  margin-bottom: 56px;
+  scroll-margin-top: 72px;
+}
+
+/* ===== CARD SHARED ===== */
+.artifact-card {
+  width: 100%;
+  background: var(--dark-card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 40px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.card-head .stage {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.card-head .brand-tag {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.55;
+}
+
+.card-section {
+  padding: 36px 40px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.card-section:last-child { border-bottom: none; }
+
+.c-eyebrow {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+.confidence-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 40px;
+  border-top: 1px solid var(--border-soft);
+}
+.confidence-foot .cf-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.4;
+  white-space: nowrap;
+}
+.confidence-foot .cf-body {
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--white);
+  opacity: 0.5;
+  text-align: right;
+}
+
+
+/* =============================================
+   CARD 1: BRAND DOSSIER
+   ============================================= */
+
+.verdict-open { padding-top: 44px; padding-bottom: 40px; }
+
+.id-line {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+.id-line b { color: var(--white); opacity: 1; font-weight: 700; }
+
+.verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 8px;
+}
+.verdict span {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: clamp(28px, 4.6vw, 38px);
+  line-height: 1.25;
+  color: var(--white);
+}
+.verdict span + span::before {
+  content: "";
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin: 0 20px;
+  vertical-align: middle;
+}
+
+.positioning {
+  margin-top: 22px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.55;
+  max-width: 56ch;
+}
+
+.aud-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 40px;
+}
+.aud-grid p {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.7;
+}
+.aud-grid .desired {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.truth-lede {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.7;
+  margin-bottom: 14px;
+  max-width: 58ch;
+}
+.truth-claims { list-style: none; margin-top: 4px; }
+.truth-claims li {
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--white);
+  opacity: 0.7;
+  padding: 9px 0 9px 20px;
+  border-bottom: 1px solid var(--border-soft);
+  position: relative;
+}
+.truth-claims li:last-child { border-bottom: none; }
+.truth-claims li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 17px;
+  width: 8px; height: 1px;
+  background: var(--accent);
+}
+
+.swatch-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.swatch .chip {
+  height: 68px;
+  border: 1px solid var(--border-soft);
+  margin-bottom: 10px;
+}
+.swatch .sw-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.8;
+  display: block;
+}
+.swatch .sw-role {
+  font-size: 12.5px;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.45;
+  display: block;
+  margin-top: 3px;
+}
+
+.sense-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.word-run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 0;
+  align-items: baseline;
+}
+.word-run span {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--white);
+  opacity: 0.85;
+}
+.word-run span + span::before {
+  content: "";
+  display: inline-block;
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin: 0 13px;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+.sense-note {
+  margin-top: 14px;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.5;
+}
+.refs-list { list-style: none; }
+.refs-list li {
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--white);
+  opacity: 0.7;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.refs-list li:last-child { border-bottom: none; }
+.refs-list li em {
+  font-style: normal;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 10px;
+}
+
+.culture-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.culture-grid p {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.65;
+}
+
+.guard-section {
+  background: rgba(232,120,42,0.05);
+  border-top: 1px solid var(--border);
+}
+.guard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 36px;
+}
+.guard-item {
+  border-left: 2px solid var(--border);
+  padding-left: 18px;
+}
+.guard-item .never {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 5px;
+}
+.guard-item p {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--white);
+  opacity: 0.7;
+}
+
+
+/* =============================================
+   CARD 2: LIVED-WORLD PROFILE
+   ============================================= */
+
+.person-open { padding-top: 44px; padding-bottom: 40px; }
+
+.protagonist {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: clamp(26px, 4.2vw, 34px);
+  line-height: 1.32;
+  color: var(--white);
+}
+.essence {
+  margin-top: 22px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.55;
+  max-width: 54ch;
+}
+
+.drives-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.drive-list { list-style: none; }
+.drive-list li {
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--white);
+  opacity: 0.7;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.drive-list li:last-child { border-bottom: none; }
+
+.values-run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 0;
+  align-items: baseline;
+}
+.values-run span {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.85;
+}
+.values-run span + span::before {
+  content: "";
+  display: inline-block;
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin: 0 14px;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+.tension-row {
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.tension-row:first-of-type { padding-top: 4px; }
+.tension-row:last-of-type { border-bottom: none; padding-bottom: 4px; }
+
+.tension-side {
+  font-family: 'Playfair Display', serif;
+  font-size: 17.5px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--white);
+}
+.tension-side.pull-a { text-align: right; opacity: 0.92; }
+.tension-side.pull-b { text-align: left; font-style: italic; opacity: 0.62; }
+
+.tension-mark {
+  justify-self: center;
+  width: 1px; height: 34px;
+  background: var(--border);
+  position: relative;
+}
+.tension-mark::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 7px; height: 7px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--dark-card);
+}
+
+.pattern-row {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: baseline;
+}
+.pattern-row:first-of-type { padding-top: 0; }
+.pattern-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+
+.pattern-freq {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.9;
+}
+.pattern-body {
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--white);
+  opacity: 0.7;
+}
+.pattern-body .ctx { opacity: 0.62; font-weight: 300; }
+
+.week-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 12px;
+}
+.week-line .state {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  line-height: 1.3;
+  color: var(--white);
+}
+.week-line .state + .state::before {
+  content: "";
+  display: inline-block;
+  width: 22px; height: 1px;
+  background: var(--border);
+  margin: 0 16px;
+  vertical-align: middle;
+}
+.week-line .state:nth-child(1) { opacity: 0.55; }
+.week-line .state:nth-child(2) { opacity: 0.68; }
+.week-line .state:nth-child(3) { opacity: 0.8; }
+.week-line .state:nth-child(4) { opacity: 0.92; font-style: italic; }
+.week-line .state:nth-child(5) { opacity: 0.7; }
+
+.week-note {
+  margin-top: 16px;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.45;
+}
+
+.social-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.social-col { padding-right: 32px; }
+.social-col + .social-col {
+  padding-right: 0;
+  padding-left: 32px;
+  border-left: 1px solid var(--border-soft);
+}
+.social-col h4 {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.5;
+  margin-bottom: 14px;
+}
+.social-col p {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.7;
+}
+
+.env-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 36px;
+}
+.env-item { border-left: 2px solid var(--border); padding-left: 18px; }
+.env-name {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 19px;
+  line-height: 1.35;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.env-earned {
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.6;
+}
+.env-earned strong {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.role-section {
+  background: rgba(232,120,42,0.05);
+  border-top: 1px solid var(--border);
+}
+.role-line {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(19px, 3vw, 23px);
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--white);
+}
+
+.opportunity {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border-soft);
+}
+.opportunity .c-eyebrow { margin-bottom: 10px; }
+.opportunity p {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.65;
+  max-width: 58ch;
+}
+
+
+/* =============================================
+   CARD 3: STORY ARCHITECTURE
+   ============================================= */
+
+.story-open { padding-top: 44px; padding-bottom: 38px; }
+
+.pattern-line {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: clamp(23px, 3.8vw, 30px);
+  line-height: 1.4;
+  color: var(--white);
+}
+.pattern-line em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.arc-note {
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.55;
+  max-width: 56ch;
+}
+
+.shots { position: relative; padding-left: 34px; }
+.shots::before {
+  content: "";
+  position: absolute;
+  left: 8px; top: 14px; bottom: 14px;
+  width: 1px;
+  background: linear-gradient(to bottom,
+    rgba(232,120,42,0.55),
+    rgba(232,120,42,0.22) 45%,
+    rgba(245,237,226,0.28) 75%,
+    rgba(232,120,42,0.5));
+}
+
+.shot {
+  position: relative;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.shot:first-child { padding-top: 4px; }
+.shot:last-child { border-bottom: none; padding-bottom: 4px; }
+
+.shot::before {
+  content: "";
+  position: absolute;
+  left: -30px; top: 34px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--dark-card);
+}
+.shot:first-child::before { top: 12px; }
+.shot.t-morning::before { background: var(--accent); opacity: 0.55; }
+.shot.t-dusk::before { background: var(--accent); opacity: 0.85; }
+.shot.t-night::before { background: #f5ede2; border-color: rgba(245,237,226,0.6); opacity: 0.75; }
+.shot.t-dawn::before { background: var(--accent); opacity: 0.35; }
+
+.shot-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-bottom: 10px;
+}
+.shot-when {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.shot-tag {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.45;
+}
+.brand-mark {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  padding: 3px 9px 2px;
+  margin-left: auto;
+}
+
+.shot-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 1.35;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.shot-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--white);
+  opacity: 0.7;
+  max-width: 60ch;
+}
+
+.shot-foot {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+}
+.shot-foot span {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.5;
+}
+.shot-foot span b {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.85;
+  margin-right: 7px;
+}
+
+.arc-close {
+  background: rgba(232,120,42,0.05);
+  border-top: 1px solid var(--border);
+}
+.arc-close p {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 2.8vw, 21px);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--white);
+}
+.arc-close .next-note {
+  margin-top: 16px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: var(--white);
+  opacity: 0.5;
+}
+
+
+/* ===== FOOTER ===== */
+.page-foot {
+  border-top: 1px solid var(--border);
+  padding: 36px 0 80px;
+  text-align: center;
+}
+.page-foot p {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.3;
+}
+
+
+/* ===== MOBILE ===== */
+@media (max-width: 640px) {
+  .site-nav { padding: 0 16px; height: 50px; }
+  .nav-logo { font-size: 12px; }
+  .nav-pill { font-size: 11px; padding: 5px 10px; letter-spacing: 0.12em; }
+  .nav-back { display: none; }
+
+  .page-wrap { padding: 0 16px; }
+
+  .intro { padding-top: 86px; padding-bottom: 44px; margin-bottom: 40px; }
+  .artifact-section { padding-bottom: 40px; margin-bottom: 40px; }
+
+  .card-head, .card-section, .confidence-foot { padding-left: 24px; padding-right: 24px; }
+
+  /* Dossier mobile */
+  .aud-grid, .sense-grid, .culture-grid, .guard-grid { grid-template-columns: 1fr; gap: 26px; }
+  .swatch-row { grid-template-columns: repeat(3, 1fr); row-gap: 20px; }
+  .verdict span + span::before { margin: 0 12px; }
+
+  /* Profile mobile */
+  .drives-grid, .env-grid { grid-template-columns: 1fr; gap: 28px; }
+  .social-grid { grid-template-columns: 1fr; }
+  .social-col { padding-right: 0; }
+  .social-col + .social-col { padding-left: 0; border-left: none; border-top: 1px solid var(--border-soft); margin-top: 22px; padding-top: 22px; }
+  .tension-row { grid-template-columns: 1fr; gap: 8px; }
+  .tension-side.pull-a { text-align: left; }
+  .tension-side.pull-b { text-align: left; padding-left: 22px; }
+  .tension-mark { display: none; }
+
+  /* Story mobile */
+  .shots { padding-left: 26px; }
+  .shots::before { left: 4px; }
+  .shot::before { left: -26px; }
+  .brand-mark { margin-left: 0; }
+
+  /* Shared */
+  .confidence-foot { flex-direction: column; align-items: flex-start; }
+  .confidence-foot .cf-body { text-align: left; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="../../" class="nav-logo">Higher Roads</a>
+  <div class="nav-pills">
+    <a class="nav-pill active" data-target="dossier">Dossier</a>
+    <a class="nav-pill" data-target="lived-world">Lived World</a>
+    <a class="nav-pill" data-target="story">Story</a>
+  </div>
+  <a href="../" class="nav-back">Back to tool</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- INTRO -->
+  <section class="intro">
+    <div class="eyebrow">Product World Preview · Artifact Gallery</div>
+    <h1>What the system figured out before the first render.</h1>
+    <p>The Product World Preview reads a brand, interprets the human context, builds a story architecture, and renders a multi-panel visual board. These three artifacts are the strategic reasoning the system produces along the way. Each one is a deliverable.</p>
+    <div class="brand-badge">
+      <span class="bb-label">Example brand</span>
+      <span class="bb-name">Fishwife</span>
+    </div>
+  </section>
+
+
+  <!-- ===== CARD 1: BRAND DOSSIER ===== -->
+  <section class="artifact-section" id="dossier">
+    <article class="artifact-card">
+
+      <header class="card-head">
+        <span class="stage">Artifact 01 · Brand Dossier</span>
+        <span class="brand-tag">Fishwife</span>
+      </header>
+
+      <section class="card-section verdict-open">
+        <div class="id-line"><b>Fishwife</b> · Tinned seafood · Premium pantry</div>
+        <div class="c-eyebrow">The read</div>
+        <div class="verdict">
+          <span>Playful</span>
+          <span>Elevated</span>
+          <span>Proudly specific</span>
+        </div>
+        <p class="positioning">A brand that took a humble format and gave it a personality: bright, confident, and serious about sourcing without ever sounding serious.</p>
+      </section>
+
+      <section class="card-section">
+        <div class="aud-grid">
+          <div>
+            <div class="c-eyebrow">Who this is for</div>
+            <p>Food-curious hosts and home cooks who treat grocery shopping as culture, follow chefs the way others follow bands, and want everyday meals to feel like small occasions.</p>
+          </div>
+          <div>
+            <div class="c-eyebrow">How they should feel</div>
+            <p class="desired">In on something good, and generous enough to share it.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">Product truth</div>
+        <p class="truth-lede">Responsibly sourced tinned seafood, wild-caught and small-batch smoked, built to move from pantry shelf to dinner table without a recipe.</p>
+        <ul class="truth-claims">
+          <li>Wild-caught and traceably sourced, named waters and named methods</li>
+          <li>Small-batch smoked for flavor that holds up plain or dressed</li>
+          <li>Ready in the time it takes to open the tin and slice bread</li>
+          <li>Packaging designed to sit out, not hide in a cabinet</li>
+        </ul>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">Palette, pulled from the brand</div>
+        <div class="swatch-row">
+          <div class="swatch">
+            <div class="chip" style="background:#e04f2f;"></div>
+            <span class="sw-name">Tomato red</span>
+            <span class="sw-role">Signature</span>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background:#f2c14e;"></div>
+            <span class="sw-name">Butter yellow</span>
+            <span class="sw-role">Warmth</span>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background:#2e6f6c;"></div>
+            <span class="sw-name">Sea teal</span>
+            <span class="sw-role">Depth</span>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background:#f5ead4;"></div>
+            <span class="sw-name">Cream</span>
+            <span class="sw-role">Ground</span>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background:#1d2a33;"></div>
+            <span class="sw-name">Harbor navy</span>
+            <span class="sw-role">Contrast</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="sense-grid">
+          <div>
+            <div class="c-eyebrow">How it feels</div>
+            <div class="word-run">
+              <span>Rolled tin</span>
+              <span>Olive oil</span>
+              <span>Crusty bread</span>
+              <span>Sea air</span>
+            </div>
+            <p class="sense-note">Temperature runs warm and coastal. Texture over gloss, hands over props.</p>
+          </div>
+          <div>
+            <div class="c-eyebrow">Visual neighbors</div>
+            <ul class="refs-list">
+              <li><em>Closest</em>Illustrated European tin design, mid-century seaside</li>
+              <li><em>Adjacent</em>Modern natural-wine and specialty-grocer culture</li>
+              <li><em>Energy</em>Editorial food photography with visible appetite</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="culture-grid">
+          <div>
+            <div class="c-eyebrow">Cultural codes</div>
+            <p>Tinned fish as a lifestyle signal. Aperitivo hour, snack dinners, the board as social object. Quality worn lightly, provenance told as story rather than certification.</p>
+          </div>
+          <div>
+            <div class="c-eyebrow">Competitive context</div>
+            <p>Sits above commodity canned seafood and beside imported conservas, winning on personality and approachability where imports win on heritage alone.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section guard-section">
+        <div class="c-eyebrow">Guardrails</div>
+        <div class="guard-grid">
+          <div class="guard-item">
+            <span class="never">Never</span>
+            <p>Sterile health-food minimalism. The brand's warmth is the asset; clinical framing kills it.</p>
+          </div>
+          <div class="guard-item">
+            <span class="never">Never</span>
+            <p>Nautical costume. Rope, anchors, and fisherman clichés turn provenance into theme-park set dressing.</p>
+          </div>
+          <div class="guard-item">
+            <span class="never">Never</span>
+            <p>Luxury hush. Whispered premium cues contradict a brand built on appetite and color.</p>
+          </div>
+          <div class="guard-item">
+            <span class="never">Never</span>
+            <p>Raw-fish market realism. The world is the table and the pantry, not the dock and the catch.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="confidence-foot">
+        <span class="cf-label">Evidence confidence</span>
+        <span class="cf-body">Product claims, palette, and audience posture rest on strong site evidence. Cultural codes and competitive framing are interpretation from brand voice and category context.</span>
+      </footer>
+
+    </article>
+  </section>
+
+
+  <!-- ===== CARD 2: LIVED-WORLD PROFILE ===== -->
+  <section class="artifact-section" id="lived-world">
+    <article class="artifact-card">
+
+      <header class="card-head">
+        <span class="stage">Artifact 02 · Lived-World Profile</span>
+        <span class="brand-tag">Fishwife</span>
+      </header>
+
+      <section class="card-section person-open">
+        <div class="c-eyebrow">The person</div>
+        <h2 class="protagonist">A person who shops with intention, cooks as a form of care, and gathers people around small meals that carry weight without ceremony.</h2>
+        <p class="essence">Fishwife makes exceptional everyday eating feel earned rather than performed. The tin is proof that quality can be casual.</p>
+      </section>
+
+      <section class="card-section">
+        <div class="drives-grid">
+          <div>
+            <div class="c-eyebrow">What they want</div>
+            <ul class="drive-list">
+              <li>A kitchen that friends walk into without being invited twice</li>
+              <li>To know where their food comes from and why it costs what it costs</li>
+              <li>Weeknight meals that feel considered without feeling like projects</li>
+              <li>A life where hosting is a habit, not an event</li>
+            </ul>
+          </div>
+          <div>
+            <div class="c-eyebrow">What they hold</div>
+            <div class="values-run">
+              <span>Provenance</span>
+              <span>Generosity</span>
+              <span>Craft</span>
+              <span>Ease</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">The tensions they live inside</div>
+        <div class="tension-row">
+          <div class="tension-side pull-a">Wants to feed people well</div>
+          <div class="tension-mark"></div>
+          <div class="tension-side pull-b">but weeknights end at seven with nothing thawed</div>
+        </div>
+        <div class="tension-row">
+          <div class="tension-side pull-a">Cares deeply about sourcing</div>
+          <div class="tension-mark"></div>
+          <div class="tension-side pull-b">but refuses to make dinner a lecture</div>
+        </div>
+        <div class="tension-row">
+          <div class="tension-side pull-a">Loves the ritual of cooking alone</div>
+          <div class="tension-mark"></div>
+          <div class="tension-side pull-b">but measures a good week by who sat at the table</div>
+        </div>
+        <div class="tension-row">
+          <div class="tension-side pull-a">Wants the good stuff daily</div>
+          <div class="tension-mark"></div>
+          <div class="tension-side pull-b">but was raised to save it for occasions</div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">Life patterns</div>
+        <div class="pattern-row">
+          <span class="pattern-freq">Saturdays</span>
+          <p class="pattern-body">Walks to the specialty shop and reads labels front to back. <span class="ctx">Discovery is on foot, unhurried, half the point of the morning.</span></p>
+        </div>
+        <div class="pattern-row">
+          <span class="pattern-freq">Weeknights</span>
+          <p class="pattern-body">Assembles more than cooks: tins, good bread, whatever the counter holds. <span class="ctx">Twenty minutes, one board, no apology.</span></p>
+        </div>
+        <div class="pattern-row">
+          <span class="pattern-freq">Fridays</span>
+          <p class="pattern-body">Hosts four people, never twelve. <span class="ctx">Candles get lit for close friends, not for show.</span></p>
+        </div>
+        <div class="pattern-row">
+          <span class="pattern-freq">Sundays</span>
+          <p class="pattern-body">Walks near water with coffee before the week starts. <span class="ctx">Renewal is a place, and the place is a shoreline.</span></p>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">A normal week, felt from the inside</div>
+        <div class="week-line">
+          <span class="state">Focused</span>
+          <span class="state">Stretched</span>
+          <span class="state">Anticipating</span>
+          <span class="state">Warm</span>
+          <span class="state">Restored</span>
+        </div>
+        <p class="week-note">The register moves from weekday discipline toward weekend warmth, then resets near water.</p>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">Their social world</div>
+        <div class="social-grid">
+          <div class="social-col">
+            <h4>Alone</h4>
+            <p>Cooking is solitary and unhurried. Music on, phone face down, tasting as they go. Solitude in the kitchen is preparation for company, not an absence of it.</p>
+          </div>
+          <div class="social-col">
+            <h4>Together</h4>
+            <p>Gathers small groups around food that invites reaching and passing. Conversation over presentation. The meal is the excuse, the table is the point.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">Environments they have earned</div>
+        <div class="env-grid">
+          <div class="env-item">
+            <div class="env-name">The specialty shop, mid-morning</div>
+            <div class="env-earned">
+              <strong>Earned by</strong>
+              Shopping as ritual. They are here to read, compare, and choose, not to grab and go.
+            </div>
+          </div>
+          <div class="env-item">
+            <div class="env-name">A home kitchen at dusk</div>
+            <div class="env-earned">
+              <strong>Earned by</strong>
+              Cooking as care. The counter is worked, lived in, lit by the last of the window light.
+            </div>
+          </div>
+          <div class="env-item">
+            <div class="env-name">A candlelit table for four</div>
+            <div class="env-earned">
+              <strong>Earned by</strong>
+              Hosting as habit. Close friends, open tins, no performance.
+            </div>
+          </div>
+          <div class="env-item">
+            <div class="env-name">A coastal pier at first light</div>
+            <div class="env-earned">
+              <strong>Earned by</strong>
+              Renewal near water. The walk that closes one week and opens the next.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section role-section">
+        <div class="c-eyebrow">Where the brand belongs</div>
+        <p class="role-line">Fishwife is the shortcut to the meal they meant to make: quality already done, so care can go into the gathering instead.</p>
+        <div class="opportunity">
+          <div class="c-eyebrow">The world this opens</div>
+          <p>A visual territory of earned everyday luxury: worked kitchens, small tables, coastal light, and food that gets reached for. Nothing staged, everything specific.</p>
+        </div>
+      </section>
+
+      <footer class="confidence-foot">
+        <span class="cf-label">Evidence confidence</span>
+        <span class="cf-body">Audience, sourcing values, and product truths rest on strong site evidence. Weekly rhythm and social patterns are interpretation from brand voice and category behavior.</span>
+      </footer>
+
+    </article>
+  </section>
+
+
+  <!-- ===== CARD 3: STORY ARCHITECTURE ===== -->
+  <section class="artifact-section" id="story">
+    <article class="artifact-card">
+
+      <header class="card-head">
+        <span class="stage">Artifact 03 · Story Architecture</span>
+        <span class="brand-tag">Fishwife</span>
+      </header>
+
+      <section class="card-section story-open">
+        <div class="c-eyebrow">The rhythm of their week</div>
+        <p class="pattern-line">Discovery on foot, preparation in solitude, connection through sharing, <em>renewal near water.</em></p>
+        <p class="arc-note">Four moments from one life, chosen because each environment is earned by a behavior. The emotional register builds from quiet attention toward shared warmth, then resets at the shoreline.</p>
+      </section>
+
+      <section class="card-section">
+        <div class="c-eyebrow">The shot list</div>
+        <div class="shots">
+
+          <article class="shot t-morning">
+            <div class="shot-meta">
+              <span class="shot-when">Saturday · Morning</span>
+              <span class="shot-tag">Room scale</span>
+            </div>
+            <h3 class="shot-title">Reading labels at the specialty shop</h3>
+            <p class="shot-body">Unhurried in the aisle, turning a tin over to read the sourcing story. Shopping as culture, not errand. The shelf light is flat and honest.</p>
+            <div class="shot-foot">
+              <span><b>Feels</b>Curious, unrushed</span>
+              <span><b>Does for the board</b>Opens the world at eye level, establishes intention</span>
+            </div>
+          </article>
+
+          <article class="shot t-dusk">
+            <div class="shot-meta">
+              <span class="shot-when">Wednesday · Evening</span>
+              <span class="shot-tag">Intimate scale</span>
+              <span class="brand-mark">Tin present</span>
+            </div>
+            <h3 class="shot-title">Assembling dinner in a worked kitchen</h3>
+            <p class="shot-body">Counter crowded with bread, oil, and an opened week. The tin joins the assembly as an ingredient among equals, lit by the last of the window light.</p>
+            <div class="shot-foot">
+              <span><b>Feels</b>Settled, capable</span>
+              <span><b>Does for the board</b>Puts the product inside the ritual, hands over props</span>
+            </div>
+          </article>
+
+          <article class="shot t-night">
+            <div class="shot-meta">
+              <span class="shot-when">Friday · Night</span>
+              <span class="shot-tag">Room scale</span>
+              <span class="brand-mark">Tin present</span>
+            </div>
+            <h3 class="shot-title">Dinner for four by candlelight</h3>
+            <p class="shot-body">Close friends around a small table, food that invites reaching. The tin sits open among the plates, unbothered and unhidden. Warmth over polish.</p>
+            <div class="shot-foot">
+              <span><b>Feels</b>Warm, generous</span>
+              <span><b>Does for the board</b>The emotional peak, proof the brand earns the table</span>
+            </div>
+          </article>
+
+          <article class="shot t-dawn">
+            <div class="shot-meta">
+              <span class="shot-when">Sunday · First light</span>
+              <span class="shot-tag">Landscape scale</span>
+            </div>
+            <h3 class="shot-title">Walking the coastal pier</h3>
+            <p class="shot-body">Coffee in hand, water on both sides, the week behind and ahead. No product in frame. The provenance the brand talks about, felt rather than stated.</p>
+            <div class="shot-foot">
+              <span><b>Feels</b>Restored, clear</span>
+              <span><b>Does for the board</b>Closes the arc at landscape scale, ties life to source</span>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <section class="card-section arc-close">
+        <div class="c-eyebrow">Why these four</div>
+        <p>The board holds one life across one week: intention, preparation, gathering, renewal. The product appears exactly twice, both times earned by what the person is already doing.</p>
+        <p class="next-note">Next: these four moments render as a single board sharing one palette, one light quality, one lens character.</p>
+      </section>
+
+    </article>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer class="page-foot">
+    <p>Higher Roads Creative · Product World Preview</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const pills = document.querySelectorAll('.nav-pill[data-target]');
+  const sections = [];
+
+  pills.forEach(pill => {
+    const el = document.getElementById(pill.dataset.target);
+    if (el) sections.push({ pill, el });
+  });
+
+  // Click to scroll
+  pills.forEach(pill => {
+    pill.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.getElementById(this.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Scroll spy
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function() {
+      const scrollY = window.scrollY + 90;
+      let active = sections[0];
+      for (let i = sections.length - 1; i >= 0; i--) {
+        if (sections[i].el.offsetTop <= scrollY) {
+          active = sections[i];
+          break;
+        }
+      }
+      pills.forEach(p => p.classList.remove('active'));
+      if (active) active.pill.classList.add('active');
+      ticking = false;
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+</body>
+</html>
