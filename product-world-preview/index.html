@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-28-lived-world-v11';
+const PWP_BUILD_ID = 'pwp-index-2026-07-28-context-compression-v12';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -1028,16 +1028,19 @@ async function generateLivedWorldProfile(data){
 }
 
 async function ideateWorldTheses(data){
-  // Pass both the grammar module summary and the aesthetic mode library, so the
-  // ideation model can pick a mode per thesis rather than defaulting to cinema.
   const modesShort=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when}));
-  const profileJson=(data&&data.vibes&&data.vibes.lived_world_profile)
+  const isCompressed=data&&data.context_type==='compressed_ideation_v1';
+  const profileJson=(isCompressed&&data.lived_world_profile)
+    ?'\n\nLived-world profile:\n'+JSON.stringify(data.lived_world_profile)
+    :(data&&data.vibes&&data.vibes.lived_world_profile)
     ?'\n\nLived-world profile (derived from the dossier above):\n'+JSON.stringify(data.vibes.lived_world_profile)
     :'';
+  const contextLabel=isCompressed?'Creative context':'Creative dossier';
+  const contextPayload=isCompressed?data:fullCreativeDossier(data);
   const parsed=await runModelStage(
     'ideation',
     WORLD_IDEATION_PROMPT,
-    'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data))+
+    contextLabel+':\n'+JSON.stringify(contextPayload)+
     profileJson+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modesShort),
     2600);
@@ -1067,10 +1070,13 @@ function validHumanPresence(x){
 async function selectThesisAndGrammar(data, theses){
   const moduleLibrary=GRAMMAR_MODULES.map(m=>({id:m.id,name:m.name,grammar:m.grammar,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
   const modeLibrary=AESTHETIC_MODES.map(m=>({id:m.id,name:m.name,scene_grammar:m.scene_grammar,human_presence_default:m.human_presence_default,best_when:m.best_when,avoid_when:m.avoid_when,traps:m.traps}));
+  const isCompressed=data&&data.context_type==='compressed_selection_v1';
+  const contextLabel=isCompressed?'Creative context':'Creative dossier';
+  const contextPayload=isCompressed?data:fullCreativeDossier(data);
   const parsed=await runModelStage(
     'selection',
     THESIS_SELECTION_PROMPT,
-    'Creative dossier:\n'+JSON.stringify(fullCreativeDossier(data))+
+    contextLabel+':\n'+JSON.stringify(contextPayload)+
     '\n\nCandidate world theses (each carries a proposed aesthetic_mode and human_presence):\n'+JSON.stringify(theses)+
     '\n\nGrammar module library:\n'+JSON.stringify(moduleLibrary)+
     '\n\nAesthetic mode library:\n'+JSON.stringify(modeLibrary),
@@ -1191,7 +1197,7 @@ function renderCreativeDirectionPanel(){
   const cs=cd.creative_selection, st=cd.scene_translation||{};
   const row=(label,val)=>val?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+esc(val)+'</span></div>'):'';
   const chips=(label,arr)=>(arr&&arr.length)?('<div class="cd-row"><span class="cd-k">'+esc(label)+'</span><span class="cd-v">'+arr.map(x=>'<span class="cd-chip">'+esc(x)+'</span>').join(' ')+'</span></div>'):'';
-  let html='<div class="cd-head">Creative direction <span class="cd-tag">internal</span></div>';
+  let html='<div class="cd-head">Creative direction <span class="cd-tag">internal</span>'+(CREATIVE_JOB?' <button onclick="exportCreativeJob()" style="margin-left:12px;padding:2px 10px;font-size:11px;cursor:pointer;background:transparent;color:var(--accent);border:1px solid var(--border);border-radius:4px;font-family:inherit">Export job</button>':'')+'</div>';
   if(!cs){
     html+='<div class="cd-row"><span class="cd-k">Pipeline</span><span class="cd-v">fallback (aesthetic mode pipeline unavailable, using brand-read scene)</span></div>';
   }else{
@@ -1227,6 +1233,19 @@ function renderCreativeDirectionPanel(){
   }
   if(st.authored_prompt) html+='<div class="cd-row cd-prompt"><span class="cd-k">Authored prompt</span><span class="cd-v">'+esc(st.authored_prompt)+'</span></div>';
   if(st.final_render_prompt) html+='<div class="cd-row cd-prompt"><span class="cd-k">Final render prompt</span><span class="cd-v">'+esc(st.final_render_prompt)+'</span></div>';
+  if(CREATIVE_JOB){
+    var metricsHtml='<div class="cd-row"><span class="cd-k">Context</span><span class="cd-v">'+(CREATIVE_JOB.compressed_context?'compressed':'full dossier')+'</span></div>';
+    var stageOrder=['lived_world','ideation','selection','direction'];
+    stageOrder.forEach(function(k){
+      var s=CREATIVE_JOB.stages[k];
+      if(!s) return;
+      var icon=s.status==='complete'?'\u2713':s.status==='failed'?'\u2717':'\u2026';
+      var dur=s.duration_ms?(' '+Math.round(s.duration_ms/100)/10+'s'):'';
+      var err=s.error?(' \u2014 '+s.error.slice(0,80)):'';
+      metricsHtml+='<div class="cd-row"><span class="cd-k">'+icon+' '+k+'</span><span class="cd-v">'+esc(s.status+dur+err)+'</span></div>';
+    });
+    html+=metricsHtml;
+  }
   el.innerHTML=html;
   el.hidden=false;
 }
@@ -1236,7 +1255,7 @@ const ART_DIRECTOR_PROMPT = [
   '',
   'CREATIVE-FIRST AUTHORITY:',
   'The selected world thesis is authoritative. Develop it into one authored master scene; never relocate it, dilute it toward category convention, or replace it with a grammar-default location.',
-  'Use the full creative dossier, including source evidence and visual identity when present, as creative source material, not as a compliance checklist.',
+  'Use the supplied creative intelligence, including source evidence and visual identity when present, as creative source material, not as a compliance checklist.',
   'authored_prompt is the deliverable: one 120-200 word paragraph in the selected aesthetic mode that will be sent to the renderer nearly verbatim. Write it as prose, world and action first, supplied locked assets only when present, light and atmosphere last.',
   'Return only the required JSON schema.'
 ].join('\n');
@@ -1476,16 +1495,22 @@ function workerFallbackScene(data){
 }
 
 async function buildMasterScene(data,creativeSelection,winningThesis){
-  // The scene author receives the COMPLETE dossier. The previous build passed
-  // only brand_tone, visual_territory, sensory, and competitive, withholding
-  // campaign_signals, audience, product_truth, and brand_intent from the one
-  // call that authors the world.
-  const input={
-    dossier:fullCreativeDossier(data),
-    locked_asset_rule:normalizedLockedAssets(data).length
-      ?'Supplied locked assets are identity-locked and state-locked. Integrate them without redrawing, retyping, recoloring, relabeling, reshaping, cropping, opening, closing, removing, adding, or reinterpreting protected identity.'
-      :'No locked asset is supplied. This is a world-only scene. Do not invent, describe, place, or imply any product, package, bottle, can, jar, pouch, container, label, logo, brand mark, SKU, hero object, placeholder shape, or reserved product area anywhere in the scene. Reference URLs in the source stack are creative evidence for palette, composition, and tonal behavior only. Their products, brand names, and packaging do not exist in this world.'
-  };
+  const isCompressed=data&&data.context_type==='compressed_direction_v1';
+  const input=isCompressed
+    ?{
+      context_type:'compressed_direction_v1',
+      locked_asset_rule:data.locked_asset_rule,
+      delivery_context:data.delivery_context,
+      avoid:data.avoid,
+      requirements:data.requirements,
+      product_facts:data.product_facts
+    }
+    :{
+      dossier:fullCreativeDossier(data),
+      locked_asset_rule:normalizedLockedAssets(data).length
+        ?'Supplied locked assets are identity-locked and state-locked. Integrate them without redrawing, retyping, recoloring, relabeling, reshaping, cropping, opening, closing, removing, adding, or reinterpreting protected identity.'
+        :'No locked asset is supplied. This is a world-only scene. Do not invent, describe, place, or imply any product, package, bottle, can, jar, pouch, container, label, logo, brand mark, SKU, hero object, placeholder shape, or reserved product area anywhere in the scene. Reference URLs in the source stack are creative evidence for palette, composition, and tonal behavior only. Their products, brand names, and packaging do not exist in this world.'
+    };
   let parsed=null;
   let rawSceneText='';
   try{
@@ -2970,6 +2995,162 @@ function resolveHomeUrlForProduct(productUrl, explicitHomeUrl){
   };
 }
 
+/* ===================== Commit 1: Pipeline job wrapper ===================== */
+/* Thin instrumentation layer over the existing pipeline. Each stage writes
+   status, output, duration, and error to a structured job object. The job
+   is exportable as a single JSON for artifact comparison. */
+
+let CREATIVE_JOB = null;
+
+function initCreativeJob(){
+  CREATIVE_JOB = {
+    id: 'job_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+    version: PWP_BUILD_ID,
+    created_at: new Date().toISOString(),
+    compressed_context: USE_COMPRESSED_CONTEXT,
+    stages: {}
+  };
+  return CREATIVE_JOB;
+}
+
+async function runPipelineStage(stageName, executor){
+  if(!CREATIVE_JOB) initCreativeJob();
+  const entry = { status:'running', output:null, error:null, started_at:Date.now(), duration_ms:0 };
+  CREATIVE_JOB.stages[stageName] = entry;
+  try {
+    const result = await executor();
+    entry.output = result;
+    entry.status = 'complete';
+    entry.duration_ms = Date.now() - entry.started_at;
+    return result;
+  } catch(err) {
+    entry.status = 'failed';
+    entry.error = String((err&&err.message)||err).slice(0,300);
+    entry.duration_ms = Date.now() - entry.started_at;
+    throw err;
+  }
+}
+
+function exportCreativeJob(){
+  if(!CREATIVE_JOB) { console.warn('No creative job to export'); return; }
+  const exportData = {
+    job_id: CREATIVE_JOB.id,
+    version: CREATIVE_JOB.version,
+    created_at: CREATIVE_JOB.created_at,
+    compressed_context: CREATIVE_JOB.compressed_context,
+    dossier: fullCreativeDossier(DATA),
+    lived_world_profile: (DATA.vibes&&DATA.vibes.lived_world_profile)||null,
+    world_theses: (DATA.vibes&&DATA.vibes.world_theses)||[],
+    selection: (DATA.vibes&&DATA.vibes.creative_selection)||null,
+    winning_thesis: (DATA.vibes&&DATA.vibes.world_thesis_selected)||null,
+    master_scene: (DATA.vibes&&DATA.vibes.master_scene)||null,
+    scene_meta: (DATA.vibes&&DATA.vibes.master_scene_meta)||null,
+    scene_diagnostics: (DATA.vibes&&DATA.vibes.scene_diagnostics)||null,
+    metrics: Object.keys(CREATIVE_JOB.stages).reduce(function(acc,k){
+      var s=CREATIVE_JOB.stages[k];
+      acc[k]={status:s.status, duration_ms:s.duration_ms, error:s.error};
+      return acc;
+    },{})
+  };
+  const blob = new Blob([JSON.stringify(exportData,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (DATA.brand||'brand').replace(/[^a-zA-Z0-9]/g,'_')+'_'+CREATIVE_JOB.id+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ===================== Commit 2: Context compression ===================== */
+/* Toggle: when true, downstream stages receive compressed inputs instead of
+   the full dossier. When false, existing full-dossier behavior is preserved
+   for A/B comparison. */
+
+const USE_COMPRESSED_CONTEXT = true;
+
+/* --- Lived World context (no change, already correctly scoped) --- */
+/* generateLivedWorldProfile already receives the full dossier, which is
+   correct: it is the first interpretive stage and needs all evidence. */
+
+/* --- Ideation context --- */
+function buildIdeationContext(data){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  const brief=(data&&data.brief)||{};
+  const profile=v.lived_world_profile||null;
+  const lockedAssets=normalizedLockedAssets(data);
+  return {
+    context_type:'compressed_ideation_v1',
+    lived_world_profile:profile,
+    brand_essence:_c(profile&&profile.brand_essence)||_c(brief.intent)||_c(ix.assets&&ix.assets.brand_intent),
+    source_identity:{
+      name:_c(brief.source_name)||_c(data&&data.brand)||'creative brief',
+      kind:_c(brief.source_kind)||'brand'
+    },
+    product_facts:(function(){
+      var f=(data&&data.factual)||{};
+      if(_c(f.name)||_c(f.category)||_c(f.flavor_sku)) return {name:_c(f.name),category:_c(f.category),flavor_sku:_c(f.flavor_sku)};
+      return null;
+    })(),
+    locked_asset_summary:lockedAssets.length
+      ?{count:lockedAssets.length,type:_c(lockedAssets[0].asset_type),name:_c(lockedAssets[0].asset_name)}
+      :null,
+    delivery_context:resolvedDeliveryContext(brief),
+    avoid:_dedupe([].concat(_l(brief.avoid),_l(ix.visual_identity&&ix.visual_identity.never_world))),
+    requirements:_dedupe(_l(brief.requirements)),
+    anchors:Array.isArray(brief.anchors)?brief.anchors.map(function(a){
+      return {anchor_id:a.anchor_id,role:a.role,source_name:_c(a.input&&a.input.source_name),usage_note:_c(a.input&&a.input.usage_note),confidence:a.confidence};
+    }):[],
+    read_confidence:v.confidence||'unknown'
+  };
+}
+
+/* --- Selection context --- */
+function buildSelectionContext(data){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  const brief=(data&&data.brief)||{};
+  const profile=v.lived_world_profile||null;
+  const lockedAssets=normalizedLockedAssets(data);
+  return {
+    context_type:'compressed_selection_v1',
+    lived_world_profile:profile,
+    brand_essence:_c(profile&&profile.brand_essence)||_c(brief.intent)||_c(ix.assets&&ix.assets.brand_intent),
+    locked_asset_summary:lockedAssets.length
+      ?{count:lockedAssets.length,type:_c(lockedAssets[0].asset_type)}
+      :null,
+    delivery_context:resolvedDeliveryContext(brief),
+    avoid:_dedupe([].concat(_l(brief.avoid),_l(ix.visual_identity&&ix.visual_identity.never_world))),
+    requirements:_dedupe(_l(brief.requirements)),
+    read_confidence:v.confidence||'unknown'
+  };
+}
+
+/* --- Direction context --- */
+function buildDirectionContext(data){
+  const v=(data&&data.vibes)||{};
+  const ix=v.intake_expressive||{};
+  const brief=(data&&data.brief)||{};
+  const lockedAssets=normalizedLockedAssets(data);
+  return {
+    context_type:'compressed_direction_v1',
+    locked_assets:lockedAssets,
+    locked_asset_rule:lockedAssets.length
+      ?'Supplied locked assets are identity-locked and state-locked. Integrate them without redrawing, retyping, recoloring, relabeling, reshaping, cropping, opening, closing, removing, adding, or reinterpreting protected identity.'
+      :'No locked asset is supplied. This is a world-only scene. Do not invent, describe, place, or imply any product, package, bottle, can, jar, pouch, container, label, logo, brand mark, SKU, hero object, placeholder shape, or reserved product area anywhere in the scene. Reference URLs in the source stack are creative evidence for palette, composition, and tonal behavior only. Their products, brand names, and packaging do not exist in this world.',
+    delivery_context:resolvedDeliveryContext(brief),
+    avoid:_dedupe([].concat(_l(brief.avoid),_l(ix.visual_identity&&ix.visual_identity.never_world))),
+    requirements:_dedupe(_l(brief.requirements)),
+    product_facts:(function(){
+      var f=(data&&data.factual)||{};
+      if(_c(f.name)||_c(f.category)||_c(f.flavor_sku)) return {name:_c(f.name),category:_c(f.category),flavor_sku:_c(f.flavor_sku)};
+      return null;
+    })()
+  };
+}
+
+/* ===================== Pipeline ===================== */
+
 async function completeCreativePipeline(brandData){
   DATA.brand=brandData.brand||DATA.brand;
   DATA.factual=Object.assign({},DATA.factual||{},brandData.factual||{});
@@ -2979,13 +3160,15 @@ async function completeCreativePipeline(brandData){
   PREVIEW_FLOW_STATE.scene='loading';
   refresh();
 
+  initCreativeJob();
+
   // Stage 2.5: lived-world profile (brand/product briefs only).
-  // Transforms the dossier into a human-centered creative context so ideation
-  // starts from a person's life instead of geography.
   if(shouldGenerateLivedWorld(DATA)){
     try{
       PERF.start('lived_world_profile_anthropic');
-      const profile=await generateLivedWorldProfile(DATA);
+      const profile=await runPipelineStage('lived_world',function(){
+        return generateLivedWorldProfile(DATA);
+      });
       DATA.vibes.lived_world_profile=profile;
       PERF.end('lived_world_profile_anthropic',{
         identity:_c(profile&&profile.human_subject&&profile.human_subject.identity).slice(0,80),
@@ -2998,29 +3181,31 @@ async function completeCreativePipeline(brandData){
     }
   }
 
-  // Stage 3: three divergent world theses from the full dossier.
+  // Stage 3: three divergent world theses.
   let theses=null;
   try{
     PERF.start('world_ideation_anthropic');
-    theses=await ideateWorldTheses(DATA);
-    PERF.end('world_ideation_anthropic',{count:theses.length,names:theses.map(t=>t.thesis_name).join(' | ')});
+    theses=await runPipelineStage('ideation',function(){
+      return ideateWorldTheses(USE_COMPRESSED_CONTEXT?buildIdeationContext(DATA):DATA);
+    });
+    PERF.end('world_ideation_anthropic',{count:theses.length,names:theses.map(t=>t.thesis_name).join(' | '),compressed:USE_COMPRESSED_CONTEXT});
   }catch(ideaErr){
     PERF.end('world_ideation_anthropic',{error:String((ideaErr&&ideaErr.message)||ideaErr).slice(0,160)});
     console.warn('world ideation failed; scene author will work from the dossier alone',ideaErr);
   }
   DATA.vibes.world_theses=theses||[];
 
-  // Stage 4: comparative selection plus grammar modules. Selection replaces the
-  // previous score-then-revise critic; choosing between divergent candidates
-  // beats revising a single one toward the mean.
+  // Stage 4: comparative selection plus grammar modules.
   let creativeSelection=null, winningThesis=null;
   if(theses&&theses.length){
     try{
       PERF.start('thesis_selection_anthropic');
-      const picked=await selectThesisAndGrammar(DATA,theses);
+      const picked=await runPipelineStage('selection',function(){
+        return selectThesisAndGrammar(USE_COMPRESSED_CONTEXT?buildSelectionContext(DATA):DATA,theses);
+      });
       creativeSelection=picked.selection;
       winningThesis=picked.thesis;
-      PERF.end('thesis_selection_anthropic',{selected:creativeSelection.selected_thesis_name,modules:(creativeSelection.grammar_modules||[]).map(g=>g.id).join(',')});
+      PERF.end('thesis_selection_anthropic',{selected:creativeSelection.selected_thesis_name,modules:(creativeSelection.grammar_modules||[]).map(g=>g.id).join(','),compressed:USE_COMPRESSED_CONTEXT});
     }catch(selErr){
       PERF.end('thesis_selection_anthropic',{error:String((selErr&&selErr.message)||selErr).slice(0,160)});
       console.warn('thesis selection failed; using the first thesis without grammar modules',selErr);
@@ -3030,11 +3215,13 @@ async function completeCreativePipeline(brandData){
   DATA.vibes.creative_selection=creativeSelection;
   DATA.vibes.world_thesis_selected=winningThesis;
 
-  // Stage 6: one authored master scene from the winner, with everything in hand.
+  // Stage 6: one authored master scene from the winner.
   try{
     PERF.start('master_scene_anthropic');
-    const built=await buildMasterScene(DATA,creativeSelection,winningThesis);
-    PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name,authored_prompt:!!(built&&built.scene_direction&&built.scene_direction.authored_prompt)});
+    const built=await runPipelineStage('direction',function(){
+      return buildMasterScene(USE_COMPRESSED_CONTEXT?buildDirectionContext(DATA):DATA,creativeSelection,winningThesis);
+    });
+    PERF.end('master_scene_anthropic',{scene:built&&built.scene_direction&&built.scene_direction.scene_name,authored_prompt:!!(built&&built.scene_direction&&built.scene_direction.authored_prompt),compressed:USE_COMPRESSED_CONTEXT});
     DATA.vibes.master_scene=built.scene_direction;
     DATA.vibes.master_scene_meta={brand_world_read:built.brand_world_read||'',world_thesis:built.world_thesis||'',cinematic_translation:built.cinematic_translation||'',category_cliches_to_avoid:built.category_cliches_to_avoid||[],anti_tabletop_rules:built.anti_tabletop_rules||[]};
     DATA.vibes.scene_diagnostics=built.diagnostics||null;

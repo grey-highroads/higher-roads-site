@@ -14,8 +14,8 @@
 //   3. artDirectorPrompt     -> one authored master scene in the selected mode's register
 (function(){
   window.HR_CREATIVE_CONFIG = {
-    config_version: 'creative-config-2026-07-28-lived-world-v11',
-    version: 'creative-config-2026-07-28-lived-world-v11',
+    config_version: 'creative-config-2026-07-28-context-compression-v12',
+    version: 'creative-config-2026-07-28-context-compression-v12',
 
     fidelityNegatives: ['redrawn packaging','retyped label','altered label hierarchy','distorted pack proportions','recolored packaging','generated or fake product','warped logo','invented text on label'],
 
@@ -448,6 +448,8 @@ Your job has three parts.
 
 PART 1: SELECT ONE THESIS, COMPARATIVELY.
 Judge the three theses against each other, not against an absolute scale. The winner is the thesis a strong creative director would develop: most traceable to supplied evidence, most specific in its memorable image, most true to its aesthetic mode, and truest to the intent and emotional posture in the dossier. State what the winner does that the others do not. If the dossier includes never_world, disqualify any thesis that enters it.
+
+HUMAN WORLD ALIGNMENT. When a lived_world_profile is present, evaluate whether each thesis expresses the behaviors, values, tensions, and environments from the profile. A thesis whose environment connects to a named life pattern or tension is stronger than one that invents a setting unrelated to the person's life. A thesis that matches the profile's emotional range is stronger than one stuck in a single mood. A beautiful world that ignores the human subject loses to a less obvious world that grows from the person's actual life. State the alignment in selection_reason.
 
 Give real weight to source evidence. A thesis that adapts a concrete gesture, material behavior, use pattern, visual relationship, or cultural signal from the anchors is stronger than one that uses generic territory beautifully. Beautiful and generic loses to specific and honest.
 
