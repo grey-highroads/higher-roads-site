@@ -522,7 +522,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13a';
+const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13b';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -1047,13 +1047,24 @@ async function generateWorldStoryboard(data){
       _l(data&&data.vibes&&data.vibes.intake_expressive&&data.vibes.intake_expressive.visual_identity&&data.vibes.intake_expressive.visual_identity.never_world)
     ))
   };
-  const parsed=await runModelStage(
-    'storyboard',
-    WORLD_STORYBOARD_PROMPT,
-    'Lived-world profile and brand context:\n'+JSON.stringify(input),
-    3200);
+  var rawText=null;
+  try{
+    rawText=await requestModelStageText(
+      'storyboard',
+      WORLD_STORYBOARD_PROMPT,
+      'Lived-world profile and brand context:\n'+JSON.stringify(input),
+      4096);
+  }catch(modelErr){
+    throw new Error('Storyboard model call failed: '+String((modelErr&&modelErr.message)||modelErr).slice(0,200));
+  }
+  var parsed=null;
+  try{
+    parsed=extractJson(rawText);
+  }catch(parseErr){
+    throw new Error('Storyboard JSON parse failed. Raw response starts with: '+String(rawText||'').slice(0,200));
+  }
   if(!parsed||!Array.isArray(parsed.scenes)||parsed.scenes.length<2){
-    throw new Error('Storyboard generation returned fewer than two usable scenes');
+    throw new Error('Storyboard returned '+((parsed&&parsed.scenes)?parsed.scenes.length:0)+' scenes (need 2+). Keys: '+Object.keys(parsed||{}).join(','));
   }
   return parsed;
 }

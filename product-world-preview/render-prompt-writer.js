@@ -130,6 +130,10 @@
   }
 
   function peopleExcluded(pkg){
+    // If the scene brief explicitly includes people at primary or supporting scale,
+    // they are intended and should not be excluded by blanket negative language.
+    const hp=c(pkg&&pkg.scene_brief&&pkg.scene_brief.human_presence).toLowerCase();
+    if(hp==='primary_scale'||hp==='supporting_scale'||hp==='crowd_scale') return false;
     const hay=[
       splitTerms(pkg&&pkg.prompts&&pkg.prompts.negative).join(' '),
       l(pkg&&pkg.scene_brief&&pkg.scene_brief.avoid).join(' '),
