@@ -523,7 +523,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-28-world-board-v13c';
+const PWP_BUILD_ID = 'pwp-index-2026-07-29-world-board-v13d';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -1107,9 +1107,9 @@ function buildWorldBoardPackage(data, storyboard){
   };
 
   // Run through the compiler to produce the board prompt
-  var writer=getPromptWriter();
-  if(writer){
-    var compiled=writer.compile(pkg);
+  var writerResult=getPromptWriter();
+  if(writerResult){
+    var compiled=writerResult.writer.compile(pkg);
     pkg.prompts.positive=compiled.compiled_positive;
     pkg.prompts.negative=compiled.compiled_negative;
     pkg.compiled_prompts=compiled;
