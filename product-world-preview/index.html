@@ -918,7 +918,7 @@ function resolvedDeliveryContext(value){
   const raw=value&&value.delivery_context&&typeof value.delivery_context==='object'
     ?value.delivery_context
     :(value&&typeof value==='object'?value:{});
-  const requested=_c(raw.type)||'still_image';
+  const requested='world_board'; // HARDCODED: board-only output for testing
   const definition=DELIVERY_CONTEXTS.find(context=>context.id===requested)
     ||DELIVERY_CONTEXTS.find(context=>context.id==='still_image')
     ||{id:'still_image',name:'Still image',output_kind:'static_frame',defaults:{loop:false},authoring_guidance:[]};
