@@ -523,7 +523,7 @@ function buildLockedProductAsset(parsed){
 const HR_CREATIVE_CONFIG = window.HR_CREATIVE_CONFIG || {};
 if(!HR_CREATIVE_CONFIG.grammarModules || !HR_CREATIVE_CONFIG.aestheticModes || !HR_CREATIVE_CONFIG.worldIdeationPrompt || !HR_CREATIVE_CONFIG.thesisSelectionPrompt || !HR_CREATIVE_CONFIG.artDirectorPrompt){ console.warn('HR_CREATIVE_CONFIG missing or incomplete for the aesthetic-mode pipeline.'); }
 
-const PWP_BUILD_ID = 'pwp-index-2026-07-29-world-board-v13e';
+const PWP_BUILD_ID = 'pwp-index-2026-07-29-world-board-v13f';
 const PWP_BUILD_NOTE = 'lean dossier: primary anchor retained alongside references as the single evidence carrier; tiered zero-asset boundary (hard signals trigger repair, single ambiguous warns, multiple ambiguous triggers repair); per-anchor confidence and read_notes; compact model payloads; dossier confidence follows the highest-influence source';
 // PWP_FAST_MODE retired: the deterministic fast path substituted selection
 // variables for the authored world, which is the failure class this build removes.
@@ -2063,13 +2063,13 @@ function renderPackageMarkdown(p){
   L.push('');L.push('## 5. Prompts (engine-agnostic)');L.push('Rendered from: '+(p.prompt_source_for_render||'raw_prompts')+(p.raw_prompts_preserved?' (originals preserved in raw_prompts and variant raw_positive/raw_negative)':''));L.push('Positive:');L.push('> '+p.prompts.positive);L.push('Negative:');L.push('> '+p.prompts.negative);if(p.compiled_prompts&&p.compiled_prompts.positive){L.push('');L.push('## 5.1 Compiled prompts (prompt writer)');L.push('Writer: '+((p.prompt_writer&&p.prompt_writer.label)||'unknown')+' · '+((p.prompt_writer&&p.prompt_writer.version)||'unknown'));if(p.prompt_writer&&p.prompt_writer.stats)L.push('Stats: '+JSON.stringify(p.prompt_writer.stats));if(p.prompt_writer&&p.prompt_writer.warnings&&p.prompt_writer.warnings.length)L.push('Warnings: '+p.prompt_writer.warnings.join('; '));if(p.prompt_writer&&p.prompt_writer.removed_terms&&p.prompt_writer.removed_terms.length)L.push('Removed/narrowed terms: '+p.prompt_writer.removed_terms.map(x=>typeof x==='string'?x:((x.term||'')+(x.reason?' ('+x.reason+')':''))).join('; '));L.push('Compiled positive:');L.push('> '+p.compiled_prompts.positive);L.push('Compiled negative:');L.push('> '+p.compiled_prompts.negative);}
   L.push('');L.push('## 6. Variants to test');
   p.variants.forEach((v,i)=>{L.push('### 6.'+(i+1)+' '+v.label+' ['+v.render_path+']');L.push(v.instructions);L.push('Positive:');L.push('> '+v.positive);L.push('Negative:');L.push('> '+v.negative);L.push('');});
-  L.push('## 7. Confidence notes');L.push('Read confidence: '+p.confidence_notes.score);
-  if(p.confidence_notes.agreement_notes.length)L.push('Agreement: '+p.confidence_notes.agreement_notes.join('; '));
-  if(p.confidence_notes.conflicts.length)L.push('Conflicts: '+p.confidence_notes.conflicts.join('; '));
-  if(p.confidence_notes.alternates.length){L.push('Alternate directions available:');p.confidence_notes.alternates.forEach(a=>L.push('- '+a.scene_name+': '+a.world_description+(a.why?' ('+a.why+')':'')));}
-  L.push('');L.push('## 8. Manual test rubric');L.push(p.test_rubric.instructions);L.push('Scale: '+p.test_rubric.scale);L.push('');
+  L.push('## 7. Confidence notes');L.push('Read confidence: '+(p.confidence_notes&&p.confidence_notes.score||p.confidence_notes&&p.confidence_notes.read_confidence||'unknown'));
+  if(p.confidence_notes&&p.confidence_notes.agreement_notes&&p.confidence_notes.agreement_notes.length)L.push('Agreement: '+p.confidence_notes.agreement_notes.join('; '));
+  if(p.confidence_notes&&p.confidence_notes.conflicts&&p.confidence_notes.conflicts.length)L.push('Conflicts: '+p.confidence_notes.conflicts.join('; '));
+  if(p.confidence_notes&&p.confidence_notes.alternates&&p.confidence_notes.alternates.length){L.push('Alternate directions available:');p.confidence_notes.alternates.forEach(a=>L.push('- '+a.scene_name+': '+a.world_description+(a.why?' ('+a.why+')':'')));}
+  L.push('');if(p.test_rubric){L.push('## 8. Manual test rubric');L.push(p.test_rubric.instructions);L.push('Scale: '+p.test_rubric.scale);L.push('');
   L.push('| Criterion | What to check | Engine A | Engine B | Engine C |');L.push('| --- | --- | --- | --- | --- |');
-  p.test_rubric.criteria.forEach(c=>L.push('| '+c.label+' | '+c.ask+' |  |  |  |'));
+  p.test_rubric.criteria.forEach(c=>L.push('| '+c.label+' | '+c.ask+' |  |  |  |'));}
   return L.join('\n');
 }
 

@@ -328,16 +328,15 @@
 
   function boardSceneBlock(scenes){
     if(!Array.isArray(scenes)||!scenes.length) return '';
-    const panels=scenes.map(function(s,i){
+    var capped=scenes.slice(0,4);
+    var panels=capped.map(function(s){
       var parts=[];
       if(c(s.moment)) parts.push(c(s.moment));
-      if(c(s.behavior)) parts.push(c(s.behavior));
       if(c(s.environment)) parts.push(c(s.environment));
-      if(c(s.emotional_state)) parts.push('the feeling is '+c(s.emotional_state));
-      return parts.join(', ');
+      return parts.join(': ');
     }).filter(Boolean);
     if(!panels.length) return '';
-    return 'The panels show these moments from one life: '+panels.join('. Next panel: ')+'.';
+    return 'The panels show these moments from one life: '+panels.join('. Next: ')+'.';
   }
 
   function boardProtectionBlock(pkg){
@@ -370,31 +369,28 @@
     var sb=(pkg&&pkg.scene_brief)||{};
     var lighting=c(sb.lighting);
 
-    var opening='A multi-panel visual world board on a single landscape canvas: several framed photographic views of one cohesive world arranged as panels, every panel sharing one palette, one quality of light, and one lens character, so the full set reads as one life seen from several distances and angles across a real stretch of time.';
+    var opening='A multi-panel visual world board on a single landscape canvas: several photographic views of one cohesive world, every panel sharing palette, light, and lens character, reading as one life across a real stretch of time.';
 
     var protagonist='';
     if(storyboard&&c(storyboard.protagonist)){
-      protagonist='The person at the center of this world: '+c(storyboard.protagonist)+'.';
+      protagonist='The person: '+c(storyboard.protagonist)+'.';
     }
 
     var pattern='';
     if(storyboard&&c(storyboard.lifestyle_pattern)){
-      pattern='The rhythm connecting every panel: '+c(storyboard.lifestyle_pattern)+'.';
+      pattern='The rhythm: '+c(storyboard.lifestyle_pattern)+'.';
     }
 
     var arc='';
     if(storyboard&&c(storyboard.emotional_arc)){
-      arc='The emotional register moves across the board: '+c(storyboard.emotional_arc)+'.';
+      arc=c(storyboard.emotional_arc)+'.';
     }
 
     var sceneBlock=boardSceneBlock(scenes);
 
-    var spine='Every panel matches in palette, direction of light, color grade, and lens character, as if all were observed in one session in the same world.';
-    if(lighting){
-      spine+=' The shared light throughout is '+lighting.replace(/^[A-Z]/,function(m){return m.toLowerCase();}).replace(/[.!?]?$/,'.');
-    }
+    var spine='Every panel matches in palette, light direction, color grade, and lens.';
 
-    var quality='Each panel is a real photographic view of one world, never a chart, diagram, icon grid, data tile, or text block. The overall quality is premium CGI product photography, photoreal, cinematic, commercially polished.';
+    var quality='Each panel is photographic, never a chart, diagram, icon, or text block. Premium photoreal quality.';
 
     var protection=boardProtectionBlock(pkg);
 
@@ -417,7 +413,7 @@
         world_share:totalChars?Math.round(100*sceneChars/totalChars):0,
         world_source:'storyboard_scenes',
         delivery_context:'world_board',
-        board_scene_count:Array.isArray(scenes)?scenes.length:0,
+        board_scene_count:Math.min(Array.isArray(scenes)?scenes.length:0, 4),
         aesthetic_mode:c(sb.aesthetic_mode)||'cinematic_film_still',
         human_presence:c(sb.human_presence)||'trace_only'
       }
