@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Steve Taylor Presents Website Setup Guide</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  line-height: 1.5;
+  color: #222;
+}
+h1, h2 { color: #111; }
+pre {
+  background: #f4f4f4;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.code-wrap {
+  position: relative;
+}
+button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+.note {
+  background: #fff4d6;
+  padding: 12px;
+  border-radius: 8px;
+}
+</style>
+</head>
+<body>
+
+<h1>Steve Taylor Presents Website Setup Guide</h1>
+
+<h2>Architecture</h2>
+<pre>GitHub Repository
+        ↓
+Cloudflare Pages Hosting
+        ↓
+Decap CMS Editing Interface
+        ↓
+GitHub OAuth Authentication</pre>
+
+<h2>Repository Structure</h2>
+<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
+<pre>steve-taylor-presents/
+
+├── index.html
+├── styles.css
+
+├── admin/
+│   ├── index.html
+│   └── config.yml
+
+├── content/
+│   └── homepage.yml
+
+└── functions/
+    └── api/
+        ├── auth.js
+        └── callback.js</pre>
+</div>
+
+<h2>Decap admin/index.html</h2>
+<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
+<pre>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8" /&gt;
+  &lt;title&gt;Content Manager&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;script src="https://unpkg.com/decap-cms@3.0.0/dist/decap-cms.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+</div>
+
+<h2>Decap config.yml</h2>
+<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
+<pre>backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/steve-taylor-presents
+  branch: main
+  base_url: https://steve-taylor-presents.pages.dev
+  auth_endpoint: /api/auth
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"</pre>
+</div>
+
+<h2>Important Notes</h2>
+<div class="note">
+<ul>
+<li>Use functions/api, not functions/API.</li>
+<li>The Cloudflare OAuth routes are auth.js and callback.js.</li>
+<li>Do not create an empty [...path].js file unless following a different OAuth implementation.</li>
+<li>The GitHub Client ID is a text variable.</li>
+<li>The GitHub Client Secret is a secret variable.</li>
+<li>Client users need GitHub accounts with this setup.</li>
+</ul>
+</div>
+
+<h2>Cloudflare Environment Variables</h2>
+<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
+<pre>GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET</pre>
+</div>
+
+<script>
+function copyCode(button) {
+  const text = button.parentElement.querySelector("pre").innerText;
+  navigator.clipboard.writeText(text);
+  button.innerText = "Copied";
+  setTimeout(() => button.innerText = "Copy", 1500);
+}
+</script>
+
+</body>
+</html>
