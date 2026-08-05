@@ -2,44 +2,22 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Steve Taylor Presents Website Setup Guide</title>
+<title>Steve Taylor Presents Setup Guide</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  max-width: 900px;
-  margin: 40px auto;
-  line-height: 1.5;
-  color: #222;
-}
-h1, h2 { color: #111; }
-pre {
-  background: #f4f4f4;
-  padding: 16px;
-  border-radius: 8px;
-  overflow-x: auto;
-}
-.code-wrap {
-  position: relative;
-}
-button {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  cursor: pointer;
-  padding: 6px 10px;
-}
-.note {
-  background: #fff4d6;
-  padding: 12px;
-  border-radius: 8px;
-}
+body { font-family: Arial, sans-serif; max-width: 950px; margin: 40px auto; line-height: 1.5; }
+.code { position: relative; margin: 20px 0; }
+pre { background:#f4f4f4; padding:16px; border-radius:8px; overflow:auto; }
+button { position:absolute; right:10px; top:10px; padding:6px 10px; cursor:pointer; }
+.note { background:#fff3cd; padding:12px; border-radius:8px; }
 </style>
 </head>
 <body>
 
 <h1>Steve Taylor Presents Website Setup Guide</h1>
 
-<h2>Architecture</h2>
+<h2>Goal</h2>
+<p>Create a client website stack using GitHub, Cloudflare Pages, Decap CMS, and GitHub OAuth.</p>
+
 <pre>GitHub Repository
         ↓
 Cloudflare Pages Hosting
@@ -48,9 +26,12 @@ Decap CMS Editing Interface
         ↓
 GitHub OAuth Authentication</pre>
 
-<h2>Repository Structure</h2>
-<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
-<pre>steve-taylor-presents/
+<h2>Phase 1: Create GitHub Repository</h2>
+<p>Create repository:</p>
+<div class="code"><button>Copy</button><pre>steve-taylor-presents</pre></div>
+
+<p>Use this structure:</p>
+<div class="code"><button>Copy</button><pre>steve-taylor-presents/
 
 ├── index.html
 ├── styles.css
@@ -65,62 +46,170 @@ GitHub OAuth Authentication</pre>
 └── functions/
     └── api/
         ├── auth.js
-        └── callback.js</pre>
+        └── callback.js</pre></div>
+
+<div class="note">
+<p>Important: use functions/api, not functions/API. Cloudflare routes are case sensitive.</p>
 </div>
 
-<h2>Decap admin/index.html</h2>
-<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
-<pre>&lt;!doctype html&gt;
+<h2>Phase 2: Create Basic Website</h2>
+
+<p>Create index.html:</p>
+<div class="code"><button>Copy</button><pre>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
-  &lt;meta charset="utf-8" /&gt;
-  &lt;title&gt;Content Manager&lt;/title&gt;
+  &lt;title&gt;Steve Taylor Presents&lt;/title&gt;
+  &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Steve Taylor Presents&lt;/h1&gt;
+  &lt;p&gt;Website coming soon.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+
+<h2>Phase 3: Deploy Cloudflare Pages</h2>
+<p>Cloudflare steps:</p>
+<ol>
+<li>Workers & Pages</li>
+<li>Create application</li>
+<li>Pages</li>
+<li>Connect GitHub</li>
+<li>Select repository</li>
+</ol>
+
+<p>Build settings:</p>
+<div class="code"><button>Copy</button><pre>Framework preset: None
+Build command: blank
+Output directory: /</pre></div>
+
+<h2>Phase 4: Add Decap CMS</h2>
+
+<p>Create admin/index.html:</p>
+<div class="code"><button>Copy</button><pre>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;title&gt;Content Manager&lt;/title&gt;
 &lt;/head&gt;
 &lt;body&gt;
 &lt;script src="https://unpkg.com/decap-cms@3.0.0/dist/decap-cms.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;</pre>
-</div>
+&lt;/html&gt;</pre></div>
 
-<h2>Decap config.yml</h2>
-<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
-<pre>backend:
+<p>Create admin/config.yml:</p>
+<div class="code"><button>Copy</button><pre>backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/steve-taylor-presents
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: pages
+    label: Pages
+    files:
+      - label: Homepage
+        name: homepage
+        file: content/homepage.yml
+        fields:
+          - label: Headline
+            name: headline
+            widget: string
+          - label: Button Link
+            name: button_link
+            widget: string</pre></div>
+
+<p>Create content/homepage.yml:</p>
+<div class="code"><button>Copy</button><pre>headline: "Welcome"
+button_link: "https://example.com"</pre></div>
+
+<h2>Phase 5: Test Decap Loading</h2>
+<p>Open:</p>
+<div class="code"><button>Copy</button><pre>https://steve-taylor-presents.pages.dev/admin/</pre></div>
+<p>Decap loading and authentication are separate. Authentication will fail until OAuth is configured.</p>
+
+<h2>Phase 6: Create GitHub OAuth App</h2>
+<p>GitHub:</p>
+<ol>
+<li>Settings</li>
+<li>Developer Settings</li>
+<li>OAuth Apps</li>
+<li>New OAuth App</li>
+</ol>
+
+<p>Homepage URL:</p>
+<div class="code"><button>Copy</button><pre>https://steve-taylor-presents.pages.dev</pre></div>
+
+<p>Authorization callback:</p>
+<div class="code"><button>Copy</button><pre>https://steve-taylor-presents.pages.dev/api/callback</pre></div>
+
+<p>Leave Device Flow disabled.</p>
+
+<h2>Phase 7: Cloudflare Environment Variables</h2>
+
+<div class="code"><button>Copy</button><pre>GITHUB_CLIENT_ID
+
+Type: Text
+
+GITHUB_CLIENT_SECRET
+
+Type: Secret</pre></div>
+
+<h2>Phase 8: Add Cloudflare OAuth Functions</h2>
+
+<p>Create:</p>
+<div class="code"><button>Copy</button><pre>functions/
+└── api/
+    ├── auth.js
+    └── callback.js</pre></div>
+
+<p>Do not create an empty [...path].js file when using this structure.</p>
+
+<h2>Phase 9: Update Decap Config</h2>
+
+<div class="code"><button>Copy</button><pre>backend:
   name: github
   repo: YOUR-GITHUB-USERNAME/steve-taylor-presents
   branch: main
   base_url: https://steve-taylor-presents.pages.dev
-  auth_endpoint: /api/auth
+  auth_endpoint: /api/auth</pre></div>
 
-media_folder: "images/uploads"
-public_folder: "/images/uploads"</pre>
-</div>
+<h2>Phase 10: Deploy and Test</h2>
 
-<h2>Important Notes</h2>
-<div class="note">
+<div class="code"><button>Copy</button><pre>https://steve-taylor-presents.pages.dev/admin/</pre></div>
+
+<p>Expected flow:</p>
+<div class="code"><button>Copy</button><pre>Decap CMS
+↓
+GitHub OAuth
+↓
+Authorization
+↓
+Return to Decap
+↓
+Edit content
+↓
+Commit to GitHub
+↓
+Cloudflare rebuild</pre></div>
+
+<h2>Lessons Learned</h2>
 <ul>
-<li>Use functions/api, not functions/API.</li>
-<li>The Cloudflare OAuth routes are auth.js and callback.js.</li>
-<li>Do not create an empty [...path].js file unless following a different OAuth implementation.</li>
-<li>The GitHub Client ID is a text variable.</li>
-<li>The GitHub Client Secret is a secret variable.</li>
-<li>Client users need GitHub accounts with this setup.</li>
+<li>Cloudflare Pages deployment was simple. Authentication was the complex part.</li>
+<li>Decap plus Cloudflare requires OAuth setup.</li>
+<li>This setup requires client users to have GitHub accounts.</li>
+<li>For nontechnical clients, evaluate a more client-friendly CMS option.</li>
 </ul>
-</div>
-
-<h2>Cloudflare Environment Variables</h2>
-<div class="code-wrap"><button onclick="copyCode(this)">Copy</button>
-<pre>GITHUB_CLIENT_ID
-GITHUB_CLIENT_SECRET</pre>
-</div>
 
 <script>
-function copyCode(button) {
-  const text = button.parentElement.querySelector("pre").innerText;
-  navigator.clipboard.writeText(text);
-  button.innerText = "Copied";
-  setTimeout(() => button.innerText = "Copy", 1500);
-}
+document.querySelectorAll("button").forEach(btn => {
+  btn.onclick = () => {
+    navigator.clipboard.writeText(btn.parentElement.querySelector("pre").innerText);
+    btn.innerText = "Copied";
+    setTimeout(() => btn.innerText = "Copy", 1200);
+  };
+});
 </script>
-
 </body>
 </html>
