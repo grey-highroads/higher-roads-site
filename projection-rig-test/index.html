@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ember">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Higher Roads" />
+  <meta property="og:description" content="Higher Roads builds the visual world of your brand — for screens and for spaces. Based in Nashville." />
+  <meta property="og:image" content="https://higher-roads.com/images/og-image1.png" />
+  <meta property="og:url" content="https://higher-roads.com" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>Higher Roads — Visual Worlds for Screens and Spaces</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root, [data-theme="ember"] {
+      --black: #0a0906;
+      --dark: #181510;
+      --accent: #e8782a;
+      --accent-dim: #a04f18;
+      --glow: rgba(232, 120, 42, 0.07);
+      --white: #f5ede2;
+      --muted: #6b6057;
+      --border: rgba(232, 120, 42, 0.18);
+    }
+
+    [data-theme="neon-noir"] {
+      --black: #07050f;
+      --dark: #0e0a1a;
+      --accent: #f72585;
+      --accent-dim: #7b1fa2;
+      --glow: rgba(183, 0, 255, 0.08);
+      --white: #ede8f5;
+      --muted: #5c5470;
+      --border: rgba(247, 37, 133, 0.2);
+    }
+
+    [data-theme="ice"] {
+      --black: #050810;
+      --dark: #0a0f1e;
+      --accent: #4fc3f7;
+      --accent-dim: #1a6a8a;
+      --glow: rgba(79, 195, 247, 0.07);
+      --white: #e8f4f8;
+      --muted: #4a6070;
+      --border: rgba(79, 195, 247, 0.18);
+    }
+
+    [data-theme="acid"] {
+      --black: #040a04;
+      --dark: #081208;
+      --accent: #39ff14;
+      --accent-dim: #1a7a08;
+      --glow: rgba(57, 255, 20, 0.06);
+      --white: #e8f5e8;
+      --muted: #4a6b4a;
+      --border: rgba(57, 255, 20, 0.18);
+    }
+
+    /* ── THEME SWITCHER ── */
+    .theme-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .theme-dots {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-dot:hover { transform: scale(1.3); }
+
+    .theme-dot.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 7px 2px var(--dot-color);
+    }
+
+    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
+    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
+    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
+    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
+
+    html, body {
+      height: 100%;
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Radial atmospheric glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .wordmark {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .wordmark span { color: var(--accent); }
+
+    .header-logo {
+      display: block;
+      width: auto;
+      height: 32px;
+      max-width: none;
+    }
+
+    .contact-link {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .contact-link:hover { color: var(--accent); }
+
+    /* ── NAV ── */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--white);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      background: var(--black);
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .mobile-nav a:hover { color: var(--white); }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+      gap: 2.5rem;
+      background-color: #181510;
+    }
+
+    .eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .headline {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--white);
+      max-width: 760px;
+      animation: fadeUp 0.8s 0.35s ease both;
+    }
+
+    .headline em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .subhead {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 440px;
+      letter-spacing: 0.03em;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+
+    /* ── PORTFOLIO SECTIONS ── */
+    .portfolio-section {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    .portfolio-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .portfolio-bg video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .portfolio-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.1) 0%,
+        rgba(0,0,0,0.15) 40%,
+        rgba(0,0,0,0.75) 100%
+      );
+      z-index: 1;
+    }
+
+    .portfolio-content {
+      position: relative;
+      z-index: 2;
+      padding: 2rem 2.5rem;
+      margin: 3rem 4rem;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+      background: rgba(0,0,0,0.45);
+      border-left: 2px solid var(--accent);
+    }
+
+    .section-clarifier {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      opacity: 0.55;
+      margin-top: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .portfolio-section.animate .portfolio-content {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .portfolio-section.animate.in-view .portfolio-content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .portfolio-category {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .portfolio-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--white);
+      max-width: 600px;
+    }
+
+    /* Scroll cue */
+    .scroll-cue {
+      position: absolute;
+      bottom: 2rem;
+      right: 3rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.4;
+    }
+
+    .scroll-cue span {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .scroll-cue-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--white), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.1); }
+    }
+
+    @media (max-width: 640px) {
+      .portfolio-content { padding: 2rem 1.5rem; }
+      .scroll-cue { right: 1.5rem; }
+    }
+
+    /* ── TRIPTYCH SECTION ── */
+    .triptych-section {
+      display: flex;
+      align-items: stretch;
+      min-height: 100vh;
+      background: var(--dark);
+    }
+
+    .triptych-copy {
+      flex: 0 0 42%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .triptych-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--white);
+    }
+
+    .triptych-videos {
+      flex: 1;
+      display: flex;
+    }
+
+    .triptych-video {
+      flex: 1;
+      overflow: hidden;
+      border-left: 1px solid var(--border);
+    }
+
+    .triptych-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .triptych-section .portfolio-content {
+      margin: 0;
+      padding: 3rem 2.5rem;
+      align-self: flex-start;
+    }
+
+    @media (max-width: 640px) {
+      .triptych-section {
+        flex-direction: column;
+        min-height: auto;
+      }
+      .triptych-copy {
+        flex: none;
+        padding: 3rem 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .triptych-videos {
+        flex-direction: column;
+      }
+      .triptych-video {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        height: 75vw;
+      }
+    }
+
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: var(--accent-dim);
+      margin: 0 auto;
+      animation: fadeUp 0.8s 0.8s ease both;
+    }
+
+    /* ── FORM ── */
+    .lead-form-section {
+      padding: 6rem 2rem 5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .lead-form-wrap {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .form-intro {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      line-height: 1.2;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+
+    .lead-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .lead-form input,
+    .lead-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--white);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+    }
+
+    .lead-form input::placeholder,
+    .lead-form textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .lead-form textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    .lead-form button {
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      padding: 1rem 1.25rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .lead-form button:hover {
+      opacity: 0.92;
+    }
+
+    @media (max-width: 640px) {
+      .lead-form-section {
+        padding: 4rem 1.5rem 4rem;
+      }
+      .form-intro {
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    /* ── POSITIONING SECTION ── */
+    .positioning-section {
+      padding: 6rem 2rem;
+      display: flex;
+      justify-content: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .positioning-inner {
+      width: 100%;
+      max-width: 680px;
+      text-align: center;
+    }
+
+    .positioning-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1.75rem;
+    }
+
+    .positioning-body {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: 0.85;
+    }
+
+    @media (max-width: 640px) {
+      .positioning-section { padding: 4rem 1.5rem; }
+    }
+
+    /* ── WHY A VISUAL WORLD ── */
+    .world-why-section {
+      padding: 6rem 4rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--dark);
+    }
+
+    .world-why-text {
+      max-width: 680px;
+      margin: 0 auto 3.5rem;
+    }
+
+    .world-why-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 500;
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .world-why-body {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+
+    .world-why-visual {
+      max-width: 680px;
+      margin: 0 auto;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .world-why-visual video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .world-why-section { padding: 4rem 1.5rem; }
+    }
+
+    /* ── WHERE WE FIT ── */
+    .where-we-fit-section {
+      padding: 6rem 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .where-we-fit-header {
+      max-width: 760px;
+      margin: 0 auto 4rem;
+      text-align: center;
+    }
+
+    .where-we-fit-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--white);
+      margin-top: 1rem;
+    }
+
+    .where-we-fit-columns {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border: 1px solid var(--border);
+    }
+
+    .fit-column {
+      padding: 2.5rem;
+      border-right: 1px solid var(--border);
+      border-top: 2px solid transparent;
+    }
+
+    .fit-column:last-child {
+      border-right: none;
+      border-top: 2px solid var(--accent);
+    }
+
+    .fit-column-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .fit-column-body {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: 0.65;
+    }
+
+    .fit-image-strip {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+
+    .fit-image {
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      background: var(--dark);
+    }
+
+    .fit-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.65);
+      transition: filter 0.4s ease;
+    }
+
+    .fit-image:hover img { filter: brightness(0.85); }
+
+    @media (max-width: 640px) {
+      .where-we-fit-section { padding: 4rem 1.5rem; }
+      .where-we-fit-columns { grid-template-columns: 1fr; }
+      .fit-column {
+        border-right: none;
+        border-top: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .fit-column:last-child {
+        border-bottom: none;
+        border-top: 2px solid var(--accent);
+      }
+      .fit-image-strip { grid-template-columns: 1fr; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.8s 1s ease both;
+    }
+
+    .footer-note {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-email {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-email:hover { color: var(--accent); }
+
+    /* ── BUTTONS ── */
+    .btn-see-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #f5f0eb;
+      border: 1px solid rgba(245,240,235,0.25);
+      padding: 0.65rem 1.25rem;
+      margin-top: 1.25rem;
+      background: transparent;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-see-more:hover {
+      border-color: #e8782a;
+      color: #e8782a;
+    }
+
+    .btn-see-more .arrow {
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .btn-see-more:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .triptych-copy .btn-see-more {
+      align-self: flex-start;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      header { padding: 1.5rem; justify-content: center; }
+      header .contact-link { display: none; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+      .hero { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="page">
+
+    <header>
+      <a class="wordmark" href="#">
+        <img src="images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="screens/">For Screens</a>
+        <a href="spaces/">For Spaces</a>
+        <a href="for-partners/">For Partners</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </header>
+
+    <nav class="mobile-nav">
+      <a href="screens/">For Screens</a>
+      <a href="spaces/">For Spaces</a>
+      <a href="for-partners/">For Partners</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <main>
+
+      <!-- ── HERO ── -->
+      <section class="hero">
+        <p class="eyebrow">For Screens · For Spaces</p>
+        <h1 class="headline">
+          <span style="display:block">Your brand deserves</span>
+          <span style="display:block">its own <em>world.</em></span>
+        </h1>
+        <p class="subhead">We can help build yours.</p>
+      </section>
+
+      <!-- ── POSITIONING ── -->
+      <section class="positioning-section">
+        <div class="positioning-inner">
+          <span class="positioning-label">The Studio</span>
+          <p class="positioning-body">Higher Roads is a Nashville-based creative studio building visual worlds for brands. From product launches to immersive experiences, every touchpoint speaks the same visual language.</p>
+        </div>
+      </section>
+
+      <!-- ── FOR SCREENS ── -->
+      <section class="triptych-section" id="screens">
+        <div class="triptych-copy">
+          <span class="portfolio-category">For Screens</span>
+          <h2 class="portfolio-title">Your brand's world.<br>Your product's scene.<br>Your customer's moment.</h2>
+          <p class="section-clarifier">We call it the Visual Product World, a motion-first environment built as an extension of your brand identity. Product content that helps find your tribe.</p>
+          <a href="/screens/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
+        </div>
+        <div class="triptych-videos">
+          <div class="triptych-video">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Tideform.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="triptych-video">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mindbloom-vid.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="triptych-video">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switchback-vid.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── FOR SPACES ── -->
+      <section class="portfolio-section" id="spaces">
+        <div class="portfolio-bg">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-category">For Spaces</span>
+          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that entertain.</h2>
+          <p class="section-clarifier">Brand activations, events, and permanent installs where the room becomes the experience.</p>
+          <a href="/spaces/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
+        </div>
+        <div class="scroll-cue">
+          <div class="scroll-cue-line"></div>
+          <span>Scroll</span>
+        </div>
+      </section>
+
+      <!-- ── WHY A VISUAL WORLD ── -->
+      <section class="world-why-section">
+        <div class="world-why-text">
+          <span class="portfolio-category">The Case for a World</span>
+          <h2 class="world-why-headline">Create the world your customers want to live in.</h2>
+          <p class="world-why-body">Your logo and your packaging are the starting point. A visual world is what happens when that identity is put in motion, given depth, and made into a place where your audience can see the best version of themselves.</p>
+          <p class="world-why-body">Your brand world communicates who you are, what you value, and why you exist in ways catalog photography or marketing copy can't. We help our clients put that ethos into motion, so the right customers find you, connect with you, and stick with you for the long haul.</p>
+        </div>
+        <div class="world-why-visual">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </section>
+
+      <!-- ── WHERE WE FIT ── -->
+      <section class="where-we-fit-section">
+        <div class="where-we-fit-header">
+          <span class="portfolio-category">Our Role</span>
+          <h2 class="where-we-fit-headline">We are the production layer between your brand identity and the world where your products live.</h2>
+        </div>
+        <div class="where-we-fit-columns">
+          <div class="fit-column">
+            <span class="fit-column-label">Your brand team owns</span>
+            <p class="fit-column-body">The identity, the story, the strategic direction. You did that work when the brand was born. Our work starts when you pass us the baton.</p>
+          </div>
+          <div class="fit-column">
+            <span class="fit-column-label">Your agency owns</span>
+            <p class="fit-column-body">The campaign strategy, the channel plan, the media buy. The distribution layer that gets your content in front of the right people. We work alongside that.</p>
+          </div>
+          <div class="fit-column">
+            <span class="fit-column-label">Higher Roads builds</span>
+            <p class="fit-column-body">The visual world where your product lives and your brand shows up. Motion content, 3D environments, and immersive installations. The production layer between having an identity and inhabiting a world.</p>
+          </div>
+        </div>
+        <div class="fit-image-strip">
+          <div class="fit-image">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png" alt="Visual Product World for screens" />
+          </div>
+          <div class="fit-image">
+            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Immersive environment for spaces" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ── CONTACT ── -->
+      <section id="contact" class="lead-form-section">
+        <div class="lead-form-wrap">
+          <p class="form-intro">What's your vision?</p>
+          <form
+            class="lead-form"
+            action="https://formspree.io/f/xrerprnv"
+            method="POST"
+          >
+            <input type="text" name="name" placeholder="Your name" required />
+            <input type="email" name="email" placeholder="Your email" required />
+            <textarea name="message" placeholder="What are you working on?" rows="5" required></textarea>
+            <button type="submit">Get in touch</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <span class="footer-note">© 2026 Higher Roads</span>
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <div class="theme-dots">
+          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
+          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
+          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
+          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
+        </div>
+      </div>
+      <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Hamburger toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+
+    // Close mobile nav on link click
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('open');
+        mobileNav.classList.remove('open');
+      });
+    });
+
+    // Theme switcher
+    const dots = document.querySelectorAll('.theme-dot');
+    const root = document.documentElement;
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        root.setAttribute('data-theme', dot.dataset.t);
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Portfolio scroll-trigger + video autoplay
+    const portfolioSections = document.querySelectorAll('.portfolio-section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          const video = entry.target.querySelector('video');
+          if (video) video.play();
+        } else {
+          const video = entry.target.querySelector('video');
+          if (video) video.pause();
+        }
+      });
+    }, { threshold: 0.1 });
+
+    portfolioSections.forEach(section => observer.observe(section));
+
+  </script>
+</body>
+</html>
