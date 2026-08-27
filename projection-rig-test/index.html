@@ -1,1101 +1,586 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="ember">
+<html lang="en">
 <head>
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-NM73WT97');</script>
-  <!-- End Google Tag Manager -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="Higher Roads" />
-  <meta property="og:description" content="Higher Roads builds the visual world of your brand — for screens and for spaces. Based in Nashville." />
-  <meta property="og:image" content="https://higher-roads.com/images/og-image1.png" />
-  <meta property="og:url" content="https://higher-roads.com" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <title>Higher Roads — Visual Worlds for Screens and Spaces</title>
-  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#090b0b" />
+  <title>Higher Roads — Projection Rig Test</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
+    :root {
+      --black: #090b0b;
+      --black-2: #0d1010;
+      --panel: #121515;
+      --panel-2: #171b1a;
+      --white: #f0f2ed;
+      --muted: #a1a7a1;
+      --dim: #6f7671;
+      --line: rgba(240, 242, 237, 0.17);
+      --line-strong: rgba(240, 242, 237, 0.34);
+      --line-soft: rgba(240, 242, 237, 0.08);
+      --max: 1500px;
+      --pad: clamp(22px, 4vw, 64px);
+      --mono: "IBM Plex Mono", monospace;
+      --sans: "Archivo", sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--black); }
+    body {
       margin: 0;
-      padding: 0;
-    }
-
-    :root, [data-theme="ember"] {
-      --black: #0a0906;
-      --dark: #181510;
-      --accent: #e8782a;
-      --accent-dim: #a04f18;
-      --glow: rgba(232, 120, 42, 0.07);
-      --white: #f5ede2;
-      --muted: #6b6057;
-      --border: rgba(232, 120, 42, 0.18);
-    }
-
-    [data-theme="neon-noir"] {
-      --black: #07050f;
-      --dark: #0e0a1a;
-      --accent: #f72585;
-      --accent-dim: #7b1fa2;
-      --glow: rgba(183, 0, 255, 0.08);
-      --white: #ede8f5;
-      --muted: #5c5470;
-      --border: rgba(247, 37, 133, 0.2);
-    }
-
-    [data-theme="ice"] {
-      --black: #050810;
-      --dark: #0a0f1e;
-      --accent: #4fc3f7;
-      --accent-dim: #1a6a8a;
-      --glow: rgba(79, 195, 247, 0.07);
-      --white: #e8f4f8;
-      --muted: #4a6070;
-      --border: rgba(79, 195, 247, 0.18);
-    }
-
-    [data-theme="acid"] {
-      --black: #040a04;
-      --dark: #081208;
-      --accent: #39ff14;
-      --accent-dim: #1a7a08;
-      --glow: rgba(57, 255, 20, 0.06);
-      --white: #e8f5e8;
-      --muted: #4a6b4a;
-      --border: rgba(57, 255, 20, 0.18);
-    }
-
-    /* ── THEME SWITCHER ── */
-    .theme-switcher {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .theme-label {
-      font-size: 0.55rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .theme-dots {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .theme-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.15);
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .theme-dot:hover { transform: scale(1.3); }
-
-    .theme-dot.active {
-      transform: scale(1.25);
-      box-shadow: 0 0 7px 2px var(--dot-color);
-    }
-
-    .theme-dot[data-t="ember"]     { background: #e8782a; --dot-color: #e8782a; }
-    .theme-dot[data-t="neon-noir"] { background: #f72585; --dot-color: #f72585; }
-    .theme-dot[data-t="ice"]       { background: #4fc3f7; --dot-color: #4fc3f7; }
-    .theme-dot[data-t="acid"]      { background: #39ff14; --dot-color: #39ff14; }
-
-    html, body {
-      height: 100%;
-      background-color: var(--black);
+      background: var(--black);
       color: var(--white);
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
+      font-family: var(--sans);
+      font-variation-settings: "wdth" 96;
+      -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    /* Radial atmospheric glow */
-    body::after {
-      content: '';
-      position: fixed;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 700px;
-      height: 500px;
-      background: radial-gradient(ellipse, var(--glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+    a { color: inherit; }
+    img, video { display: block; max-width: 100%; }
+    button, input, textarea { font: inherit; }
+
+    .site-shell {
+      position: relative;
+      overflow: clip;
+      background:
+        linear-gradient(90deg, transparent calc(50% - .5px), rgba(240,242,237,.028) 50%, transparent calc(50% + .5px)),
+        var(--black);
     }
 
-    /* Grain overlay */
-    body::before {
-      content: '';
+    .site-shell::before {
+      content: "";
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 0;
-      opacity: 0.8;
+      z-index: 100;
+      opacity: .18;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 100% 6px;
+      mix-blend-mode: soft-light;
     }
 
-    .page {
+    .technical-label,
+    .eyebrow,
+    .meta,
+    .nav-links a,
+    .frame-label,
+    .frame-axis,
+    .fit-index,
+    .field-label,
+    .footer-meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.3;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .site-header {
       position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── HEADER ── */
-    header {
-      padding: 2rem 3rem;
-      display: flex;
+      z-index: 20;
+      height: 84px;
+      padding: 0 var(--pad);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      animation: fadeDown 0.8s ease both;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9,11,11,.92);
+      backdrop-filter: blur(16px);
     }
 
-    .wordmark {
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 600;
-      font-size: 1.1rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--white);
-      text-decoration: none;
-    }
-
-    .wordmark span { color: var(--accent); }
-
-    .header-logo {
-      display: block;
-      width: auto;
-      height: 32px;
-      max-width: none;
-    }
-
-    .contact-link {
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .contact-link:hover { color: var(--accent); }
-
-    /* ── NAV ── */
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 2.5rem;
-    }
-
-    .nav-links a {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
+    .brand-mark { display: inline-flex; align-items: center; width: max-content; text-decoration: none; }
+    .header-logo { width: auto; height: 31px; }
+    .header-center { color: var(--dim); text-align: center; }
+    .nav-links { justify-self: end; display: flex; align-items: center; gap: 28px; }
+    .nav-links a { color: var(--muted); text-decoration: none; transition: color .2s ease; }
     .nav-links a:hover { color: var(--white); }
+    .nav-toggle { display: none; justify-self: end; width: 34px; height: 34px; border: 1px solid var(--line); background: transparent; padding: 8px; }
+    .nav-toggle span { display: block; height: 1px; background: var(--white); margin: 4px 0; }
+    .mobile-nav { display: none; }
 
-    .nav-toggle {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      padding: 4px;
-      background: none;
-      border: none;
+    .hero {
+      min-height: calc(100svh - 84px);
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(460px, .98fr);
+      border-bottom: 1px solid var(--line);
     }
 
-    .nav-toggle span {
-      display: block;
-      width: 22px;
+    .hero-copy {
+      min-height: calc(100svh - 84px);
+      padding: clamp(60px, 8vw, 130px) var(--pad) 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--line);
+      position: relative;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: calc(var(--pad) - 8px);
+      top: 32px;
+      width: 16px;
+      height: 16px;
+      border-left: 1px solid var(--line-strong);
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .hero-copy::after {
+      content: "Y 00.000";
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      writing-mode: vertical-rl;
+      color: var(--dim);
+      font: 9px/1 var(--mono);
+      letter-spacing: .14em;
+    }
+
+    .eyebrow { color: var(--muted); margin: 0 0 32px; }
+    .hero-title {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(62px, 8.25vw, 150px);
+      line-height: .82;
+      letter-spacing: -.065em;
+      font-weight: 760;
+      font-variation-settings: "wdth" 109;
+      text-transform: uppercase;
+    }
+    .hero-title span { display: block; }
+    .hero-title .quiet { font-weight: 370; font-variation-settings: "wdth" 100; }
+    .hero-sub { margin: 28px 0 0; color: var(--muted); font-size: clamp(18px, 2vw, 29px); font-weight: 350; letter-spacing: -.025em; }
+    .hero-bottom { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 20px; padding-top: 60px; }
+    .hero-bottom .meta { color: var(--dim); }
+    .hero-bottom .meta strong { display: block; color: var(--white); font-weight: 500; margin-top: 6px; letter-spacing: .08em; }
+
+    .hero-rig {
+      position: relative;
+      min-height: calc(100svh - 84px);
+      padding: 38px 38px 68px;
+      background: var(--black-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-rig::before,
+    .hero-rig::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+    .hero-rig::before { inset: 0; background: linear-gradient(90deg, transparent 49.9%, var(--line-soft) 50%, transparent 50.1%); }
+    .hero-rig::after { left: 0; right: 0; top: 50%; height: 1px; background: var(--line-soft); }
+
+    .rig-window {
+      width: min(100%, 770px);
+      aspect-ratio: 4 / 5;
+      position: relative;
+      border: 1px solid var(--line-strong);
+      padding: 12px;
+      z-index: 2;
+    }
+
+    .rig-window video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(.72) contrast(1.05) brightness(.86);
+    }
+
+    .rig-window .scan {
+      position: absolute;
+      left: 12px;
+      right: 12px;
       height: 1px;
-      background: var(--white);
-      transition: transform 0.3s, opacity 0.3s;
+      top: 12px;
+      background: rgba(255,255,255,.68);
+      box-shadow: 0 0 18px rgba(255,255,255,.2);
+      opacity: .5;
+      animation: scan 8s linear infinite;
+      pointer-events: none;
     }
 
-    .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-    .nav-toggle.open span:nth-child(2) { opacity: 0; }
-    .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @keyframes scan { from { transform: translateY(0); } to { transform: translateY(calc(100svh - 170px)); } }
 
-    .mobile-nav {
-      display: none;
-      flex-direction: column;
-      gap: 0;
-      border-top: 1px solid var(--border);
+    .crop { position: absolute; width: 26px; height: 26px; pointer-events: none; }
+    .crop.tl { left: -8px; top: -8px; border-left: 1px solid var(--white); border-top: 1px solid var(--white); }
+    .crop.tr { right: -8px; top: -8px; border-right: 1px solid var(--white); border-top: 1px solid var(--white); }
+    .crop.bl { left: -8px; bottom: -8px; border-left: 1px solid var(--white); border-bottom: 1px solid var(--white); }
+    .crop.br { right: -8px; bottom: -8px; border-right: 1px solid var(--white); border-bottom: 1px solid var(--white); }
+    .frame-label { position: absolute; top: -25px; left: 0; color: var(--muted); }
+    .frame-axis { position: absolute; bottom: -28px; right: 0; color: var(--dim); }
+    .frame-counter { position: absolute; right: 22px; top: 20px; color: rgba(255,255,255,.85); background: rgba(0,0,0,.42); padding: 7px 8px; font: 10px/1 var(--mono); letter-spacing: .1em; }
+
+    .studio-band {
+      display: grid;
+      grid-template-columns: 230px 1fr 160px;
+      min-height: 260px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .studio-band > * { padding: 48px var(--pad); }
+    .studio-band .band-label { border-right: 1px solid var(--line); color: var(--muted); }
+    .studio-band .band-copy { font-size: clamp(25px, 3vw, 48px); line-height: 1.08; letter-spacing: -.04em; font-weight: 380; max-width: 1100px; }
+    .studio-band .band-index { border-left: 1px solid var(--line); color: var(--dim); text-align: right; }
+
+    .screens-section {
+      position: relative;
+      border-bottom: 1px solid var(--line);
+      padding: 0 var(--pad) 70px;
       background: var(--black);
     }
-
-    .mobile-nav.open { display: flex; }
-
-    .mobile-nav a {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      transition: color 0.3s;
-    }
-
-    .mobile-nav a:hover { color: var(--white); }
-
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .nav-toggle { display: flex; }
-    }
-
-    /* ── HERO ── */
-    .hero {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 4rem 2rem;
-      text-align: center;
-      gap: 2.5rem;
-      background-color: #181510;
-    }
-
-    .eyebrow {
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 500;
-      font-size: 0.85rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--accent);
-      animation: fadeUp 0.8s 0.2s ease both;
-    }
-
-    .headline {
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: clamp(2.8rem, 7vw, 5.5rem);
-      line-height: 1.05;
-      letter-spacing: -0.01em;
-      color: var(--white);
-      max-width: 760px;
-      animation: fadeUp 0.8s 0.35s ease both;
-    }
-
-    .headline em {
-      font-style: italic;
-      font-weight: 400;
-      color: var(--accent);
-    }
-
-    .subhead {
-      font-size: 0.875rem;
-      line-height: 1.8;
-      color: var(--muted);
-      max-width: 440px;
-      letter-spacing: 0.03em;
-      animation: fadeUp 0.8s 0.5s ease both;
-    }
-
-    /* ── PORTFOLIO SECTIONS ── */
-    .portfolio-section {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      overflow: hidden;
-    }
-
-    .portfolio-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-    }
-
-    .portfolio-bg video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .portfolio-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.1) 0%,
-        rgba(0,0,0,0.15) 40%,
-        rgba(0,0,0,0.75) 100%
-      );
-      z-index: 1;
-    }
-
-    .portfolio-content {
-      position: relative;
-      z-index: 2;
-      padding: 2rem 2.5rem;
-      margin: 3rem 4rem;
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
-      background: rgba(0,0,0,0.45);
-      border-left: 2px solid var(--accent);
-    }
-
-    .section-clarifier {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      color: var(--white);
-      opacity: 0.55;
-      margin-top: 0.75rem;
-      line-height: 1.5;
-    }
-
-    .portfolio-section.animate .portfolio-content {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    .portfolio-section.animate.in-view .portfolio-content {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .portfolio-category {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.75rem;
-      display: block;
-    }
-
-    .portfolio-title {
-      font-family: 'Playfair Display', serif;
-      font-weight: 500;
-      font-size: clamp(1.8rem, 3vw, 3rem);
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--white);
-      max-width: 600px;
-    }
-
-    /* Scroll cue */
-    .scroll-cue {
-      position: absolute;
-      bottom: 2rem;
-      right: 3rem;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      opacity: 0.4;
-    }
-
-    .scroll-cue span {
-      font-size: 0.55rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--white);
-    }
-
-    .scroll-cue-line {
-      width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--white), transparent);
-      animation: scrollPulse 2s ease infinite;
-    }
-
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.4; transform: scaleY(1); }
-      50% { opacity: 0.8; transform: scaleY(1.1); }
-    }
-
-    @media (max-width: 640px) {
-      .portfolio-content { padding: 2rem 1.5rem; }
-      .scroll-cue { right: 1.5rem; }
-    }
-
-    /* ── TRIPTYCH SECTION ── */
-    .triptych-section {
-      display: flex;
-      align-items: stretch;
-      min-height: 100vh;
-      background: var(--dark);
-    }
-
-    .triptych-copy {
-      flex: 0 0 42%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 4rem;
-      border-right: 1px solid var(--border);
-    }
-
-    .triptych-title {
-      font-family: 'Playfair Display', serif;
-      font-weight: 500;
-      font-size: clamp(1.8rem, 3vw, 3rem);
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--white);
-    }
-
-    .triptych-videos {
-      flex: 1;
-      display: flex;
-    }
-
-    .triptych-video {
-      flex: 1;
-      overflow: hidden;
-      border-left: 1px solid var(--border);
-    }
-
-    .triptych-video video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .triptych-section .portfolio-content {
-      margin: 0;
-      padding: 3rem 2.5rem;
-      align-self: flex-start;
-    }
-
-    @media (max-width: 640px) {
-      .triptych-section {
-        flex-direction: column;
-        min-height: auto;
-      }
-      .triptych-copy {
-        flex: none;
-        padding: 3rem 1.5rem;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-      .triptych-videos {
-        flex-direction: column;
-      }
-      .triptych-video {
-        border-left: none;
-        border-top: 1px solid var(--border);
-        height: 75vw;
-      }
-    }
-
-    .divider {
-      width: 48px;
-      height: 1px;
-      background: var(--accent-dim);
-      margin: 0 auto;
-      animation: fadeUp 0.8s 0.8s ease both;
-    }
-
-    /* ── FORM ── */
-    .lead-form-section {
-      padding: 6rem 2rem 5rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .lead-form-wrap {
-      width: 100%;
-      max-width: 640px;
-    }
-
-    .form-intro {
-      text-align: center;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.4rem, 3vw, 2rem);
-      line-height: 1.2;
-      color: var(--white);
-      margin-bottom: 2rem;
-    }
-
-    .lead-form {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .lead-form input,
-    .lead-form textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.03);
-      color: var(--white);
-      border: 1px solid var(--border);
-      padding: 1rem;
-      font-family: 'Barlow', sans-serif;
-      font-size: 0.95rem;
-    }
-
-    .lead-form input::placeholder,
-    .lead-form textarea::placeholder {
-      color: var(--muted);
-    }
-
-    .lead-form textarea {
-      min-height: 180px;
-      resize: vertical;
-    }
-
-    .lead-form button {
-      background: var(--accent);
-      color: var(--black);
-      border: none;
-      padding: 1rem 1.25rem;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.8rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-    }
-
-    .lead-form button:hover {
-      opacity: 0.92;
-    }
-
-    @media (max-width: 640px) {
-      .lead-form-section {
-        padding: 4rem 1.5rem 4rem;
-      }
-      .form-intro {
-        margin-bottom: 1.5rem;
-      }
-    }
-
-    /* ── POSITIONING SECTION ── */
-    .positioning-section {
-      padding: 6rem 2rem;
-      display: flex;
-      justify-content: center;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .positioning-inner {
-      width: 100%;
-      max-width: 680px;
-      text-align: center;
-    }
-
-    .positioning-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      display: block;
-      margin-bottom: 1.75rem;
-    }
-
-    .positioning-body {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
-      font-weight: 400;
-      line-height: 1.7;
-      color: var(--white);
-      opacity: 0.85;
-    }
-
-    @media (max-width: 640px) {
-      .positioning-section { padding: 4rem 1.5rem; }
-    }
-
-    /* ── WHY A VISUAL WORLD ── */
-    .world-why-section {
-      padding: 6rem 4rem;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--dark);
-    }
-
-    .world-why-text {
-      max-width: 680px;
-      margin: 0 auto 3.5rem;
-    }
-
-    .world-why-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 3vw, 2.8rem);
-      font-weight: 500;
-      line-height: 1.15;
-      color: var(--white);
-      margin-bottom: 1.5rem;
-      margin-top: 1rem;
-    }
-
-    .world-why-body {
-      font-family: 'Barlow', sans-serif;
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: var(--white);
-      opacity: 0.7;
-      margin-bottom: 1rem;
-    }
-
-    .world-why-visual {
-      max-width: 680px;
-      margin: 0 auto;
-      aspect-ratio: 16/9;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .world-why-visual video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    @media (max-width: 640px) {
-      .world-why-section { padding: 4rem 1.5rem; }
-    }
-
-    /* ── WHERE WE FIT ── */
-    .where-we-fit-section {
-      padding: 6rem 4rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .where-we-fit-header {
-      max-width: 760px;
-      margin: 0 auto 4rem;
-      text-align: center;
-    }
-
-    .where-we-fit-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.3rem, 2.2vw, 1.9rem);
-      font-weight: 400;
-      line-height: 1.35;
-      color: var(--white);
-      margin-top: 1rem;
-    }
-
-    .where-we-fit-columns {
-      max-width: 1100px;
-      margin: 0 auto;
+    .section-head {
+      min-height: 270px;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      border: 1px solid var(--border);
+      grid-template-columns: minmax(0, .48fr) minmax(0, 1fr);
+      gap: 60px;
+      align-items: end;
+      padding: 70px 0 44px;
+      border-bottom: 1px solid var(--line);
     }
+    .section-head .eyebrow { margin: 0 0 10px; }
+    .section-title { margin: 0; font-size: clamp(42px, 5.8vw, 94px); line-height: .93; letter-spacing: -.055em; font-weight: 680; font-variation-settings: "wdth" 107; text-transform: uppercase; }
+    .section-copy { max-width: 620px; align-self: end; }
+    .section-copy p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.7; font-weight: 330; }
+    .section-link { margin-top: 26px; display: inline-grid; grid-auto-flow: column; gap: 18px; align-items: center; padding: 12px 0 9px; border-bottom: 1px solid var(--line-strong); text-decoration: none; font: 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .13em; }
 
-    .fit-column {
-      padding: 2.5rem;
-      border-right: 1px solid var(--border);
-      border-top: 2px solid transparent;
+    .screen-rig {
+      margin-top: 44px;
+      min-height: 720px;
+      display: grid;
+      grid-template-columns: 1.4fr .6fr;
+      gap: 18px;
+      position: relative;
     }
+    .media-frame { position: relative; border: 1px solid var(--line); background: var(--panel); overflow: hidden; }
+    .media-frame video { width: 100%; height: 100%; object-fit: cover; filter: saturate(.82) contrast(1.03); }
+    .media-frame::before { content: attr(data-frame); position: absolute; z-index: 3; top: 12px; left: 12px; padding: 5px 7px; background: rgba(0,0,0,.58); color: var(--white); font: 9px/1 var(--mono); letter-spacing: .12em; }
+    .screen-main { min-height: 720px; }
+    .screen-stack { display: grid; grid-template-rows: 1fr 1fr; gap: 18px; }
+    .screen-stack .media-frame { min-height: 351px; }
+    .rig-legend { position: absolute; right: 0; bottom: -32px; color: var(--dim); font: 9px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
 
-    .fit-column:last-child {
-      border-right: none;
-      border-top: 2px solid var(--accent);
+    .spaces-section {
+      position: relative;
+      min-height: 100svh;
+      border-bottom: 1px solid var(--line);
+      background: #050707;
+      overflow: hidden;
     }
+    .spaces-media { position: absolute; inset: 0; }
+    .spaces-media video { width: 100%; height: 100%; object-fit: cover; filter: brightness(.58) saturate(.74) contrast(1.08); }
+    .spaces-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,7,7,.92) 0%, rgba(5,7,7,.52) 43%, rgba(5,7,7,.1) 74%), linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.4)); }
+    .spaces-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px); background-size: 12.5% 12.5%; opacity: .42; }
+    .spaces-inner { position: relative; z-index: 2; min-height: 100svh; padding: 80px var(--pad); display: grid; grid-template-columns: minmax(0, .65fr) minmax(300px, .35fr); align-items: end; }
+    .spaces-title { margin: 20px 0 0; max-width: 900px; font-size: clamp(58px, 8vw, 126px); line-height: .84; letter-spacing: -.065em; font-weight: 720; font-variation-settings: "wdth" 106; text-transform: uppercase; }
+    .spaces-copy { justify-self: end; width: min(100%, 390px); padding: 28px; border: 1px solid var(--line-strong); background: rgba(9,11,11,.74); backdrop-filter: blur(13px); }
+    .spaces-copy p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.7; }
+    .spaces-copy .section-link { color: var(--white); }
 
-    .fit-column-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      display: block;
-      margin-bottom: 1rem;
-    }
-
-    .fit-column-body {
-      font-family: 'Barlow', sans-serif;
-      font-size: 0.9rem;
-      line-height: 1.8;
-      color: var(--white);
-      opacity: 0.65;
-    }
-
-    .fit-image-strip {
-      max-width: 1100px;
-      margin: 0 auto;
+    .world-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-top: none;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .world-copy { padding: clamp(70px, 8vw, 130px) var(--pad); border-right: 1px solid var(--line); }
+    .world-copy .section-title { max-width: 780px; }
+    .world-body { margin-top: 44px; max-width: 720px; display: grid; gap: 20px; color: var(--muted); font-size: 17px; line-height: 1.75; font-weight: 330; }
+    .world-body p { margin: 0; }
+    .world-media { min-height: 760px; padding: 44px; display: flex; align-items: center; position: relative; }
+    .world-media .media-frame { width: 100%; aspect-ratio: 16/10; }
+    .world-media::before { content: "SOURCE / WORLD_MOTION_04"; position: absolute; top: 25px; left: 44px; color: var(--dim); font: 9px/1 var(--mono); letter-spacing: .13em; }
+
+    .role-section { padding: 85px var(--pad) 100px; border-bottom: 1px solid var(--line); }
+    .role-intro { display: grid; grid-template-columns: 210px 1fr; gap: 60px; margin-bottom: 62px; }
+    .role-intro .section-title { max-width: 1050px; font-size: clamp(40px, 5.3vw, 80px); }
+    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); }
+    .role-card { position: relative; min-height: 340px; padding: 32px 34px 42px; border-right: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
+    .role-card:last-child { border-right: 0; background: var(--panel); }
+    .fit-index { color: var(--dim); }
+    .fit-label { font: 600 12px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; margin: 0 0 20px; }
+    .fit-copy { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.72; max-width: 420px; }
+    .role-card::after { content: ""; position: absolute; left: 34px; right: 34px; top: 62px; height: 1px; background: var(--line-soft); }
+    .role-card:last-child::before { content: "ACTIVE LAYER"; position: absolute; right: 24px; top: 21px; color: var(--white); font: 9px/1 var(--mono); letter-spacing: .1em; }
+    .fit-images { margin-top: 20px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 20px; }
+    .fit-images .media-frame { aspect-ratio: 16/7; }
+    .fit-images img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.72) saturate(.7); }
+
+    .contact-section { display: grid; grid-template-columns: .88fr 1.12fr; min-height: 720px; background: var(--black-2); }
+    .contact-copy { padding: 85px var(--pad); border-right: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
+    .contact-title { margin: 0; font-size: clamp(62px, 8vw, 128px); line-height: .83; letter-spacing: -.065em; text-transform: uppercase; font-weight: 730; font-variation-settings: "wdth" 108; }
+    .contact-meta { color: var(--dim); font: 10px/1.7 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .lead-form { padding: 85px var(--pad); display: grid; align-content: center; gap: 0; }
+    .field { position: relative; border-top: 1px solid var(--line); }
+    .field:last-of-type { border-bottom: 1px solid var(--line); }
+    .field-label { position: absolute; left: 0; top: 18px; color: var(--dim); }
+    .lead-form input, .lead-form textarea { width: 100%; color: var(--white); background: transparent; border: 0; outline: 0; padding: 50px 0 20px 130px; font-size: 20px; font-family: var(--sans); font-weight: 340; }
+    .lead-form textarea { min-height: 190px; resize: vertical; }
+    .lead-form input::placeholder, .lead-form textarea::placeholder { color: #737a75; }
+    .lead-form button { justify-self: start; margin-top: 34px; border: 1px solid var(--line-strong); background: var(--white); color: var(--black); padding: 16px 23px; cursor: pointer; font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+
+    footer { min-height: 150px; padding: 34px var(--pad); display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; border-top: 1px solid var(--line); }
+    .footer-meta { color: var(--dim); }
+    .footer-center { color: var(--muted); text-align: center; }
+    .footer-email { justify-self: end; color: var(--muted); text-decoration: none; font: 11px/1 var(--mono); letter-spacing: .08em; }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 1050px) {
+      .site-header { grid-template-columns: 1fr auto; }
+      .header-center { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-copy { min-height: 720px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .hero-rig { min-height: 760px; }
+      .rig-window { aspect-ratio: 16/10; }
+      .studio-band { grid-template-columns: 170px 1fr; }
+      .studio-band .band-index { display: none; }
+      .screen-rig { grid-template-columns: 1fr; min-height: 0; }
+      .screen-main { min-height: 640px; }
+      .screen-stack { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+      .screen-stack .media-frame { min-height: 320px; }
+      .world-section { grid-template-columns: 1fr; }
+      .world-copy { border-right: 0; border-bottom: 1px solid var(--line); }
+      .world-media { min-height: 620px; }
+      .contact-section { grid-template-columns: 1fr; }
+      .contact-copy { min-height: 520px; border-right: 0; border-bottom: 1px solid var(--line); }
     }
 
-    .fit-image {
-      overflow: hidden;
-      aspect-ratio: 16/9;
-      background: var(--dark);
+    @media (max-width: 760px) {
+      .site-header { height: 72px; }
+      .header-logo { height: 26px; }
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+      .mobile-nav.open { display: grid; position: absolute; z-index: 30; top: 72px; left: 0; right: 0; background: var(--black); border-bottom: 1px solid var(--line); }
+      .mobile-nav a { padding: 18px var(--pad); border-top: 1px solid var(--line); color: var(--white); text-decoration: none; font: 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+      .hero-copy { min-height: 620px; padding-top: 75px; }
+      .hero-title { font-size: clamp(56px, 18vw, 94px); }
+      .hero-bottom { grid-template-columns: 1fr; }
+      .hero-rig { min-height: 560px; padding: 48px 24px; }
+      .rig-window { aspect-ratio: 4/5; }
+      .studio-band { grid-template-columns: 1fr; }
+      .studio-band .band-label { border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+      .studio-band .band-copy { padding-top: 32px; }
+      .section-head { grid-template-columns: 1fr; gap: 28px; align-items: start; }
+      .screen-main { min-height: 520px; }
+      .screen-stack { grid-template-columns: 1fr; }
+      .screen-stack .media-frame { min-height: 390px; }
+      .spaces-inner { grid-template-columns: 1fr; gap: 50px; align-content: end; }
+      .spaces-title { font-size: clamp(55px, 17vw, 92px); }
+      .spaces-copy { justify-self: start; }
+      .world-media { min-height: 470px; padding: 24px; }
+      .role-intro { grid-template-columns: 1fr; gap: 25px; }
+      .role-grid { grid-template-columns: 1fr; }
+      .role-card { border-right: 0; border-bottom: 1px solid var(--line); min-height: 260px; }
+      .role-card:last-child { border-bottom: 0; }
+      .fit-images { grid-template-columns: 1fr; }
+      .fit-images .media-frame { aspect-ratio: 16/10; }
+      .contact-copy { min-height: 430px; }
+      .lead-form { padding-top: 60px; padding-bottom: 60px; }
+      .lead-form input, .lead-form textarea { padding-left: 0; padding-top: 55px; }
+      footer { grid-template-columns: 1fr; gap: 18px; align-items: start; }
+      .footer-center { text-align: left; }
+      .footer-email { justify-self: start; }
     }
 
-    .fit-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      filter: brightness(0.65);
-      transition: filter 0.4s ease;
-    }
-
-    .fit-image:hover img { filter: brightness(0.85); }
-
-    @media (max-width: 640px) {
-      .where-we-fit-section { padding: 4rem 1.5rem; }
-      .where-we-fit-columns { grid-template-columns: 1fr; }
-      .fit-column {
-        border-right: none;
-        border-top: none;
-        border-bottom: 1px solid var(--border);
-      }
-      .fit-column:last-child {
-        border-bottom: none;
-        border-top: 2px solid var(--accent);
-      }
-      .fit-image-strip { grid-template-columns: 1fr; }
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 2rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--border);
-      animation: fadeUp 0.8s 1s ease both;
-    }
-
-    .footer-note {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .footer-email {
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .footer-email:hover { color: var(--accent); }
-
-    /* ── BUTTONS ── */
-    .btn-see-more {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #f5f0eb;
-      border: 1px solid rgba(245,240,235,0.25);
-      padding: 0.65rem 1.25rem;
-      margin-top: 1.25rem;
-      background: transparent;
-      text-decoration: none;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
-    .btn-see-more:hover {
-      border-color: #e8782a;
-      color: #e8782a;
-    }
-
-    .btn-see-more .arrow {
-      display: inline-block;
-      transition: transform 0.2s;
-    }
-
-    .btn-see-more:hover .arrow {
-      transform: translateX(4px);
-    }
-
-    .triptych-copy .btn-see-more {
-      align-self: flex-start;
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 640px) {
-      header { padding: 1.5rem; justify-content: center; }
-      header .contact-link { display: none; }
-      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
-      .hero { padding: 3rem 1.5rem; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NM73WT97"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
-
-  <div class="page">
-
-    <header>
-      <a class="wordmark" href="#">
-        <img src="images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
-      </a>
-      <nav class="nav-links">
-        <a href="screens/">For Screens</a>
-        <a href="spaces/">For Spaces</a>
-        <a href="for-partners/">For Partners</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand-mark" href="/" aria-label="Higher Roads home"><img src="/images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" /></a>
+      <div class="header-center technical-label">Visual worlds / Nashville TN / 36.1627 N · 86.7816 W</div>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="/screens/">Screens</a>
+        <a href="/spaces/">Spaces</a>
+        <a href="/for-partners/">Partners</a>
         <a href="#contact">Contact</a>
       </nav>
-      <button class="nav-toggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <button class="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
     </header>
 
-    <nav class="mobile-nav">
-      <a href="screens/">For Screens</a>
-      <a href="spaces/">For Spaces</a>
-      <a href="for-partners/">For Partners</a>
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a href="/screens/">For Screens</a>
+      <a href="/spaces/">For Spaces</a>
+      <a href="/for-partners/">For Partners</a>
       <a href="#contact">Contact</a>
     </nav>
 
     <main>
-
-      <!-- ── HERO ── -->
       <section class="hero">
-        <p class="eyebrow">For Screens · For Spaces</p>
-        <h1 class="headline">
-          <span style="display:block">Your brand deserves</span>
-          <span style="display:block">its own <em>world.</em></span>
-        </h1>
-        <p class="subhead">We can help build yours.</p>
-      </section>
-
-      <!-- ── POSITIONING ── -->
-      <section class="positioning-section">
-        <div class="positioning-inner">
-          <span class="positioning-label">The Studio</span>
-          <p class="positioning-body">Higher Roads is a Nashville-based creative studio building visual worlds for brands. From product launches to immersive experiences, every touchpoint speaks the same visual language.</p>
+        <div class="hero-copy">
+          <div>
+            <p class="eyebrow">For Screens · For Spaces</p>
+            <h1 class="hero-title"><span>Your brand</span><span>deserves its</span><span class="quiet">own world.</span></h1>
+            <p class="hero-sub">We can help build yours.</p>
+          </div>
+          <div class="hero-bottom">
+            <div class="meta">Higher Roads / Creative Studio<strong>Motion · 3D · Immersive</strong></div>
+            <div class="meta">Rig / HR-001<strong>LIVE IMAGE</strong></div>
+          </div>
         </div>
-      </section>
-
-      <!-- ── FOR SCREENS ── -->
-      <section class="triptych-section" id="screens">
-        <div class="triptych-copy">
-          <span class="portfolio-category">For Screens</span>
-          <h2 class="portfolio-title">Your brand's world.<br>Your product's scene.<br>Your customer's moment.</h2>
-          <p class="section-clarifier">We call it the Visual Product World, a motion-first environment built as an extension of your brand identity. Product content that helps find your tribe.</p>
-          <a href="/screens/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
-        </div>
-        <div class="triptych-videos">
-          <div class="triptych-video">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Tideform.mp4" type="video/mp4" />
+        <div class="hero-rig">
+          <div class="rig-window">
+            <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+            <span class="frame-label">Projection surface / 04:05 / source A</span>
+            <span class="frame-axis">X 01.000 · Y 00.000 · SCALE 100%</span>
+            <span class="frame-counter">FRM 000184</span>
+            <video autoplay muted loop playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4" />
             </video>
-          </div>
-          <div class="triptych-video">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mindbloom-vid.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <div class="triptych-video">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switchback-vid.mp4" type="video/mp4" />
-            </video>
+            <span class="scan"></span>
           </div>
         </div>
       </section>
 
-      <!-- ── FOR SPACES ── -->
-      <section class="portfolio-section" id="spaces">
-        <div class="portfolio-bg">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" />
-          </video>
+      <section class="studio-band reveal">
+        <div class="band-label technical-label">The Studio<br><br>01 / Identity into world</div>
+        <div class="band-copy">Higher Roads is a Nashville-based creative studio building visual worlds for brands. From product launches to immersive experiences, every touchpoint speaks the same visual language.</div>
+        <div class="band-index technical-label">IN / BRAND<br>OUT / WORLD</div>
+      </section>
+
+      <section class="screens-section" id="screens">
+        <div class="section-head reveal">
+          <div>
+            <p class="eyebrow">For Screens / 02</p>
+            <h2 class="section-title">Your brand's world.<br>Your product's scene.<br>Your customer's moment.</h2>
+          </div>
+          <div class="section-copy">
+            <p>We call it the Visual Product World, a motion-first environment built as an extension of your brand identity. Product content that helps find your tribe.</p>
+            <a class="section-link" href="/screens/">See what's possible <span>→</span></a>
+          </div>
         </div>
-        <div class="portfolio-overlay"></div>
-        <div class="portfolio-content">
-          <span class="portfolio-category">For Spaces</span>
-          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that entertain.</h2>
-          <p class="section-clarifier">Brand activations, events, and permanent installs where the room becomes the experience.</p>
-          <a href="/spaces/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
-        </div>
-        <div class="scroll-cue">
-          <div class="scroll-cue-line"></div>
-          <span>Scroll</span>
+        <div class="screen-rig reveal">
+          <div class="media-frame screen-main" data-frame="SOURCE / TIDEFORM / A01">
+            <video autoplay muted loop playsinline preload="metadata"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Tideform.mp4" type="video/mp4" /></video>
+          </div>
+          <div class="screen-stack">
+            <div class="media-frame" data-frame="SOURCE / MINDBLOOM / B01">
+              <video autoplay muted loop playsinline preload="metadata"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mindbloom-vid.mp4" type="video/mp4" /></video>
+            </div>
+            <div class="media-frame" data-frame="SOURCE / SWITCHBACK / C01">
+              <video autoplay muted loop playsinline preload="metadata"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switchback-vid.mp4" type="video/mp4" /></video>
+            </div>
+          </div>
+          <div class="rig-legend">3 active surfaces / linked world / continuous loop</div>
         </div>
       </section>
 
-      <!-- ── WHY A VISUAL WORLD ── -->
-      <section class="world-why-section">
-        <div class="world-why-text">
-          <span class="portfolio-category">The Case for a World</span>
-          <h2 class="world-why-headline">Create the world your customers want to live in.</h2>
-          <p class="world-why-body">Your logo and your packaging are the starting point. A visual world is what happens when that identity is put in motion, given depth, and made into a place where your audience can see the best version of themselves.</p>
-          <p class="world-why-body">Your brand world communicates who you are, what you value, and why you exist in ways catalog photography or marketing copy can't. We help our clients put that ethos into motion, so the right customers find you, connect with you, and stick with you for the long haul.</p>
-        </div>
-        <div class="world-why-visual">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </section>
-
-      <!-- ── WHERE WE FIT ── -->
-      <section class="where-we-fit-section">
-        <div class="where-we-fit-header">
-          <span class="portfolio-category">Our Role</span>
-          <h2 class="where-we-fit-headline">We are the production layer between your brand identity and the world where your products live.</h2>
-        </div>
-        <div class="where-we-fit-columns">
-          <div class="fit-column">
-            <span class="fit-column-label">Your brand team owns</span>
-            <p class="fit-column-body">The identity, the story, the strategic direction. You did that work when the brand was born. Our work starts when you pass us the baton.</p>
+      <section class="spaces-section" id="spaces">
+        <div class="spaces-media"><video autoplay muted loop playsinline preload="metadata"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" /></video></div>
+        <div class="spaces-grid"></div>
+        <div class="spaces-inner">
+          <div class="reveal">
+            <p class="eyebrow">For Spaces / 03</p>
+            <h2 class="spaces-title">Walls that move.<br>Floors that breathe.<br>Spaces that entertain.</h2>
           </div>
-          <div class="fit-column">
-            <span class="fit-column-label">Your agency owns</span>
-            <p class="fit-column-body">The campaign strategy, the channel plan, the media buy. The distribution layer that gets your content in front of the right people. We work alongside that.</p>
-          </div>
-          <div class="fit-column">
-            <span class="fit-column-label">Higher Roads builds</span>
-            <p class="fit-column-body">The visual world where your product lives and your brand shows up. Motion content, 3D environments, and immersive installations. The production layer between having an identity and inhabiting a world.</p>
-          </div>
-        </div>
-        <div class="fit-image-strip">
-          <div class="fit-image">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png" alt="Visual Product World for screens" />
-          </div>
-          <div class="fit-image">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Immersive environment for spaces" />
+          <div class="spaces-copy reveal">
+            <div class="technical-label" style="color:var(--dim);margin-bottom:22px;">Surface / ENV-01<br>Mode / Spatial</div>
+            <p>Brand activations, events, and permanent installs where the room becomes the experience.</p>
+            <a class="section-link" href="/spaces/">See what's possible <span>→</span></a>
           </div>
         </div>
       </section>
 
-      <!-- ── CONTACT ── -->
-      <section id="contact" class="lead-form-section">
-        <div class="lead-form-wrap">
-          <p class="form-intro">What's your vision?</p>
-          <form
-            class="lead-form"
-            action="https://formspree.io/f/xrerprnv"
-            method="POST"
-          >
-            <input type="text" name="name" placeholder="Your name" required />
-            <input type="email" name="email" placeholder="Your email" required />
-            <textarea name="message" placeholder="What are you working on?" rows="5" required></textarea>
-            <button type="submit">Get in touch</button>
-          </form>
+      <section class="world-section">
+        <div class="world-copy reveal">
+          <p class="eyebrow">The Case for a World / 04</p>
+          <h2 class="section-title">Create the world your customers want to live in.</h2>
+          <div class="world-body">
+            <p>Your logo and your packaging are the starting point. A visual world is what happens when that identity is put in motion, given depth, and made into a place where your audience can see the best version of themselves.</p>
+            <p>Your brand world communicates who you are, what you value, and why you exist in ways catalog photography or marketing copy can't. We help our clients put that ethos into motion, so the right customers find you, connect with you, and stick with you for the long haul.</p>
+          </div>
+        </div>
+        <div class="world-media reveal">
+          <div class="media-frame" data-frame="WORLD / MOTION / 04">
+            <video autoplay muted loop playsinline preload="metadata"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4" /></video>
+          </div>
         </div>
       </section>
 
+      <section class="role-section">
+        <div class="role-intro reveal">
+          <p class="eyebrow">Our Role / 05</p>
+          <h2 class="section-title">We are the production layer between your brand identity and the world where your products live.</h2>
+        </div>
+        <div class="role-grid reveal">
+          <article class="role-card">
+            <div class="fit-index">01 / INPUT</div>
+            <div><h3 class="fit-label">Your brand team owns</h3><p class="fit-copy">The identity, the story, the strategic direction. You did that work when the brand was born. Our work starts when you pass us the baton.</p></div>
+          </article>
+          <article class="role-card">
+            <div class="fit-index">02 / DISTRIBUTION</div>
+            <div><h3 class="fit-label">Your agency owns</h3><p class="fit-copy">The campaign strategy, the channel plan, the media buy. The distribution layer that gets your content in front of the right people. We work alongside that.</p></div>
+          </article>
+          <article class="role-card">
+            <div class="fit-index">03 / PRODUCTION</div>
+            <div><h3 class="fit-label">Higher Roads builds</h3><p class="fit-copy">The visual world where your product lives and your brand shows up. Motion content, 3D environments, and immersive installations. The production layer between having an identity and inhabiting a world.</p></div>
+          </article>
+        </div>
+        <div class="fit-images reveal">
+          <div class="media-frame" data-frame="SCREENS / WORLD"><img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png" alt="Visual Product World for screens" /></div>
+          <div class="media-frame" data-frame="SPACES / ENVIRONMENT"><img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Immersive environment for spaces" /></div>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contact">
+        <div class="contact-copy reveal">
+          <div><p class="eyebrow">Contact / 06</p><h2 class="contact-title">What's your<br>vision?</h2></div>
+          <div class="contact-meta">Higher Roads<br>Nashville, Tennessee<br>connect@higher-roads.com</div>
+        </div>
+        <form class="lead-form reveal" action="https://formspree.io/f/xrerprnv" method="POST">
+          <div class="field"><label class="field-label" for="name">Name</label><input id="name" type="text" name="name" placeholder="Your name" required /></div>
+          <div class="field"><label class="field-label" for="email">Email</label><input id="email" type="email" name="email" placeholder="Your email" required /></div>
+          <div class="field"><label class="field-label" for="message">Project</label><textarea id="message" name="message" placeholder="What are you working on?" rows="5" required></textarea></div>
+          <button type="submit">Get in touch</button>
+        </form>
+      </section>
     </main>
 
     <footer>
-      <span class="footer-note">© 2026 Higher Roads</span>
-      <div class="theme-switcher">
-        <span class="theme-label">Theme</span>
-        <div class="theme-dots">
-          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
-          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
-          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
-          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
-        </div>
-      </div>
+      <div class="footer-meta">© 2026 Higher Roads<br>Projection Rig / Test 01</div>
+      <div class="footer-center technical-label">Screens · Spaces · Motion · 3D · Immersive</div>
       <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
     </footer>
-
   </div>
 
   <script>
-    // Hamburger toggle
-    const navToggle = document.querySelector('.nav-toggle');
-    const mobileNav = document.querySelector('.mobile-nav');
+    const toggle = document.querySelector('.nav-toggle');
+    const mobile = document.querySelector('.mobile-nav');
+    toggle.addEventListener('click', () => mobile.classList.toggle('open'));
+    mobile.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mobile.classList.remove('open')));
 
-    navToggle.addEventListener('click', () => {
-      navToggle.classList.toggle('open');
-      mobileNav.classList.toggle('open');
-    });
-
-    // Close mobile nav on link click
-    mobileNav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        navToggle.classList.remove('open');
-        mobileNav.classList.remove('open');
-      });
-    });
-
-    // Theme switcher
-    const dots = document.querySelectorAll('.theme-dot');
-    const root = document.documentElement;
-
-    dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        root.setAttribute('data-theme', dot.dataset.t);
-        dots.forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-      });
-    });
-
-    // Portfolio scroll-trigger + video autoplay
-    const portfolioSections = document.querySelectorAll('.portfolio-section');
-    const observer = new IntersectionObserver((entries) => {
+    const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          const video = entry.target.querySelector('video');
-          if (video) video.play();
-        } else {
-          const video = entry.target.querySelector('video');
-          if (video) video.pause();
-        }
+        if (entry.isIntersecting) entry.target.classList.add('in');
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-    portfolioSections.forEach(section => observer.observe(section));
-
+    const videos = document.querySelectorAll('video');
+    const videoObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      });
+    }, { rootMargin: '150px 0px', threshold: 0.01 });
+    videos.forEach(video => videoObserver.observe(video));
   </script>
 </body>
 </html>
