@@ -11,12 +11,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:title" content="Higher Roads" />
-  <meta property="og:description" content="Higher Roads builds the visual world of your brand — for screens and for spaces. Based in Nashville." />
+  <meta property="og:description" content="Higher Roads is an art and technology studio in Nashville. We build projections, tables, walls, screens, and shows that respond to the people in front of them." />
   <meta property="og:image" content="https://higher-roads.com/images/og-image1.png" />
   <meta property="og:url" content="https://higher-roads.com" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <title>Higher Roads — Visual Worlds for Screens and Spaces</title>
+  <title>Higher Roads | Media that knows where it is</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -868,6 +868,70 @@
       footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
       .hero { padding: 3rem 1.5rem; }
     }
+
+    /* ── VISION HOMEPAGE (branch: vision-homepage) ── */
+    .hero .subhead { max-width: 640px; margin: 1.5rem auto 0; line-height: 1.7; }
+
+    .work-section { padding: 6rem 4rem; border-bottom: 1px solid var(--border); }
+    .work-header { max-width: 760px; margin: 0 auto 3.5rem; text-align: center; }
+    .work-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--border);
+    }
+    .work-card {
+      padding: 2.25rem 1.75rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 0.85rem; min-height: 240px;
+    }
+    .work-card:nth-child(4n) { border-right: none; }
+    .work-card:nth-last-child(-n+4) { border-bottom: none; }
+    .work-card-media {
+      aspect-ratio: 4 / 3; background: var(--dark); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-family: 'Rajdhani', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .work-card-media video, .work-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .work-card-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 400; color: var(--white); }
+    .work-card-body { font-family: 'Barlow', sans-serif; font-size: 0.88rem; line-height: 1.7; color: var(--white); opacity: 0.65; }
+    .work-card-inside {
+      margin-top: auto; font-family: 'Rajdhani', sans-serif; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+    }
+
+    .prose-section { padding: 6rem 4rem; border-bottom: 1px solid var(--border); }
+    .prose-section.alt { background: var(--dark); }
+    .prose-inner { max-width: 680px; margin: 0 auto; }
+    .prose-headline {
+      font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 400; line-height: 1.3; color: var(--white); margin: 1rem 0 1.75rem;
+    }
+    .prose-body { font-family: 'Barlow', sans-serif; font-size: 1.02rem; line-height: 1.85; color: var(--white); opacity: 0.8; margin-bottom: 1.25rem; }
+    .prose-body:last-child { margin-bottom: 0; }
+    .prose-inner .btn-see-more { margin-top: 0.5rem; }
+
+    .tools-grid { max-width: 1100px; margin: 3rem auto 0; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); }
+    .tools-grid .fit-column:last-child { border-top: 2px solid transparent; }
+    .tools-grid .fit-column .btn-see-more { margin-top: 1.5rem; }
+
+    @media (max-width: 1000px) {
+      .work-grid { grid-template-columns: repeat(2, 1fr); }
+      .work-card:nth-child(4n) { border-right: 1px solid var(--border); }
+      .work-card:nth-child(2n) { border-right: none; }
+      .work-card:nth-last-child(-n+4) { border-bottom: 1px solid var(--border); }
+      .work-card:nth-last-child(-n+2) { border-bottom: none; }
+    }
+    @media (max-width: 640px) {
+      .work-section, .prose-section { padding: 4rem 1.5rem; }
+      .work-grid { grid-template-columns: 1fr; }
+      .work-card { border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+      .work-card:last-child { border-bottom: none !important; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .tools-grid .fit-column { border-right: none; border-bottom: 1px solid var(--border); }
+      .tools-grid .fit-column:last-child { border-bottom: none; }
+    }
   </style>
 </head>
 <body>
@@ -883,9 +947,11 @@
         <img src="images/HR-logo-horiz-white.png" alt="Higher Roads" class="header-logo" />
       </a>
       <nav class="nav-links">
-        <a href="screens/">For Screens</a>
-        <a href="spaces/">For Spaces</a>
-        <a href="for-partners/">For Partners</a>
+        <a href="#work">Work</a>
+        <a href="#how">How it's built</a>
+        <a href="#software">Software</a>
+        <a href="#lab">The Lab</a>
+        <a href="for-partners/">Partners</a>
         <a href="#contact">Contact</a>
       </nav>
       <button class="nav-toggle" aria-label="Toggle menu">
@@ -896,9 +962,11 @@
     </header>
 
     <nav class="mobile-nav">
-      <a href="screens/">For Screens</a>
-      <a href="spaces/">For Spaces</a>
-      <a href="for-partners/">For Partners</a>
+      <a href="#work">Work</a>
+      <a href="#how">How it's built</a>
+      <a href="#software">Software</a>
+      <a href="#lab">The Lab</a>
+      <a href="for-partners/">Partners</a>
       <a href="#contact">Contact</a>
     </nav>
 
@@ -906,123 +974,146 @@
 
       <!-- ── HERO ── -->
       <section class="hero">
-        <p class="eyebrow">For Screens · For Spaces</p>
         <h1 class="headline">
-          <span style="display:block">Your brand deserves</span>
-          <span style="display:block">its own <em>world.</em></span>
+          <span style="display:block">Media that knows</span>
+          <span style="display:block">where it <em>is.</em></span>
         </h1>
-        <p class="subhead">We can help build yours.</p>
+        <p class="subhead">Higher Roads is an art and technology studio in Nashville. We build projections, tables, walls, screens, and shows that respond to the people in front of them. We design the content, write the software, and build the hardware that runs it.</p>
       </section>
 
-      <!-- ── POSITIONING ── -->
-      <section class="positioning-section">
-        <div class="positioning-inner">
-          <span class="positioning-label">The Studio</span>
-          <p class="positioning-body">Higher Roads is a Nashville-based creative studio building visual worlds for brands. From product launches to immersive experiences, every touchpoint speaks the same visual language.</p>
-        </div>
-      </section>
-
-      <!-- ── FOR SCREENS ── -->
-      <section class="triptych-section" id="screens">
-        <div class="triptych-copy">
-          <span class="portfolio-category">For Screens</span>
-          <h2 class="portfolio-title">Your brand's world.<br>Your product's scene.<br>Your customer's moment.</h2>
-          <p class="section-clarifier">We call it the Visual Product World, a motion-first environment built as an extension of your brand identity. Product content that helps find your tribe.</p>
-          <a href="/screens/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
-        </div>
-        <div class="triptych-videos">
-          <div class="triptych-video">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Tideform.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <div class="triptych-video">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mindbloom-vid.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <div class="triptych-video">
-            <video autoplay muted loop playsinline preload="auto">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Switchback-vid.mp4" type="video/mp4" />
-            </video>
-          </div>
+      <!-- ── THE BELIEF ── -->
+      <section class="prose-section">
+        <div class="prose-inner">
+          <span class="portfolio-category">The belief</span>
+          <h2 class="prose-headline">Most media is a file. We think a room can do better.</h2>
+          <p class="prose-body">A file plays the same loop in every room, for everyone, whether anyone is watching or not. A tabletop can recognize the product in your hand and tell you about it. A gallery wall can change as you move through it. A map can find your way for you. That's what we build, and we build it small enough to live in real venues on real budgets.</p>
         </div>
       </section>
 
-      <!-- ── FOR SPACES ── -->
-      <section class="portfolio-section" id="spaces">
-        <div class="portfolio-bg">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive.mp4" type="video/mp4" />
-          </video>
+      <!-- ── THE WORK ── -->
+      <section class="work-section" id="work">
+        <div class="work-header">
+          <span class="portfolio-category">The work</span>
+          <h2 class="prose-headline">Things that responded to someone.</h2>
         </div>
-        <div class="portfolio-overlay"></div>
-        <div class="portfolio-content">
-          <span class="portfolio-category">For Spaces</span>
-          <h2 class="portfolio-title">Walls that move.<br>Floors that breathe.<br>Spaces that entertain.</h2>
-          <p class="section-clarifier">Brand activations, events, and permanent installs where the room becomes the experience.</p>
-          <a href="/spaces/" class="btn-see-more">See what's possible <span class="arrow">→</span></a>
-        </div>
-        <div class="scroll-cue">
-          <div class="scroll-cue-line"></div>
-          <span>Scroll</span>
+        <div class="work-grid">
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">The Product Table</h3>
+            <p class="work-card-body">Put something down and the table tells you about it.</p>
+            <span class="work-card-inside">Camera, small computer, projector</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">The Responsive Gallery</h3>
+            <p class="work-card-body">Projection that moves when you do, mapped onto the pieces on the wall and built to run every night of an art crawl.</p>
+            <span class="work-card-inside">Sensor, mapped projection</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">The Sponsor Game</h3>
+            <p class="work-card-body">An interactive game at an activation, dressed in the sponsor's brand, built so attendees play it and talk about it after.</p>
+            <span class="work-card-inside">Custom software, screen or projection</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">The Wayfinding Table</h3>
+            <p class="work-card-body">A topographical map projected onto a table so attendees can find their own route through the event.</p>
+            <span class="work-card-inside">Touch or vision, projector</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">The Living Fabrication</h3>
+            <p class="work-card-body">Media built into a fabricated structure so the build changes as people move around it.</p>
+            <span class="work-card-inside">Media brain, sensors, integrated screens</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">The Immersive Room</h3>
+            <p class="work-card-body">Projection mapping for events where the room itself is the show.</p>
+            <span class="work-card-inside">Mapped projection, media server</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">Show Media with Layers</h3>
+            <p class="work-card-body">Tour content built for multi-input systems, so the operator has layers to play rather than a flat clip.</p>
+            <span class="work-card-inside">Multi-output formats, live control</span>
+          </article>
+          <article class="work-card">
+            <div class="work-card-media">Media coming</div>
+            <h3 class="work-card-title">Rabbit Ears</h3>
+            <p class="work-card-body">An analog TV experience for venues, running on a small media brain with real channels to flip through.</p>
+            <span class="work-card-inside">Local app, media brain, any TV</span>
+          </article>
         </div>
       </section>
 
-      <!-- ── WHY A VISUAL WORLD ── -->
-      <section class="world-why-section">
-        <div class="world-why-text">
-          <span class="portfolio-category">The Case for a World</span>
-          <h2 class="world-why-headline">Create the world your customers want to live in.</h2>
-          <p class="world-why-body">Your logo and your packaging are the starting point. A visual world is what happens when that identity is put in motion, given depth, and made into a place where your audience can see the best version of themselves.</p>
-          <p class="world-why-body">Your brand world communicates who you are, what you value, and why you exist in ways catalog photography or marketing copy can't. We help our clients put that ethos into motion, so the right customers find you, connect with you, and stick with you for the long haul.</p>
-        </div>
-        <div class="world-why-visual">
-          <video autoplay muted loop playsinline preload="auto">
-            <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/MB-mountainvid.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </section>
-
-      <!-- ── WHERE WE FIT ── -->
-      <section class="where-we-fit-section">
+      <!-- ── HOW IT'S BUILT ── -->
+      <section class="where-we-fit-section" id="how">
         <div class="where-we-fit-header">
-          <span class="portfolio-category">Our Role</span>
-          <h2 class="where-we-fit-headline">We are the production layer between your brand identity and the world where your products live.</h2>
+          <span class="portfolio-category">How it's built</span>
+          <h2 class="where-we-fit-headline">Most of what we build has something that senses, something that decides, and something that shows.</h2>
         </div>
         <div class="where-we-fit-columns">
           <div class="fit-column">
-            <span class="fit-column-label">Your brand team owns</span>
-            <p class="fit-column-body">The identity, the story, the strategic direction. You did that work when the brand was born. Our work starts when you pass us the baton.</p>
+            <span class="fit-column-label">Senses</span>
+            <p class="fit-column-body">This part changes the most from project to project. It might be a camera watching a tabletop, a sensor at a doorway, a control surface in an operator's hands, or nothing more than a schedule on a media box.</p>
           </div>
           <div class="fit-column">
-            <span class="fit-column-label">Your agency owns</span>
-            <p class="fit-column-body">The campaign strategy, the channel plan, the media buy. The distribution layer that gets your content in front of the right people. We work alongside that.</p>
+            <span class="fit-column-label">Decides</span>
+            <p class="fit-column-body">Usually a small computer running software we wrote. It takes what the sensor sees and decides what the room should do next.</p>
           </div>
           <div class="fit-column">
-            <span class="fit-column-label">Higher Roads builds</span>
-            <p class="fit-column-body">The visual world where your product lives and your brand shows up. Motion content, 3D environments, and immersive installations. The production layer between having an identity and inhabiting a world.</p>
+            <span class="fit-column-label">Shows</span>
+            <p class="fit-column-body">A projector, a wall, or a screen. We've built enough of these that the parts carry over, which is how a studio of three delivers a new one on time.</p>
           </div>
         </div>
-        <div class="fit-image-strip">
-          <div class="fit-image">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Collage2.png" alt="Visual Product World for screens" />
+      </section>
+
+      <!-- ── THE TOOLS ── -->
+      <section class="prose-section alt" id="software">
+        <div class="prose-inner">
+          <span class="portfolio-category">The tools</span>
+          <h2 class="prose-headline">The same habit produced two products.</h2>
+          <p class="prose-body">Both started because the tools we had didn't understand the job.</p>
+        </div>
+        <div class="tools-grid">
+          <div class="fit-column">
+            <span class="fit-column-label">Meridian</span>
+            <p class="fit-column-body">Review, approvals, and versions for creative teams, without the weight of systems built for other kinds of work.</p>
           </div>
-          <div class="fit-image">
-            <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Immersive environment for spaces" />
+          <div class="fit-column">
+            <span class="fit-column-label">Aura</span>
+            <p class="fit-column-body">A creative partner that carries a brand's ethos, values, and visual world, so small teams can plan and make better work every week.</p>
+            <a href="https://aura.higher-roads.com" class="btn-see-more">See Aura <span class="arrow">→</span></a>
           </div>
+        </div>
+      </section>
+
+      <!-- ── THE LAB ── -->
+      <section class="prose-section" id="lab">
+        <div class="prose-inner">
+          <span class="portfolio-category">The lab</span>
+          <h2 class="prose-headline">Some of what we build starts without a client.</h2>
+          <p class="prose-body">Rabbit Ears was one of those. There's always something on the bench, and if you have a room that needs something that doesn't exist yet, this is where to ask.</p>
+        </div>
+      </section>
+
+      <!-- ── PARTNERS ── -->
+      <section class="prose-section alt" id="partners">
+        <div class="prose-inner">
+          <span class="portfolio-category">Partners</span>
+          <h2 class="prose-headline">You bring the room. We bring the part that responds.</h2>
+          <p class="prose-body">Fabricators, experiential agencies, and event producers bring us the space and the brief. We work under your name when that's what the project needs.</p>
+          <a href="for-partners/" class="btn-see-more">Working with partners <span class="arrow">→</span></a>
         </div>
       </section>
 
       <!-- ── CONTACT ── -->
       <section id="contact" class="lead-form-section">
         <div class="lead-form-wrap">
-          <p class="form-intro">What's your vision?</p>
-          <form
-            class="lead-form"
-            action="https://formspree.io/f/xrerprnv"
-            method="POST"
-          >
+          <p class="form-intro">Tell us about the room.</p>
+          <form class="lead-form" action="https://formspree.io/f/xrerprnv" method="POST">
             <input type="text" name="name" placeholder="Your name" required />
             <input type="email" name="email" placeholder="Your email" required />
             <textarea name="message" placeholder="What are you working on?" rows="5" required></textarea>
