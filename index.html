@@ -11,12 +11,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta property="og:title" content="Higher Roads" />
-  <meta property="og:description" content="Higher Roads is an art and technology studio in Nashville. We create media for rooms, stages, screens, tables, and physical spaces, built around the place where the work will live." />
+  <meta property="og:description" content="Higher Roads is an art and technology studio in Nashville creating visual experiences for rooms, stages, venues, screens, tables, installations, and live environments." />
   <meta property="og:image" content="https://higher-roads.com/images/og-image1.png" />
   <meta property="og:url" content="https://higher-roads.com" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <title>Higher Roads | Media that knows where it is</title>
+  <title>Higher Roads | Visual experiences for physical spaces</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1075,6 +1075,439 @@
       }
     }
 
+  
+    /* ── VISION HOMEPAGE FULL EDITORIAL PASS ── */
+    :root {
+      --ink: #0b0a08;
+      --ink-2: #151310;
+      --paper: #eee9df;
+      --paper-2: #e5dfd4;
+      --text: #f0ece4;
+      --text-dim: rgba(240,236,228,0.66);
+      --paper-text: #171512;
+      --paper-dim: rgba(23,21,18,0.62);
+      --rust: #b85f32;
+    }
+
+    body::after { display: none; }
+    body::before { opacity: 0.18; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--ink); }
+
+    main { background: var(--ink); }
+
+    .editorial-section {
+      position: relative;
+      padding: clamp(5rem, 9vw, 9rem) clamp(1.5rem, 5vw, 5.5rem);
+      background: var(--ink);
+    }
+
+    .section-kicker {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--text-dim);
+    }
+
+    .editorial-heading {
+      font-family: 'Newsreader', serif;
+      font-weight: 400;
+      font-size: clamp(2.7rem, 5vw, 5.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .editorial-copy {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: clamp(1rem, 1.25vw, 1.16rem);
+      line-height: 1.72;
+      color: var(--text-dim);
+    }
+
+    .belief {
+      min-height: 72vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: clamp(3rem, 8vw, 9rem);
+      align-items: end;
+    }
+
+    .belief .editorial-heading { max-width: 10ch; }
+    .belief-copy { max-width: 34rem; padding-bottom: 0.4rem; }
+    .belief-copy p + p { margin-top: 1.2rem; }
+
+    .work-editorial {
+      padding-top: 2rem;
+      padding-bottom: clamp(6rem, 10vw, 11rem);
+    }
+
+    .work-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .work-intro .editorial-heading {
+      font-size: clamp(2.3rem, 4vw, 4.2rem);
+      max-width: 11ch;
+    }
+
+    .project-feature {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.65fr);
+      gap: clamp(1.8rem, 4vw, 4.5rem);
+      align-items: end;
+      margin-bottom: clamp(5rem, 10vw, 10rem);
+    }
+
+    .project-media {
+      overflow: hidden;
+      background: #171410;
+    }
+
+    .project-media video,
+    .project-media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .project-media.feature {
+      aspect-ratio: 16 / 10;
+    }
+
+    .project-text {
+      max-width: 28rem;
+      padding-bottom: 0.4rem;
+    }
+
+    .project-title {
+      font-family: 'Newsreader', serif;
+      font-size: clamp(1.8rem, 2.6vw, 2.8rem);
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .project-description {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    .project-link {
+      display: inline-block;
+      margin-top: 1.4rem;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.86rem;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(240,236,228,0.28);
+      padding-bottom: 0.25rem;
+    }
+
+    .project-link:hover { color: var(--rust); border-color: var(--rust); }
+
+    .process-strip {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr 1fr;
+      gap: clamp(0.7rem, 1.5vw, 1.4rem);
+      align-items: start;
+      margin-left: clamp(0rem, 7vw, 8rem);
+    }
+
+    .process-shot:nth-child(2) { margin-top: clamp(2rem, 6vw, 6rem); }
+    .process-shot:nth-child(3) { margin-top: clamp(0rem, 2vw, 2rem); }
+
+    .process-image {
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: #171410;
+    }
+
+    .process-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .process-caption {
+      margin-top: 0.8rem;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: rgba(240,236,228,0.52);
+    }
+
+    .approach-editorial {
+      min-height: 80vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+      gap: clamp(4rem, 8vw, 10rem);
+      align-items: center;
+      background: var(--ink-2);
+    }
+
+    .approach-editorial .editorial-heading { max-width: 9ch; }
+    .approach-points { display: flex; flex-direction: column; gap: 3.2rem; }
+    .approach-point { max-width: 31rem; }
+    .approach-title {
+      font-family: 'Newsreader', serif;
+      font-size: 1.65rem;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+    .approach-body {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    .tools-editorial { padding-bottom: clamp(7rem, 12vw, 12rem); }
+    .tools-intro {
+      max-width: 48rem;
+      margin-bottom: clamp(4rem, 8vw, 8rem);
+    }
+    .tools-intro .editorial-heading { margin-top: 1rem; max-width: 12ch; }
+    .tool-row {
+      display: grid;
+      grid-template-columns: minmax(170px, 0.42fr) minmax(0, 1.1fr) auto;
+      align-items: baseline;
+      gap: clamp(1.5rem, 5vw, 6rem);
+      padding: 2.4rem 0;
+      border-top: 1px solid rgba(240,236,228,0.14);
+    }
+    .tool-row:last-child { border-bottom: 1px solid rgba(240,236,228,0.14); }
+    .tool-name {
+      font-family: 'Newsreader', serif;
+      font-size: clamp(2rem, 3vw, 3.6rem);
+      color: var(--text);
+      line-height: 1;
+    }
+    .tool-description {
+      max-width: 42rem;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+    .tool-link {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.84rem;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .tool-link:hover { color: var(--rust); }
+
+    .lab-editorial {
+      padding-top: clamp(7rem, 11vw, 12rem);
+      padding-bottom: clamp(7rem, 11vw, 12rem);
+      background: #100f0d;
+    }
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+      gap: clamp(3rem, 8vw, 9rem);
+      align-items: start;
+    }
+    .lab-copy .editorial-heading {
+      margin-top: 1rem;
+      max-width: 9ch;
+      font-size: clamp(2.6rem, 4.7vw, 5.2rem);
+    }
+    .lab-copy .editorial-copy { margin-top: 2rem; max-width: 30rem; }
+    .lab-images {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 1rem;
+      align-items: end;
+      padding-top: 3rem;
+    }
+    .lab-image {
+      overflow: hidden;
+      background: #171410;
+    }
+    .lab-image:first-child { aspect-ratio: 4 / 5; }
+    .lab-image:last-child { aspect-ratio: 4 / 3; margin-bottom: 3rem; }
+    .lab-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .paper-section {
+      background: var(--paper);
+      color: var(--paper-text);
+      padding: clamp(6rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5.5rem);
+    }
+    .partners-editorial {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
+      gap: clamp(4rem, 10vw, 12rem);
+      align-items: start;
+    }
+    .paper-kicker {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--paper-dim);
+    }
+    .paper-heading {
+      font-family: 'Newsreader', serif;
+      font-weight: 400;
+      font-size: clamp(3rem, 5.5vw, 6rem);
+      line-height: 0.96;
+      letter-spacing: -0.035em;
+      color: var(--paper-text);
+      max-width: 9ch;
+      margin-top: 1rem;
+    }
+    .partners-copy {
+      max-width: 37rem;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: clamp(1rem, 1.25vw, 1.15rem);
+      line-height: 1.72;
+      color: var(--paper-dim);
+      padding-top: 2rem;
+    }
+    .partners-copy p + p { margin-top: 1.2rem; }
+    .paper-link {
+      display: inline-block;
+      margin-top: 1.8rem;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.86rem;
+      color: var(--paper-text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(23,21,18,0.28);
+      padding-bottom: 0.25rem;
+    }
+    .paper-link:hover { color: var(--rust); border-color: var(--rust); }
+
+    .contact-editorial {
+      background: var(--paper-2);
+      padding: clamp(5rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5.5rem);
+    }
+    .contact-layout {
+      max-width: 1120px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(320px, 1fr);
+      gap: clamp(4rem, 10vw, 11rem);
+      margin: 0 auto;
+      align-items: start;
+    }
+    .contact-heading {
+      font-family: 'Newsreader', serif;
+      font-size: clamp(2.8rem, 5vw, 5rem);
+      line-height: 0.98;
+      font-weight: 400;
+      color: var(--paper-text);
+      letter-spacing: -0.03em;
+      max-width: 7ch;
+    }
+    .contact-form {
+      display: grid;
+      gap: 0;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(23,21,18,0.22);
+      padding: 1rem 0;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 1rem;
+      color: var(--paper-text);
+      outline: none;
+      border-radius: 0;
+    }
+    .contact-form textarea { min-height: 140px; resize: vertical; }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder { color: rgba(23,21,18,0.42); }
+    .contact-form button {
+      width: fit-content;
+      margin-top: 1.5rem;
+      padding: 0;
+      background: none;
+      border: none;
+      border-bottom: 1px solid rgba(23,21,18,0.28);
+      padding-bottom: 0.25rem;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--paper-text);
+      cursor: pointer;
+    }
+    .contact-form button:hover { color: var(--rust); border-color: var(--rust); }
+
+    footer {
+      background: var(--paper-2);
+      border-top: 1px solid rgba(23,21,18,0.12);
+      padding: 1.6rem clamp(1.5rem, 5vw, 5.5rem);
+      animation: none;
+    }
+    .footer-note, .footer-email {
+      font-family: 'Instrument Sans', sans-serif;
+      color: rgba(23,21,18,0.5);
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.76rem;
+    }
+    .theme-switcher { display: none; }
+
+    @media (max-width: 900px) {
+      .belief,
+      .approach-editorial,
+      .lab-layout,
+      .partners-editorial,
+      .contact-layout {
+        grid-template-columns: 1fr;
+      }
+      .belief { min-height: auto; align-items: start; }
+      .belief .editorial-heading { max-width: 12ch; }
+      .project-feature {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+      .project-text { max-width: 36rem; }
+      .process-strip { margin-left: 0; }
+      .tool-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .tool-link { margin-top: 0.25rem; }
+      .lab-images { padding-top: 0; }
+      .paper-heading { max-width: 12ch; }
+    }
+
+    @media (max-width: 640px) {
+      .editorial-section,
+      .paper-section,
+      .contact-editorial {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      .work-intro { grid-template-columns: 1fr; }
+      .process-strip { grid-template-columns: 1fr; gap: 2rem; }
+      .process-shot:nth-child(2),
+      .process-shot:nth-child(3) { margin-top: 0; }
+      .lab-images { grid-template-columns: 1fr; }
+      .lab-image:first-child,
+      .lab-image:last-child { aspect-ratio: 4 / 3; margin-bottom: 0; }
+    }
+
   </style>
 </head>
 <body>
@@ -1113,6 +1546,7 @@
       <a href="#contact">Contact</a>
     </nav>
 
+
     <main>
 
       <!-- ── HERO ── -->
@@ -1127,136 +1561,144 @@
         </div>
       </section>
 
-      <!-- ── THE BELIEF ── -->
-      <section class="prose-section">
-        <div class="prose-inner">
-          <span class="portfolio-category">The belief</span>
-          <h2 class="prose-headline">Most media is made for a screen. We start with the place where the work will live.</h2>
-          <p class="prose-body">A room changes the job. So does a stage, a table, a gallery, a venue, or a fabricated object.</p>
-          <p class="prose-body">Sometimes the experience responds to someone. Sometimes content changes with time, location, an object, an operator, or a live performance. Sometimes the right answer is simpler.</p>
-          <p class="prose-body">The technology is secondary. The goal is media that feels native to the environment around it.</p>
+      <!-- ── BELIEF ── -->
+      <section class="editorial-section belief">
+        <div>
+          <p class="section-kicker">The starting point</p>
+          <h2 class="editorial-heading">The room changes the job.</h2>
+        </div>
+        <div class="belief-copy editorial-copy">
+          <p>A stage is different from a table. A gallery is different from a venue. The same visual idea behaves differently in each one.</p>
+          <p>We start with the space, what people are doing there, and what the experience needs to accomplish. The format follows from there.</p>
         </div>
       </section>
 
-      <!-- ── THE WORK ── -->
-      <section class="work-section" id="work">
-        <div class="work-header">
-          <span class="portfolio-category">The work</span>
-          <h2 class="prose-headline">Built for the place where people experience it.</h2>
+      <!-- ── WORK ── -->
+      <section class="editorial-section work-editorial" id="work">
+        <div class="work-intro">
+          <div>
+            <p class="section-kicker">Selected work</p>
+            <h2 class="editorial-heading">Built in real rooms.</h2>
+          </div>
         </div>
-        <div class="work-grid">
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">The Product Table</h3>
-            <p class="work-card-body">Place a product on the table and the experience changes around what is there.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">The Responsive Gallery</h3>
-            <p class="work-card-body">Projected media becomes part of the artwork and shifts as visitors move through the space.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">The Sponsor Game</h3>
-            <p class="work-card-body">A branded experience people play rather than another sponsor message they walk past.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">The Wayfinding Table</h3>
-            <p class="work-card-body">A physical map that helps people understand where they are and where they want to go.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">The Living Fabrication</h3>
-            <p class="work-card-body">Media integrated into the physical build rather than added after the structure is finished.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">The Immersive Room</h3>
-            <p class="work-card-body">Projection and content designed around the architecture of the room.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">Show Media with Layers</h3>
-            <p class="work-card-body">Live media built for operators who need choices during the show rather than one finished clip.</p>
-          </article>
-          <article class="work-card">
-            <div class="work-card-media">Media coming</div>
-            <h3 class="work-card-title">Rabbit Ears</h3>
-            <p class="work-card-body">A television experience with real channels, original programming, and a small media brain behind the screen.</p>
-          </article>
+
+        <article class="project-feature">
+          <div class="project-media feature">
+            <video autoplay muted loop playsinline preload="metadata" poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopop-reel-poster.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="project-text">
+            <h3 class="project-title">Mycopop launch environment</h3>
+            <p class="project-description">A five-day build for a functional beverage launch in Nashville. Projection across three walls, a playable branded game, panel visuals, and motion content turned the venue into part of the launch.</p>
+            <a class="project-link" href="mycopop/">View the project</a>
+          </div>
+        </article>
+
+        <div class="process-strip">
+          <figure class="process-shot">
+            <div class="process-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-1c.png" alt="3D model used to plan a projection environment" loading="lazy" />
+            </div>
+            <figcaption class="process-caption">The room modeled before content production.</figcaption>
+          </figure>
+          <figure class="process-shot">
+            <div class="process-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Projection calibration on architectural surfaces" loading="lazy" />
+            </div>
+            <figcaption class="process-caption">Calibration against the actual surfaces.</figcaption>
+          </figure>
+          <figure class="process-shot">
+            <div class="process-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="Projection content live at an event" loading="lazy" />
+            </div>
+            <figcaption class="process-caption">The finished environment live with guests in the room.</figcaption>
+          </figure>
         </div>
       </section>
 
-      <!-- ── HOW WE WORK ── -->
-      <section class="where-we-fit-section" id="how">
-        <div class="where-we-fit-header">
-          <span class="portfolio-category">How we work</span>
-          <h2 class="where-we-fit-headline">We don't start with a technology stack. We start with what should happen.</h2>
+      <!-- ── APPROACH ── -->
+      <section class="editorial-section approach-editorial" id="how">
+        <div>
+          <p class="section-kicker">How we work</p>
+          <h2 class="editorial-heading">Start with what should happen.</h2>
         </div>
-        <div class="where-we-fit-columns">
-          <div class="fit-column">
-            <span class="fit-column-label">The place</span>
-            <p class="fit-column-body">We look at the room, audience, physical environment, operator, and moment. Those conditions shape the work before we decide how anything gets built.</p>
+        <div class="approach-points">
+          <div class="approach-point">
+            <h3 class="approach-title">The place</h3>
+            <p class="approach-body">What is the room? Where are people standing? What already exists? What has to stay out of the way?</p>
           </div>
-          <div class="fit-column">
-            <span class="fit-column-label">The behavior</span>
-            <p class="fit-column-body">What should move, change, appear, react, or stay exactly the same? Response matters when it serves the idea. When a simpler approach works better, we use the simpler approach.</p>
+          <div class="approach-point">
+            <h3 class="approach-title">The behavior</h3>
+            <p class="approach-body">What should people see or do? What changes during the experience? What does an operator need to control?</p>
           </div>
-          <div class="fit-column">
-            <span class="fit-column-label">The build</span>
-            <p class="fit-column-body">Then we build the experience around the idea, using only what the project needs. Every project has its own shape.</p>
+          <div class="approach-point">
+            <h3 class="approach-title">The build</h3>
+            <p class="approach-body">We make the visual work and the technical pieces needed to make it happen, then test them in the space.</p>
           </div>
         </div>
       </section>
 
-      <!-- ── THE TOOLS ── -->
-      <section class="prose-section alt" id="software">
-        <div class="prose-inner">
-          <span class="portfolio-category">The tools</span>
-          <h2 class="prose-headline">Sometimes the missing piece is the tool behind the work.</h2>
-          <p class="prose-body">Meridian and Aura began as answers to recurring creative problems. The instinct is the same: when existing tools get in the way, we build the missing piece.</p>
+      <!-- ── TOOLS ── -->
+      <section class="editorial-section tools-editorial" id="software">
+        <div class="tools-intro">
+          <p class="section-kicker">Tools</p>
+          <h2 class="editorial-heading">Sometimes the missing piece is software.</h2>
         </div>
-        <div class="tools-grid">
-          <div class="fit-column">
-            <span class="fit-column-label">Meridian</span>
-            <p class="fit-column-body">Creative teams lose time when priorities change, approvals scatter, and versions spread across tools built for other kinds of work. Meridian gives live and visual production teams one place to manage the creative process around the work.</p>
-          </div>
-          <div class="fit-column">
-            <span class="fit-column-label">Aura</span>
-            <p class="fit-column-body">Brand knowledge usually lives across decks, folders, guidelines, references, conversations, and people's heads. Aura turns those signals into an active creative partner for teams planning and making brand work.</p>
-            <a href="https://aura.higher-roads.com" class="btn-see-more">See Aura <span class="arrow">→</span></a>
-          </div>
+        <div class="tool-row">
+          <h3 class="tool-name">Meridian</h3>
+          <p class="tool-description">Creative teams use it to keep approvals, versions, priorities, and handoffs around live media in one place.</p>
+          <span class="tool-link">In development</span>
+        </div>
+        <div class="tool-row">
+          <h3 class="tool-name">Aura</h3>
+          <p class="tool-description">A creative workspace built around a company's brand knowledge, so teams have more context when they plan and make new work.</p>
+          <a class="tool-link" href="https://aura.higher-roads.com">View Aura</a>
         </div>
       </section>
 
-      <!-- ── THE LAB ── -->
-      <section class="prose-section" id="lab">
-        <div class="prose-inner">
-          <span class="portfolio-category">The lab</span>
-          <h2 class="prose-headline">Some of what we build starts without a client.</h2>
-          <p class="prose-body">The Lab is where Higher Roads experiments with new forms of physical media, interaction, creative software, and small pieces of technology worth building because the experience should exist. Some stay experiments. Some become products. Some become the starting point for future client work.</p>
+      <!-- ── LAB ── -->
+      <section class="editorial-section lab-editorial" id="lab">
+        <div class="lab-layout">
+          <div class="lab-copy">
+            <p class="section-kicker">The Lab</p>
+            <h2 class="editorial-heading">Some projects begin with us.</h2>
+            <p class="editorial-copy">Rabbit Ears is an analog-TV-style venue experience with original channels running from a small local media box. Other experiments explore projection, physical interfaces, sensing, and tools we want to exist before anyone asks for them.</p>
+          </div>
+          <div class="lab-images">
+            <div class="lab-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Projection test in progress" loading="lazy" />
+            </div>
+            <div class="lab-image">
+              <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Live projection environment" loading="lazy" />
+            </div>
+          </div>
         </div>
       </section>
 
       <!-- ── PARTNERS ── -->
-      <section class="prose-section alt" id="partners">
-        <div class="prose-inner">
-          <span class="portfolio-category">Partners</span>
-          <h2 class="prose-headline">You bring the room. We bring the part that responds.</h2>
-          <p class="prose-body">Higher Roads works with fabricators, experiential agencies, event producers, creative teams, and venue partners when an idea crosses into media, interaction, projection, or screen-based experience. Sometimes we join early and help shape the idea. Sometimes the concept is already set and needs a specialist to make the media layer work. We work under your name when the relationship calls for it.</p>
-          <a href="for-partners/" class="btn-see-more">Working with partners <span class="arrow">→</span></a>
+      <section class="paper-section" id="partners">
+        <div class="partners-editorial">
+          <div>
+            <p class="paper-kicker">For partners</p>
+            <h2 class="paper-heading">A specialist layer when the brief needs one.</h2>
+          </div>
+          <div class="partners-copy">
+            <p>Agencies, fabricators, event producers, creative teams, and venues bring us in when a project crosses into projection, interaction, screens, or live media.</p>
+            <p>We can help shape the idea early or take a defined scope and build our part. White-label work is fine.</p>
+            <a class="paper-link" href="for-partners/">How we work with partners</a>
+          </div>
         </div>
       </section>
 
       <!-- ── CONTACT ── -->
-      <section id="contact" class="lead-form-section">
-        <div class="lead-form-wrap">
-          <p class="form-intro">Tell us about the room.</p>
-          <form class="lead-form" action="https://formspree.io/f/xrerprnv" method="POST">
+      <section class="contact-editorial" id="contact">
+        <div class="contact-layout">
+          <h2 class="contact-heading">Tell us about the room.</h2>
+          <form class="contact-form" action="https://formspree.io/f/xrerprnv" method="POST">
             <input type="text" name="name" placeholder="Your name" required />
             <input type="email" name="email" placeholder="Your email" required />
-            <textarea name="message" placeholder="What are you trying to make happen there?" rows="5" required></textarea>
+            <textarea name="message" placeholder="What are you trying to make happen there?" required></textarea>
             <button type="submit">Get in touch</button>
           </form>
         </div>
@@ -1265,16 +1707,7 @@
     </main>
 
     <footer>
-      <span class="footer-note">© 2026 Higher Roads</span>
-      <div class="theme-switcher">
-        <span class="theme-label">Theme</span>
-        <div class="theme-dots">
-          <div class="theme-dot active" data-t="ember"     title="Ember"></div>
-          <div class="theme-dot"        data-t="neon-noir" title="Neon Noir"></div>
-          <div class="theme-dot"        data-t="ice"       title="Ice"></div>
-          <div class="theme-dot"        data-t="acid"      title="Acid"></div>
-        </div>
-      </div>
+      <span class="footer-note">© 2026 Higher Roads · Nashville, TN</span>
       <a class="footer-email" href="mailto:connect@higher-roads.com">connect@higher-roads.com</a>
     </footer>
 
@@ -1295,18 +1728,6 @@
       link.addEventListener('click', () => {
         navToggle.classList.remove('open');
         mobileNav.classList.remove('open');
-      });
-    });
-
-    // Theme switcher
-    const dots = document.querySelectorAll('.theme-dot');
-    const root = document.documentElement;
-
-    dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        root.setAttribute('data-theme', dot.dataset.t);
-        dots.forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
       });
     });
 
