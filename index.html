@@ -46,57 +46,179 @@
     .nav-toggle span { display: block; width: 23px; height: 1px; background: var(--text); margin: 5px 0; }
     .mobile-nav { display: none; background: var(--ink); }
     .hero { display: grid; grid-template-columns: 50% 50%; background: var(--ink); }
-    .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 58px clamp(32px,4vw,64px) 62px var(--gutter); }
+    .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 30px clamp(32px,4vw,64px) 34px var(--gutter); }
     .headline { font-family: 'Newsreader',serif; font-weight: 400; font-size: clamp(50px,5.05vw,82px); line-height: 1.02; letter-spacing: -.045em; }
     .headline span { display: block; }
     .subhead { font-size: 21px; line-height: 1.65; max-width: none; margin-top: 26px; color: var(--text-dim); }
     .hero-link, .project-link, .paper-link { display: inline-block; width: fit-content; font-size: 12px; border-bottom: 1px solid rgba(240,236,228,.28); padding-bottom: 4px; }
     .hero-link { margin-top: 28px; }
-    .hero-visual { position: relative; min-height: 490px; overflow: hidden; background: var(--charcoal); }
-    .hero-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(.94); }
+    .hero-visual { position: relative; height: 430px; min-height: 0; overflow: hidden; background: var(--charcoal); }
+    .hero-visual img { position: absolute; top: 0; left: 0; width: 100%; height: calc(100% + 60px); object-fit: cover; object-position: center top; filter: brightness(.94); }
     .hero-visual::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--ink) 0%, rgba(11,10,8,.9) 12%, rgba(11,10,8,.55) 28%, rgba(11,10,8,.15) 46%, transparent 65%); }
-    .introduction { padding: 72px var(--gutter) 80px; background: var(--ink); }
-    .introduction p { max-width: 1050px; font-family: 'Newsreader',serif; font-size: clamp(28px,3.1vw,44px); font-weight: 400; line-height: 1.22; letter-spacing: -.025em; color: var(--text); }
+    .introduction { display: grid; grid-template-columns: 1.05fr 2.15fr; gap: 6%; padding: 64px var(--gutter); background: var(--ink); }
+    .introduction h2, .approach-heading { font-family: 'Newsreader',serif; font-size: clamp(30px,2.65vw,40px); font-weight: 400; line-height: 1.08; letter-spacing: -.035em; }
+    .introduction p { font-family: 'Newsreader',serif; font-size: clamp(14px,1.55vw,22px); line-height: 1.5; max-width: 68ch; }
     .editorial-section { padding-left: var(--gutter); padding-right: var(--gutter); }
-    .section-kicker, .paper-kicker { font-size: 12px; font-weight: 500; line-height: 1.4; margin-bottom: 26px; }
-    .section-kicker { color: var(--text-dim); }
-    .paper-kicker { color: var(--paper-dim); }
     .editorial-heading { font-family: 'Newsreader',serif; font-weight: 400; letter-spacing: -.035em; }
 
-    /* A real project feature followed by two differently scaled process studies. */
-    .work-editorial { padding-top: 64px; padding-bottom: 76px; }
-    .project-feature { display: grid; grid-template-columns: minmax(240px,.85fr) minmax(0,2fr); gap: 52px; align-items: center; margin-bottom: 42px; }
-    .project-text { max-width: 35ch; }
-    .project-title { font-family: 'Newsreader',serif; font-size: clamp(34px,3.25vw,50px); font-weight: 400; line-height: 1.02; max-width: 13ch; margin-bottom: 24px; }
-    .project-description { font-size: 14px; line-height: 1.65; color: var(--text-dim); }
-    .project-description + .project-description { margin-top: 14px; }
-    .project-link { margin-top: 24px; }
-    .project-media { overflow: hidden; background: var(--charcoal); }
-    .project-media.feature { aspect-ratio: 16 / 9; position: relative; }
-    .project-media video { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .process-strip { display: grid; grid-template-columns: .72fr 1fr; gap: 28px; margin-left: 25%; align-items: end; }
-    .process-shot:first-child { padding-bottom: 30px; }
-    .process-image { aspect-ratio: 3 / 2; overflow: hidden; background: var(--charcoal); }
-    .process-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .process-caption { font-size: 12px; line-height: 1.55; max-width: 34ch; margin-top: 14px; color: var(--text-dim); }
+    .myco-wrap {
+      padding: 64px var(--gutter);
+      border-top: 0;
+    }
 
-    .approach-editorial { display: grid; grid-template-columns: .45fr 1fr 1.1fr; gap: 5%; padding-top: 68px; padding-bottom: 72px; background: var(--charcoal); align-items: start; }
-    .approach-heading { font-weight: 500; font-size: 12px; padding-top: 8px; }
-    .approach-lead { font-family: 'Newsreader',serif; font-weight: 400; font-size: clamp(30px,2.7vw,42px); line-height: 1.08; letter-spacing: -.02em; }
-    .approach-copy { font-size: 14px; line-height: 1.7; color: var(--text-dim); padding-top: 3px; max-width: 48ch; }
+    .myco-world {
+      width: 68%;
+      margin: 0 auto;
+      background: var(--charcoal);
+      border: 1px solid rgba(240,236,228,.18);
+      overflow: hidden;
+    }
+
+    .myco-intro {
+      padding: 3rem 2.8rem 2.2rem;
+    }
+
+    .myco-intro > .eyebrow { margin-bottom: 0.6rem; }
+
+    .myco-headline {
+      font-family: 'Newsreader', serif;
+      font-size: clamp(1.4rem, 2.4vw, 1.95rem);
+      font-weight: 500; line-height: 1.2;
+      color: var(--text); margin-bottom: 0.85rem;
+    }
+
+    .myco-bio {
+      font-size: 0.88rem; line-height: 1.8;
+      color: var(--text); opacity: 0.58;
+    }
+
+    .myco-quote {
+      margin-top: 1.5rem;
+      padding-left: 1.2rem;
+      border-left: 2px solid rgba(240,236,228,.25);
+    }
+
+    .myco-quote p {
+      font-family: 'Newsreader', serif;
+      font-style: italic; font-size: 0.95rem;
+      line-height: 1.75; color: var(--text); opacity: 0.82;
+    }
+
+    .myco-cite {
+      font-family: 'Instrument Sans', sans-serif; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim); display: block; margin-top: 0.7rem;
+    }
+
+    .myco-stats {
+      display: flex; gap: 2.5rem;
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(240,236,228,.18);
+    }
+
+    .stat { display: flex; flex-direction: column; }
+
+    .stat-value {
+      font-family: 'Newsreader', serif;
+      font-size: 2.5rem; font-weight: 500;
+      color: var(--text); line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim); margin-top: 0.45rem;
+    }
+
+    /* Reel inside box */
+    .myco-reel {
+      position: relative;
+      width: 100%; aspect-ratio: 16 / 9;
+      background: var(--ink);
+    }
+
+    .myco-reel video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    .play-btn {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: none; border: none; cursor: pointer; padding: 0;
+      transition: opacity 0.3s, transform 0.3s; z-index: 2;
+    }
+    .play-btn:hover { transform: translate(-50%, -50%) scale(1.08); }
+    .play-btn.hidden { opacity: 0; pointer-events: none; }
+
+    /* Three-column process grid inside box */
+    .myco-process {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: rgba(240,236,228,.18);
+      border-top: 1px solid rgba(240,236,228,.18);
+    }
+
+    .myco-process-item {
+      background: var(--charcoal);
+      overflow: hidden;
+    }
+
+    .myco-process-img {
+      width: 100%; aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+
+    .myco-process-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .myco-process-item:hover .myco-process-img img { transform: scale(1.04); }
+
+    .myco-process-caption {
+      padding: 1.4rem 1.6rem 1.9rem;
+    }
+
+    .myco-process-num {
+      font-family: 'Instrument Sans', sans-serif; font-weight: 600;
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--text); display: block; margin-bottom: 0.5rem;
+    }
+
+    .myco-process-title {
+      font-family: 'Newsreader', serif;
+      font-size: 1.1rem; font-weight: 500;
+      color: var(--text); margin-bottom: 0.6rem; line-height: 1.25;
+    }
+
+    .myco-process-body {
+      font-size: 0.83rem; line-height: 1.75;
+      color: var(--text); opacity: 0.58;
+    }
+
+    .approach-editorial { display: grid; grid-template-columns: 1.05fr 2.15fr; gap: 5%; padding-top: 68px; padding-bottom: 72px; background: var(--charcoal); align-items: start; }
+    .approach-heading { padding-top: 0; }
+    .approach-lead { font-size: 18px; line-height: 1.6; margin-bottom: 20px; }
+    .approach-copy { font-size: 14px; line-height: 1.7; color: var(--text-dim); padding-top: 3px; max-width: 68ch; }
     .approach-copy p + p { margin-top: 20px; }
 
     .tools-editorial { display: grid; grid-template-columns: 1.05fr 1fr 1fr; gap: 6%; padding-top: 70px; padding-bottom: 74px; }
     .tools-intro .editorial-heading { font-size: clamp(30px,2.65vw,40px); line-height: 1.08; max-width: 16ch; }
-    .tool-row { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding-top: 40px; }
+    .tool-row { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding-top: 0; }
+    .tool-row > a:first-child { display: block; width: 100%; }
+    .tool-preview { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; margin-bottom: 8px; }
     .tool-name { font-family: 'Newsreader',serif; font-weight: 400; font-size: 30px; line-height: 1; }
     .tool-description { font-size: 14px; line-height: 1.7; max-width: 32ch; color: var(--text-dim); }
     .tool-link { font-size: 12px; margin-top: 6px; }
     a.tool-link { border-bottom: 1px solid rgba(240,236,228,.3); padding-bottom: 4px; }
     span.tool-link { color: var(--text-dim); }
 
-    .lab-editorial { background: var(--paper); color: var(--paper-text); display: grid; grid-template-columns: 1.15fr 1fr .8fr; gap: 6%; padding-top: 64px; padding-bottom: 68px; }
+    .lab-editorial { background: var(--paper); color: var(--paper-text); display: grid; grid-template-columns: 1.05fr 2.15fr; gap: 6%; padding-top: 64px; padding-bottom: 68px; }
     .lab-heading { font-family: 'Newsreader',serif; font-weight: 400; font-size: clamp(30px,2.7vw,42px); line-height: 1.08; letter-spacing: -.02em; max-width: 20ch; }
+    .lab-studies { display: grid; grid-template-columns: 1fr 1fr; gap: 38px 40px; }
     .lab-study { padding-top: 4px; }
     .lab-status { font-size: 11px; color: var(--paper-dim); margin-bottom: 22px; }
     .lab-title { font-family: 'Newsreader',serif; font-weight: 400; font-size: 30px; margin-bottom: 18px; }
@@ -137,12 +259,8 @@
       .nav-links { display: none; }
       .nav-toggle { display: block; }
       .mobile-nav.open { display: flex; flex-direction: column; padding: 12px var(--gutter) 28px; gap: 20px; }
-      .project-feature { grid-template-columns: 1fr; gap: 32px; }
-      .project-text { max-width: 60ch; }
-      .project-title { max-width: none; }
-      .process-strip { margin-left: 0; }
       .approach-editorial { grid-template-columns: 1fr 1.2fr; gap: 28px 40px; }
-      .approach-heading { grid-column: 1 / -1; }
+
       .tools-editorial { grid-template-columns: 1fr 1fr; gap: 32px 48px; }
       .tools-intro { grid-column: 1 / -1; }
       .tools-intro .editorial-heading { max-width: 24ch; }
@@ -155,22 +273,15 @@
       .hero-copy { padding: 40px var(--gutter) 42px; }
       .headline { font-size: clamp(46px,8.4vw,64px); max-width: 15ch; }
       .subhead { max-width: none; font-size: 21px; }
-      .hero-visual { min-height: 0; aspect-ratio: 1161 / 714; }
+      .hero-visual { height: auto; min-height: 0; aspect-ratio: 1161 / 650; }
       .hero-visual img { object-position: center; }
     }
     @media(max-width:640px) {
       header { padding: 20px var(--gutter); }
       .header-logo { height: 23px; }
-      .section-kicker, .paper-kicker { margin-bottom: 20px; }
       .work-editorial { padding-top: 56px; padding-bottom: 56px; }
-      .project-feature { gap: 28px; margin-bottom: 28px; }
-      .project-title { font-size: 38px; max-width: 15ch; }
-      .project-description { font-size: 15px; }
-      .process-strip { grid-template-columns: 1fr; gap: 28px; }
-      .process-shot:first-child { padding-bottom: 0; }
-      .process-caption { max-width: none; }
       .approach-editorial { grid-template-columns: 1fr; padding-top: 48px; padding-bottom: 52px; gap: 24px; }
-      .approach-lead { font-size: 34px; }
+      .approach-lead { font-size: 18px; }
       .approach-copy { font-size: 15px; }
       .tools-editorial { grid-template-columns: 1fr; gap: 36px; padding-top: 52px; padding-bottom: 56px; }
       .tool-description { font-size: 15px; max-width: none; }
@@ -186,6 +297,18 @@
       .contact-form input, .contact-form textarea { font-size: 16px; }
       .contact-form textarea { min-height: 100px; }
       footer { flex-direction: column; gap: 14px; }
+    }
+    @media(max-width:900px) { .myco-world { width: 100%; } }
+    @media(max-width:640px) {
+      .introduction { grid-template-columns: 1fr; gap: 24px; padding: 44px var(--gutter); }
+      .introduction p { font-size: 14px; }
+      .myco-wrap { padding: 32px var(--gutter) 52px; }
+      .myco-intro { padding: 28px 24px; }
+      .myco-process { grid-template-columns: 1fr; }
+      .myco-stats { gap: 20px; justify-content: space-between; }
+      .stat-label { font-size: 10px; letter-spacing: 0; }
+      .lab-studies { grid-template-columns: 1fr; gap: 30px; }
+      .lab-note { padding-top: 20px; }
     }
     @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } }
   </style>
@@ -204,7 +327,7 @@
       </a>
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#work">Work</a>
-        <a href="#how">How we work</a>
+        <a href="#how">How we collaborate</a>
         <a href="#software">Tools</a>
         <a href="#lab">The Lab</a>
         <a href="#partners">Partners</a>
@@ -219,7 +342,7 @@
 
     <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
       <a href="#work">Work</a>
-      <a href="#how">How we work</a>
+      <a href="#how">How we collaborate</a>
       <a href="#software">Tools</a>
       <a href="#lab">The Lab</a>
       <a href="#partners">Partners</a>
@@ -241,47 +364,96 @@
         </div>
       </section>
 
-      <section class="introduction" aria-label="What we do">
+      <section class="introduction" aria-labelledby="focus-heading">
+        <h2 id="focus-heading">Where we’re focused</h2>
         <p>We help turn an idea for a space or event into something people can see and interact with. Our work can include visual content, projection, custom software, and the setup needed to bring those parts together.</p>
       </section>
 
       <!-- ── WORK ── -->
-      <section class="editorial-section work-editorial" id="work">
-        <article class="project-feature">
-          <div class="project-text">
-            <h2 class="project-title">Mycopop launch environment</h2>
-            <p class="project-description">For Mycopop's product launch, we created visuals for the walls and a game guests could play on a large projection. We modeled the room, made the content, and set up and calibrated the projection on site.</p>
-            <a class="project-link" href="mycopop/">View the project</a>
+      <section class="myco-wrap" id="work">
+        <div class="myco-world">
+
+          <div class="myco-intro">
+            <h2 class="myco-headline">Meet Mycopop</h2>
+            <p class="myco-bio">Mycopop has a distinctive visual identity. We extended it across five mapped surfaces so every element in the room spoke the same visual language. Packaging, projection, animation, and interaction worked together as a single branded environment.</p>
+            <blockquote class="myco-quote">
+              <p>"The room felt like stepping inside the Mycopop universe."</p>
+              <cite class="myco-cite">Allen, CEO | Mycopop Functional Energy</cite>
+            </blockquote>
+            <div class="myco-stats">
+              <div class="stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Days concept to event</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Surfaces mapped and live</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">100+</span>
+                <span class="stat-label">Guests in the room</span>
+              </div>
+            </div>
           </div>
-          <div class="project-media feature">
-            <video controls playsinline preload="none" poster="images/vision/live.webp" aria-label="Mycopop launch environment film">
+
+          <div class="myco-reel">
+            <video id="proof-video" playsinline preload="none" aria-label="Mycopop launch film"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
               <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
             </video>
+            <button class="play-btn" id="play-btn" aria-label="Play video">
+              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                <polygon points="24,17 48,30 24,43" fill="white"/>
+              </svg>
+            </button>
           </div>
-        </article>
 
-        <div class="process-strip">
-          <figure class="process-shot">
-            <div class="process-image">
-              <img src="images/vision/model.webp" alt="3D model used to plan a projection environment" width="1352" height="902" loading="lazy" />
+          <div class="myco-process">
+
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-1c.png" alt="Content production" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">01</span>
+                <h3 class="myco-process-title">Content production</h3>
+                <p class="myco-process-body">We design and produce motion content from your existing brand identity. Every asset is built for the specific surfaces it lands on.</p>
+              </div>
             </div>
-            <figcaption class="process-caption">A model of the room helped us plan the projections.</figcaption>
-          </figure>
-          <figure class="process-shot">
-            <div class="process-image">
-              <img src="images/vision/calibration.webp" alt="Projection calibration on architectural surfaces" width="1600" height="1067" loading="lazy" />
+
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-2.png" alt="Technical production" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">02</span>
+                <h3 class="myco-process-title">Technical production</h3>
+                <p class="myco-process-body">We model the space before content production begins. Throw distances, overlap zones, and geometry corrections are resolved before anything gets rendered.</p>
+              </div>
             </div>
-            <figcaption class="process-caption">Adjusting the projections to fit the walls on site.</figcaption>
-          </figure>
+
+            <div class="myco-process-item">
+              <div class="myco-process-img">
+                <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Immersive-3.png" alt="On-site execution" />
+              </div>
+              <div class="myco-process-caption">
+                <span class="myco-process-num">03</span>
+                <h3 class="myco-process-title">On-site execution</h3>
+                <p class="myco-process-body">We spec and source the hardware, manage load-in, run calibration and rehearsal, and execute on event night. You arrive to a room that's ready.</p>
+              </div>
+            </div>
+
+          </div>
 
         </div>
       </section>
 
       <!-- ── APPROACH ── -->
       <section class="editorial-section approach-editorial" id="how">
-        <h2 class="approach-heading">How we work</h2>
-        <p class="approach-lead">We start by talking through what you want to make and where people will experience it.</p>
+        <h2 class="approach-heading">How we collaborate</h2>
         <div class="approach-copy">
+          <p class="approach-lead">We start by talking through what you want to make and where people will experience it.</p>
           <p>We look at the space, the audience, and the practical limits of the project before deciding what to build. That helps us work out which parts need content, projection, screens, software, or interaction.</p>
           <p>From there, we develop the content and any systems it needs, then test and set them up in the space.</p>
         </div>
@@ -293,14 +465,16 @@
           <h2 class="editorial-heading">Software we’re building</h2>
         </div>
         <div class="tool-row">
+          <a href="https://meridian-blue-ten.vercel.app/landing.html" aria-label="View Meridian"><img class="tool-preview" src="images/vision/meridian-hero.jpg" alt="Meridian website hero" width="1280" height="813" loading="lazy" /></a>
           <h3 class="tool-name">Meridian</h3>
           <p class="tool-description">We’re developing Meridian to help creative teams keep track of priorities, approvals, versions, and handoffs during live media projects.</p>
           <span class="tool-link">In development</span>
         </div>
         <div class="tool-row">
+          <a href="https://aura.higher-roads.com/landing.html" aria-label="View Aura"><img class="tool-preview" src="images/vision/aura-hero.jpg" alt="Aura website hero" width="1280" height="720" loading="lazy" /></a>
           <h3 class="tool-name">Aura</h3>
           <p class="tool-description">Aura brings a company’s brand knowledge into a creative workspace, where teams can refer to it as they plan and make new work.</p>
-          <a class="tool-link" href="https://aura.higher-roads.com">View Aura</a>
+          <a class="tool-link" href="https://aura.higher-roads.com/landing.html">View Aura</a>
         </div>
       </section>
 
@@ -308,13 +482,18 @@
       <section class="editorial-section lab-editorial" id="lab">
         <div class="lab-intro">
           <h2 class="lab-heading">Ideas we’re testing</h2>
+          <p class="lab-note">We use the Lab to try ideas outside client projects and learn how they work in practice.</p>
         </div>
-        <div class="lab-study">
-          <p class="lab-status">Internal experiment</p>
-          <h3 class="lab-title">Rabbit Ears</h3>
-          <p>Rabbit Ears is an experiment in making original TV channels for a venue, with the look and feel of analog television. The channels run from a local media box.</p>
+        <div class="lab-studies">
+          <article class="lab-study"><h3 class="lab-title">Rabbit Ears</h3><p>An experiment in making original TV channels for a venue, with the look and feel of analog television. The channels run from a local media box.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Product Table</h3><p>A table that displays information about a product placed on its surface.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Responsive Gallery</h3><p>Projection that moves when you do, mapped onto the pieces on the wall and built to run every night of an art crawl.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Sponsor Game</h3><p>An interactive game for an event or activation, using the sponsor’s visual identity.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Wayfinding Table</h3><p>A table with a projected, simulated 3D topographical map for wayfinding in venues and convention spaces.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Living Fabrication</h3><p>Media built into a fabricated structure so the build changes as people move around it.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Immersive Room</h3><p>Projection content mapped across a room for events and installations.</p></article>
+          <article class="lab-study"><h3 class="lab-title">Show Media with Layers</h3><p>Tour content built for multi-input systems, so the operator has layers to play rather than a flat clip.</p></article>
         </div>
-        <p class="lab-note">We use the Lab to try ideas outside client projects and learn how they work in practice. Some may become tools or find a place in future projects.</p>
       </section>
 
       <div class="closing">
@@ -356,6 +535,14 @@
   </div>
 
   <script>
+    const proofVideo = document.getElementById('proof-video');
+    const playBtn = document.getElementById('play-btn');
+    playBtn.addEventListener('click', async () => {
+      try { await proofVideo.play(); proofVideo.controls = true; playBtn.classList.add('hidden'); }
+      catch { proofVideo.controls = true; playBtn.classList.add('hidden'); }
+    });
+    proofVideo.addEventListener('ended', () => playBtn.classList.remove('hidden'));
+
     // Hamburger toggle
     const navToggle = document.querySelector('.nav-toggle');
     const mobileNav = document.querySelector('.mobile-nav');
