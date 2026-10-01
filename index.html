@@ -49,12 +49,14 @@
     .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 58px clamp(32px,4vw,64px) 62px var(--gutter); }
     .headline { font-family: 'Newsreader',serif; font-weight: 400; font-size: clamp(50px,5.05vw,82px); line-height: 1.02; letter-spacing: -.045em; }
     .headline span { display: block; }
-    .subhead { font-size: 14px; line-height: 1.65; max-width: none; margin-top: 26px; color: var(--text-dim); }
+    .subhead { font-size: 21px; line-height: 1.65; max-width: none; margin-top: 26px; color: var(--text-dim); }
     .hero-link, .project-link, .paper-link { display: inline-block; width: fit-content; font-size: 12px; border-bottom: 1px solid rgba(240,236,228,.28); padding-bottom: 4px; }
     .hero-link { margin-top: 28px; }
     .hero-visual { position: relative; min-height: 490px; overflow: hidden; background: var(--charcoal); }
     .hero-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(.94); }
     .hero-visual::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--ink) 0%, rgba(11,10,8,.9) 12%, rgba(11,10,8,.55) 28%, rgba(11,10,8,.15) 46%, transparent 65%); }
+    .introduction { padding: 72px var(--gutter) 80px; background: var(--ink); }
+    .introduction p { max-width: 1050px; font-family: 'Newsreader',serif; font-size: clamp(28px,3.1vw,44px); font-weight: 400; line-height: 1.22; letter-spacing: -.025em; color: var(--text); }
     .editorial-section { padding-left: var(--gutter); padding-right: var(--gutter); }
     .section-kicker, .paper-kicker { font-size: 12px; font-weight: 500; line-height: 1.4; margin-bottom: 26px; }
     .section-kicker { color: var(--text-dim); }
@@ -152,7 +154,7 @@
       .hero { grid-template-columns: 1fr; }
       .hero-copy { padding: 40px var(--gutter) 42px; }
       .headline { font-size: clamp(46px,8.4vw,64px); max-width: 15ch; }
-      .subhead { max-width: 43ch; font-size: 15px; }
+      .subhead { max-width: none; font-size: 21px; }
       .hero-visual { min-height: 0; aspect-ratio: 1161 / 714; }
       .hero-visual img { object-position: center; }
     }
@@ -239,11 +241,14 @@
         </div>
       </section>
 
+      <section class="introduction" aria-label="What we do">
+        <p>We help turn an idea for a space or event into something people can see and interact with. Our work can include visual content, projection, custom software, and the setup needed to bring those parts together.</p>
+      </section>
+
       <!-- ── WORK ── -->
       <section class="editorial-section work-editorial" id="work">
         <article class="project-feature">
           <div class="project-text">
-            <p class="section-kicker">Selected work</p>
             <h2 class="project-title">Mycopop launch environment</h2>
             <p class="project-description">For Mycopop's product launch, we created visuals for the walls and a game guests could play on a large projection. We modeled the room, made the content, and set up and calibrated the projection on site.</p>
             <a class="project-link" href="mycopop/">View the project</a>
@@ -285,7 +290,6 @@
       <!-- ── TOOLS ── -->
       <section class="editorial-section tools-editorial" id="software">
         <div class="tools-intro">
-          <p class="section-kicker">Tools</p>
           <h2 class="editorial-heading">Software we’re building</h2>
         </div>
         <div class="tool-row">
@@ -303,7 +307,6 @@
       <!-- ── LAB ── -->
       <section class="editorial-section lab-editorial" id="lab">
         <div class="lab-intro">
-          <p class="paper-kicker">The Lab</p>
           <h2 class="lab-heading">Ideas we’re testing</h2>
         </div>
         <div class="lab-study">
@@ -319,7 +322,6 @@
       <section class="paper-section" id="partners">
         <div class="partners-editorial">
           <div>
-            <p class="paper-kicker">For partners</p>
             <h2 class="paper-heading">Working with your team</h2>
           </div>
           <div class="partners-copy">
