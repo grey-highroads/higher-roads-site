@@ -62,7 +62,7 @@
     .editorial-heading { font-family: 'Newsreader',serif; font-weight: 400; letter-spacing: -.035em; }
 
     .myco-wrap {
-      padding: 64px var(--gutter);
+      padding: 0 0 64px;
       border-top: 0;
     }
 
@@ -70,8 +70,9 @@
       width: 68%;
       margin: 0 auto;
       background: var(--ink);
-      border: 1px solid rgba(240,236,228,.18);
+      border: 0;
       overflow: hidden;
+      margin-top: 48px;
     }
 
     .myco-intro {
@@ -134,7 +135,7 @@
     /* Reel inside box */
     .myco-reel {
       position: relative;
-      width: 100%; aspect-ratio: 16 / 9;
+      width: 75%; margin: 0 auto; aspect-ratio: 16 / 9;
       background: var(--ink);
     }
 
@@ -298,11 +299,11 @@
       .contact-form textarea { min-height: 100px; }
       footer { flex-direction: column; gap: 14px; }
     }
-    @media(max-width:900px) { .myco-world { width: 100%; } }
+    @media(max-width:900px) { .myco-world { width: calc(100% - 2 * var(--gutter)); } }
     @media(max-width:640px) {
       .introduction { grid-template-columns: 1fr; gap: 24px; padding: 44px var(--gutter); }
       .introduction p { font-size: 14px; }
-      .myco-wrap { padding: 32px var(--gutter) 52px; }
+      .myco-wrap { padding: 0 0 52px; }
       .myco-intro { padding: 28px 24px; }
       .myco-process { grid-template-columns: 1fr; }
       .myco-stats { gap: 20px; justify-content: space-between; }
@@ -371,6 +372,19 @@
 
       <!-- ── WORK ── -->
       <section class="myco-wrap" id="work">
+          <div class="myco-reel">
+            <video id="proof-video" playsinline preload="none" aria-label="Mycopop launch film"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+            </video>
+            <button class="play-btn" id="play-btn" aria-label="Play video">
+              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                <polygon points="24,17 48,30 24,43" fill="white"/>
+              </svg>
+            </button>
+          </div>
+
         <div class="myco-world">
 
           <div class="myco-intro">
@@ -394,19 +408,6 @@
                 <span class="stat-label">Guests in the room</span>
               </div>
             </div>
-          </div>
-
-          <div class="myco-reel">
-            <video id="proof-video" playsinline preload="none" aria-label="Mycopop launch film"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
-            </video>
-            <button class="play-btn" id="play-btn" aria-label="Play video">
-              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
-                <polygon points="24,17 48,30 24,43" fill="white"/>
-              </svg>
-            </button>
           </div>
 
           <div class="myco-process">
@@ -535,6 +536,24 @@
   </div>
 
   <script>
+    const reel = document.querySelector('.myco-reel');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let revealQueued = false;
+    function updateReelReveal() {
+      revealQueued = false;
+      const top = reel.getBoundingClientRect().top;
+      const progress = Math.max(0, Math.min(1, (window.innerHeight * .85 - top) / (window.innerHeight * .73)));
+      const eased = progress * progress * (3 - 2 * progress);
+      reel.style.width = (reduceMotion.matches ? 100 : 75 + 25 * eased) + '%';
+    }
+    function queueReelReveal() {
+      if (!revealQueued) { revealQueued = true; requestAnimationFrame(updateReelReveal); }
+    }
+    window.addEventListener('scroll', queueReelReveal, { passive: true });
+    window.addEventListener('resize', queueReelReveal);
+    reduceMotion.addEventListener('change', queueReelReveal);
+    updateReelReveal();
+
     const proofVideo = document.getElementById('proof-video');
     const playBtn = document.getElementById('play-btn');
     playBtn.addEventListener('click', async () => {
