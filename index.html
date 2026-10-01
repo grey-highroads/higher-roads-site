@@ -45,15 +45,16 @@
     .nav-toggle { display: none; background: none; border: 0; padding: 10px; cursor: pointer; }
     .nav-toggle span { display: block; width: 23px; height: 1px; background: var(--text); margin: 5px 0; }
     .mobile-nav { display: none; background: var(--ink); }
-    .hero { display: grid; grid-template-columns: 60% 40%; background: var(--ink); }
+    .hero { display: grid; grid-template-columns: 50% 50%; background: var(--ink); }
     .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 58px clamp(32px,4vw,64px) 62px var(--gutter); }
     .headline { font-family: 'Newsreader',serif; font-weight: 400; font-size: clamp(50px,5.05vw,82px); line-height: 1.02; letter-spacing: -.045em; }
     .headline span { display: block; }
-    .subhead { font-size: 14px; line-height: 1.65; max-width: 34ch; margin-top: 26px; color: var(--text-dim); }
+    .subhead { font-size: 14px; line-height: 1.65; max-width: none; margin-top: 26px; color: var(--text-dim); }
     .hero-link, .project-link, .paper-link { display: inline-block; width: fit-content; font-size: 12px; border-bottom: 1px solid rgba(240,236,228,.28); padding-bottom: 4px; }
     .hero-link { margin-top: 28px; }
     .hero-visual { position: relative; min-height: 490px; overflow: hidden; background: var(--charcoal); }
-    .hero-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 47%; filter: brightness(.94); }
+    .hero-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(.94); }
+    .hero-visual::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--ink) 0%, rgba(11,10,8,.9) 12%, rgba(11,10,8,.55) 28%, rgba(11,10,8,.15) 46%, transparent 65%); }
     .editorial-section { padding-left: var(--gutter); padding-right: var(--gutter); }
     .section-kicker, .paper-kicker { font-size: 12px; font-weight: 500; line-height: 1.4; margin-bottom: 26px; }
     .section-kicker { color: var(--text-dim); }
@@ -234,7 +235,7 @@
           <a class="hero-link" href="#work">See the work</a>
         </div>
         <div class="hero-visual">
-          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Central-High.jpg" alt="Projection on the Central High building, viewed from the audience" width="1161" height="714" fetchpriority="high" />
+          <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/school-render.png" alt="Reconstructed front-of-crowd view of projection on the Central High building" width="1600" height="984" fetchpriority="high" />
         </div>
       </section>
 
