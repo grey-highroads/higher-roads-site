@@ -388,6 +388,23 @@
       .myco-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
       .myco-process { padding:0; }
     }
+    .engineering-passage { height:180vh; position:relative; background:var(--ink); --assemble:1; --wash:0%; --fade:1; }
+    .engineering-passage + .introduction { position:relative; margin-top:-50vh; opacity:var(--intro-enter,1); }
+    .engineering-stage { position:sticky; top:0; height:100vh; overflow:hidden; display:grid; place-items:center; }
+    .engineering-paper { position:absolute; inset:0; background:var(--paper); clip-path:circle(var(--wash) at 50% 110%); }
+    .engineering-drawing { position:relative; width:100%; height:100%; max-width:1700px; opacity:var(--fade); }
+    .assemble-line { stroke-dasharray:1; stroke-dashoffset:var(--assemble); }
+    .engineering-room,.engineering-computer,.engineering-projector { transform-box:fill-box; transform-origin:center; }
+    .engineering-signal { opacity:var(--signal,0); }
+    .engineering-current { opacity:var(--signal,0); stroke-dasharray:45 650; stroke-dashoffset:var(--flow,0); }
+    .projection-beam { opacity:var(--signal,0); }
+    @media(max-width:640px) { .engineering-drawing { width:125%; max-width:none; } }
+    @media(prefers-reduced-motion:reduce) {
+      .engineering-passage { height:65vh; }
+      .engineering-passage + .introduction { margin-top:0; opacity:1; }
+      .engineering-stage { position:relative; height:65vh; background:linear-gradient(var(--ink) 75%,var(--paper)); }
+      .engineering-paper { display:none; }
+    }
     @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
@@ -439,6 +456,37 @@
         </div>
         <div class="hero-visual">
           <img src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/school-render.png" alt="Reconstructed front-of-crowd view of projection on the Central High building" width="1600" height="984" fetchpriority="high" />
+        </div>
+      </section>
+
+      <section class="engineering-passage" aria-label="An illustration of a computer, projector, and architectural space connected by light">
+        <div class="engineering-stage">
+          <div class="engineering-paper"></div>
+          <svg class="engineering-drawing" viewBox="0 0 1440 900" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="signal-light" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb13b"/><stop offset=".32" stop-color="#ff299d"/><stop offset=".62" stop-color="#914aff"/><stop offset="1" stop-color="#13d7ed"/></linearGradient>
+              <filter id="signal-glow"><feGaussianBlur stdDeviation="5"/></filter>
+            </defs>
+            <g class="engineering-room" stroke="url(#signal-light)" stroke-width="1.6">
+              <path class="assemble-line" pathLength="1" d="M120 70L485 245H1000L1340 70M485 245V625L120 840M1000 245V625L1340 840M485 625H1000M120 70V840H1340V70H120M600 245V625M885 245V625M485 365H1000M485 505H1000M120 840L600 625M1340 840L885 625M120 735H1340M250 70L600 245M1200 70L885 245"/>
+              <path class="assemble-line" pathLength="1" d="M655 310H830V565H655Z M678 335H807V540H678Z M700 565V625M785 565V625"/>
+            </g>
+            <g class="engineering-computer" stroke="url(#signal-light)" stroke-width="2.4" stroke-linejoin="round">
+              <path class="assemble-line" pathLength="1" d="M155 380L435 420V600L155 560Z M173 400L416 435V578L173 543Z M280 580V635L340 645V589M230 651L380 674L430 652L280 629Z M155 690L435 730L485 691L205 651Z M190 685L410 716M216 669L436 700M230 690L260 664M280 698L310 672M330 705L360 679M380 712L410 686"/>
+              <path class="assemble-line" pathLength="1" d="M200 460L250 432L300 488L340 450L390 510M200 520L390 548"/>
+            </g>
+            <g class="engineering-projector" stroke="url(#signal-light)" stroke-width="2.4" stroke-linejoin="round">
+              <path class="assemble-line" pathLength="1" d="M1030 370L1205 337L1290 392L1115 430Z M1030 370V450L1115 505L1290 469V392M1115 430V505M1060 383L1088 401M1080 379L1108 397M1100 375L1128 393M1120 371L1148 389M1170 433L1190 429M1198 427L1218 423"/>
+              <ellipse class="assemble-line" pathLength="1" cx="1245" cy="435" rx="25" ry="29" transform="rotate(15 1245 435)"/>
+              <ellipse cx="1245" cy="435" rx="13" ry="17" transform="rotate(15 1245 435)"/>
+              <path class="projection-beam" d="M1224 411L815 300M1224 456L815 565M815 300V565" stroke-width="1"/>
+            </g>
+            <g class="engineering-signal" stroke="url(#signal-light)" stroke-width="2.5" stroke-linecap="round">
+              <path d="M430 651H520V700H930V570H1155V490M520 700V760H1010V670H1270M600 700V650H740V565M930 570H870V500H815"/>
+              <g fill="url(#signal-light)" stroke="none"><circle cx="520" cy="700" r="5"/><circle cx="930" cy="570" r="5"/><circle cx="740" cy="565" r="5"/><circle cx="1010" cy="760" r="5"/></g>
+            </g>
+            <g class="engineering-current" stroke="url(#signal-light)" stroke-width="5" filter="url(#signal-glow)"><path d="M430 651H520V700H930V570H1155V490M520 700V760H1010V670H1270M600 700V650H740V565M930 570H870V500H815"/></g>
+          </svg>
         </div>
       </section>
 
@@ -628,6 +676,41 @@
   </div>
 
   <script>
+    const passage = document.querySelector('.engineering-passage');
+    const roomDrawing = passage.querySelector('.engineering-room');
+    const computerDrawing = passage.querySelector('.engineering-computer');
+    const projectorDrawing = passage.querySelector('.engineering-projector');
+    const lightGradient = passage.querySelector('#signal-light');
+    const passageReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const clampProgress = value => Math.max(0, Math.min(1, value));
+    let passageQueued = false;
+    function updatePassage() {
+      passageQueued = false;
+      const bounds = passage.getBoundingClientRect();
+      const progress = clampProgress(-bounds.top / Math.max(1, bounds.height - innerHeight));
+      const entrance = clampProgress((innerHeight - bounds.top) / innerHeight);
+      const still = passageReduced.matches;
+      const draw = still ? 1 : clampProgress(entrance * .25 + progress * 2);
+      const wash = still ? 0 : clampProgress((progress - .68) / .32);
+      const easedWash = wash * wash * (3 - 2 * wash);
+      passage.style.setProperty('--assemble', 1 - draw);
+      passage.style.setProperty('--signal', still ? .8 : clampProgress((progress - .18) * 3));
+      passage.style.setProperty('--flow', -progress * 1800);
+      passage.style.setProperty('--wash', (easedWash * 155) + '%');
+      passage.style.setProperty('--fade', 1 - easedWash);
+      passage.nextElementSibling.style.setProperty('--intro-enter', still ? 1 : easedWash);
+      roomDrawing.style.transform = still ? '' : `scale(${.82 + progress * .42})`;
+      const drift = innerWidth <= 640 ? .12 : 1;
+      computerDrawing.style.transform = still ? '' : `translate(${-progress * 190 * drift}px, ${progress * 60 * drift}px)`;
+      projectorDrawing.style.transform = still ? '' : `translate(${progress * 190 * drift}px, ${-progress * 65 * drift}px)`;
+      lightGradient.setAttribute('gradientTransform', `translate(${progress * 240} ${-progress * 140})`);
+    }
+    function queuePassage() { if (!passageQueued) { passageQueued = true; requestAnimationFrame(updatePassage); } }
+    addEventListener('scroll', queuePassage, { passive:true });
+    addEventListener('resize', queuePassage);
+    passageReduced.addEventListener('change', queuePassage);
+    updatePassage();
+
     const reel = document.querySelector('.myco-reel');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let revealQueued = false;
