@@ -47,12 +47,12 @@
     .mobile-nav { display: none; background: var(--ink); }
     .hero { display: grid; grid-template-columns: 50% 50%; background: var(--ink); }
     .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 30px clamp(32px,4vw,64px) 34px var(--gutter); }
-    .headline { font-family: 'Instrument Sans',sans-serif; font-weight: 400; font-size: clamp(46px,4.5vw,74px); line-height: 1.02; letter-spacing: -.04em; }
+    .headline { font-family: 'Instrument Sans',sans-serif; font-weight: 400; font-size: clamp(52px,5.2vw,86px); line-height: 1.02; letter-spacing: -.04em; }
     .headline span { display: block; }
-    .subhead { font-size: 21px; line-height: 1.65; max-width: none; margin-top: 26px; color: var(--text-dim); }
+    .subhead { font-size: 22px; line-height: 1.55; max-width: none; margin-top: 26px; color: var(--text-dim); }
     .hero-link, .project-link, .paper-link { display: inline-block; width: fit-content; font-size: 12px; border-bottom: 1px solid rgba(240,236,228,.28); padding-bottom: 4px; }
     .hero-link { margin-top: 28px; }
-    .hero-visual { position: relative; height: 430px; min-height: 0; overflow: hidden; background: var(--charcoal); }
+    .hero-visual { position: relative; height: clamp(560px,72vh,720px); min-height: 0; overflow: hidden; background: var(--charcoal); }
     .hero-visual img { position: absolute; top: 0; left: 0; width: 100%; height: calc(100% + 60px); object-fit: cover; object-position: center top; filter: brightness(.94); }
     .hero-visual::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--ink) 0%, rgba(34,34,34,.9) 12%, rgba(34,34,34,.55) 28%, rgba(34,34,34,.15) 46%, transparent 65%); }
     .introduction { display: grid; grid-template-columns: 1.05fr 2.15fr; gap: 6%; padding: 104px var(--gutter) 112px; background: var(--ink); }
@@ -320,12 +320,12 @@
       .lab-studies { grid-template-columns: 1fr; gap: 30px; }
       .lab-note { padding-top: 20px; }
     }
-    .introduction { display:block; background:var(--ink); color:var(--text); padding-top:112px; padding-bottom:104px; }
+    .introduction { display:block; background:var(--paper); color:var(--paper-text); padding-top:112px; padding-bottom:104px; }
     .introduction h2 { max-width:650px; font-size:clamp(32px,3.2vw,46px); }
-    .introduction .focus-intro { max-width:660px; font-size:20px; color:var(--text-dim); margin:28px 0 88px; }
-    .focus-ways a { display:grid; grid-template-columns:1fr 1.3fr 24px; gap:6%; align-items:center; padding:34px 0; border-bottom:1px solid rgba(246,246,242,.2); text-decoration:none; color:inherit; transition:background .2s,padding .2s; }
+    .introduction .focus-intro { max-width:660px; font-size:20px; color:var(--paper-dim); margin:28px 0 88px; }
+    .focus-ways a { display:grid; grid-template-columns:1fr 1.3fr 24px; gap:6%; align-items:center; padding:34px 0; border-bottom:1px solid rgba(23,21,18,.18); text-decoration:none; color:inherit; transition:background .2s,padding .2s; }
     .focus-ways a > span:first-child { font-size:clamp(22px,2.2vw,30px); line-height:1.2; }
-    .focus-ways a p { font-size:17px; margin:0; color:var(--text-dim); }
+    .focus-ways a p { font-size:17px; margin:0; color:var(--paper-dim); }
     .focus-ways a:hover,.focus-ways a:focus-visible { background:#303030; color:var(--text); padding-left:24px; padding-right:24px; border-radius:12px; }
     .focus-ways a:hover p,.focus-ways a:focus-visible p { color:var(--text-dim); }
     .screen-work { padding:112px var(--gutter) 120px; }
