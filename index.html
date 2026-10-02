@@ -374,6 +374,20 @@
       .myco-process-intro p { font-size:15px; }
       .myco-process { padding:16px; }
     }
+    .myco-wrap { padding:112px 48px; }
+    .myco-world { width:68%; margin:0 auto; border:1px solid rgba(246,246,242,.2); background:var(--ink); }
+    .myco-intro { padding:48px 44px 36px; }
+    .myco-reel { width:65%; margin:0 auto; }
+    .myco-process { padding:0; gap:1px; background:rgba(246,246,242,.2); border-top:1px solid rgba(246,246,242,.2); }
+    .myco-process-item { background:var(--ink); }
+    @media(max-width:900px) { .myco-world { width:85%; } }
+    @media(max-width:640px) {
+      .myco-wrap { padding:72px var(--gutter); }
+      .myco-world { width:100%; }
+      .myco-intro { padding:32px 24px; }
+      .myco-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+      .myco-process { padding:0; }
+    }
     @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
@@ -440,6 +454,7 @@
 
       <!-- ── WORK ── -->
       <section class="myco-wrap" id="work">
+        <div class="myco-world">
           <div class="myco-intro">
             <h2 class="myco-headline">Meet Mycopop</h2>
             <p class="myco-bio">Mycopop has a distinctive visual identity. We extended it across five mapped surfaces so every element in the room spoke the same visual language. Packaging, projection, animation, and interaction worked together as a single branded environment.</p>
@@ -476,9 +491,6 @@
               </svg>
             </button>
           </div>
-
-        <div class="myco-world">
-          <div class="myco-process-intro"><h2>How it’s created</h2><p>Content production, technical planning, and on-site execution are developed together, so what we make works in the room.</p></div>
 
           <div class="myco-process">
 
@@ -624,7 +636,7 @@
       const top = reel.getBoundingClientRect().top;
       const progress = Math.max(0, Math.min(1, (window.innerHeight * .85 - top) / (window.innerHeight * .73)));
       const eased = progress * progress * (3 - 2 * progress);
-      reel.style.width = (reduceMotion.matches ? 75 : 50 + 25 * eased) + '%';
+      reel.style.width = (reduceMotion.matches ? 100 : 65 + 35 * eased) + '%';
     }
     function queueReelReveal() {
       if (!revealQueued) { revealQueued = true; requestAnimationFrame(updateReelReveal); }
