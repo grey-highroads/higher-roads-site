@@ -49,7 +49,7 @@
     .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 30px clamp(32px,4vw,64px) 34px var(--gutter); }
     .headline { font-family: 'Instrument Sans',sans-serif; font-weight: 400; font-size: clamp(52px,5.2vw,86px); line-height: 1.02; letter-spacing: -.04em; }
     .headline span { display: block; }
-    .subhead { font-size: 22px; line-height: 1.55; max-width: none; margin-top: 26px; color: var(--text-dim); }
+    .subhead { font-size: 20px; line-height: 1.55; max-width: none; margin-top: 26px; color: var(--text-dim); }
     .hero-link, .project-link, .paper-link { display: inline-block; width: fit-content; font-size: 12px; border-bottom: 1px solid rgba(240,236,228,.28); padding-bottom: 4px; }
     .hero-link { margin-top: 28px; }
     .hero-visual { position: relative; height: clamp(560px,72vh,720px); min-height: 0; overflow: hidden; background: var(--charcoal); }
@@ -282,7 +282,7 @@
       .hero { grid-template-columns: 1fr; }
       .hero-copy { padding: 40px var(--gutter) 42px; }
       .headline { font-size: clamp(46px,8.4vw,64px); max-width: 15ch; }
-      .subhead { max-width: none; font-size: 21px; }
+      .subhead { max-width: none; font-size: 19px; }
       .hero-visual { height: auto; min-height: 0; aspect-ratio: 1161 / 650; }
       .hero-visual img { object-position: center; }
     }
@@ -353,6 +353,27 @@
     .myco-wrap > .myco-intro { width:75%; margin:0 auto 72px; padding:0; }
     .myco-world { margin-top:80px; }
     @media(max-width:640px) { .myco-wrap > .myco-intro { width:calc(100% - 2 * var(--gutter)); margin-bottom:44px; } }
+    .myco-wrap { padding-top:112px; }
+    .myco-wrap > .myco-intro, .myco-world { width:75%; }
+    .myco-process-intro { padding:36px 0; border-top:1px solid rgba(246,246,242,.22); }
+    .myco-process-intro h2 { font-weight:400; font-size:30px; line-height:1.15; margin-bottom:18px; }
+    .myco-process-intro p { max-width:65ch; color:var(--text-dim); font-size:17px; line-height:1.5; }
+    .tools-editorial { background:var(--paper); color:var(--paper-text); }
+    .tools-editorial::before { display:none; }
+    .tools-editorial .tool-description, .tools-editorial span.tool-link { color:var(--paper-dim); }
+    .tools-editorial a.tool-link { border-color:rgba(23,21,18,.3); }
+    .closing { background:var(--ink); color:var(--text); }
+    .closing .partners-copy { color:var(--text-dim); }
+    .closing .paper-link, .closing .contact-form input, .closing .contact-form textarea, .closing .contact-form button { color:var(--text); border-color:rgba(246,246,242,.3); }
+    .closing .contact-form input::placeholder, .closing .contact-form textarea::placeholder { color:var(--text-dim); }
+    .closing .contact-form input:focus, .closing .contact-form textarea:focus { border-color:var(--text); }
+    @media(max-width:640px) {
+      .myco-wrap { padding-top:72px; }
+      .myco-wrap > .myco-intro, .myco-world { width:75%; }
+      .myco-process-intro h2 { font-size:26px; }
+      .myco-process-intro p { font-size:15px; }
+      .myco-process { padding:16px; }
+    }
     @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
@@ -399,7 +420,7 @@
       <section class="hero">
         <div class="hero-copy">
           <h1 class="headline"><span>Visual experiences</span> <span>for physical spaces.</span></h1>
-          <p class="subhead">Higher Roads is an art and technology studio in Nashville. We create projection, visual content, and interactive experiences for events, venues, and installations.</p>
+          <p class="subhead">Higher Roads is an art and technology studio in Nashville. We create projection, visual content, and interactive experiences for events, venues, and installations. We call it Artistic Engineering.</p>
           <a class="hero-link" href="#work">See the work</a>
         </div>
         <div class="hero-visual">
@@ -457,6 +478,7 @@
           </div>
 
         <div class="myco-world">
+          <div class="myco-process-intro"><h2>How it’s created</h2><p>Content production, technical planning, and on-site execution are developed together, so what we make works in the room.</p></div>
 
           <div class="myco-process">
 
@@ -506,7 +528,6 @@
           <div class="screen-window" style="--panel:2"><video muted loop playsinline preload="metadata" aria-label="Brand world study 3"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
           <div class="screen-window" style="--panel:3"><video muted loop playsinline preload="metadata" aria-label="Brand world study 4"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
         </div>
-        <button class="screen-motion" type="button" aria-pressed="false">Play motion studies</button>
       </section>
 
       <!-- ── APPROACH ── -->
@@ -614,15 +635,11 @@
     updateReelReveal();
 
     const screenVideos = [...document.querySelectorAll('.screen-window video')];
-    const motionButton = document.querySelector('.screen-motion');
     let motionPlaying = false;
     function setScreenMotion(playing) {
       motionPlaying = playing;
       screenVideos.forEach(video => { if (playing) video.play().catch(() => {}); else video.pause(); });
-      motionButton.textContent = playing ? 'Pause motion studies' : 'Play motion studies';
-      motionButton.setAttribute('aria-pressed', String(playing));
     }
-    motionButton.addEventListener('click', () => setScreenMotion(!motionPlaying));
     const screenObserver = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && !reduceMotion.matches) setScreenMotion(true);
       else setScreenMotion(false);
