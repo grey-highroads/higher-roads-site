@@ -135,7 +135,7 @@
     /* Reel inside box */
     .myco-reel {
       position: relative;
-      width: 75%; margin: 0 auto; aspect-ratio: 16 / 9;
+      width: 50%; margin: 0 auto; aspect-ratio: 16 / 9;
       background: var(--ink);
     }
 
@@ -320,6 +320,36 @@
       .lab-studies { grid-template-columns: 1fr; gap: 30px; }
       .lab-note { padding-top: 20px; }
     }
+    .introduction { display:block; background:var(--paper); color:var(--paper-text); padding-top:112px; padding-bottom:104px; }
+    .introduction h2 { max-width:650px; font-size:clamp(32px,3.2vw,46px); }
+    .introduction .focus-intro { max-width:660px; font-size:20px; color:var(--paper-dim); margin:28px 0 88px; }
+    .focus-ways a { display:grid; grid-template-columns:1fr 1.3fr 24px; gap:6%; align-items:center; padding:34px 0; border-bottom:1px solid rgba(23,21,18,.18); text-decoration:none; color:inherit; transition:background .2s,padding .2s; }
+    .focus-ways a > span:first-child { font-size:clamp(22px,2.2vw,30px); line-height:1.2; }
+    .focus-ways a p { font-size:17px; margin:0; color:var(--paper-dim); }
+    .focus-ways a:hover,.focus-ways a:focus-visible { background:var(--ink); color:var(--text); padding-left:24px; padding-right:24px; border-radius:12px; }
+    .focus-ways a:hover p,.focus-ways a:focus-visible p { color:var(--text-dim); }
+    .screen-work { padding:112px var(--gutter) 120px; }
+    .screen-intro { max-width:660px; }
+    .screen-intro h2 { font-size:clamp(30px,3vw,42px); line-height:1.12; font-weight:400; letter-spacing:-.035em; }
+    .screen-intro p { font-size:18px; line-height:1.5; color:var(--text-dim); margin:28px 0; }
+    .screen-gallery { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px; align-items:start; margin-top:80px; padding-bottom:80px; }
+    .screen-window { position:relative; overflow:hidden; border-radius:16px; aspect-ratio:9/16; background:#111; }
+    .screen-window:nth-child(2) { margin-top:54px; }
+    .screen-window:nth-child(3) { margin-top:80px; }
+    .screen-window video { position:absolute; top:0; left:calc(var(--panel) * -100%); width:400%; max-width:none; height:100%; object-fit:cover; }
+    .screen-motion { background:none; border:0; border-bottom:1px solid var(--text-dim); color:var(--text-dim); font:inherit; padding:0 0 8px; cursor:pointer; }
+    @media(max-width:640px) {
+      .introduction { padding-top:72px; padding-bottom:72px; }
+      .introduction .focus-intro { font-size:17px; margin-bottom:44px; }
+      .focus-ways a { grid-template-columns:1fr 20px; gap:16px; padding:26px 0; }
+      .focus-ways a p { grid-row:2; font-size:15px; }
+      .focus-ways a > span:last-child { grid-column:2; grid-row:1; }
+      .screen-work { padding:72px var(--gutter) 80px; }
+      .screen-intro p { font-size:16px; }
+      .screen-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:44px; padding-bottom:24px; }
+      .screen-window:nth-child(2),.screen-window:nth-child(4) { margin-top:30px; }
+      .screen-window:nth-child(3) { margin-top:0; }
+    }
     @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
@@ -375,8 +405,24 @@
       </section>
 
       <section class="introduction" aria-labelledby="focus-heading">
-        <h2 id="focus-heading">Where we’re focused</h2>
-        <p>We help turn an idea for a space or event into something people can see and interact with. Our work can include visual content, projection, custom software, and the setup needed to bring those parts together.</p>
+        <h2 id="focus-heading">How we help brands show up</h2>
+        <p class="focus-intro">We build on your brand’s identity to create a visual world people can recognize, on a screen or in a room.</p>
+        <div class="focus-ways">
+          <a href="#screen-work"><span>Develop the visual world</span><p>Give your product an environment, with materials, lighting, and motion drawn from your brand.</p><span aria-hidden="true">↗</span></a>
+          <a href="#screen-work"><span>Create content for screens</span><p>Make product imagery and motion for websites, campaigns, social media, and event screens.</p><span aria-hidden="true">↗</span></a>
+          <a href="#work"><span>Bring it into the room</span><p>Carry that same visual language into projection, installations, and experiences people can interact with.</p><span aria-hidden="true">↓</span></a>
+        </div>
+      </section>
+
+      <section class="screen-work" id="screen-work" aria-labelledby="screen-heading">
+        <div class="screen-intro"><h2 id="screen-heading">A world the product belongs in</h2><p>These studies explore how a product’s surroundings, light, and movement can express the brand. The same world can supply digital content and give direction to a physical experience.</p><a href="screens/" class="hero-link">More about our work for screens</a></div>
+        <div class="screen-gallery">
+          <div class="screen-window" style="--panel:0"><video muted loop playsinline preload="metadata" aria-label="Brand world study 1"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+          <div class="screen-window" style="--panel:1"><video muted loop playsinline preload="metadata" aria-label="Brand world study 2"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+          <div class="screen-window" style="--panel:2"><video muted loop playsinline preload="metadata" aria-label="Brand world study 3"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+          <div class="screen-window" style="--panel:3"><video muted loop playsinline preload="metadata" aria-label="Brand world study 4"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+        </div>
+        <button class="screen-motion" type="button" aria-pressed="false">Play motion studies</button>
       </section>
 
       <!-- ── WORK ── -->
@@ -553,7 +599,7 @@
       const top = reel.getBoundingClientRect().top;
       const progress = Math.max(0, Math.min(1, (window.innerHeight * .85 - top) / (window.innerHeight * .73)));
       const eased = progress * progress * (3 - 2 * progress);
-      reel.style.width = (reduceMotion.matches ? 100 : 75 + 25 * eased) + '%';
+      reel.style.width = (reduceMotion.matches ? 75 : 50 + 25 * eased) + '%';
     }
     function queueReelReveal() {
       if (!revealQueued) { revealQueued = true; requestAnimationFrame(updateReelReveal); }
@@ -562,6 +608,23 @@
     window.addEventListener('resize', queueReelReveal);
     reduceMotion.addEventListener('change', queueReelReveal);
     updateReelReveal();
+
+    const screenVideos = [...document.querySelectorAll('.screen-window video')];
+    const motionButton = document.querySelector('.screen-motion');
+    let motionPlaying = false;
+    function setScreenMotion(playing) {
+      motionPlaying = playing;
+      screenVideos.forEach(video => { if (playing) video.play().catch(() => {}); else video.pause(); });
+      motionButton.textContent = playing ? 'Pause motion studies' : 'Play motion studies';
+      motionButton.setAttribute('aria-pressed', String(playing));
+    }
+    motionButton.addEventListener('click', () => setScreenMotion(!motionPlaying));
+    const screenObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !reduceMotion.matches) setScreenMotion(true);
+      else setScreenMotion(false);
+    }, { threshold: .15 });
+    screenObserver.observe(document.querySelector('.screen-gallery'));
+    reduceMotion.addEventListener('change', () => { if (reduceMotion.matches) setScreenMotion(false); });
 
     const proofVideo = document.getElementById('proof-video');
     const playBtn = document.getElementById('play-btn');
