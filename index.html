@@ -391,8 +391,8 @@
     .engineering-passage { height:180vh; position:relative; background:var(--ink); --assemble:1; --wash:0%; --fade:1; }
     .engineering-passage + .introduction { position:relative; margin-top:-50vh; opacity:var(--intro-enter,1); }
     .engineering-stage { position:sticky; top:0; height:100vh; overflow:hidden; display:grid; place-items:center; }
-    .engineering-paper { position:absolute; inset:0; background:var(--paper); clip-path:circle(var(--wash) at 50% 110%); }
-    .engineering-drawing { position:relative; width:100%; height:100%; max-width:1700px; opacity:var(--fade); }
+    .engineering-paper { position:absolute; inset:0; background:var(--paper); clip-path:inset(var(--portal-top,50%) var(--portal-right,50%) var(--portal-bottom,50%) var(--portal-left,50%) round var(--portal-radius,4px)); opacity:var(--portal-visible,0); }
+    .engineering-drawing { position:relative; width:100%; height:100%; max-width:1700px; opacity:var(--fade); transform-origin:51.56% 48.61%; }
     .assemble-line { stroke-dasharray:1; stroke-dashoffset:var(--assemble); }
     .engineering-room,.engineering-computer,.engineering-projector { transform-box:fill-box; transform-origin:center; }
     .engineering-signal { opacity:var(--signal,0); }
@@ -471,6 +471,7 @@
               <path class="assemble-line" pathLength="1" d="M120 70L485 245H1000L1340 70M485 245V625L120 840M1000 245V625L1340 840M485 625H1000M120 70V840H1340V70H120M600 245V625M885 245V625M485 365H1000M485 505H1000M120 840L600 625M1340 840L885 625M120 735H1340M250 70L600 245M1200 70L885 245"/>
               <path class="assemble-line" pathLength="1" d="M655 310H830V565H655Z M678 335H807V540H678Z M700 565V625M785 565V625"/>
             </g>
+            <rect class="portal-outline" x="655" y="310" width="175" height="255" stroke="none"/>
             <g class="engineering-computer" stroke="url(#signal-light)" stroke-width="2.4" stroke-linejoin="round">
               <path class="assemble-line" pathLength="1" d="M155 380L435 420V600L155 560Z M173 400L416 435V578L173 543Z M280 580V635L340 645V589M230 651L380 674L430 652L280 629Z M155 690L435 730L485 691L205 651Z M190 685L410 716M216 669L436 700M230 690L260 664M280 698L310 672M330 705L360 679M380 712L410 686"/>
               <path class="assemble-line" pathLength="1" d="M200 460L250 432L300 488L340 450L390 510M200 520L390 548"/>
@@ -678,6 +679,9 @@
   <script>
     const passage = document.querySelector('.engineering-passage');
     const roomDrawing = passage.querySelector('.engineering-room');
+    const fullDrawing = passage.querySelector('.engineering-drawing');
+    const portalOutline = passage.querySelector('.portal-outline');
+    const passageStage = passage.querySelector('.engineering-stage');
     const computerDrawing = passage.querySelector('.engineering-computer');
     const projectorDrawing = passage.querySelector('.engineering-projector');
     const lightGradient = passage.querySelector('#signal-light');
@@ -691,15 +695,25 @@
       const entrance = clampProgress((innerHeight - bounds.top) / innerHeight);
       const still = passageReduced.matches;
       const draw = still ? 1 : clampProgress(entrance * .25 + progress * 2);
-      const wash = still ? 0 : clampProgress((progress - .68) / .32);
+      const wash = still ? 0 : clampProgress((progress - .52) / .48);
       const easedWash = wash * wash * (3 - 2 * wash);
       passage.style.setProperty('--assemble', 1 - draw);
       passage.style.setProperty('--signal', still ? .8 : clampProgress((progress - .18) * 3));
       passage.style.setProperty('--flow', -progress * 1800);
-      passage.style.setProperty('--wash', (easedWash * 155) + '%');
+      fullDrawing.style.transform = still ? '' : `scale(${.9 + progress * 1.35})`;
+      roomDrawing.style.transform = '';
+      const portalBounds = portalOutline.getBoundingClientRect();
+      const stageBounds = passageStage.getBoundingClientRect();
+      const remaining = 1 - easedWash;
+      passage.style.setProperty('--portal-top', Math.max(0, portalBounds.top - stageBounds.top) * remaining + 'px');
+      passage.style.setProperty('--portal-left', Math.max(0, portalBounds.left - stageBounds.left) * remaining + 'px');
+      passage.style.setProperty('--portal-right', Math.max(0, stageBounds.right - portalBounds.right) * remaining + 'px');
+      passage.style.setProperty('--portal-bottom', Math.max(0, stageBounds.bottom - portalBounds.bottom) * remaining + 'px');
+      passage.style.setProperty('--portal-visible', still ? 0 : clampProgress((progress - .48) * 12));
+      passage.style.setProperty('--portal-radius', (remaining * 4) + 'px');
       passage.style.setProperty('--fade', 1 - easedWash);
-      passage.nextElementSibling.style.setProperty('--intro-enter', still ? 1 : easedWash);
-      roomDrawing.style.transform = still ? '' : `scale(${.82 + progress * .42})`;
+      passage.nextElementSibling.style.setProperty('--intro-enter', still ? 1 : clampProgress((wash - .65) / .35));
+
       const drift = innerWidth <= 640 ? .12 : 1;
       computerDrawing.style.transform = still ? '' : `translate(${-progress * 190 * drift}px, ${progress * 60 * drift}px)`;
       projectorDrawing.style.transform = still ? '' : `translate(${progress * 190 * drift}px, ${-progress * 65 * drift}px)`;
