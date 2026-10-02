@@ -320,13 +320,13 @@
       .lab-studies { grid-template-columns: 1fr; gap: 30px; }
       .lab-note { padding-top: 20px; }
     }
-    .introduction { display:block; background:var(--paper); color:var(--paper-text); padding-top:112px; padding-bottom:104px; }
+    .introduction { display:block; background:var(--ink); color:var(--text); padding-top:112px; padding-bottom:104px; }
     .introduction h2 { max-width:650px; font-size:clamp(32px,3.2vw,46px); }
-    .introduction .focus-intro { max-width:660px; font-size:20px; color:var(--paper-dim); margin:28px 0 88px; }
-    .focus-ways a { display:grid; grid-template-columns:1fr 1.3fr 24px; gap:6%; align-items:center; padding:34px 0; border-bottom:1px solid rgba(23,21,18,.18); text-decoration:none; color:inherit; transition:background .2s,padding .2s; }
+    .introduction .focus-intro { max-width:660px; font-size:20px; color:var(--text-dim); margin:28px 0 88px; }
+    .focus-ways a { display:grid; grid-template-columns:1fr 1.3fr 24px; gap:6%; align-items:center; padding:34px 0; border-bottom:1px solid rgba(246,246,242,.2); text-decoration:none; color:inherit; transition:background .2s,padding .2s; }
     .focus-ways a > span:first-child { font-size:clamp(22px,2.2vw,30px); line-height:1.2; }
-    .focus-ways a p { font-size:17px; margin:0; color:var(--paper-dim); }
-    .focus-ways a:hover,.focus-ways a:focus-visible { background:var(--ink); color:var(--text); padding-left:24px; padding-right:24px; border-radius:12px; }
+    .focus-ways a p { font-size:17px; margin:0; color:var(--text-dim); }
+    .focus-ways a:hover,.focus-ways a:focus-visible { background:#303030; color:var(--text); padding-left:24px; padding-right:24px; border-radius:12px; }
     .focus-ways a:hover p,.focus-ways a:focus-visible p { color:var(--text-dim); }
     .screen-work { padding:112px var(--gutter) 120px; }
     .screen-intro { max-width:660px; }
@@ -350,6 +350,9 @@
       .screen-window:nth-child(2),.screen-window:nth-child(4) { margin-top:30px; }
       .screen-window:nth-child(3) { margin-top:0; }
     }
+    .myco-wrap > .myco-intro { width:75%; margin:0 auto 72px; padding:0; }
+    .myco-world { margin-top:80px; }
+    @media(max-width:640px) { .myco-wrap > .myco-intro { width:calc(100% - 2 * var(--gutter)); margin-bottom:44px; } }
     @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
@@ -406,42 +409,16 @@
 
       <section class="introduction" aria-labelledby="focus-heading">
         <h2 id="focus-heading">How we help brands show up</h2>
-        <p class="focus-intro">We build on your brand’s identity to create a visual world people can recognize, on a screen or in a room.</p>
+        <p class="focus-intro">We help turn your brand’s identity into an experience people can spend time in. The content, the space, and the way people interact all need to work together.</p>
         <div class="focus-ways">
-          <a href="#screen-work"><span>Develop the visual world</span><p>Give your product an environment, with materials, lighting, and motion drawn from your brand.</p><span aria-hidden="true">↗</span></a>
-          <a href="#screen-work"><span>Create content for screens</span><p>Make product imagery and motion for websites, campaigns, social media, and event screens.</p><span aria-hidden="true">↗</span></a>
-          <a href="#work"><span>Bring it into the room</span><p>Carry that same visual language into projection, installations, and experiences people can interact with.</p><span aria-hidden="true">↓</span></a>
+          <a href="#work"><span>Shape the space</span><p>Work out how your brand belongs in the room, from the atmosphere to the surfaces where media will appear.</p><span aria-hidden="true">↗</span></a>
+          <a href="#work"><span>Create the media</span><p>Build imagery and motion from your existing identity, made for the scale and character of the space.</p><span aria-hidden="true">↗</span></a>
+          <a href="#work"><span>Make it work</span><p>Bring content, projection, and interaction together, then test and set them up for the people who will be there.</p><span aria-hidden="true">↓</span></a>
         </div>
-      </section>
-
-      <section class="screen-work" id="screen-work" aria-labelledby="screen-heading">
-        <div class="screen-intro"><h2 id="screen-heading">A world the product belongs in</h2><p>These studies explore how a product’s surroundings, light, and movement can express the brand. The same world can supply digital content and give direction to a physical experience.</p><a href="screens/" class="hero-link">More about our work for screens</a></div>
-        <div class="screen-gallery">
-          <div class="screen-window" style="--panel:0"><video muted loop playsinline preload="metadata" aria-label="Brand world study 1"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
-          <div class="screen-window" style="--panel:1"><video muted loop playsinline preload="metadata" aria-label="Brand world study 2"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
-          <div class="screen-window" style="--panel:2"><video muted loop playsinline preload="metadata" aria-label="Brand world study 3"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
-          <div class="screen-window" style="--panel:3"><video muted loop playsinline preload="metadata" aria-label="Brand world study 4"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
-        </div>
-        <button class="screen-motion" type="button" aria-pressed="false">Play motion studies</button>
       </section>
 
       <!-- ── WORK ── -->
       <section class="myco-wrap" id="work">
-          <div class="myco-reel">
-            <video id="proof-video" playsinline preload="none" aria-label="Mycopop launch film"
-              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
-              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
-            </video>
-            <button class="play-btn" id="play-btn" aria-label="Play video">
-              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
-                <polygon points="24,17 48,30 24,43" fill="white"/>
-              </svg>
-            </button>
-          </div>
-
-        <div class="myco-world">
-
           <div class="myco-intro">
             <h2 class="myco-headline">Meet Mycopop</h2>
             <p class="myco-bio">Mycopop has a distinctive visual identity. We extended it across five mapped surfaces so every element in the room spoke the same visual language. Packaging, projection, animation, and interaction worked together as a single branded environment.</p>
@@ -464,6 +441,22 @@
               </div>
             </div>
           </div>
+
+
+          <div class="myco-reel">
+            <video id="proof-video" playsinline preload="none" aria-label="Mycopop launch film"
+              poster="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Mycopop-Reel-Poster.png">
+              <source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/mycopopreel_v2.mp4" type="video/mp4" />
+            </video>
+            <button class="play-btn" id="play-btn" aria-label="Play video">
+              <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="30" fill="rgba(0,0,0,0.45)"/>
+                <polygon points="24,17 48,30 24,43" fill="white"/>
+              </svg>
+            </button>
+          </div>
+
+        <div class="myco-world">
 
           <div class="myco-process">
 
@@ -503,6 +496,17 @@
           </div>
 
         </div>
+      </section>
+
+      <section class="screen-work" id="screen-work" aria-labelledby="screen-heading">
+        <div class="screen-intro"><h2 id="screen-heading">The same visual world, on screens</h2><p>The visual work can continue beyond the room. We also build product environments and motion for websites, campaigns, and social media, using the same attention to setting, light, and movement.</p><a href="screens/" class="hero-link">More about our work for screens</a></div>
+        <div class="screen-gallery">
+          <div class="screen-window" style="--panel:0"><video muted loop playsinline preload="metadata" aria-label="Brand world study 1"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+          <div class="screen-window" style="--panel:1"><video muted loop playsinline preload="metadata" aria-label="Brand world study 2"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+          <div class="screen-window" style="--panel:2"><video muted loop playsinline preload="metadata" aria-label="Brand world study 3"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+          <div class="screen-window" style="--panel:3"><video muted loop playsinline preload="metadata" aria-label="Brand world study 4"><source src="https://pub-cc523e0480124a5e8d50ce67108ed9e1.r2.dev/Main4VerticalCompForWeb.mp4" type="video/mp4" /></video></div>
+        </div>
+        <button class="screen-motion" type="button" aria-pressed="false">Play motion studies</button>
       </section>
 
       <!-- ── APPROACH ── -->
